@@ -1,0 +1,120 @@
+/**
+ * WhatsApp Button Visibility Fix
+ * 
+ * Fixes WhatsApp button not showing on Products and Categories pages
+ * The issue is caused by isolation: isolate creating new stacking contexts
+ */
+
+/* ============================================================================
+   WHATSAPP BUTTON - ALWAYS VISIBLE ON ALL PAGES
+   ============================================================================ */
+
+/* Ensure WhatsApp button is always on top, even on pages with isolation */
+.whatsapp-container {
+  position: fixed !important;
+  z-index: 99999 !important; /* Higher than any page z-index */
+  bottom: var(--spacing-lg) !important;
+  right: var(--spacing-lg) !important;
+  /* Force rendering above all other elements */
+  isolation: auto !important; /* Don't create new stacking context */
+  transform: translateZ(0); /* Force GPU layer */
+  will-change: transform;
+}
+
+.whatsapp-button {
+  z-index: 100000 !important; /* Even higher */
+  position: relative !important;
+  /* Force visibility */
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+  /* Force rendering */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.whatsapp-popup {
+  z-index: 99998 !important; /* Below button but above everything else */
+  position: fixed !important;
+}
+
+.whatsapp-backdrop {
+  z-index: 99997 !important; /* Below popup */
+}
+
+/* ============================================================================
+   OVERRIDE PAGE ISOLATION FOR WHATSAPP BUTTON
+   ============================================================================ */
+
+/* Products page has isolation: isolate which creates new stacking context */
+.products-page {
+  /* Don't affect WhatsApp button */
+  isolation: isolate;
+}
+
+/* But ensure WhatsApp button is outside this context */
+.products-page ~ .whatsapp-container,
+.products-page + .whatsapp-container,
+body > .whatsapp-container {
+  isolation: auto !important;
+  z-index: 99999 !important;
+}
+
+/* Categories page */
+.categories-page {
+  /* Don't affect WhatsApp button */
+  isolation: isolate;
+}
+
+/* ============================================================================
+   MOBILE FIXES
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .whatsapp-container {
+    z-index: 99999 !important;
+    bottom: max(var(--spacing-md), env(safe-area-inset-bottom)) !important;
+    right: max(var(--spacing-md), env(safe-area-inset-right)) !important;
+  }
+  
+  .whatsapp-button {
+    z-index: 100000 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-container {
+    z-index: 99999 !important;
+    bottom: max(var(--spacing-sm), env(safe-area-inset-bottom)) !important;
+    right: max(var(--spacing-sm), env(safe-area-inset-right)) !important;
+  }
+}
+
+/* ============================================================================
+   FORCE RENDERING ON SPECIFIC PAGES
+   ============================================================================ */
+
+/* Products page */
+.products-page ~ .whatsapp-container,
+body:has(.products-page) .whatsapp-container {
+  z-index: 99999 !important;
+  position: fixed !important;
+  isolation: auto !important;
+}
+
+/* Categories page */
+.categories-page ~ .whatsapp-container,
+body:has(.categories-page) .whatsapp-container {
+  z-index: 99999 !important;
+  position: fixed !important;
+  isolation: auto !important;
+}
+
+/* Product detail page */
+.product-detail ~ .whatsapp-container,
+body:has(.product-detail) .whatsapp-container {
+  z-index: 99999 !important;
+  position: fixed !important;
+  isolation: auto !important;
+}
+

@@ -1,0 +1,353 @@
+/**
+ * iPhone Sort Modal & Product Rendering Fix
+ * 
+ * Fixes issues where:
+ * 1. Sort modal causes page UI to crash/not be visible on iPhone
+ * 2. Products don't show properly after sorting on iPhone
+ * 3. Body overflow hidden causes layout issues
+ * 4. Z-index stacking context problems
+ */
+
+/* ============================================================================
+   SORT MODAL - iPhone SPECIFIC FIXES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari detected */
+  
+  /* Fix backdrop - ensure it doesn't hide products grid */
+  .sort-sheet-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 9998 !important;
+    /* Ensure it doesn't interfere with product rendering */
+    pointer-events: auto !important;
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Fix sort sheet - ensure proper rendering on iPhone */
+  .sort-sheet {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: var(--bg-primary) !important;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
+    z-index: 9999 !important;
+    max-height: 80% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    /* Force GPU acceleration for smooth rendering */
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
+    /* Ensure safe area support */
+    padding-bottom: max(var(--spacing-lg), env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ============================================================================
+   PRODUCTS GRID - ENSURE VISIBILITY WHEN SORT MODAL OPENS
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Ensure products grid stays visible and properly stacked */
+  .products-grid {
+    position: relative !important;
+    z-index: 1 !important;
+    /* Force proper rendering */
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+    /* Ensure visibility */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: grid !important;
+  }
+  
+  /* Ensure product cards are visible */
+  .product-card {
+    position: relative !important;
+    z-index: auto !important;
+    /* Force rendering */
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+  }
+  
+  /* Ensure product info is visible */
+  .product-info {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    position: relative !important;
+    z-index: auto !important;
+  }
+}
+
+/* ============================================================================
+   BODY OVERFLOW HANDLING - iPhone SAFE
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* When sort modal is open, don't break layout on iPhone */
+  body.sort-modal-open {
+    /* Prevent scrolling only when modal is open */
+    position: fixed !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    /* Store scroll position */
+    top: 0 !important;
+    left: 0 !important;
+    /* Ensure proper rendering */
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Ensure html is also set when modal is open */
+  html.sort-modal-open {
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  
+  /* Fix for products page specifically */
+  body.sort-modal-open .products-page {
+    position: relative !important;
+    /* Maintain visibility */
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Ensure products content stays visible */
+  body.sort-modal-open .products-content {
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* Ensure products grid is visible */
+  body.sort-modal-open .products-grid {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: grid !important;
+  }
+  
+  /* CRITICAL: Ensure scrolling is restored when modal is NOT open */
+  body:not(.sort-modal-open) {
+    position: static !important;
+    overflow: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  html:not(.sort-modal-open) {
+    overflow: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Ensure products page is scrollable when modal is closed */
+  body:not(.sort-modal-open) .products-page,
+  body:not(.sort-modal-open) .products-content {
+    overflow: visible !important;
+    position: relative !important;
+    height: auto !important;
+  }
+  
+  /* Ensure the entire page is scrollable */
+  body:not(.sort-modal-open),
+  html:not(.sort-modal-open),
+  body:not(.sort-modal-open) #root,
+  body:not(.sort-modal-open) .App {
+    overflow: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    position: relative !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ============================================================================
+   PRODUCTS PAGE - FIX STACKING CONTEXT
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  .products-page {
+    /* Maintain isolation but ensure proper stacking */
+    isolation: isolate !important;
+    position: relative !important;
+    z-index: 0 !important;
+    /* Force rendering */
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Products content should be above backdrop but below modal */
+  .products-content {
+    position: relative !important;
+    z-index: 1 !important;
+    isolation: isolate !important;
+    /* Ensure visibility */
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Filters section - ensure it's above products */
+  .products-filters-section {
+    position: sticky !important;
+    z-index: 99 !important;
+    /* Force rendering */
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+  }
+}
+
+/* ============================================================================
+   MOBILE SPECIFIC - ENHANCED FIXES
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  @supports (-webkit-touch-callout: none) {
+    /* Fix sort sheet on iPhone - ensure it doesn't cover everything */
+    .sort-sheet {
+      z-index: 9999 !important;
+      /* Use transform to ensure proper layering */
+      -webkit-transform: translateY(0) translateZ(0) !important;
+      transform: translateY(0) translateZ(0) !important;
+    }
+    
+    /* Ensure products are visible when modal opens */
+    .sort-sheet-backdrop ~ .products-content,
+    .sort-sheet ~ .products-content {
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    /* Fix product cards after sorting */
+    .product-card {
+      /* Force re-render after sort */
+      -webkit-transform: translateZ(0) scale(1) !important;
+      transform: translateZ(0) scale(1) !important;
+      /* Ensure visibility */
+      visibility: visible !important;
+      opacity: 1 !important;
+      display: flex !important;
+    }
+    
+    /* Ensure product grid re-renders properly */
+    .products-grid {
+      /* Force layout recalculation */
+      display: grid !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      /* Prevent rendering issues */
+      -webkit-transform: translateZ(0) !important;
+      transform: translateZ(0) !important;
+    }
+    
+    /* Fix filter chips interaction */
+    .filter-chip {
+      /* Ensure proper touch handling */
+      -webkit-tap-highlight-color: rgba(118, 9, 9, 0.1) !important;
+      /* Force rendering */
+      -webkit-transform: translateZ(0) !important;
+      transform: translateZ(0) !important;
+      position: relative !important;
+      z-index: auto !important;
+    }
+    
+    /* Fix sort button */
+    .product-sort-mobile-button {
+      position: relative !important;
+      z-index: auto !important;
+      /* Ensure it doesn't break layout */
+      -webkit-transform: translateZ(0) !important;
+      transform: translateZ(0) !important;
+    }
+  }
+}
+
+/* ============================================================================
+   FORCE PRODUCT VISIBILITY AFTER SORT
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Force all product-related elements to be visible */
+  .products-page .products-grid .product-card,
+  .products-page .products-grid .product-card * {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Force product info visibility */
+  .products-page .product-info,
+  .products-page .product-info * {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+  
+  /* Ensure product images render */
+  .products-page .product-image-container,
+  .products-page .product-image {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+}
+
+/* ============================================================================
+   ANIMATION FIXES - PREVENT RENDERING ISSUES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Disable problematic animations during sort on iPhone */
+  .sort-sheet-backdrop,
+  .sort-sheet {
+    /* Use simple transitions that don't break rendering */
+    transition: opacity 0.2s ease-out, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  
+  /* Ensure product cards don't have animation issues */
+  .product-card {
+    /* Simplify transitions on iPhone */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out !important;
+  }
+}
+
+/* ============================================================================
+   TOUCH EVENT FIXES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 767px) {
+    /* Ensure touch events work properly */
+    .sort-option,
+    .sort-sheet-close,
+    .product-sort-mobile-button,
+    .filter-chip {
+      /* Improve touch responsiveness */
+      -webkit-tap-highlight-color: rgba(118, 9, 9, 0.1) !important;
+      touch-action: manipulation !important;
+      /* Force active state visibility */
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+  }
+}
+

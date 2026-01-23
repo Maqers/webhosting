@@ -1,0 +1,343 @@
+/**
+ * PREMIUM ANIMATION SYSTEM
+ * 
+ * Senior-level animation library with:
+ * - GPU-accelerated transforms
+ * - Multiple animation types
+ * - Reduced motion support
+ * - Mobile-optimized performance
+ */
+
+/* ============================================================================
+   ANIMATION BASE STYLES
+   ============================================================================ */
+
+/* All animated elements start hidden */
+[data-animate] {
+  opacity: 0;
+  will-change: transform, opacity;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Animation complete state */
+[data-animate].animate-in {
+  opacity: 1;
+  will-change: auto;
+}
+
+/* ============================================================================
+   FADE UP ANIMATION (Default)
+   ============================================================================ */
+
+[data-animate="fade-up"] {
+  transform: translateY(2rem) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="fade-up"].animate-in {
+  transform: translateY(0) translateZ(0);
+}
+
+/* ============================================================================
+   FADE IN ANIMATION
+   ============================================================================ */
+
+[data-animate="fade-in"] {
+  opacity: 0;
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="fade-in"].animate-in {
+  opacity: 1;
+}
+
+/* ============================================================================
+   SLIDE LEFT ANIMATION
+   ============================================================================ */
+
+[data-animate="slide-left"] {
+  transform: translateX(2rem) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="slide-left"].animate-in {
+  transform: translateX(0) translateZ(0);
+}
+
+/* ============================================================================
+   SLIDE RIGHT ANIMATION
+   ============================================================================ */
+
+[data-animate="slide-right"] {
+  transform: translateX(-2rem) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="slide-right"].animate-in {
+  transform: translateX(0) translateZ(0);
+}
+
+/* ============================================================================
+   SLIDE UP ANIMATION
+   ============================================================================ */
+
+[data-animate="slide-up"] {
+  transform: translateY(2rem) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="slide-up"].animate-in {
+  transform: translateY(0) translateZ(0);
+}
+
+/* ============================================================================
+   SCALE ANIMATION
+   ============================================================================ */
+
+[data-animate="scale"] {
+  transform: scale(0.9) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="scale"].animate-in {
+  transform: scale(1) translateZ(0);
+}
+
+/* ============================================================================
+   SCALE UP ANIMATION
+   ============================================================================ */
+
+[data-animate="scale-up"] {
+  transform: scale(0.8) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="scale-up"].animate-in {
+  transform: scale(1) translateZ(0);
+}
+
+/* ============================================================================
+   STAGGER ANIMATION (Parent Container)
+   ============================================================================ */
+
+[data-animate="stagger"] {
+  opacity: 1; /* Parent stays visible */
+}
+
+[data-animate="stagger"] [data-stagger-item] {
+  opacity: 0;
+  transform: translateY(1.5rem) translateZ(0);
+  transition: opacity var(--animation-duration, 600ms) var(--ease-premium),
+              transform var(--animation-duration, 600ms) var(--ease-premium);
+}
+
+[data-animate="stagger"] [data-stagger-item].animate-in {
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+}
+
+/* ============================================================================
+   HOVER INTERACTIONS (Desktop Only)
+   ============================================================================ */
+
+/* Lift effect on hover */
+.hover-lift {
+  transition: transform var(--transition-base) var(--ease-premium),
+              box-shadow var(--transition-base) var(--ease-premium);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift:hover {
+    transform: translateY(-4px) translateZ(0);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* Image zoom on hover */
+.hover-zoom {
+  overflow: hidden;
+}
+
+.hover-zoom img {
+  transition: transform var(--transition-slow) var(--ease-premium);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-zoom:hover img {
+    transform: scale(1.05) translateZ(0);
+  }
+}
+
+/* Underline animation */
+.hover-underline {
+  position: relative;
+  transition: color var(--transition-base) var(--ease-premium);
+}
+
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  transition: width var(--transition-base) var(--ease-premium);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-underline:hover::after {
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   TOUCH INTERACTIONS (Mobile)
+   ============================================================================ */
+
+/* Touch feedback - Scale down on active */
+.touch-feedback {
+  transition: transform var(--duration-fast) var(--ease-out-expo);
+  -webkit-tap-highlight-color: rgba(118, 9, 9, 0.1);
+  touch-action: manipulation;
+}
+
+.touch-feedback:active {
+  transform: scale(0.97) translateZ(0);
+}
+
+/* Ripple effect (for buttons) */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.touch-feedback.ripple-effect:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* ============================================================================
+   REDUCED MOTION SUPPORT
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-animate],
+  [data-animate].animate-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .hover-lift:hover,
+  .hover-zoom:hover img {
+    transform: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================================ */
+
+/* GPU acceleration for animated elements */
+[data-animate],
+.hover-lift,
+.hover-zoom img,
+.touch-feedback {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize will-change property */
+[data-animate]:not(.animate-in) {
+  will-change: transform, opacity;
+}
+
+[data-animate].animate-in {
+  will-change: auto;
+}
+
+/* ============================================================================
+   MOBILE-SPECIFIC OPTIMIZATIONS
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Reduce animation distance on mobile */
+  [data-animate="fade-up"],
+  [data-animate="slide-up"] {
+    transform: translateY(1rem) translateZ(0);
+  }
+
+  [data-animate="slide-left"] {
+    transform: translateX(1rem) translateZ(0);
+  }
+
+  [data-animate="slide-right"] {
+    transform: translateX(-1rem) translateZ(0);
+  }
+
+  /* Faster animations on mobile */
+  [data-animate] {
+    --animation-duration: 400ms;
+  }
+
+  /* Disable hover effects on mobile */
+  .hover-lift:hover,
+  .hover-zoom:hover img {
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all var(--transition-base) var(--ease-premium);
+}
+
+/* Fade transition */
+.transition-fade {
+  transition: opacity var(--transition-base) var(--ease-premium);
+}
+
+/* Transform transition */
+.transition-transform {
+  transition: transform var(--transition-base) var(--ease-premium);
+}
+

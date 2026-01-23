@@ -1,0 +1,120 @@
+<!-- 
+  📧 PROFESSIONAL EMAILJS TEMPLATE - READY TO USE
+  Copy this entire HTML code into your EmailJS template editor
+-->
+
+<div style="font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+  
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, #760909 0%, #8a1a1a 100%); color: #ffffff; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.5px;">
+      📋 New Contact Form Submission
+    </h1>
+    <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.95;">
+      A message has been received. Kindly respond at your earliest convenience.
+    </p>
+  </div>
+
+  <!-- Main Content -->
+  <div style="background-color: #ffffff; padding: 30px 25px; border: 1px solid #e8e8e8; border-top: none; border-radius: 0 0 8px 8px;">
+    
+    <!-- Contact Information Section -->
+    <div style="margin-bottom: 30px;">
+      <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #760909;">
+        <div style="background-color: #f8f8f8; padding: 12px 14px; margin-right: 15px; border-radius: 8px; font-size: 28px;">
+          👤
+        </div>
+        <div>
+          <h2 style="margin: 0; color: #760909; font-size: 18px; font-weight: 600;">
+            Contact Information
+          </h2>
+        </div>
+      </div>
+      
+      <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top;">
+            <div style="color: #666666; font-size: 13px; font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Full Name
+            </div>
+            <div style="color: #2c3e50; font-size: 16px; font-weight: 600;">
+              {{from_name}}
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top;">
+            <div style="color: #666666; font-size: 13px; font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Email Address
+            </div>
+            <div style="color: #760909; font-size: 16px;">
+              <a href="mailto:{{from_email}}" style="color: #760909; text-decoration: none; font-weight: 500;">{{from_email}}</a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top;">
+            <div style="color: #666666; font-size: 13px; font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Phone Number
+            </div>
+            <div style="color: #2c3e50; font-size: 16px; font-weight: 500;">
+              <a href="tel:{{phone}}" style="color: #2c3e50; text-decoration: none;">{{phone}}</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Message Section -->
+    <div style="margin-bottom: 30px;">
+      <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #760909;">
+        <div style="background-color: #f8f8f8; padding: 12px 14px; margin-right: 15px; border-radius: 8px; font-size: 28px;">
+          💬
+        </div>
+        <div>
+          <h2 style="margin: 0; color: #760909; font-size: 18px; font-weight: 600;">
+            Message
+          </h2>
+        </div>
+      </div>
+      
+      <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #760909; border-radius: 4px; font-size: 16px; line-height: 1.7; color: #2c3e50; white-space: pre-wrap; word-wrap: break-word;">
+        {{message}}
+      </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 25px;">
+      <div style="color: #666666; font-size: 13px; font-weight: 500; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+        Quick Actions
+      </div>
+      <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0;">
+            <a href="mailto:{{reply_to}}?subject=Re: Contact Form Inquiry from {{from_name}}" style="display: inline-block; background-color: #760909; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: 500; font-size: 14px;">
+              📧 Reply via Email
+            </a>
+          </td>
+          <td style="padding: 8px 0; text-align: right;">
+            <a href="tel:{{phone}}" style="display: inline-block; background-color: #ffffff; color: #760909; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: 500; font-size: 14px; border: 2px solid #760909;">
+              📞 Call Now
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align: center; margin-top: 20px; padding: 15px; color: #999999; font-size: 12px;">
+    <p style="margin: 0;">
+      This email was sent from <strong>maqers.in</strong> contact form
+    </p>
+    <p style="margin: 5px 0 0 0; font-size: 11px;">
+      Reply to: <a href="mailto:{{reply_to}}" style="color: #760909; text-decoration: none;">{{reply_to}}</a>
+    </p>
+  </div>
+
+</div>
+

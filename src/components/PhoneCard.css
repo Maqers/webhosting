@@ -1,0 +1,153 @@
+/**
+ * Phone Card Component Styles
+ * 
+ * Reusable phone number card with click-to-copy
+ */
+
+.phone-card {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.phone-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: var(--spacing-md);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.phone-card-link:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.phone-card-link:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.phone-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color);
+}
+
+.phone-card:active {
+  transform: translateY(0);
+}
+
+.phone-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.phone-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.phone-card-label {
+  font-family: var(--font-family-heading);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phone-card-primary .phone-card-label {
+  color: var(--primary-color);
+}
+
+.phone-card-alternate .phone-card-label {
+  color: var(--text-secondary);
+}
+
+.phone-card-copied {
+  font-family: var(--font-family-primary);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--success-color);
+  animation: fadeInOut 0.3s ease;
+}
+
+.phone-card-number {
+  font-family: var(--font-family-heading);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.phone-card-primary .phone-card-number {
+  color: var(--primary-color);
+}
+
+.phone-card-hint {
+  font-family: var(--font-family-primary);
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.phone-card:hover .phone-card-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile/Desktop text visibility - Zoom-safe */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: inline;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .phone-card-link {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .phone-card-number {
+    font-size: 1rem;
+  }
+
+  .phone-card-hint {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

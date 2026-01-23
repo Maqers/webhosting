@@ -1,0 +1,102 @@
+/**
+ * FAQ Page Hero Section Fixes
+ *
+ * Critical fixes for FAQ page where the hero background
+ * ("Frequently Asked Questions" and subtitle) is excessively large on mobile.
+ */
+
+/* ============================================================================
+   FAQ HERO SECTION - PADDING & FONT SIZE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  .faqs-hero {
+    padding: var(--spacing-lg) 0 !important; /* Reduce padding on mobile */
+    height: auto !important; /* Allow height to adjust to content */
+    min-height: unset !important; /* Remove min-height constraint */
+    max-height: 200px !important; /* Max height to prevent excessive expansion */
+    overflow: hidden !important; /* Prevent content overflow */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .faqs-hero .container {
+    padding-left: var(--spacing-md) !important;
+    padding-right: var(--spacing-md) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .faqs-title {
+    font-size: clamp(1.5rem, 7vw, 2rem) !important; /* Smaller font size for title */
+    line-height: 1.2 !important;
+    margin-bottom: var(--spacing-xs) !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100% !important;
+  }
+
+  .faqs-subtitle {
+    font-size: clamp(0.9375rem, 3vw, 1rem) !important; /* Smaller font size for subtitle */
+    line-height: 1.4 !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .faqs-hero {
+    padding: var(--spacing-md) 0 !important; /* Even smaller padding on small mobile */
+    max-height: 180px !important; /* Further constrain height */
+  }
+
+  .faqs-title {
+    font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+  }
+
+  .faqs-subtitle {
+    font-size: clamp(0.875rem, 2.5vw, 0.9375rem) !important;
+  }
+}
+
+/* ============================================================================
+   iOS SAFARI SPECIFIC OVERRIDES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  .faqs-hero {
+    min-height: auto !important; /* Allow height to be determined by content */
+    max-height: 200px !important; /* Ensure it doesn't expand too much */
+    height: auto !important; /* Explicitly set height to auto */
+    padding-top: var(--spacing-md) !important;
+    padding-bottom: var(--spacing-md) !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    width: 100vw !important; /* Ensure full viewport width */
+    max-width: 100vw !important;
+  }
+
+  .faqs-hero .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: var(--spacing-md) !important;
+    padding-right: var(--spacing-md) !important;
+  }
+
+  .faqs-title,
+  .faqs-subtitle {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Ensure text is visible and not clipped */
+  .faqs-hero * {
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: var(--text-on-primary) !important;
+  }
+}
+

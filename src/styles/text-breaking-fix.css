@@ -1,0 +1,342 @@
+/**
+ * Text Breaking Fix - Entire Application
+ * 
+ * Prevents text from breaking improperly across the entire application
+ * Ensures proper word wrapping and text overflow handling
+ * Senior UI/UX expert approach for professional text rendering
+ */
+
+/* ============================================================================
+   GLOBAL TEXT WRAPPING - PREVENT BREAKING ISSUES
+   ============================================================================ */
+
+/* Base text wrapping for all text elements */
+* {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto !important;
+}
+
+/* Prevent breaking in inappropriate places */
+p,
+span,
+div,
+h1, h2, h3, h4, h5, h6,
+li,
+td,
+th,
+label {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto !important;
+  word-break: normal !important; /* Use normal word breaking, not break-all */
+}
+
+/* ============================================================================
+   HEADINGS - PREVENT BREAKING
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto !important;
+  word-break: normal !important;
+  line-break: auto !important;
+}
+
+/* Prevent single words from breaking in headings */
+.hero-title,
+.products-title,
+.categories-title,
+.about-title,
+.contact-title,
+.faqs-title,
+.category-page-title {
+  word-break: keep-all !important; /* Keep words together when possible */
+  overflow-wrap: break-word !important; /* Break only when necessary */
+  hyphens: manual !important; /* Use manual hyphens only */
+}
+
+/* ============================================================================
+   PRODUCT TITLES - PREVENT BREAKING
+   ============================================================================ */
+
+.product-title,
+.category-product-title {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  hyphens: auto !important;
+  /* Use line-clamp for multi-line titles */
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ============================================================================
+   BUTTONS AND LINKS - PREVENT BREAKING
+   ============================================================================ */
+
+button,
+a,
+.filter-chip,
+.sub-navbar-link,
+.navbar-link {
+  white-space: nowrap !important; /* Keep button text on one line */
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+}
+
+/* Allow wrapping for long button text on mobile */
+@media (max-width: 767px) {
+  button,
+  a {
+    white-space: normal !important; /* Allow wrapping on mobile */
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  
+  /* Keep filter chips on one line */
+  .filter-chip {
+    white-space: nowrap !important;
+  }
+}
+
+/* ============================================================================
+   PRICES AND NUMBERS - PREVENT BREAKING
+   ============================================================================ */
+
+.product-price,
+.category-product-price {
+  white-space: nowrap !important; /* Keep prices on one line */
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+}
+
+.product-id {
+  white-space: nowrap !important; /* Keep IDs on one line */
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+  font-family: 'Courier New', monospace !important;
+}
+
+/* ============================================================================
+   CATEGORY NAMES - PREVENT BREAKING
+   ============================================================================ */
+
+.category-name {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  hyphens: auto !important;
+  /* Allow wrapping but prefer keeping words together */
+  line-break: auto !important;
+}
+
+/* ============================================================================
+   DESCRIPTIONS AND PARAGRAPHS - PROPER WRAPPING
+   ============================================================================ */
+
+p,
+.description,
+.product-description,
+.hero-subtitle,
+.products-subtitle,
+.categories-subtitle {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  hyphens: auto !important;
+  line-break: auto !important;
+  /* Allow natural wrapping */
+  white-space: normal !important;
+}
+
+/* ============================================================================
+   NAVBAR AND MENU ITEMS - PREVENT BREAKING
+   ============================================================================ */
+
+.navbar-link,
+.sub-navbar-link,
+.mobile-menu-nav a {
+  white-space: nowrap !important; /* Keep nav items on one line */
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+}
+
+/* ============================================================================
+   FORM ELEMENTS - PREVENT BREAKING
+   ============================================================================ */
+
+input,
+textarea,
+select,
+label {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+/* Input text should not break */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+textarea {
+  white-space: pre-wrap !important; /* Preserve whitespace but allow wrapping */
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* ============================================================================
+   TABLES - PREVENT BREAKING
+   ============================================================================ */
+
+table {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  table-layout: auto !important;
+}
+
+td,
+th {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  hyphens: auto !important;
+}
+
+/* ============================================================================
+   MOBILE SPECIFIC TEXT FIXES
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  /* Ensure all text wraps properly on mobile */
+  * {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  
+  /* Headings - allow wrapping on mobile */
+  h1, h2, h3, h4, h5, h6 {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  /* Long text should wrap */
+  .hero-title,
+  .products-title,
+  .categories-title {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  /* Product titles - ensure proper wrapping */
+  .product-title,
+  .category-product-title {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    /* Use line-clamp for consistent display */
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  /* Descriptions - proper wrapping */
+  p,
+  .description,
+  .hero-subtitle {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    white-space: normal !important;
+  }
+}
+
+/* ============================================================================
+   PREVENT TEXT OVERFLOW
+   ============================================================================ */
+
+/* Ensure text doesn't overflow containers */
+* {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Text elements should respect container width */
+p,
+h1, h2, h3, h4, h5, h6,
+span,
+div,
+li {
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+}
+
+/* ============================================================================
+   LONG WORDS - HANDLE PROPERLY
+   ============================================================================ */
+
+/* Break long URLs and words when necessary */
+a[href^="http"],
+a[href^="https"],
+.url,
+.email {
+  word-break: break-all !important; /* Break URLs if needed */
+  overflow-wrap: anywhere !important;
+}
+
+/* ============================================================================
+   ELLIPSIS FOR TRUNCATED TEXT
+   ============================================================================ */
+
+/* Single line ellipsis */
+.ellipsis,
+.product-category,
+.category-count {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Multi-line ellipsis (2 lines) */
+.product-title,
+.category-product-title {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ============================================================================
+   iOS SAFARI TEXT RENDERING
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Better text rendering on iOS */
+  * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+  }
+  
+  /* Ensure proper word breaking on iOS */
+  p,
+  span,
+  div {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    -webkit-hyphens: auto !important;
+    hyphens: auto !important;
+  }
+}
+

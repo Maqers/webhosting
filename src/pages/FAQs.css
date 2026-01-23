@@ -1,0 +1,456 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap');
+
+.faqs {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+}
+
+.faqs-hero {
+  position: relative;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  padding: 6rem 0 4rem;
+  text-align: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.faqs-hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure all child elements inherit white text color */
+.faqs-hero * {
+  color: inherit;
+}
+
+.faqs-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+  animation: grain 20s linear infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(118, 9, 9, 0.9) 0%, rgba(118, 9, 9, 0.3) 100%);
+  z-index: 1;
+}
+
+.faqs-title {
+  font-family: var(--font-family-heading);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  position: relative;
+  z-index: 3;
+  letter-spacing: -0.02em;
+  animation: fadeInUp 0.8s ease-out;
+  color: var(--text-on-primary); /* Explicit white text for readability */
+  visibility: visible;
+  opacity: 1;
+}
+
+.faqs-title.scroll-animate {
+  /* Ensure title is visible even before animation */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faqs-title.scroll-animate.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faqs-subtitle {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-weight: 400;
+  opacity: 0.95;
+  position: relative;
+  z-index: 3;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+  color: var(--text-on-primary); /* Explicit white text for readability */
+  visibility: visible;
+}
+
+.faqs-subtitle.scroll-animate {
+  /* Ensure subtitle is visible even before animation */
+  opacity: 0.95;
+  transform: translateY(0);
+}
+
+.faqs-subtitle.scroll-animate.animate-in {
+  opacity: 0.95;
+  transform: translateY(0);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.faqs-content {
+  padding: 4rem 0;
+}
+
+.faqs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.faq-item {
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-light);
+  position: relative;
+  visibility: visible;
+  opacity: 1;
+}
+
+.faq-item.scroll-animate {
+  /* Override scroll-animate opacity for FAQ items to ensure they're visible */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faq-item.scroll-animate.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* .faq-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(180deg, var(--primary-color), var(--primary-light));
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-item:hover::before,
+.faq-item.open::before {
+  width: 4px;
+} */
+.faq-item::before {
+  display: none;
+}
+
+.faq-item:hover {
+  box-shadow: 0 4px 16px rgba(118, 9, 9, 0.1);
+  transform: translateX(4px);
+}
+
+.faq-item.open {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 24px rgba(118, 9, 9, 0.12);
+}
+
+.faq-question {
+  width: 100%;
+  padding: 1.5rem 1.75rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  font-family: var(--font-family-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.faq-question:hover {
+  color: var(--primary-color);
+}
+
+.faq-question-text {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.faq-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: rgba(118, 9, 9, 0.08);
+  color: var(--primary-color);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-icon svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-item.open .faq-icon {
+  background: var(--primary-color);
+  color: white;
+  transform: rotate(180deg);
+}
+
+.faq-question:hover .faq-icon {
+  background: rgba(118, 9, 9, 0.15);
+  transform: scale(1.1);
+}
+
+.faq-item.open .faq-question:hover .faq-icon {
+  transform: rotate(180deg) scale(1.1);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+              padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+  padding: 0 1.75rem;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 1000px;
+  padding: 0 1.75rem 1.5rem;
+  opacity: 1;
+  visibility: visible;
+}
+
+.faq-answer p {
+  font-family: var(--font-family-primary);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.faqs-contact {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  padding: 3rem 2.5rem;
+  border-radius: var(--radius-xl);
+  text-align: center;
+  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  box-shadow: 0 8px 32px rgba(118, 9, 9, 0.2);
+  position: relative;
+  overflow: hidden;
+  max-width: 700px;
+  margin: 0 auto;
+  visibility: visible;
+  opacity: 1;
+}
+
+.faqs-contact.scroll-animate {
+  /* Ensure contact section is visible */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faqs-contact.scroll-animate.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ensure all child text elements inherit white text color */
+.faqs-contact h2,
+.faqs-contact p {
+  color: var(--text-on-primary);
+}
+
+/* Contact link has white background, so it should use primary color text */
+.faqs-contact .contact-link {
+  color: var(--primary-color);
+}
+
+.faqs-contact::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.contact-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  stroke-width: 2.5;
+}
+
+.faqs-contact h2 {
+  font-family: var(--font-family-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  position: relative;
+  z-index: 1;
+}
+
+.faqs-contact p {
+  font-family: var(--font-family-primary);
+  font-size: 1.125rem;
+  opacity: 0.95;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+  color: var(--text-on-primary); /* Explicit white text for readability */
+}
+
+.contact-link {
+  display: inline-block;
+  padding: 0.875rem 2rem;
+  background: white;
+  color: var(--primary-color);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.contact-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  background: var(--primary-color);
+}
+
+@media (max-width: 968px) {
+  .faqs-hero {
+    padding: 4rem 0 3rem;
+  }
+
+  .faqs-list {
+    gap: 0.875rem;
+  }
+
+  .faq-question {
+    padding: 1.25rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .faq-answer {
+    padding: 0 1.5rem;
+  }
+
+  .faq-item.open .faq-answer {
+    padding: 0 1.5rem 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .faqs-hero {
+    padding: 3rem 0 2rem;
+  }
+
+  .faq-question {
+    padding: 1rem 1.25rem;
+    font-size: 0.9375rem;
+    gap: 1rem;
+  }
+
+  .faq-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .faq-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .faq-answer {
+    padding: 0 1.25rem;
+  }
+
+  .faq-item.open .faq-answer {
+    padding: 0 1.25rem 1rem;
+  }
+
+  .faqs-contact {
+    padding: 2rem 1.5rem;
+  }
+
+  .faqs-contact h2 {
+    font-size: 1.5rem;
+  }
+}

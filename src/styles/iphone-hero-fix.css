@@ -1,0 +1,128 @@
+/**
+ * iPhone Products Hero Background Fix
+ * 
+ * Fixes issue where hero section background becomes too big on iPhone
+ * Text "Our Custom Gifts Collection" and subtitle background expands too much
+ */
+
+/* ============================================================================
+   PRODUCTS HERO - iPhone SPECIFIC FIXES
+   ============================================================================ */
+
+/* Reduce padding on iPhone to prevent background from being too big */
+@media (max-width: 767px) {
+  .products-hero {
+    padding: var(--spacing-lg) 0 !important; /* Reduced from var(--spacing-2xl) */
+    min-height: auto !important;
+    max-height: none !important;
+    height: auto !important;
+  }
+  
+  /* Ensure container doesn't expand unnecessarily */
+  .products-hero .container {
+    padding-top: var(--spacing-md) !important;
+    padding-bottom: var(--spacing-md) !important;
+    max-width: 100% !important;
+  }
+  
+  /* Reduce title font size on iPhone */
+  .products-title {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important; /* Reduced max from 3rem */
+    line-height: 1.2 !important;
+    margin-bottom: var(--spacing-xs) !important; /* Reduced margin */
+    padding: 0 var(--spacing-md) !important;
+    max-width: 100% !important;
+  }
+  
+  /* Reduce subtitle font size on iPhone */
+  .products-subtitle {
+    font-size: clamp(0.9375rem, 3vw, 1rem) !important; /* Reduced max from 1.125rem */
+    line-height: 1.4 !important;
+    padding: 0 var(--spacing-md) !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* Extra small iPhone screens */
+@media (max-width: 480px) {
+  .products-hero {
+    padding: var(--spacing-md) 0 !important; /* Even smaller padding */
+  }
+  
+  .products-title {
+    font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
+    margin-bottom: var(--spacing-xs) !important;
+  }
+  
+  .products-subtitle {
+    font-size: clamp(0.875rem, 2.5vw, 0.9375rem) !important;
+  }
+}
+
+/* ============================================================================
+   iOS SAFARI SPECIFIC FIXES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari detected */
+  
+  /* Constrain hero height on iOS */
+  @media (max-width: 767px) {
+    .products-hero {
+      padding: var(--spacing-md) 0 !important;
+      min-height: auto !important;
+      max-height: 200px !important; /* Constrain maximum height */
+      height: auto !important;
+      overflow: hidden !important;
+    }
+    
+    /* Ensure text doesn't cause expansion */
+    .products-title,
+    .products-subtitle {
+      max-width: 100% !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+  }
+  
+  /* Very small iPhone screens */
+  @media (max-width: 480px) {
+    .products-hero {
+      padding: var(--spacing-sm) 0 !important;
+      max-height: 180px !important;
+    }
+  }
+}
+
+/* ============================================================================
+   PREVENT BACKGROUND EXPANSION
+   ============================================================================ */
+
+/* Ensure hero background doesn't expand beyond content */
+.products-hero {
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+/* Ensure container wraps content tightly */
+.products-hero .container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: var(--spacing-md) !important;
+  padding-right: var(--spacing-md) !important;
+  box-sizing: border-box !important;
+}
+
+/* Prevent text from causing expansion */
+.products-title,
+.products-subtitle {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+

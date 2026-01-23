@@ -1,0 +1,450 @@
+/**
+ * iOS SAFARI CRITICAL FIXES
+ * 
+ * Comprehensive fixes for iPhone/iOS Safari specific issues
+ * - Prevents layout breaking on zoom
+ * - Fixes viewport unit issues
+ * - Safe area support for notched devices
+ * - Input zoom prevention
+ * - Touch scrolling improvements
+ */
+
+/* ============================================================================
+   CRITICAL: Remove vw units on mobile to prevent zoom breaking
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  /* Replace all vw units in clamp() with percentage or fixed values */
+  h1 {
+    font-size: clamp(1.5rem, 8%, 2.25rem) !important;
+  }
+  
+  h2 {
+    font-size: clamp(1.25rem, 7%, 1.875rem) !important;
+  }
+  
+  h3 {
+    font-size: clamp(1.125rem, 6%, 1.5rem) !important;
+  }
+  
+  h4 {
+    font-size: clamp(1rem, 5%, 1.25rem) !important;
+  }
+  
+  p, body {
+    font-size: clamp(0.9375rem, 2%, 1rem) !important;
+  }
+  
+  /* Hero titles */
+  .hero-title,
+  .products-title,
+  .about-title,
+  .contact-title,
+  .faqs-title {
+    font-size: clamp(1.75rem, 8%, 2.5rem) !important;
+  }
+  
+  .hero-subtitle,
+  .products-subtitle,
+  .about-subtitle,
+  .contact-subtitle,
+  .faqs-subtitle {
+    font-size: clamp(1rem, 3%, 1.25rem) !important;
+  }
+}
+
+/* ============================================================================
+   iOS SAFARI VIEWPORT FIXES
+   ============================================================================ */
+
+/* Prevent iOS Safari from auto-adjusting text size */
+html {
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  -ms-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+body {
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  -ms-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+/* ============================================================================
+   INPUT ZOOM PREVENTION - CRITICAL FOR iOS
+   ============================================================================ */
+
+/* iOS Safari zooms in when input font size is less than 16px */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="password"],
+input[type="url"],
+textarea,
+select {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0; /* Remove iOS default styling */
+}
+
+/* Ensure search inputs don't zoom */
+.search-input,
+.navbar-mobile-search-section .search-input {
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+/* ============================================================================
+   SAFE AREA SUPPORT - NOTCHED DEVICES
+   ============================================================================ */
+
+@supports (padding: max(0px)) {
+  /* Navbar safe area */
+  .navbar,
+  .navbar-container {
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left)) !important;
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right)) !important;
+    padding-top: max(0px, env(safe-area-inset-top)) !important;
+  }
+  
+  /* Sub-navbar safe area */
+  .sub-navbar,
+  .sub-navbar-container {
+    padding-left: max(var(--spacing-sm), env(safe-area-inset-left)) !important;
+    padding-right: max(var(--spacing-sm), env(safe-area-inset-right)) !important;
+  }
+  
+  /* Container safe area */
+  .container {
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left)) !important;
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right)) !important;
+  }
+  
+  /* WhatsApp button safe area */
+  .whatsapp-container {
+    bottom: max(var(--spacing-lg), env(safe-area-inset-bottom)) !important;
+    right: max(var(--spacing-lg), env(safe-area-inset-right)) !important;
+  }
+  
+  /* Footer safe area */
+  .footer {
+    padding-bottom: max(var(--spacing-xl), env(safe-area-inset-bottom)) !important;
+  }
+  
+  /* Full-width elements */
+  .hero,
+  .products-hero,
+  .about-hero,
+  .contact-hero,
+  .faqs-hero {
+    padding-left: env(safe-area-inset-left) !important;
+    padding-right: env(safe-area-inset-right) !important;
+  }
+}
+
+/* ============================================================================
+   iOS SCROLLING FIXES
+   ============================================================================ */
+
+/* Smooth momentum scrolling on iOS */
+@media (max-width: 767px) {
+  * {
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Fix scroll containers */
+  .category-filters,
+  .sub-navbar-container,
+  .products-grid,
+  .container {
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Prevent bounce scrolling on body */
+  body {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix for iOS Safari scroll position issues - DO NOT use position:fixed on html/body */
+  /* This breaks scrolling completely - removed */
+}
+
+/* ============================================================================
+   iOS TOUCH FIXES
+   ============================================================================ */
+
+/* Prevent iOS callout menu on long press */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in content areas */
+p,
+h1, h2, h3, h4, h5, h6,
+span,
+li,
+.product-title,
+.product-description {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Prevent tap highlight */
+a,
+button {
+  -webkit-tap-highlight-color: rgba(118, 9, 9, 0.1) !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================================
+   iOS FONT RENDERING
+   ============================================================================ */
+
+/* Better font rendering on iOS */
+body,
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================================================
+   iOS CONTAINER FIXES
+   ============================================================================ */
+
+/* Force full width on iOS to prevent horizontal scroll */
+@media (max-width: 767px) {
+  html,
+  body,
+  #root,
+  .App {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    position: relative;
+  }
+  
+  /* All containers must be 100% width */
+  .container,
+  .navbar-container,
+  .sub-navbar-container,
+  .hero-content,
+  .products-content,
+  .product-detail-content,
+  section,
+  .section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: var(--spacing-md) !important;
+    padding-right: var(--spacing-md) !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Products grid - ensure no overflow */
+  .products-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Category filters - horizontal scroll fix */
+  .category-filters {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .category-filters::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
+/* ============================================================================
+   iOS SPECIFIC MEDIA QUERIES
+   ============================================================================ */
+
+/* Detect iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  /* iOS-specific fixes */
+  
+  /* Fix for iOS Safari address bar - use 100dvh or -webkit-fill-available */
+  @media (max-width: 767px) {
+    .hero,
+    .products-hero,
+    .about-hero,
+    .contact-hero,
+    .faqs-hero {
+      min-height: -webkit-fill-available;
+      min-height: 100dvh; /* Dynamic viewport height - excludes address bar */
+    }
+    
+    /* Fix all 100vh issues on iOS */
+    #root,
+    .App,
+    .home,
+    .products-page,
+    .about-us,
+    .contact-page,
+    .faqs-page,
+    .categories-page {
+      min-height: -webkit-fill-available;
+      min-height: 100dvh;
+    }
+  }
+  
+  /* Fix sticky positioning on iOS */
+  .navbar,
+  .sub-navbar,
+  .products-filters-section {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+  
+  /* Fix backdrop filter on iOS */
+  .navbar,
+  .sub-navbar,
+  .whatsapp-popup-header {
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+}
+
+/* ============================================================================
+   iOS ORIENTATION FIXES
+   ============================================================================ */
+
+/* Fix layout on orientation change */
+@media (orientation: landscape) and (max-height: 500px) {
+  .navbar {
+    min-height: 60px !important;
+  }
+  
+  .hero {
+    min-height: 100vh !important;
+  }
+  
+  .products-hero {
+    padding: var(--spacing-md) 0 !important;
+  }
+}
+
+/* ============================================================================
+   iOS FIXED POSITION FIXES
+   ============================================================================ */
+
+/* Fix for iOS Safari fixed position issues */
+.whatsapp-container,
+.whatsapp-button {
+  position: fixed;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ============================================================================
+   iOS ANIMATION FIXES
+   ============================================================================ */
+
+/* Disable animations on iOS if they cause issues */
+@media (max-width: 767px) {
+  @supports (-webkit-touch-callout: none) {
+    /* Reduce animation complexity on iOS */
+    * {
+      animation-duration: 0.3s !important;
+      transition-duration: 0.3s !important;
+    }
+  }
+}
+
+/* ============================================================================
+   iOS FORM FIXES
+   ============================================================================ */
+
+/* Fix iOS form styling */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-primary);
+}
+
+/* Fix iOS date/time pickers */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  min-height: 44px;
+  font-size: 16px !important;
+}
+
+/* ============================================================================
+   iOS MODAL FIXES
+   ============================================================================ */
+
+/* Fix modal positioning on iOS */
+.modal,
+.whatsapp-popup {
+  position: fixed;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  max-height: 90dvh; /* Use dvh instead of vh for iOS */
+  max-height: 90vh; /* Fallback */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================================
+   CRITICAL: Prevent horizontal scroll on iOS
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  /* Force no horizontal scroll */
+  * {
+    max-width: 100% !important;
+  }
+  
+  /* Images */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Tables */
+  table {
+    width: 100% !important;
+    table-layout: auto !important;
+    word-wrap: break-word !important;
+  }
+  
+  /* Prevent any element from causing overflow */
+  .container > *,
+  section > *,
+  .section > * {
+    max-width: 100% !important;
+  }
+}
+

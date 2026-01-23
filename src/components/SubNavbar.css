@@ -1,0 +1,552 @@
+/**
+ * SUB-NAVBAR - MOBILE-FIRST RESPONSIVE DESIGN
+ * 
+ * Category navigation bar that adapts to navbar height changes
+ */
+
+.sub-navbar {
+  background: rgba(248, 248, 248, 0.95);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: var(--navbar-height-mobile, 64px); /* Mobile-first: Match mobile navbar height exactly */
+  left: 0;
+  right: 0;
+  z-index: 998;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              top 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity, top;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden; /* Prevent horizontal overflow */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  /* Ensure it stays right after navbar */
+  position: sticky;
+}
+
+/* Hide sub-navbar on scroll down, show on scroll up */
+.sub-navbar.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sub-navbar-container {
+  max-width: min(1400px, 95%);
+  margin: 0 auto;
+  /* Zoom-safe: Fixed spacing */
+  padding: 0 var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  height: var(--sub-navbar-height, 48px);
+  min-height: var(--sub-navbar-height, 48px);
+  max-height: var(--sub-navbar-height, 48px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  min-width: max-content;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  flex: 1; /* Take available space between arrows */
+  /* Smooth scrolling for better UX */
+  scroll-behavior: smooth;
+}
+
+/* Mobile-first: Enhanced slider experience */
+@media (max-width: 768px) {
+  .sub-navbar {
+    top: var(--navbar-height-mobile, 64px); /* Exact navbar height using CSS variable */
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    /* Ensure proper stacking */
+    position: sticky;
+  }
+  
+  .sub-navbar-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    /* Mobile: Proper padding for arrows - increased for better visibility */
+    padding-left: 3.5rem !important; /* Space for left arrow */
+    padding-right: 3.5rem !important; /* Space for right arrow */
+    margin: 0 !important;
+    /* Enhanced smooth scrolling */
+    scroll-behavior: smooth;
+    /* Better touch scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Allow horizontal scroll */
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Enhanced snap scrolling for better UX - mandatory snap */
+    scroll-snap-type: x mandatory;
+    /* Ensure content doesn't get cut off */
+    scroll-padding-left: 1.5rem;
+    scroll-padding-right: 1.5rem;
+    /* Take available space between arrows */
+    flex: 1;
+    /* Better visual feedback */
+    /* Force hardware acceleration for smooth scrolling */
+    transform: translateZ(0);
+    will-change: scroll-position;
+    /* Prevent momentum scrolling issues */
+    overscroll-behavior-x: contain;
+  }
+  
+  /* Snap each link for smooth scrolling - mandatory snap */
+  .sub-navbar-link {
+    scroll-snap-align: start;
+    scroll-snap-stop: always; /* Always stop at each item */
+  }
+  
+  /* Fix for iOS Safari scroll issue */
+  @supports (-webkit-touch-callout: none) {
+    .sub-navbar-container {
+      -webkit-overflow-scrolling: touch;
+      /* Force hardware acceleration */
+      transform: translateZ(0);
+      will-change: scroll-position;
+      /* Better momentum scrolling */
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}
+
+.sub-navbar-container::-webkit-scrollbar {
+  display: none;
+}
+
+.sub-navbar-link {
+  padding: 0.75rem 0.875rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem; /* Mobile-first: 13px */
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  position: relative;
+  transition: all var(--transition-base) var(--ease-premium);
+  border-bottom: 2px solid transparent;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  transform: translateZ(0);
+  min-height: 44px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  outline: none;
+  -webkit-tap-highlight-color: rgba(118, 9, 9, 0.1);
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* Mobile: Optimize link padding for better visibility */
+@media (max-width: 768px) {
+  .sub-navbar-link {
+    /* Mobile: Slightly smaller padding but still touch-friendly */
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+    /* Ensure links don't get cut off */
+    min-width: fit-content;
+    /* Prevent text wrapping */
+    white-space: nowrap;
+    /* Ensure full visibility */
+    flex-shrink: 0;
+  }
+  
+  /* First and last links need extra padding for visual balance */
+  .sub-navbar-link:first-child {
+    margin-left: 0;
+  }
+  
+  .sub-navbar-link:last-child {
+    margin-right: 0;
+    padding-right: 1rem; /* Extra padding for last item */
+  }
+}
+
+/* Very small screens: Further optimize */
+@media (max-width: 480px) {
+  .sub-navbar-container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  .sub-navbar-link {
+    padding: 0.625rem 0.625rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Smaller arrows on very small screens */
+  .sub-navbar-arrow {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .sub-navbar-arrow svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.sub-navbar-link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.sub-navbar-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  transition: width var(--transition-base) var(--ease-premium);
+}
+
+.sub-navbar-link:hover {
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.sub-navbar-link:active {
+  transform: translateY(0) scale(0.98);
+  transition: transform var(--duration-fast) var(--ease-out-expo);
+}
+
+/* Prevent :active state from persisting on mobile */
+.sub-navbar-link:active:not(.active) {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.sub-navbar-link:hover::before {
+  width: 100%;
+}
+
+/* Scoped active state - only applies to sub-navbar links */
+.sub-navbar-link.active {
+  color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sub-navbar-link.active::before {
+  width: 100%;
+}
+
+.sub-navbar-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  animation: slideInWidth var(--duration-base) var(--ease-premium) forwards;
+  z-index: 1;
+}
+
+/* Ensure :visited doesn't interfere */
+.sub-navbar-link:visited {
+  color: var(--text-secondary);
+}
+
+.sub-navbar-link.active:visited {
+  color: var(--primary-color);
+}
+
+@keyframes slideInWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Scroll indicator gradient for mobile */
+.sub-navbar-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  /* Zoom-safe: Fixed rem value - wider gradient for better visibility */
+  width: 3rem;
+  height: 100%;
+  background: linear-gradient(to left, rgba(248, 248, 248, 0.98) 0%, rgba(248, 248, 248, 0.8) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+  display: none; /* Hidden by default */
+  /* Smooth fade */
+  transition: opacity 0.3s ease;
+}
+
+/* Show gradient only when content is scrollable */
+.sub-navbar-container.scrollable::after {
+  opacity: 1;
+}
+
+.sub-navbar-container.not-scrollable::after {
+  opacity: 0;
+}
+
+/* Tablet Styles (768px - 968px) */
+@media (min-width: 768px) and (max-width: 968px) {
+  .sub-navbar {
+    top: var(--navbar-height-tablet, 80px); /* Match tablet navbar height */
+  }
+
+  .sub-navbar-container {
+    /* Zoom-safe: Fixed spacing */
+    padding: 0 var(--spacing-md);
+    padding-left: 3.5rem !important; /* Space for left arrow */
+    padding-right: 3.5rem !important; /* Space for right arrow */
+    gap: var(--spacing-md);
+    /* Enhanced scrolling */
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+  }
+
+  .sub-navbar-link {
+    /* Zoom-safe: Fixed rem values */
+    font-size: 0.875rem;
+    padding: 0.75rem var(--spacing-md);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  
+  /* Show arrows on tablet if scrollable */
+  .sub-navbar-arrow {
+    display: flex;
+  }
+  
+  /* Hide gradient on tablet when arrows are present */
+  .sub-navbar-container::after {
+    display: none !important;
+  }
+}
+
+/* Desktop Styles (> 968px) */
+@media (min-width: 969px) {
+  .sub-navbar {
+    top: var(--navbar-height-desktop, 120px); /* Match desktop navbar height */
+  }
+
+  .sub-navbar-container {
+    /* Zoom-safe: Fixed spacing */
+    padding: 0 var(--spacing-xl);
+    gap: var(--spacing-xl);
+    /* On desktop, usually all items fit, so no arrows needed */
+  }
+
+  .sub-navbar-link {
+    /* Zoom-safe: Fixed rem value */
+    font-size: 0.9375rem;
+    padding: 0.75rem 0;
+  }
+
+  .sub-navbar-container::after {
+    display: none; /* No scroll indicator on desktop */
+  }
+  
+  /* Hide arrows on desktop by default - they'll be shown via JS if needed */
+  .sub-navbar-arrow {
+    display: none;
+  }
+}
+
+/* Slider Navigation Arrows - Professional Design */
+.sub-navbar-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  display: none; /* Hidden by default, shown via JS when scrollable */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  color: var(--primary-color);
+  flex-shrink: 0;
+  touch-action: manipulation;
+  /* Prevent affecting other UI */
+  pointer-events: auto;
+  /* Professional hover effect */
+  opacity: 0.9;
+  /* Better touch target */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sub-navbar-arrow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(118, 9, 9, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sub-navbar-arrow svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sub-navbar-arrow:hover {
+  background: white;
+  box-shadow: 0 4px 16px rgba(118, 9, 9, 0.2), 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) scale(1.05);
+  opacity: 1;
+  border-color: var(--primary-color);
+}
+
+.sub-navbar-arrow:hover::before {
+  opacity: 1;
+}
+
+.sub-navbar-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+  box-shadow: 0 2px 8px rgba(118, 9, 9, 0.15);
+}
+
+.sub-navbar-arrow:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.sub-navbar-arrow-left {
+  left: 0.5rem;
+}
+
+.sub-navbar-arrow-right {
+  right: 0.5rem;
+}
+
+/* Mobile: Enhanced arrow visibility and positioning */
+@media (max-width: 768px) {
+  .sub-navbar-arrow {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 1; /* Always visible on mobile when scrollable */
+    display: flex; /* Ensure arrows are shown */
+    /* Better touch target - minimum 44px */
+    touch-action: manipulation;
+    /* Prevent text selection */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .sub-navbar-arrow svg {
+    width: 18px;
+    height: 18px;
+    pointer-events: none; /* Prevent SVG from interfering */
+  }
+  
+  .sub-navbar-arrow-left {
+    left: 0.25rem;
+  }
+  
+  .sub-navbar-arrow-right {
+    right: 0.25rem;
+  }
+  
+  /* Better touch targets and visual feedback */
+  .sub-navbar-arrow:active {
+    background: rgba(118, 9, 9, 0.15);
+    transform: translateY(-50%) scale(0.9);
+  }
+  
+  .sub-navbar-arrow:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+  
+  /* Ensure arrows are always above content */
+  .sub-navbar-arrow {
+    z-index: 999;
+  }
+}
+
+/* Hide arrows on desktop when not needed */
+@media (min-width: 969px) {
+  .sub-navbar-arrow {
+    display: none;
+  }
+}
+
+/* Mobile: Enhanced professional slider experience */
+@media (max-width: 767px) {
+  .sub-navbar {
+    /* Ensure proper positioning */
+    top: var(--navbar-height-mobile, 64px);
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    position: sticky;
+  }
+  
+  .sub-navbar-container {
+    /* Enhanced padding for better arrow visibility */
+    padding-left: 3.5rem !important;
+    padding-right: 3.5rem !important;
+    /* Ensure smooth scrolling */
+    scroll-behavior: smooth;
+    /* Better snap behavior */
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Hide gradient since we have arrows now */
+  .sub-navbar-container::after {
+    display: none !important;
+  }
+  
+  /* Ensure links are fully visible when scrolling */
+  .sub-navbar-link {
+    /* Prevent text truncation */
+    text-overflow: ellipsis;
+    overflow: visible;
+    /* Better touch targets */
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+    /* Snap alignment */
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    /* Ensure links don't shrink */
+    flex-shrink: 0;
+  }
+  
+  /* Ensure arrows are always visible when scrollable */
+  .sub-navbar-container.scrollable + .sub-navbar-arrow,
+  .sub-navbar.scrollable .sub-navbar-arrow {
+    display: flex !important;
+  }
+}

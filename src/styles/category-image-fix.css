@@ -1,0 +1,166 @@
+/**
+ * Category Page Image Full Width Fix
+ * 
+ * Fixes issue where category product images only take half width on mobile
+ * Ensures all category images take full width on mobile devices
+ */
+
+/* ============================================================================
+   CATEGORY PRODUCT IMAGES - FULL WIDTH ON MOBILE
+   ============================================================================ */
+
+/* Category product image container - full width */
+.category-product-image-container {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  overflow: hidden !important;
+  background: var(--bg-secondary) !important;
+}
+
+/* Category product image - full width */
+.category-product-image {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Image wrapper from ImageWithFallback - ensure full width */
+.category-product-image-container .image-wrapper,
+.category-product-image-wrapper {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Ensure img tag inside wrapper is full width */
+.category-product-image-container .image-wrapper img,
+.category-product-image-wrapper img,
+.category-product-image-container img {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Category product card - ensure full width */
+.category-product-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Category products grid - ensure proper layout */
+.category-products-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+/* ============================================================================
+   MOBILE SPECIFIC FIXES
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  /* Force full width on mobile */
+  .category-product-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .category-product-image-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+  
+  .category-product-image,
+  .category-product-image-container .image-wrapper,
+  .category-product-image-wrapper,
+  .category-product-image-container img,
+  .category-product-image-container .image-wrapper img {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+  
+  /* Ensure grid takes full width */
+  .category-products-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 var(--spacing-md) !important;
+    gap: var(--spacing-md) !important;
+  }
+}
+
+/* ============================================================================
+   iOS SAFARI SPECIFIC FIXES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari detected */
+  
+  @media (max-width: 767px) {
+    .category-product-image-container,
+    .category-product-image {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 100% !important;
+    }
+    
+    /* Ensure images render at full width on iOS */
+    .category-product-image-container img,
+    .category-product-image {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+}
+
+/* ============================================================================
+   PREVENT OVERFLOW OR CLIPPING
+   ============================================================================ */
+
+.category-product-image-container,
+.category-product-image {
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure images don't get clipped */
+.category-product-image {
+  min-width: 100% !important;
+  min-height: 100% !important;
+}
+

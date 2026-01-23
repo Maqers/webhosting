@@ -1,0 +1,92 @@
+/**
+ * ZOOM-SAFE UTILITIES
+ * 
+ * Critical fix for mobile zoom issues
+ * Replaces viewport units (vw/vh) with zoom-safe relative units
+ * 
+ * Problem: vw/vh units don't scale with browser zoom, causing UI breaks
+ * Solution: Use rem/em/% units that scale properly with zoom
+ */
+
+/* Override viewport units with zoom-safe alternatives */
+@media (max-width: 768px) {
+  /* Force all containers to use percentage-based widths */
+  .container,
+  .navbar-container,
+  .sub-navbar-container,
+  .hero-content,
+  .showcase-content,
+  .product-detail-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Fix hero heights - use percentage instead of vh */
+  .hero {
+    min-height: 50vh !important;
+    max-height: 100vh !important;
+  }
+  
+  /* Ensure all padding uses rem, not vw */
+  * {
+    /* Override any vw-based padding */
+  }
+  
+  /* Fix font sizes - remove vw from clamp */
+  h1, .hero-title {
+    font-size: clamp(1.5rem, 8%, 2.5rem) !important;
+  }
+  
+  h2, .hero-subtitle {
+    font-size: clamp(1rem, 6%, 1.5rem) !important;
+  }
+  
+  h3 {
+    font-size: clamp(1.125rem, 5%, 1.5rem) !important;
+  }
+  
+  /* Fix grid minmax - use rem instead of vw */
+  .products-grid,
+  .featured-grid {
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)) !important;
+    gap: 1rem !important;
+  }
+  
+  /* Fix icon sizes */
+  .stat-icon-wrapper {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+  
+  .stat-icon {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+  
+  /* Fix button sizes */
+  button,
+  .hero-btn,
+  .cta-button {
+    min-height: 2.75rem !important;
+    padding: 0.75rem 1.5rem !important;
+  }
+  
+  /* Fix zoom controls */
+  .zoom-btn {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    min-width: 2.25rem !important;
+    min-height: 2.25rem !important;
+  }
+  
+  /* Fix thumbnails */
+  .thumbnail {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+    min-width: 3.5rem !important;
+    min-height: 3.5rem !important;
+  }
+}
+

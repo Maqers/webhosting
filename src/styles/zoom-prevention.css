@@ -1,0 +1,106 @@
+/**
+ * ZOOM PREVENTION & MOBILE FIXES
+ * 
+ * Critical fixes for mobile zoom issues
+ * Prevents UI breaking when users zoom
+ */
+
+/* Prevent zoom gestures on mobile */
+@media (max-width: 768px) {
+  /* Disable pinch zoom */
+  * {
+    touch-action: pan-x pan-y;
+    -ms-touch-action: pan-x pan-y;
+  }
+  
+  /* Allow zoom only on images */
+  img {
+    touch-action: pan-x pan-y pinch-zoom;
+    -ms-touch-action: pan-x pan-y pinch-zoom;
+  }
+  
+  /* Prevent double-tap zoom */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
+}
+
+/* Force all containers to use full width on mobile */
+@media (max-width: 768px) {
+  .container,
+  .navbar-container,
+  .sub-navbar-container,
+  .hero-content,
+  .showcase-content,
+  .product-detail-content,
+  section,
+  .section,
+  .products-hero,
+  .products-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Ensure no element uses viewport units */
+  * {
+    max-width: 100%;
+  }
+  
+  /* Fix any remaining vw/vh */
+  [style*="vw"],
+  [style*="vh"] {
+    max-width: 100% !important;
+  }
+}
+
+/* Prevent text size adjustment on iOS */
+@media (max-width: 768px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  body {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* Ensure all images scale properly */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Prevent overflow on all elements */
+* {
+  box-sizing: border-box;
+}
+
+/* Force full width on mobile for critical containers */
+@media (max-width: 768px) {
+  html,
+  body,
+  #root,
+  .App {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
+

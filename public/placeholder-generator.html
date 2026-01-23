@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placeholder Image Generator</title>
+    <style>
+        body {
+            font-family: 'EB Garamond', serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5dc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #760909;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .image-preview {
+            margin: 20px 0;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            border: 2px solid #760909;
+            border-radius: 5px;
+        }
+        .instructions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #760909;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Placeholder Image Generator</h1>
+        <div class="info">
+            <p><strong>Note:</strong> This is a helper tool. For production, use actual product images.</p>
+            <p>You can use online services like:</p>
+            <ul>
+                <li><a href="https://via.placeholder.com" target="_blank">via.placeholder.com</a></li>
+                <li><a href="https://placeholder.com" target="_blank">placeholder.com</a></li>
+                <li><a href="https://unsplash.com" target="_blank">Unsplash</a> for free stock photos</li>
+            </ul>
+        </div>
+        
+        <div class="image-preview">
+            <h3>Example Placeholder URLs:</h3>
+            <p>For Product 1, Image 1:</p>
+            <code>https://via.placeholder.com/800x800/760909/f5f5dc?text=Product+1-1</code>
+            <br><br>
+            <p>For Product 1, Image 2:</p>
+            <code>https://via.placeholder.com/800x800/760909/f5f5dc?text=Product+1-2</code>
+            <br><br>
+            <p>For Product 1, Image 3:</p>
+            <code>https://via.placeholder.com/800x800/760909/f5f5dc?text=Product+1-3</code>
+        </div>
+
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Download or create your product images</li>
+                <li>Name them according to the convention: product{id}-{number}.jpg</li>
+                <li>Place them in the <code>public/images/</code> folder</li>
+                <li>Make sure each product has exactly 3 images</li>
+                <li>Optimize images for web (keep under 500KB each)</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
+

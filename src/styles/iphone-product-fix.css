@@ -1,0 +1,271 @@
+/**
+ * iPhone Product Page Critical Fix
+ * 
+ * Fixes issue where only images are visible on iPhone Safari
+ * Product info (title, price, category) not showing
+ */
+
+/* ============================================================================
+   PRODUCT CARD - ENSURE ALL CONTENT VISIBLE ON iPhone
+   ============================================================================ */
+
+/* Force product card to display properly on iOS Safari */
+.product-card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: auto !important;
+  width: 100% !important;
+  position: relative !important;
+  overflow: visible !important;
+  background: var(--bg-primary) !important;
+}
+
+/* Ensure product-info is always visible and properly displayed */
+.product-info {
+  display: flex !important;
+  flex-direction: column !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: auto !important;
+  width: 100% !important;
+  padding: 0.75rem !important;
+  gap: 0.375rem !important;
+  flex: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Ensure all text elements are visible */
+.product-title,
+.product-id,
+.product-category,
+.product-price {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Product title - ensure visible */
+.product-title {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Product ID - ensure visible */
+.product-id {
+  color: var(--text-tertiary) !important;
+  font-size: 0.75rem !important;
+  font-weight: 400 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0.7 !important;
+  display: block !important;
+}
+
+/* Product category - ensure visible */
+.product-category {
+  color: var(--text-secondary) !important;
+  font-size: 0.8125rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0.8 !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Product price - ensure visible */
+.product-price {
+  color: var(--primary-color) !important;
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+/* Product footer - ensure visible */
+.product-footer {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  margin-top: auto !important;
+  padding-top: 0.5rem !important;
+  min-height: 2rem !important;
+  width: 100% !important;
+}
+
+/* Product image container - ensure it doesn't cover product-info */
+.product-image-container {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  z-index: 0 !important;
+}
+
+/* ============================================================================
+   iOS SAFARI SPECIFIC FIXES
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari detected */
+  
+  /* Force product card layout */
+  .product-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+  
+  /* Ensure product-info is below image */
+  .product-info {
+    order: 2 !important;
+    display: flex !important;
+    flex: 1 1 auto !important;
+  }
+  
+  /* Ensure image is above info */
+  .product-image-container {
+    order: 1 !important;
+    flex: 0 0 auto !important;
+  }
+  
+  /* Force text rendering */
+  .product-title,
+  .product-id,
+  .product-category,
+  .product-price {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+    color: inherit !important;
+  }
+  
+  /* Ensure colors are applied */
+  .product-title {
+    color: var(--text-primary) !important;
+  }
+  
+  .product-id {
+    color: var(--text-tertiary) !important;
+  }
+  
+  .product-category {
+    color: var(--text-secondary) !important;
+  }
+  
+  .product-price {
+    color: var(--primary-color) !important;
+  }
+}
+
+/* ============================================================================
+   MOBILE SPECIFIC FIXES
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  /* Ensure product card has proper height on mobile */
+  .product-card {
+    min-height: auto !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Ensure product-info is visible and has proper spacing */
+  .product-info {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0.75rem !important;
+    gap: 0.375rem !important;
+    min-height: 120px !important; /* Ensure minimum height for content */
+    background: var(--bg-primary) !important;
+  }
+  
+  /* Ensure text is readable */
+  .product-title {
+    font-size: 0.875rem !important;
+    color: var(--text-primary) !important;
+    line-height: 1.4 !important;
+  }
+  
+  .product-price {
+    font-size: 1rem !important;
+    color: var(--primary-color) !important;
+    font-weight: 700 !important;
+  }
+  
+  .product-id {
+    font-size: 0.6875rem !important;
+    color: var(--text-tertiary) !important;
+  }
+  
+  .product-category {
+    font-size: 0.75rem !important;
+    color: var(--text-secondary) !important;
+  }
+}
+
+/* ============================================================================
+   FORCE VISIBILITY - OVERRIDE ANY HIDING
+   ============================================================================ */
+
+/* Override any rules that might hide product-info */
+.product-card .product-info,
+.products-grid .product-card .product-info {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  overflow: visible !important;
+  clip: unset !important;
+  clip-path: none !important;
+}
+
+/* Ensure product-info children are visible */
+.product-info > * {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Force product-title to be visible */
+.product-info .product-title {
+  display: -webkit-box !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: var(--text-primary) !important;
+}
+
+/* Force product-price to be visible */
+.product-info .product-price {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: var(--primary-color) !important;
+}
+

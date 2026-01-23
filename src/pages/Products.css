@@ -1,0 +1,622 @@
+.products-page {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  /* Ensure navbar is always visible above products page content */
+  position: relative;
+  z-index: 0;
+  /* Create stacking context below navbar */
+  isolation: isolate;
+  /* Immediate rendering - no delays */
+  opacity: 1;
+  visibility: visible;
+  /* Prevent blank page flash */
+  display: block;
+}
+
+.products-hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  padding: var(--spacing-2xl) 0;
+  text-align: center;
+}
+
+/* Ensure all child elements inherit white text color */
+.products-hero * {
+  color: inherit;
+}
+
+.products-title {
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-on-primary); /* Explicit white text for readability */
+  line-height: 1.2;
+  padding: 0 var(--spacing-md);
+}
+
+.products-subtitle {
+  font-size: clamp(1rem, 3vw, 1.125rem);
+  opacity: 0.95;
+  padding: 0 var(--spacing-md);
+  line-height: 1.5;
+  color: var(--text-on-primary); /* Explicit white text for readability */
+}
+
+.products-filters-section {
+  background: var(--bg-primary);
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  /* Dynamic top value based on navbar heights */
+  top: calc(var(--navbar-height-mobile, 64px) + var(--sub-navbar-height, 48px));
+  /* Ensure filters stay below navbar (navbar z-index: 1000) */
+  z-index: 99;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  overflow-x: hidden;
+  /* Ensure navbar is always visible above filters */
+  isolation: isolate;
+}
+
+.filters-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.category-filters {
+  display: flex;
+  gap: 0.75rem; /* Consistent 12px gap between all buttons */
+  flex-wrap: wrap;
+  flex: 1;
+  overflow-x: auto;
+  padding: var(--spacing-xs) 0;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  padding: 0.75rem 1.5rem; /* Consistent padding: 12px vertical, 24px horizontal */
+  border: 1.5px solid var(--border-light);
+  background: var(--bg-primary);
+  border-radius: 9999px; /* Perfect pill shape */
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 44px; /* Touch-friendly minimum height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Consistent gap between text and icon */
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.01em;
+  margin: 0;
+  box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.filter-chip:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: rgba(118, 9, 9, 0.05);
+  transform: translateY(-1px);
+}
+
+.filter-chip.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(118, 9, 9, 0.3);
+  /* Remove scale transform to maintain consistent button size */
+  transform: none;
+}
+
+.filter-chip.active:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(118, 9, 9, 0.4);
+  transform: translateY(-1px); /* Subtle lift on hover */
+}
+
+/* Check icon for selected categories */
+.filter-chip .check-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-chip.active .check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Filter count badge */
+.filter-count {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-left: 0.25rem; /* Consistent spacing */
+  font-weight: var(--font-weight-normal);
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+/* Sort styles moved to ProductSort.css */
+
+.products-content {
+  /* Immediate visibility - no blank page */
+  opacity: 1;
+  visibility: visible;
+  /* Prevent layout shift */
+  contain: layout style;
+  padding: var(--spacing-2xl) 0 4rem;
+}
+
+/* Container styles now handled by responsive-fixes.css */
+
+/* Additional spacing for filters container */
+.products-filters-section .container {
+  padding-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* Desktop: Ensure proper spacing and alignment */
+@media (min-width: 1024px) {
+  .filters-wrapper {
+    gap: var(--spacing-xl); /* Consistent large gap on desktop */
+    align-items: center;
+  }
+
+  .category-filters {
+    gap: 0.875rem; /* Slightly larger gap on desktop (14px) */
+  }
+
+  .filter-chip {
+    padding: 0.75rem 1.5rem; /* Consistent desktop padding */
+    font-size: 0.9375rem;
+    min-height: 44px;
+  }
+}
+
+/* Container mobile styles now handled by responsive-fixes.css */
+@media (max-width: 768px) {
+
+  .products-filters-section {
+    padding: var(--spacing-md) 0;
+  }
+
+  .filters-wrapper {
+    gap: var(--spacing-md); /* Consistent gap between filters and sort */
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .category-filters {
+    gap: 0.625rem; /* Consistent 10px gap on mobile */
+    padding: var(--spacing-xs) 0;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-chip {
+    padding: 0.6875rem 1.25rem; /* 11px vertical, 20px horizontal - proportional to desktop */
+    font-size: 0.875rem; /* Slightly smaller font on mobile */
+    min-height: 44px; /* Maintain touch-friendly height */
+  }
+}
+
+.search-results-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.search-results-header h2 {
+  font-size: var(--font-size-2xl);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.search-results-header p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* ============================================================================
+   PRODUCTION-LEVEL E-COMMERCE PRODUCT GRID SYSTEM
+   ============================================================================
+   Grid styles now handled by responsive-fixes.css for consistency
+   This section kept for page-specific overrides if needed
+   ============================================================================ */
+
+/* ============================================================================
+   PRODUCT CARD - E-COMMERCE STANDARD DESIGN
+   ============================================================================ */
+
+.product-card {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  position: relative;
+  /* Performance: Optimize rendering */
+  will-change: transform, box-shadow;
+  /* Smooth rendering */
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  /* Immediate visibility - no animation delays */
+  opacity: 1;
+  transform: translateZ(0); /* Force GPU acceleration */
+  /* Content visibility for performance */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px; /* Estimated height for layout stability */
+}
+
+/* Premium hover effect - Amazon/Flipkart style */
+.product-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(118, 9, 9, 0.3);
+  z-index: 1;
+}
+
+/* Active state for touch devices */
+.product-card:active {
+  transform: translateY(-2px) scale(1.005);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================================
+   PRODUCT IMAGE CONTAINER - FIXED ASPECT RATIO (1:1 for e-commerce standard)
+   ============================================================================ */
+
+.product-image-container {
+  position: relative;
+  width: 100%;
+  /* E-commerce standard: 1:1 aspect ratio (square images) */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f8f9fa;
+  flex-shrink: 0;
+  /* Prevent image stretching */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive image heights for different breakpoints */
+@media (max-width: 767px) {
+  .product-image-container {
+    min-height: 0; /* Let aspect-ratio handle it */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .product-image-container {
+    min-height: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-image-container {
+    min-height: 0;
+  }
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Prevent image stretching */
+  display: block;
+  /* Smooth image loading */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Subtle zoom on hover - professional e-commerce effect */
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.popular-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--primary-color);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================================
+   PRODUCT INFO SECTION - COMPACT & CLEAN
+   ============================================================================ */
+
+.product-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0.375rem;
+  /* Ensure consistent spacing */
+  justify-content: space-between;
+}
+
+/* Responsive padding */
+@media (min-width: 768px) {
+  .product-info {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-info {
+    padding: 1rem 1.25rem;
+  }
+}
+
+.product-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin: 0;
+  /* Max 2 lines with ellipsis - e-commerce standard */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  /* Prevent text wrapping issues */
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Responsive font sizes */
+@media (min-width: 768px) {
+  .product-title {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-title {
+    font-size: 1rem;
+  }
+}
+
+/* Product metadata - compact and subtle */
+.product-id {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  opacity: 0.7;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.product-category {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  margin: 0;
+  flex-shrink: 0;
+  line-height: 1.4;
+  opacity: 0.8;
+  /* Single line with ellipsis */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Product footer - price section */
+.product-footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  /* Ensure price is always visible */
+  min-height: 2rem;
+  flex-shrink: 0;
+}
+
+/* Price - prominent and clear */
+.product-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1.2;
+  margin: 0;
+  /* Prevent price from wrapping */
+  white-space: nowrap;
+}
+
+/* Responsive price sizes */
+@media (max-width: 767px) {
+  .product-price {
+    font-size: 1rem;
+  }
+  
+  .product-id {
+    font-size: 0.6875rem;
+  }
+  
+  .product-category {
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-price {
+    font-size: 1.25rem;
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.no-results-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-tertiary);
+}
+
+.no-results-icon svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.5;
+}
+
+.no-results h3 {
+  font-size: var(--font-size-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.no-results p {
+  color: var(--text-secondary);
+}
+
+@media (min-width: 768px) and (max-width: 968px) {
+  .products-hero {
+    /* Zoom-safe: Fixed spacing */
+    padding: var(--spacing-xl) 0;
+  }
+
+  .products-filters-section {
+    top: calc(var(--navbar-height-tablet, 80px) + var(--sub-navbar-height, 48px));
+    /* Zoom-safe: Fixed spacing */
+    padding: var(--spacing-md) 0;
+  }
+
+  .filters-wrapper {
+    /* Zoom-safe: Fixed spacing */
+    gap: var(--spacing-lg); /* Consistent gap on tablet */
+    align-items: center;
+  }
+
+  .category-filters {
+    gap: 0.75rem; /* Consistent 12px gap on tablet */
+  }
+
+  .filter-chip {
+    padding: 0.75rem 1.375rem; /* Slightly adjusted for tablet */
+    font-size: 0.9375rem;
+    min-height: 44px;
+  }
+
+  /* Override for tablet - already handled in main grid rules */
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .container {
+    /* Zoom-safe: Fixed spacing */
+    padding: 0 var(--spacing-md);
+  }
+}
+
+/* Mobile styles are now consolidated above in the @media (max-width: 768px) block */
+
+@media (max-width: 480px) {
+  .products-hero {
+    /* Zoom-safe: Fixed spacing */
+    padding: var(--spacing-lg) 0;
+  }
+
+  .products-filters-section {
+    top: calc(var(--navbar-height-mobile, 64px) + var(--sub-navbar-height, 48px));
+    /* Zoom-safe: Fixed spacing */
+    padding: var(--spacing-md) 0;
+  }
+
+  .filters-wrapper {
+    /* Zoom-safe: Fixed spacing */
+    gap: var(--spacing-md); /* Consistent gap on small mobile */
+  }
+
+  .category-filters {
+    /* Zoom-safe: Fixed spacing */
+    gap: 0.5rem; /* Consistent 8px gap on very small screens */
+  }
+
+  .filter-chip {
+    /* Zoom-safe: Fixed spacing - maintain touch-friendly size */
+    padding: 0.625rem 1rem; /* 10px vertical, 16px horizontal */
+    font-size: 0.875rem;
+    min-height: 44px; /* Maintain touch-friendly minimum */
+  }
+
+  /* Grid columns handled by responsive-fixes.css */
+
+  .product-title {
+    /* Zoom-safe: Removed vw */
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .product-price {
+    /* Zoom-safe: Removed vw */
+    font-size: var(--font-size-lg);
+  }
+
+  .no-results {
+    /* Zoom-safe: Fixed spacing */
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin: var(--spacing-lg) var(--spacing-sm);
+  }
+
+  .no-results-icon svg {
+    /* Zoom-safe: Fixed rem values */
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .no-results h3 {
+    /* Zoom-safe: Removed vw */
+    font-size: var(--font-size-lg);
+  }
+
+  /* Container padding handled by responsive-fixes.css */
+}
+

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!-- Resource Hints for Faster Loading -->
+    <!-- DNS Prefetch for external domains -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Preconnect for critical third-party resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Prefetch for likely next page resources -->
+    <link rel="prefetch" href="/products" as="document">
+    
+    <!-- Font Loading Optimization -->
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    
+    <title>Premium Catalogue</title>
+    
+    <!-- Performance and SEO Meta Tags -->
+    <meta name="description" content="Discover unique, handcrafted gifts from India - Premium custom gifts collection">
+    <meta name="theme-color" content="#760909">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/src/main.jsx" as="script" crossorigin>
+    <style>
+      /* Critical CSS to prevent FOUC */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+        background: #F8F8F8;
+        overflow-x: hidden;
+      }
+      #root {
+        min-height: 100vh;
+        min-height: -webkit-fill-available; /* iOS Safari fix */
+        min-height: 100dvh; /* Dynamic viewport height */
+      }
+      /* Loading overlay */
+      .page-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+      .page-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f0f0f0;
+        border-top-color: #760909;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+

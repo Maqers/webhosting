@@ -1,0 +1,208 @@
+/**
+ * MOBILE-FIRST BASE STYLES
+ * 
+ * Senior-level mobile optimization
+ * - Safe area support
+ * - Touch-friendly targets
+ * - Proper viewport handling
+ * - Performance optimizations
+ */
+
+/* Safe Area Support for iOS */
+@supports (padding: max(0px)) {
+  .navbar,
+  .sub-navbar {
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+  }
+  
+  .whatsapp-container {
+    bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+    right: max(var(--spacing-md), env(safe-area-inset-right));
+  }
+}
+
+/* Mobile Touch Targets - Minimum 44px */
+button,
+a,
+input[type="submit"],
+input[type="button"],
+.navbar-link,
+.sub-navbar-link,
+.filter-chip,
+.category-card,
+.product-card {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Prevent text selection on interactive elements */
+button,
+.navbar-toggle,
+.whatsapp-button {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* Smooth scrolling with momentum on iOS */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Mobile Typography Adjustments */
+@media (max-width: 480px) {
+  html {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  h1 {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    line-height: 1.2;
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.3;
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 6vw, 1.5rem);
+    line-height: 1.4;
+  }
+  
+  p {
+    font-size: 0.9375rem; /* 15px - better readability */
+    line-height: 1.6;
+  }
+}
+
+/* Prevent horizontal scroll - Enhanced for zoom safety */
+@media (max-width: 768px) {
+  * {
+    max-width: 100%;
+  }
+  
+  img,
+  video,
+  iframe {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Ensure all containers use full width on mobile */
+  .container,
+  .section,
+  .card,
+  .grid,
+  .navbar-container,
+  .sub-navbar-container,
+  .hero-content,
+  .showcase-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  
+  /* Prevent fixed-width elements from causing overflow */
+  [style*="width"] {
+    max-width: 100% !important;
+  }
+  
+  /* Ensure padding doesn't cause overflow */
+  .container,
+  .section {
+    padding-left: clamp(var(--spacing-xs), 4vw, var(--spacing-md)) !important;
+    padding-right: clamp(var(--spacing-xs), 4vw, var(--spacing-md)) !important;
+  }
+}
+
+/* Zoom-safe breakpoints - Ensure elements scale properly */
+@media (min-width: 125%) {
+  /* When browser zoom is 125%+ */
+  * {
+    font-size: inherit;
+  }
+}
+
+/* Touch target safety - Ensure minimum sizes at all zoom levels */
+@media (pointer: coarse) {
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  .clickable {
+    /* Zoom-safe: Fixed rem values instead of vw */
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+}
+
+/* CRITICAL FIX: Prevent viewport units from breaking on zoom */
+@media (max-width: 768px) {
+  /* Force all containers to use percentage widths, not viewport units */
+  .container,
+  .navbar-container,
+  .sub-navbar-container,
+  .hero-content,
+  .showcase-content,
+  section,
+  .section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Fix padding to use rem, not vw */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Ensure grids don't use vw in minmax */
+  .products-grid,
+  .featured-grid,
+  .food-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  /* Fix hero heights - use percentage, not vh clamp */
+  .hero {
+    min-height: 50vh !important;
+    max-height: 100vh !important;
+  }
+}
+
+/* Mobile Container Padding */
+@media (max-width: 480px) {
+  .container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+}
+
+/* Reduce motion for mobile performance */
+@media (max-width: 768px) {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+

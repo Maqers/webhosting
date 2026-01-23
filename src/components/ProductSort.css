@@ -1,0 +1,306 @@
+/**
+ * PRODUCT SORT STYLES
+ * 
+ * Mobile-first, accessible sorting UI
+ */
+
+.product-sort {
+  position: relative;
+  z-index: 10;
+}
+
+/* ============================================================================
+   DESKTOP STYLES
+   ============================================================================ */
+
+.product-sort-desktop {
+  display: none; /* Hidden on mobile */
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.sort-label {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.sort-select {
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px;
+  min-width: 180px;
+  outline: none;
+}
+
+.sort-select:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(118, 9, 9, 0.02);
+}
+
+.sort-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(118, 9, 9, 0.1);
+}
+
+.sort-select:active {
+  border-color: var(--primary-color);
+}
+
+/* ============================================================================
+   MOBILE STYLES
+   ============================================================================ */
+
+.product-sort-mobile-button {
+  display: flex; /* Visible on mobile */
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-height: 44px;
+  width: 100%;
+  justify-content: space-between;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.product-sort-mobile-button:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(118, 9, 9, 0.02);
+}
+
+.product-sort-mobile-button:active {
+  transform: scale(0.98);
+  background-color: rgba(118, 9, 9, 0.05);
+}
+
+.product-sort-mobile-button:focus-visible {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(118, 9, 9, 0.1);
+}
+
+.product-sort-mobile-button svg:first-child {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.product-sort-mobile-button span {
+  flex: 1;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.product-sort-mobile-button svg:last-child {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: transform var(--transition-base);
+}
+
+.product-sort-mobile-button[aria-expanded="true"] svg:last-child {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   MOBILE BOTTOM SHEET
+   ============================================================================ */
+
+.sort-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sort-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  /* Zoom-safe: Use percentage instead of vh */
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.sort-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.sort-sheet-header h3 {
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sort-sheet-close {
+  padding: var(--spacing-xs);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sort-sheet-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.sort-sheet-close:active {
+  transform: scale(0.95);
+}
+
+.sort-sheet-content {
+  padding: var(--spacing-sm);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+
+.sort-option {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  min-height: 56px;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.sort-option:hover {
+  background: var(--bg-secondary);
+}
+
+.sort-option:active {
+  transform: scale(0.98);
+  background: rgba(118, 9, 9, 0.05);
+}
+
+.sort-option:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.sort-option.active {
+  color: var(--primary-color);
+  background: rgba(118, 9, 9, 0.08);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sort-option.active svg {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.sort-option span {
+  flex: 1;
+}
+
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================================ */
+
+@media (min-width: 768px) {
+  .product-sort-desktop {
+    display: flex;
+  }
+
+  .product-sort-mobile-button {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .sort-sheet,
+  .sort-sheet-backdrop,
+  .sort-option {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Safe area support for iOS */
+@supports (padding: max(0px)) {
+  .sort-sheet {
+    padding-bottom: max(var(--spacing-lg), env(safe-area-inset-bottom));
+  }
+}
+
