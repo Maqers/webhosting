@@ -267,8 +267,8 @@ export const productsByCategory = {
       slug: "handcrafted-wooden-jewelry-box",
       description:
         "Beautiful handcrafted wooden jewelry box with intricate carvings. Perfect for storing your precious jewelry and keepsakes. Made from premium quality wood with a smooth finish. Features multiple compartments and a velvet-lined interior.",
-      price: 2499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 199,
+      images: ["/images/1.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -284,8 +284,8 @@ export const productsByCategory = {
       slug: "handmade-ceramic-dinner-set",
       description:
         "Beautiful handcrafted ceramic dinner set featuring traditional Indian designs. Includes plates, bowls, and serving dishes. Each piece is unique and hand-painted. Perfect for special occasions or as a decorative piece.",
-      price: 3499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 249,
+      images: ["/images/2.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -301,8 +301,8 @@ export const productsByCategory = {
       slug: "handwoven-cotton-cushion-covers",
       description:
         "Set of 4 handwoven cotton cushion covers with traditional Indian motifs. Made from 100% organic cotton. Available in various color combinations and patterns. Adds a touch of elegance to your home decor.",
-      price: 999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 299,
+      images: ["/images/3.png","/images/3-1.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -318,8 +318,8 @@ export const productsByCategory = {
       slug: "handmade-brass-candle-holders",
       description:
         "Set of 2 elegant brass candle holders with intricate traditional designs. Handcrafted by skilled artisans. Perfect for creating a warm and inviting atmosphere. Makes a beautiful decorative piece.",
-      price: 1599,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 399,
+      images: ["/images/4.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -335,8 +335,8 @@ export const productsByCategory = {
       slug: "traditional-indian-art-print",
       description:
         "Beautiful framed art print featuring traditional Indian artwork. High-quality print on premium paper. Available in various sizes and designs. Perfect for adding cultural elegance to your home or office.",
-      price: 2199,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 79,
+      images: ["/images/5.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -352,8 +352,8 @@ export const productsByCategory = {
       slug: "handmade-pottery-vase",
       description:
         "Beautiful handcrafted pottery vase with unique designs. Made by skilled artisans using traditional techniques. Perfect for flowers or as a standalone decorative piece. Each vase is one-of-a-kind.",
-      price: 2799,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 79,
+      images: ["/images/6.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -362,7 +362,7 @@ export const productsByCategory = {
         keywords: ["pottery vase", "handmade", "decorative", "unique"],
       },
     },
-    {
+    /*{
       id: 13,
       categoryId: "home-decor",
       title: "Traditional Brass Diya Set",
@@ -463,7 +463,7 @@ export const productsByCategory = {
       meta: {
         keywords: ["room divider", "bamboo", "handwoven", "sustainable"],
       },
-    },
+    },*/
   ],
   "personalized-gifts": [
     {
@@ -473,8 +473,8 @@ export const productsByCategory = {
       slug: "customized-photo-frame-set",
       description:
         "Elegant photo frame set perfect for displaying your cherished memories. Available in various sizes and finishes. Can be customized with names, dates, or special messages. Makes a perfect gift for weddings, anniversaries, or birthdays.",
-      price: 1299,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 518,
+      images: ["/images/7.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -490,8 +490,8 @@ export const productsByCategory = {
       slug: "custom-engraved-watch",
       description:
         "Elegant wristwatch with custom engraving option. Choose from various designs and add personalized text or dates. Premium quality movement with leather or metal strap options. Perfect gift for special occasions.",
-      price: 4499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 599,
+      images: ["/images/8.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -507,8 +507,8 @@ export const productsByCategory = {
       slug: "personalized-coffee-mug-set",
       description:
         "Set of 2 ceramic coffee mugs with custom printing option. Add names, photos, or special messages. Dishwasher safe and microwave friendly. Perfect for couples or best friends.",
-      price: 799,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 599,
+      images: ["/images/9.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -524,8 +524,8 @@ export const productsByCategory = {
       slug: "customized-keychain-set",
       description:
         "Set of 4 personalized keychains with custom text or initials. Made from durable materials. Available in various colors and finishes. Perfect as a small gift or party favor.",
-      price: 499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 879,
+      images: ["/images/10.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -542,7 +542,7 @@ export const productsByCategory = {
       description:
         "Elegant wooden or brass nameplate with custom engraving. Perfect for office doors, home entrances, or as a gift. Available in various sizes and finishes. Add names, titles, or special messages.",
       price: 899,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      images: ["/images/11.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -551,7 +551,7 @@ export const productsByCategory = {
         keywords: ["nameplate", "engraved", "custom", "personalized"],
       },
     },
-    {
+    /*{
       id: 20,
       categoryId: "personalized-gifts",
       title: "Personalized Birthstone Jewelry Box",
@@ -618,7 +618,7 @@ export const productsByCategory = {
       meta: {
         keywords: ["calendar", "photo", "custom", "personalized"],
       },
-    },
+    },*/
   ],
   "fashion-accessories": [
     {
@@ -628,8 +628,8 @@ export const productsByCategory = {
       slug: "traditional-indian-silk-scarf",
       description:
         "Luxurious handwoven silk scarf featuring traditional Indian patterns and vibrant colors. Made from premium silk with intricate embroidery work. Perfect for adding elegance to any outfit. Available in multiple color combinations.",
-      price: 1899,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 249,
+      images: ["/images/12.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -645,8 +645,8 @@ export const productsByCategory = {
       slug: "customized-leather-wallet",
       description:
         "Premium quality leather wallet with custom embossing option. Available in multiple colors and styles. Features multiple card slots and compartments. Can be personalized with initials or names.",
-      price: 1799,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 249,
+      images: ["/images/13.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -662,8 +662,8 @@ export const productsByCategory = {
       slug: "handwoven-cotton-tote-bag",
       description:
         "Eco-friendly handwoven cotton tote bag with traditional Indian patterns. Made from 100% organic cotton. Spacious and durable. Perfect for shopping, beach, or daily use. Available in various colors.",
-      price: 799,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 299,
+      images: ["/images/14.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -679,8 +679,8 @@ export const productsByCategory = {
       slug: "traditional-handloom-stole",
       description:
         "Luxurious handloom stole with traditional Indian designs. Made from premium cotton or silk blend. Perfect for adding elegance to any outfit. Available in various colors and patterns.",
-      price: 1499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 349,
+      images: ["/images/15.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -696,8 +696,8 @@ export const productsByCategory = {
       slug: "handmade-leather-belt",
       description:
         "Premium quality handmade leather belt with traditional buckle design. Made from genuine leather. Available in various sizes and colors. Can be customized with initials or patterns.",
-      price: 1299,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 349,
+      images: ["/images/16.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -715,8 +715,8 @@ export const productsByCategory = {
       slug: "traditional-silver-anklets",
       description:
         "Beautiful traditional silver anklets with intricate designs. Handcrafted by skilled artisans. Made from pure silver with traditional patterns. Perfect for festivals and special occasions.",
-      price: 2499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1859,
+      images: ["/images/17.png", "public/images/17-1.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -732,8 +732,8 @@ export const productsByCategory = {
       slug: "handmade-beaded-necklace-set",
       description:
         "Set of 3 handcrafted beaded necklaces with traditional Indian designs. Made from natural stones and beads. Each necklace is unique. Perfect for adding elegance to traditional and modern outfits.",
-      price: 1899,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1439,
+      images: ["/images/18-1.png", "/images/18.png", "/images/18-2.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -749,8 +749,8 @@ export const productsByCategory = {
       slug: "traditional-jhumka-earrings",
       description:
         "Elegant traditional jhumka (dangler) earrings with intricate designs. Made from brass or silver with traditional patterns. Perfect for weddings, festivals, and special occasions. Available in various sizes.",
-      price: 1299,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1509,
+      images: ["/images/19.png", "/images/19-1.png", "/images/19-2.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -766,8 +766,8 @@ export const productsByCategory = {
       slug: "handcrafted-bangles-set",
       description:
         "Set of 6 handcrafted bangles with traditional designs. Made from brass, wood, or lacquer. Each bangle features unique patterns. Perfect for traditional Indian attire and festivals.",
-      price: 999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1859,
+      images: ["/images/20.png", "/images/20-1.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -783,8 +783,8 @@ export const productsByCategory = {
       slug: "traditional-maang-tikka",
       description:
         "Beautiful traditional maang tikka (forehead jewelry) with intricate designs. Made from brass or silver with traditional patterns. Perfect for weddings and special occasions. Available in various designs.",
-      price: 1599,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1689,
+      images: ["/images/21.png", "/images/21-1.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -802,8 +802,8 @@ export const productsByCategory = {
       slug: "traditional-brass-serving-set",
       description:
         "Complete brass serving set including plates, bowls, and serving spoons. Handcrafted by skilled artisans using traditional methods. Perfect for traditional Indian dining. Each piece is polished to perfection.",
-      price: 4499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 2199,
+      images: ["/images/28.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -819,8 +819,8 @@ export const productsByCategory = {
       slug: "handmade-clay-cookware-set",
       description:
         "Set of traditional clay cookware including pots and pans. Made from natural clay using traditional methods. Enhances food flavor and retains nutrients. Perfect for healthy cooking.",
-      price: 1999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1499,
+      images: ["/images/23.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -836,8 +836,8 @@ export const productsByCategory = {
       slug: "copper-water-bottle",
       description:
         "Traditional copper water bottle with modern design. Copper is known for its health benefits including antimicrobial properties. Handcrafted with hammered finish. Perfect for daily use.",
-      price: 1299,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1499,
+      images: ["/images/24.png"],
       popular: true,
       featured: true,
       inStock: true,
@@ -853,8 +853,8 @@ export const productsByCategory = {
       slug: "handwoven-bamboo-dinnerware-set",
       description:
         "Eco-friendly bamboo dinnerware set including plates, bowls, and serving trays. Made from sustainable bamboo. Lightweight, durable, and perfect for outdoor dining or daily use.",
-      price: 1799,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 1499,
+      images: ["/images/25.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -875,8 +875,8 @@ export const productsByCategory = {
       slug: "traditional-spice-box-set",
       description:
         "Beautiful traditional spice box (masala dabba) with multiple compartments. Made from stainless steel or brass. Perfect for storing and organizing spices. Essential for Indian cooking.",
-      price: 899,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 2199,
+      images: ["/images/26.png"],
       popular: true,
       featured: false,
       inStock: true,
@@ -892,8 +892,8 @@ export const productsByCategory = {
       slug: "handcrafted-wooden-spoons-set",
       description:
         "Set of 6 handcrafted wooden spoons and ladles. Made from premium quality wood. Perfect for cooking and serving. Each piece is smooth and polished. Safe for non-stick cookware.",
-      price: 699,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 2199,
+      images: ["/images/27.png"],
       popular: false,
       featured: false,
       inStock: true,
