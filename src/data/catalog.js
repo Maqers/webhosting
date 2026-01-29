@@ -267,6 +267,7 @@ export const productsByCategory = {
       slug: "Handcrafted-yarn-tulip-single-stem",
       description:
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
+      price: 199,
       images: ["/images/1.png"],
       popular: true,
       featured: true,
@@ -283,6 +284,7 @@ export const productsByCategory = {
       slug: "handmade-crochet-flower-bouquet",
       description:
       "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
+      price: 250,
       images: ["/images/2.png"],
       popular: true,
       featured: false,
