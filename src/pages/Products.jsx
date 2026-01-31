@@ -167,8 +167,8 @@ let filtered = searchResultsData?.products || searchResults?.products || getAllP
     <div className="products-page">
       <div className="products-hero">
         <div className="container">
-          <h1 className="products-title">Our Custom Gifts Collection</h1>
-          <p className="products-subtitle">Discover unique, handcrafted gifts from India</p>
+          <h1 className="products-title">Our Custom Collection</h1>
+          <p className="products-subtitle">Discover unique, handcrafted gifts from Indian home businesses</p>
         </div>
       </div>
 

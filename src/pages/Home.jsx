@@ -107,8 +107,8 @@ const Home = () => {
         <div className="hero-overlay"></div>
         <div className={`hero-content ${heroTextVisible ? 'visible' : ''}`}>
           <div className="hero-text">
-            <h1 className="hero-title">Custom Gifts from India</h1>
-            <p className="hero-subtitle">Handcrafted with love, delivered with care. Order unique personalized gifts from India.</p>
+            <h1 className="hero-title">Custom Gifts from Indian small businesses</h1>
+            <p className="hero-subtitle">Handcrafted with love, delivered with care. Order unique personalized gifts from Indian home businesses and small businesses.</p>
           </div>
         </div>
         <div className="hero-indicators">
@@ -132,7 +132,7 @@ const Home = () => {
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
               </div>
-              <div className="stat-number">500+</div>
+              <div className="stat-number">20+</div>
               <div className="stat-label">Unique Products</div>
             </div>
             <div className="stat-card scroll-animate hover-lift touch-feedback" data-animate="fade-up" data-delay="100">
@@ -141,7 +141,7 @@ const Home = () => {
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               </div>
-              <div className="stat-number">4.8</div>
+              <div className="stat-number">5</div>
               <div className="stat-label">Average Rating</div>
             </div>
             <div className="stat-card scroll-animate hover-lift touch-feedback" data-animate="fade-up" data-delay="200">
@@ -162,7 +162,7 @@ const Home = () => {
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </div>
-              <div className="stat-number">10K+</div>
+              <div className="stat-number">5+</div>
               <div className="stat-label">Happy Customers</div>
             </div>
           </div>
@@ -215,7 +215,7 @@ const Home = () => {
         <div className="showcase-content">
           <div className="showcase-text" data-animate="slide-right">
             <h2>Handcrafted with Tradition, Made for You</h2>
-            <p>We bring you authentic Indian craftsmanship, where every piece tells a story. From traditional designs to modern personalized gifts, we curate unique products that celebrate Indian artistry and culture.</p>
+            <p>We bring you authentic Indian craftsmanship, home-businesses where every piece tells a story. From traditional designs to modern personalized gifts, we curate unique products that celebrate Indian home and small sellers.</p>
             <Link to="/about" className="showcase-btn hover-underline touch-feedback">Our Story</Link>
           </div>
         </div>

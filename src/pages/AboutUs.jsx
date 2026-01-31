@@ -33,16 +33,16 @@ const AboutUs = () => {
           <div className="about-section scroll-animate">
             <h2>Our Story</h2>
             <p>
-              Welcome to maqers, your trusted partner for custom gifts from India! We started with a simple 
-              vision: to bridge the gap between authentic Indian craftsmanship and gift lovers worldwide. 
-              What began as a small venture has grown into a platform that connects thousands of customers 
-              with unique, handcrafted products that tell stories.
+              Welcome to maqers, your trusted partner for custom gifts from India! maqers is a platform built for makers 
+              and for people who value thoughtful, personalised products. We bring together Indian home businsses who specialise 
+              in handmade and made-to-order items, from personalised gifts to everyday things designed with care. 
+              Every product on maqers is created by an independent maker, not mass-produced in factories.
             </p>
             <p>
-              We believe that every gift should be special, meaningful, and authentic. That's why we've 
-              partnered with skilled artisans and trusted manufacturers across India - from traditional 
-              craftsmen to modern designers - to ensure you always have access to beautiful, personalized 
-              gifts that celebrate Indian artistry and culture.
+              Our focus is simple: help makers grow their businesses while giving buyers access to meaningful, well-crafted products that feel personal and intentional.
+              maqers is not a discount marketplace. We believe in fair pricing, quality craftsmanship, and building a community where creativity, 
+              effort, and individuality are valued. When you shop on maqers, you’re not just buying a product —
+              you’re supporting a maker, a skill, and a story.
             </p>
           </div>
 
@@ -71,7 +71,7 @@ const AboutUs = () => {
                   </svg>
                 </div>
                 <h3>Authentic Craftsmanship</h3>
-                <p>Handpicked products from skilled Indian artisans, ensuring authenticity and quality in every piece</p>
+                <p>Handpicked products from skilled Indian artisans & small businsses, ensuring authenticity and quality in every piece</p>
               </div>
               <div className="feature-card scroll-animate">
                 <div className="feature-icon-wrapper">
@@ -90,8 +90,8 @@ const AboutUs = () => {
                     <line x1="12" y1="22.08" x2="12" y2="12"/>
                   </svg>
                 </div>
-                <h3>Worldwide Shipping</h3>
-                <p>We deliver to customers across the globe, bringing Indian craftsmanship to your doorstep</p>
+                <h3>Nation-wide Shipping</h3>
+                <p>We deliver to customers across India, bringing Indian home businsses to your doorstep</p>
               </div>
               <div className="feature-card scroll-animate">
                 <div className="feature-icon-wrapper">
@@ -111,8 +111,8 @@ const AboutUs = () => {
               <h2>Get in Touch</h2>
               <p>
                 Have a question about our products? Need help choosing the perfect gift? Want to partner 
-                with us? We're here to help! Reach out through our WhatsApp chat or contact our customer 
-                support team. We're available to ensure you have the best gift shopping experience.
+                with us? We're here to help! Reach out through our WhatsApp chat or email.
+                We're available to ensure you have the best gift shopping experience.
               </p>
               
               <div className="quote-section scroll-animate">
@@ -120,7 +120,7 @@ const AboutUs = () => {
                   <svg className="quote-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                   </svg>
-                  <p className="quote-text">"The best gifts come from the heart, crafted with love and delivered with care."</p>
+                  <p className="quote-text">"The best gifts come from the heart, crafted with love and delivered with care by Indian home businesses."</p>
                   <p className="quote-author">— maqers</p>
                 </div>
               </div>

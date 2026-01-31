@@ -12,7 +12,7 @@ const FAQs = () => {
     },
     {
       question: "Do you ship internationally?",
-      answer: "Yes, we offer international shipping to customers worldwide! Please contact us via WhatsApp with your location, and we'll provide you with shipping options, costs, and estimated delivery times. We ensure safe and secure packaging for all international orders."
+      answer: "No, we don't offer international shipping to customers worldwide!"
     },
     {
       question: "What payment methods do you accept?",
@@ -24,7 +24,7 @@ const FAQs = () => {
     },
     {
       question: "Can I return or exchange a product?",
-      answer: "Yes, we offer returns and exchanges within 14 days of delivery, provided the product is in its original condition with all tags and packaging intact. Customized items may have different return policies. Please contact us via WhatsApp to initiate a return or exchange, and we'll guide you through the process."
+      answer: "No, we don't offer returns and exchanges for now."
     },
     {
       question: "Are the products authentic?",
@@ -32,7 +32,7 @@ const FAQs = () => {
     },
     {
       question: "Do you offer gift wrapping?",
-      answer: "Yes, we offer beautiful gift wrapping services for an additional fee. Our elegant packaging includes premium gift boxes, ribbons, and personalized messages. Please mention this when placing your order through WhatsApp, and we'll be happy to arrange it for you. Perfect for special occasions!"
+      answer: "No, we don't offer separate gift wrapping services. Packaging depends on artisans, if something specific is required please mention this when placing your order through WhatsApp, and we'll try arranging it for you after coordinating with the sellers, if possible additional costs may apply"
     },
     {
       question: "How can I track my order?",
@@ -44,7 +44,7 @@ const FAQs = () => {
     },
     {
       question: "What if I'm not satisfied with my order?",
-      answer: "Your satisfaction is our priority! If you're not completely happy with your order, please contact us immediately via WhatsApp. We'll work with you to resolve any issues, whether that's a replacement, refund, or exchange. We stand behind the quality of every product we sell."
+      answer: "Your satisfaction is our priority! If you're not completely happy with your order, please contact us immediately via WhatsApp. We'll work with you to resolve any issues, whether that's a replacement or exchange, only if it is not personalised. We stand behind the quality of every product we sell."
     }
   ]
 

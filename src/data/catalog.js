@@ -17,46 +17,46 @@ const PLACEHOLDER = "/images/logo.png";
 // Add new categories here - UI will automatically update
 export const categories = [
   {
-    id: "home-decor",
-    name: "Home Decor",
-    slug: "home-decor",
-    description: "Beautiful handcrafted items to enhance your living space",
+    id: "Crochet",
+    name: "Handmade Crochet",
+    slug: "Crochet",
+    description: "Beautiful crochet handmade products",
     icon: "home",
     order: 1, // Display order
     featured: true, // Show in featured sections
     meta: {
-      keywords: ["home", "decor", "furniture", "decoration", "interior"],
+      keywords: ["crochet", "flowers", "bouquets", "handmade", "anniversary","gift"],
     },
   },
   {
-    id: "personalized-gifts",
-    name: "Personalized Gifts",
-    slug: "personalized-gifts",
-    description: "Customized gifts made special with personal touches",
+    id: "Candles",
+    name: "Candles",
+    slug: "Candles",
+    description: "Beautiful fragnant candles, customisations available",
     icon: "gift",
     order: 2,
     featured: true,
     meta: {
-      keywords: ["personalized", "custom", "gift", "engraved", "monogram"],
+      keywords: ["personalized", "candles", "gift", "candle", "birthday","anniversary"],
     },
   },
   {
-    id: "fashion-accessories",
-    name: "Fashion & Accessories",
-    slug: "fashion-accessories",
-    description: "Elegant fashion items and accessories",
+    id: "Handbags",
+    name: "Handbags",
+    slug: "Handbags",
+    description: "Elegant fashion items and bags",
     icon: "fashion",
     order: 3,
     featured: true,
     meta: {
-      keywords: ["fashion", "accessories", "clothing", "jewelry", "style"],
+      keywords: ["bags", "handbags", "prints", "printed", "bag"],
     },
   },
   {
-    id: "jewelry-accessories",
-    name: "Jewelry & Accessories",
-    slug: "jewelry-accessories",
-    description: "Handcrafted jewelry and traditional accessories",
+    id: "Frames&Paintings",
+    name: "Frames & Paintings",
+    slug: "Frames&Paintings",
+    description: "Handmade paintings in beautiful frames",
     icon: "jewelry",
     order: 4,
     featured: true,
@@ -71,18 +71,18 @@ export const categories = [
     },
   },
   {
-    id: "kitchen-dining",
-    name: "Kitchen & Dining",
-    slug: "kitchen-dining",
-    description: "Traditional kitchenware and dining essentials",
+    id: "Home-decor",
+    name: "Home decor",
+    slug: "Home-decor",
+    description: "Fancy home and dining utilities",
     icon: "kitchen",
     order: 5,
     featured: true,
     meta: {
-      keywords: ["kitchen", "dining", "utensils", "cookware", "traditional"],
+      keywords: ["homedecor", "decor", "glasses", "glass", "homeutilities"],
     },
   },
-  {
+  /*{
     id: "art-collectibles",
     name: "Art & Collectibles",
     slug: "art-collectibles",
@@ -135,7 +135,7 @@ export const categories = [
     meta: {
       keywords: ["office", "stationery", "desk", "organizer", "supplies"],
     },
-  },
+  },*/
 ];
 
 // ============================================================================
@@ -259,11 +259,11 @@ export const categories = [
 // To add a product: Add object to appropriate category array
 // To add a category: Add category above + create new array below
 export const productsByCategory = {
-  "home-decor": [
+  "Crochet": [
     {
       id: 1,
-      categoryId: "home-decor",
-      title: "Handcrafted Yarn Tulip (Single Stem)",
+      categoryId: "Crochet",
+      title: "Handcrafted Yarn Tulip",
       slug: "Handcrafted-yarn-tulip-single-stem",
       description:
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
@@ -279,12 +279,12 @@ export const productsByCategory = {
     },
     {
       id: 4,
-      categoryId: "home-decor",
-      title: "Handmade Crochet Flower Bouquet",
+      categoryId: "Crochet",
+      title: "Crochet Flower Bouquet",
       slug: "handmade-crochet-flower-bouquet",
       description:
       "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
-      price: 250,
+      price: 249,
       images: ["/images/2.png"],
       popular: true,
       featured: false,
@@ -296,8 +296,8 @@ export const productsByCategory = {
     },
     {
       id: 6,
-      categoryId: "home-decor",
-      title: "Handmade Crochet Flower Pot",
+      categoryId: "Crochet",
+      title: "Crochet Flower Pot",
       slug: "handmade-crochet-flower-pot",
       description:
         "A charming mini flower pot made with crochet—bright, durable, and zero-maintenance. Available in multiple colors and styles, it’s a perfect desk décor piece or a cute gifting add-on.",
@@ -313,7 +313,7 @@ export const productsByCategory = {
     },
     {
       id: 8,
-      categoryId: "home-decor",
+      categoryId: "Crochet",
       title: "Crochet Flower Bouquet",
       slug: "crochet-flower-bouquet",
       description:
@@ -330,7 +330,7 @@ export const productsByCategory = {
     },
     {
       id: 10,
-      categoryId: "home-decor",
+      categoryId: "Crochet",
       title: "Crochet Flower Keychain",
       slug: "crochet-flower-keychain",
       description:
@@ -347,7 +347,7 @@ export const productsByCategory = {
     },
     {
       id: 12,
-      categoryId: "home-decor",
+      categoryId: "Crochet",
       title: "Crochet Keychain Collection",
       slug: "crochet-keychain-collection",
       description:
@@ -465,10 +465,10 @@ export const productsByCategory = {
       },
     },*/
   ],
-  "personalized-gifts": [
+  "Candles": [
     {
       id: 2,
-      categoryId: "personalized-gifts",
+      categoryId: "Candles",
       title: "Strawberry Dessert Candle",
       slug: "strawberry-dessert-candle",
       description:
@@ -485,7 +485,7 @@ export const productsByCategory = {
     },
     {
       id: 5,
-      categoryId: "personalized-gifts",
+      categoryId: "Candles",
       title: "Heart Layered Jar Candle",
       slug: "heart-layered-jar-candle",
       description:
@@ -502,7 +502,7 @@ export const productsByCategory = {
     },
     {
       id: 9,
-      categoryId: "personalized-gifts",
+      categoryId: "Candles",
       title: "Rose Layered Jar Candle",
       slug: "rose-layered-jar-candle",
       description:
@@ -519,7 +519,7 @@ export const productsByCategory = {
     },
     {
       id: 11,
-      categoryId: "personalized-gifts",
+      categoryId: "Candles",
       title: "Ocean Breeze Dessert Candle",
       slug: "ocean-breeze-dessert-candle",
       description:
@@ -536,7 +536,7 @@ export const productsByCategory = {
     },
     {
       id: 19,
-      categoryId: "personalized-gifts",
+      categoryId: "Candles",
       title: "Mini Bucket Candlee",
       slug: "mini-bucket-candle",
       description:
@@ -620,10 +620,10 @@ export const productsByCategory = {
       },
     },*/
   ],
-  "fashion-accessories": [
+  "Handbags": [
     {
       id: 3,
-      categoryId: "fashion-accessories",
+      categoryId: "Handbags",
       title: "Fiery Tote Bag",
       slug: "fiery-tote-bag",
       description:
@@ -640,7 +640,7 @@ export const productsByCategory = {
     },
     {
       id: 7,
-      categoryId: "fashion-accessories",
+      categoryId: "Handbags",
       title: "Heart Print Tote Bag",
       slug: "heart-print-tote-bag",
       description:
@@ -657,7 +657,7 @@ export const productsByCategory = {
     },
     {
       id: 24,
-      categoryId: "fashion-accessories",
+      categoryId: "Handbags",
       title: "Sunflower Butterfly Tote Bag",
       slug: "sunflower-butterfly-tote-bag",
       description:
@@ -674,7 +674,7 @@ export const productsByCategory = {
     },
     {
       id: 25,
-      categoryId: "fashion-accessories",
+      categoryId: "Handbags",
       title: "Sunflower Butterfly Tote Bag",
       slug: "sunflower-butterfly-tote-bag",
       description:
@@ -691,7 +691,7 @@ export const productsByCategory = {
     },
     {
       id: 26,
-      categoryId: "fashion-accessories",
+      categoryId: "Handbags",
       title: "Hand-Painted Boot Tote Bag",
       slug: "hand-painted-boot-tote-bag",
       description:
@@ -707,10 +707,10 @@ export const productsByCategory = {
       },
     },
   ],
-  "jewelry-accessories": [
+  "Frames&Paintings": [
     {
       id: 27,
-      categoryId: "jewelry-accessories",
+      categoryId: "Frames&Paintings",
       title: "Pressed Flower Memory Frame",
       slug: "pressed-flower-memory-frame",
       description:
@@ -727,7 +727,7 @@ export const productsByCategory = {
     },
     {
       id: 28,
-      categoryId: "jewelry-accessories",
+      categoryId: "Frames&Paintings",
       title: "Pressed Flower Wall Frame",
       slug: "pressed-flower-wall-frame",
       description:
@@ -744,7 +744,7 @@ export const productsByCategory = {
     },
     {
       id: 29,
-      categoryId: "jewelry-accessories",
+      categoryId: "Frames&Paintings",
       title: "Pressed Petal Heart Frame",
       slug: "pressed-petal-heart-frame",
       description:
@@ -761,7 +761,7 @@ export const productsByCategory = {
     },
     {
       id: 30,
-      categoryId: "jewelry-accessories",
+      categoryId: "Frames&Paintings",
       title: "Pressed Flower Skull Art Frame",
       slug: "pressed-flower-skull-art-frame",
       description:
@@ -778,7 +778,7 @@ export const productsByCategory = {
     },
     {
       id: 31,
-      categoryId: "jewelry-accessories",
+      categoryId: "Frames&Paintings",
       title: "Pressed Flower Botanical Frame",
       slug: "pressed-flower-botanical-frame",
       description:
@@ -794,11 +794,11 @@ export const productsByCategory = {
       },
     },
   ],
-  "kitchen-dining": [
+  "Home-decor": [
     {
       id: 32,
-      categoryId: "kitchen-dining",
-      title: "Rhinestone Heart Champagne Flutes (Set of 2)",
+      categoryId: "Home-decor",
+      title: "Rhinestone Heart Champagne Flutes",
       slug: "rhinestone-heart-champagne-flutes-set-of-2",
       description:
         "A luxe pair of champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
@@ -814,96 +814,91 @@ export const productsByCategory = {
     },
     {
       id: 33,
-      categoryId: "kitchen-dining",
-      title: "Handmade Clay Cookware Set",
-      slug: "handmade-clay-cookware-set",
+      categoryId: "Home-decor",
+      title: "Spiral Champagne Flutes",
+      slug: "Spiral Champagne Flutes",
       description:
-        "Set of traditional clay cookware including pots and pans. Made from natural clay using traditional methods. Enhances food flavor and retains nutrients. Perfect for healthy cooking.",
+        "A luxe pair of champagne flutes with Spiral rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1499,
       images: ["/images/23.png"],
       popular: true,
       featured: false,
       inStock: true,
-      tags: ["clay", "cookware", "traditional", "healthy"],
+      tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
-        keywords: ["clay cookware", "traditional", "healthy", "kitchen"],
+        keywords: ["brass serving set", "traditional", "dining", "kitchen"],
       },
     },
     {
       id: 34,
-      categoryId: "kitchen-dining",
-      title: "Copper Water Bottle",
-      slug: "copper-water-bottle",
+      categoryId: "Home-decor",
+      title: "Twirl Rhinestone Champagne Flutes",
+      slug: "Twirl Rhinestone Champagne Flutes",
       description:
-        "Traditional copper water bottle with modern design. Copper is known for its health benefits including antimicrobial properties. Handcrafted with hammered finish. Perfect for daily use.",
+        "A luxe pair of twirl rhinestone flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1499,
       images: ["/images/24.png"],
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["copper", "water bottle", "health", "traditional"],
+      tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
-        keywords: ["copper water bottle", "health", "traditional", "kitchen"],
+        keywords: ["brass serving set", "traditional", "dining", "kitchen"],
       },
     },
     {
       id: 35,
-      categoryId: "kitchen-dining",
-      title: "Handwoven Bamboo Dinnerware Set",
-      slug: "handwoven-bamboo-dinnerware-set",
+      categoryId: "Home-decor",
+      title: "Minimal Champagne Flutes",
+      slug: "Minimal Champagne Flutes",
       description:
-        "Eco-friendly bamboo dinnerware set including plates, bowls, and serving trays. Made from sustainable bamboo. Lightweight, durable, and perfect for outdoor dining or daily use.",
+        "A luxe pair of champagne flutes with minimal rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1499,
       images: ["/images/25.png"],
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["bamboo", "dinnerware", "eco-friendly", "sustainable"],
+         tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
-        keywords: [
-          "bamboo dinnerware",
-          "eco-friendly",
-          "sustainable",
-          "kitchen",
-        ],
+        keywords: ["brass serving set", "traditional", "dining", "kitchen"],
       },
     },
     {
       id: 36,
-      categoryId: "kitchen-dining",
-      title: "Traditional Spice Box Set",
-      slug: "traditional-spice-box-set",
+      categoryId: "Home-decor",
+      title: "Beaded Neck Champagne Flutes",
+      slug: "Beaded Neck Champagne Flutes",
       description:
-        "Beautiful traditional spice box (masala dabba) with multiple compartments. Made from stainless steel or brass. Perfect for storing and organizing spices. Essential for Indian cooking.",
+        "A luxe pair of champagne flutes with Beaded Neck detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 2199,
       images: ["/images/26.png"],
       popular: true,
       featured: false,
       inStock: true,
-      tags: ["spice box", "traditional", "kitchen", "organizer"],
+      tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
-        keywords: ["spice box", "masala dabba", "traditional", "kitchen"],
+        keywords: ["brass serving set", "traditional", "dining", "kitchen"],
       },
     },
     {
       id: 37,
-      categoryId: "kitchen-dining",
-      title: "Handcrafted Wooden Spoons Set",
-      slug: "handcrafted-wooden-spoons-set",
+      categoryId: "Home-decor",
+      title: "Rhinestoned Champagne Flutes",
+      slug: "Rhinestoned Champagne Flutes",
       description:
-        "Set of 6 handcrafted wooden spoons and ladles. Made from premium quality wood. Perfect for cooking and serving. Each piece is smooth and polished. Safe for non-stick cookware.",
+        "A luxe pair of Rhinestoned champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 2199,
       images: ["/images/27.png"],
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["wooden spoons", "handcrafted", "kitchen", "cooking"],
+      tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
-        keywords: ["wooden spoons", "handcrafted", "kitchen", "cooking"],
+        keywords: ["brass serving set", "traditional", "dining", "kitchen"],
       },
     },
   ],
-  "art-collectibles": [
+  /*"art-collectibles": [
     {
       id: 38,
       categoryId: "art-collectibles",
@@ -1182,7 +1177,7 @@ export const productsByCategory = {
         keywords: ["paperweight", "brass", "traditional", "office"],
       },
     },
-  ],
+  ],*/
 };
 
 // ============================================================================

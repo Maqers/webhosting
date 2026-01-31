@@ -481,8 +481,7 @@ const ProductDetail = () => {
                 <li>Handcrafted with attention to detail</li>
                 <li>Elegant royal design</li>
                 <li>Perfect for gifting</li>
-                <li>Authentic Indian craftsmanship</li>
-                <li>Certificate of authenticity included</li>
+                <li>Authentic Indian home businesses & small businesses</li>
               </ul>
             </div>
           </div>
