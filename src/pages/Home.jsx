@@ -107,7 +107,7 @@ const Home = () => {
         <div className="hero-overlay"></div>
         <div className={`hero-content ${heroTextVisible ? 'visible' : ''}`}>
           <div className="hero-text">
-            <h1 className="hero-title">Custom Gifts from Indian small businesses</h1>
+            <h1 className="hero-title">Custom Gifts from Indian home businesses</h1>
             <p className="hero-subtitle">Handcrafted with love, delivered with care. Order unique personalized gifts from Indian home businesses and small businesses.</p>
           </div>
         </div>
