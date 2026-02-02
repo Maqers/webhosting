@@ -12,15 +12,15 @@ const FAQs = () => {
     },
     {
       question: "Do you ship internationally?",
-      answer: "No, we don't offer international shipping to customers worldwide!"
+      answer: "No, we don't offer international shipping to customers worldwide as of now. We currently ship only within India. However, we are working on expanding our shipping options in the future. Stay tuned for updates!"
     },
     {
       question: "What payment methods do you accept?",
-      answer: "We accept various payment methods including bank transfers, credit cards, debit cards, and digital payment platforms like PayPal, UPI, and more. Payment details will be discussed when you place an order through our WhatsApp chat. We ensure secure and hassle-free transactions."
+      answer: "We accept various payment methods including bank transfers, credit cards, debit cards, and digital payment platforms like UPI. Payment details will be discussed when you place an order through our WhatsApp chat. We ensure secure and hassle-free transactions."
     },
     {
       question: "How long does delivery take?",
-      answer: "Delivery times vary depending on your location and the product customization requirements. Typically, domestic orders take 5-10 business days, while international orders may take 10-21 business days. We'll provide specific timelines when you place your order, and you'll receive tracking information once your order ships."
+      answer: "Delivery times vary depending on your location and the product customization requirements. Typically, domestic orders take 5-7 business days. We'll provide specific timelines when you place your order, and you'll receive tracking information once your order ships."
     },
     {
       question: "Can I return or exchange a product?",
@@ -44,7 +44,7 @@ const FAQs = () => {
     },
     {
       question: "What if I'm not satisfied with my order?",
-      answer: "Your satisfaction is our priority! If you're not completely happy with your order, please contact us immediately via WhatsApp. We'll work with you to resolve any issues, whether that's a replacement or exchange, only if it is not personalised. We stand behind the quality of every product we sell."
+      answer: "Your satisfaction is our priority! If you're not completely happy with your order, please contact us immediately via WhatsApp. We'll work with you to resolve any issues. We stand behind the quality of every product we sell."
     }
   ]
 

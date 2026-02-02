@@ -1,77 +1,43 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getPopularProducts } from '../data/catalog'
 import ImageWithFallback from '../components/ImageWithFallback'
 import './Home.css'
 
+import slide1 from '../assets/images/hero/slide1.png'
+import slide2 from '../assets/images/hero/slide2.png'
+import slide3 from '../assets/images/hero/slide3.png'
+
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [heroImagesLoaded, setHeroImagesLoaded] = useState(false)
   const [heroTextVisible, setHeroTextVisible] = useState(false)
-  const popularProducts = getPopularProducts()
+
+  const heroSlides = useMemo(() => [slide1, slide2, slide3], [])
+  const popularProducts = useMemo(() => getPopularProducts(), [])
 
   // Show hero text immediately with animation
   useEffect(() => {
-    // Show text immediately after component mounts
-    const timer = setTimeout(() => {
-      setHeroTextVisible(true)
-    }, 100)
-
+    const timer = setTimeout(() => setHeroTextVisible(true), 100)
     return () => clearTimeout(timer)
-  }, [])
-
-  // Track hero images loading (non-blocking)
-  useEffect(() => {
-    const heroImages = document.querySelectorAll('.hero-slide-image')
-    let loadedCount = 0
-    const totalImages = heroImages.length
-
-    if (totalImages === 0) {
-      setHeroImagesLoaded(true)
-      return
-    }
-
-    const checkImageLoad = (img) => {
-      if (img.complete && img.naturalHeight !== 0) {
-        loadedCount++
-        if (loadedCount === totalImages) {
-          setHeroImagesLoaded(true)
-        }
-      } else {
-        img.addEventListener('load', () => {
-          loadedCount++
-          if (loadedCount === totalImages) {
-            setHeroImagesLoaded(true)
-          }
-        }, { once: true })
-        img.addEventListener('error', () => {
-          loadedCount++
-          if (loadedCount === totalImages) {
-            setHeroImagesLoaded(true)
-          }
-        }, { once: true })
-      }
-    }
-
-    heroImages.forEach(checkImageLoad)
   }, [])
 
   // Auto-slide hero images
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
+    if (heroSlides.length <= 1) return
 
-  // Scroll animation for stat cards - same as About page "What Sets Us Apart"
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [heroSlides.length])
+
+  // Scroll animation for stat cards
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in')
-          }
+          if (entry.isIntersecting) entry.target.classList.add('animate-in')
         })
       },
       { threshold: 0.1 }
@@ -81,38 +47,37 @@ const Home = () => {
     return () => observer.disconnect()
   }, [])
 
-  // Animations are handled globally via App.jsx
-
   return (
     <div className="home">
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-slider">
-          {[
-            "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1920&h=1080&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&h=1080&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&h=1080&fit=crop&q=80"
-          ].map((src, index) => (
+          {heroSlides.map((src, index) => (
             <div key={index} className={`hero-slide ${currentSlide === index ? 'active' : ''}`}>
               <ImageWithFallback
                 src={src}
                 alt={`Hero slide ${index + 1}`}
                 className="hero-slide-image"
                 loading={index === 0 ? 'eager' : 'lazy'}
-                priority={index === 0}
               />
             </div>
           ))}
         </div>
+
         <div className="hero-overlay"></div>
+
         <div className={`hero-content ${heroTextVisible ? 'visible' : ''}`}>
           <div className="hero-text">
             <h1 className="hero-title">Custom Gifts from Indian home businesses</h1>
-            <p className="hero-subtitle">Handcrafted with love, delivered with care. Order unique personalized gifts from Indian home businesses and small businesses.</p>
+            <p className="hero-subtitle">
+              Handcrafted with love, delivered with care. Order unique personalized gifts from Indian home
+              businesses and small businesses.
+            </p>
           </div>
         </div>
+
         <div className="hero-indicators">
-          {[0, 1, 2].map((index) => (
+          {heroSlides.map((_, index) => (
             <span
               key={index}
               className={`indicator ${currentSlide === index ? 'active' : ''}`}
@@ -135,6 +100,7 @@ const Home = () => {
               <div className="stat-number">20+</div>
               <div className="stat-label">Unique Products</div>
             </div>
+
             <div className="stat-card scroll-animate hover-lift touch-feedback" data-animate="fade-up" data-delay="100">
               <div className="stat-icon-wrapper">
                 <svg className="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -144,6 +110,7 @@ const Home = () => {
               <div className="stat-number">5</div>
               <div className="stat-label">Average Rating</div>
             </div>
+
             <div className="stat-card scroll-animate hover-lift touch-feedback" data-animate="fade-up" data-delay="200">
               <div className="stat-icon-wrapper">
                 <svg className="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -151,9 +118,10 @@ const Home = () => {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
               </div>
-              <div className="stat-number">7-14</div>
+              <div className="stat-number">5-7</div>
               <div className="stat-label">Days Delivery</div>
             </div>
+
             <div className="stat-card scroll-animate hover-lift touch-feedback" data-animate="fade-up" data-delay="300">
               <div className="stat-icon-wrapper">
                 <svg className="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -162,7 +130,7 @@ const Home = () => {
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </div>
-              <div className="stat-number">5+</div>
+              <div className="stat-number">100+</div>
               <div className="stat-label">Happy Customers</div>
             </div>
           </div>
@@ -174,8 +142,11 @@ const Home = () => {
         <div className="container">
           <div className="section-header">
             <h2 className="section-title" data-animate="fade-up">Featured Products</h2>
-            <p className="section-description" data-animate="fade-up" data-delay="100">Handpicked favorites from our collection</p>
+            <p className="section-description" data-animate="fade-up" data-delay="100">
+              Handpicked favorites from our collection
+            </p>
           </div>
+
           <div className="featured-grid" data-animate="stagger" data-stagger-delay="100">
             {popularProducts.slice(0, 3).map((product, index) => (
               <Link
@@ -196,6 +167,7 @@ const Home = () => {
                     <span className="featured-badge">Popular</span>
                   </div>
                 </div>
+
                 <div className="featured-content">
                   <h3>{product.title}</h3>
                   <p className="product-id">Product ID: {product.id}</p>
@@ -215,7 +187,11 @@ const Home = () => {
         <div className="showcase-content">
           <div className="showcase-text" data-animate="slide-right">
             <h2>Handcrafted with Tradition, Made for You</h2>
-            <p>We bring you authentic Indian craftsmanship, home-businesses where every piece tells a story. From traditional designs to modern personalized gifts, we curate unique products that celebrate Indian home and small sellers.</p>
+            <p>
+              We bring you authentic Indian craftsmanship, home-businesses where every piece tells a story.
+              From traditional designs to modern personalized gifts, we curate unique products that celebrate
+              Indian home and small sellers.
+            </p>
             <Link to="/about" className="showcase-btn hover-underline touch-feedback">Our Story</Link>
           </div>
         </div>
@@ -228,6 +204,7 @@ const Home = () => {
             <h2 className="section-title" data-animate="fade-up">Popular Products</h2>
             <Link to="/products" className="view-all-link hover-underline touch-feedback">View All →</Link>
           </div>
+
           <div className="products-grid" data-animate="stagger" data-stagger-delay="80">
             {popularProducts.slice(0, 6).map((product, index) => (
               <ProductCard key={product.id} product={product} index={index} />
@@ -243,7 +220,9 @@ const Home = () => {
             <h2>Ready to Order?</h2>
             <p>Browse our complete collection and find the perfect custom gift</p>
             <div className="cta-buttons">
-              <Link to="/contact" className="cta-button primary hover-lift touch-feedback ripple-effect">Contact Us</Link>
+              <Link to="/contact" className="cta-button primary hover-lift touch-feedback ripple-effect">
+                Contact Us
+              </Link>
             </div>
           </div>
         </div>
@@ -270,6 +249,7 @@ const ProductCard = ({ product, index }) => {
         />
         {product.popular && <div className="popular-badge">Popular</div>}
       </div>
+
       <div className="product-info">
         <h3 className="product-title">{product.title}</h3>
         <p className="product-id">Product ID: {product.id}</p>
