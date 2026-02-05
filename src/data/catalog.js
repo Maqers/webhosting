@@ -531,7 +531,7 @@ export const productsByCategory = {
     {
       id: 19,
       categoryId: "Candles",
-      title: "Mini Bucket Candlee",
+      title: "Mini Bucket Candles",
       slug: "mini-bucket-candle",
       description:
         "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
