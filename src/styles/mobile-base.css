@@ -45,14 +45,23 @@ button,
   user-select: none;
 }
 
-/* Smooth scrolling with momentum on iOS */
+/* Smooth scrolling with momentum on iOS and Android */
 @media (max-width: 768px) {
+  /* Enable smooth scrolling for iOS */
   * {
     -webkit-overflow-scrolling: touch;
   }
   
+  /* Android needs explicit touch-action for scrolling */
+  html,
+  body {
+    touch-action: pan-y;
+    -ms-touch-action: pan-y;
+  }
+  
   body {
     overflow-x: hidden;
+    overflow-y: auto; /* Ensure vertical scrolling is enabled */
     -webkit-text-size-adjust: 100%;
   }
 }

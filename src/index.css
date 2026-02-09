@@ -55,6 +55,9 @@
 /* iOS Safari Critical Fixes - Must be last to override other styles */
 @import './styles/ios-safari-fixes.css';
 
+/* Android Scrolling Fixes - Critical fix for Android device scrolling issues */
+@import './styles/android-scroll-fix.css';
+
 /* Global reset - Must come after @import statements */
 * {
   margin: 0;
