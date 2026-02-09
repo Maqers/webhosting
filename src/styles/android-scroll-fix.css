@@ -1,0 +1,162 @@
+/**
+ * ANDROID SCROLLING FIXES
+ * 
+ * Critical fixes for Android device scrolling issues
+ * - Enables proper touch scrolling on Android browsers
+ * - Fixes touch-action properties
+ * - Removes user-select restrictions that block scrolling
+ * - Ensures overflow properties allow scrolling
+ */
+
+/* ============================================================================
+   ANDROID TOUCH SCROLLING - CRITICAL FIX
+   ============================================================================ */
+
+/* Detect Android devices (not iOS) */
+@media (max-width: 768px) {
+  /* GLOBAL SCROLL RESET FOR ANDROID */
+  html {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    position: relative !important;
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+    scroll-behavior: smooth !important;
+  }
+
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    min-height: 100% !important;
+    height: auto !important;
+    width: 100% !important;
+    position: static !important; /* Critical: allows document to scroll on Android */
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Root containers must allow scrolling */
+  #root,
+  .App {
+    overflow-y: visible !important; /* Let body handle scroll */
+    overflow-x: hidden !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    width: 100% !important;
+    position: relative !important;
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+  }
+
+  /* Ensure all scrollable containers work */
+  .home,
+  .products-page,
+  .about-us,
+  .contact-page,
+  .faqs-page,
+  .categories-page,
+  .product-detail,
+  .container,
+  section,
+  .section,
+  main,
+  article {
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================================
+   REMOVE USER-SELECT RESTRICTIONS
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Allow default selection behavior on Android for scrolling */
+  * {
+    /* Remove restrictive user-select on Android */
+    -webkit-user-select: auto !important;
+    -moz-user-select: auto !important;
+    -ms-user-select: auto !important;
+    user-select: auto !important;
+    /* Ensure touch events propagate */
+    pointer-events: auto !important;
+  }
+
+  /* Keep user-select: none only for strictly interactive elements */
+  button,
+  .navbar-toggle,
+  .whatsapp-button {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Allow text selection in content areas */
+  p, h1, h2, h3, h4, h5, h6, span, li, a {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+}
+
+/* ============================================================================
+   ANDROID TOUCH-ACTION FIXES
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Interactive elements */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  .clickable {
+    touch-action: manipulation !important;
+    -ms-touch-action: manipulation !important;
+  }
+
+  /* Images can be zoomed */
+  img {
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
+  }
+  
+  /* Horizontal scroll containers */
+  .category-filters,
+  .sub-navbar-container,
+  .products-grid,
+  [style*="overflow-x: auto"],
+  [class*="scroll-x"] {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    touch-action: pan-x pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ============================================================================
+   PREVENT POSITION: FIXED LOCKOUT
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Ensure body is never fixed when menu is closed */
+  body:not(.menu-open):not(.sort-modal-open) {
+    position: static !important;
+    width: 100% !important;
+    overflow-y: auto !important;
+  }
+
+  /* Fix for when menu IS open - allow menu scrolling if needed */
+  body.menu-open {
+    position: fixed !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+}

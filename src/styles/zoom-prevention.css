@@ -7,7 +7,17 @@
 
 /* Prevent zoom gestures on mobile */
 @media (max-width: 768px) {
-  /* Disable pinch zoom */
+  /* Allow pan gestures for scrolling - Android needs pan-y for vertical scroll */
+  /* Default to pan-y to enable vertical scrolling on Android */
+  html,
+  body,
+  #root,
+  .App {
+    touch-action: pan-y;
+    -ms-touch-action: pan-y;
+  }
+  
+  /* Allow pan-x and pan-y for other elements */
   * {
     touch-action: pan-x pan-y;
     -ms-touch-action: pan-x pan-y;
@@ -19,7 +29,7 @@
     -ms-touch-action: pan-x pan-y pinch-zoom;
   }
   
-  /* Prevent double-tap zoom */
+  /* Prevent double-tap zoom on interactive elements */
   button,
   a,
   input,
