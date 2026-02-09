@@ -32,12 +32,10 @@
     min-height: 100% !important;
     height: auto !important;
     width: 100% !important;
-    position: relative !important;
+    position: static !important; /* Critical: allows document to scroll on Android */
     touch-action: pan-y !important;
     -ms-touch-action: pan-y !important;
     -webkit-overflow-scrolling: touch !important;
-    /* Prevent fixed positioning that blocks scroll */
-    position: static !important; 
   }
 
   /* Root containers must allow scrolling */
