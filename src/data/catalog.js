@@ -285,7 +285,7 @@ export const productsByCategory = {
       inStock: true,
       tags: ["bouquet", "crochet", "yarn", "birthday", "gift"],
       meta: {
-        keywords: ["crochet bouquet", "yarn flowers", "gift", "birthday", "anniversary"],
+        keywords: ["bouquet", "yarn flowers", "gift", "birthday", "anniversary", "flowers"],
       },
     },
     {
