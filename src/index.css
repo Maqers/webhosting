@@ -58,6 +58,9 @@
 /* Android Scrolling Fixes - Critical fix for Android device scrolling issues */
 @import './styles/android-scroll-fix.css';
 
+/* Mobile scroll priority - MUST be last so touch scroll works on all devices */
+@import './styles/mobile-scroll-priority.css';
+
 /* Global reset - Must come after @import statements */
 * {
   margin: 0;
@@ -801,6 +804,34 @@ body {
 /* Ensure all elements respect container bounds */
 * {
   max-width: 100%;
+}
+
+/* ============================================================================
+   GLOBAL MOBILE SCROLL SAFETY
+   Ensures the page can always scroll vertically on small screens
+   ============================================================================ */
+@media (max-width: 768px) {
+  html,
+  body {
+    /* Always allow vertical scrolling on mobile */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    /* Ensure touch scrolling works reliably */
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root,
+  .App {
+    /* Ensure root containers don't block scroll */
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    min-height: 100vh !important;
+    height: auto !important;
+  }
 }
 
 img,

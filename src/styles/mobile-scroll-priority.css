@@ -1,0 +1,95 @@
+/**
+ * MOBILE SCROLL PRIORITY
+ * Loaded last to override any other rules.
+ * Makes touch scrolling easy and reliable on all mobile devices.
+ */
+
+@media (max-width: 768px) {
+  /* 1. Document must scroll: html/body are the scroll container */
+  html {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
+  }
+
+  body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100% !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
+    overscroll-behavior-y: auto !important;
+  }
+
+  /* 2. Never lock body scroll (menu/modal open or not) */
+  body.menu-open,
+  body.sort-modal-open {
+    position: static !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
+  }
+
+  /* 3. Root and App must not create a scroll trap */
+  #root,
+  .App {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    position: relative !important;
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+  }
+
+  /* 4. Main content areas: allow vertical scroll immediately (no manipulation delay) */
+  main,
+  .home,
+  .products-page,
+  .about-us,
+  .contact-page,
+  .faqs-page,
+  .categories-page,
+  .product-detail,
+  section,
+  .section,
+  article,
+  .container {
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  /* 5. Links: pan-y so scrolling over links is smooth (avoid manipulation) */
+  a {
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+  }
+
+  /* 6. Only small controls get manipulation (reduces accidental zoom, keeps scroll smooth elsewhere) */
+  button,
+  input,
+  select,
+  textarea,
+  .navbar-toggle,
+  .whatsapp-button,
+  [role="button"] {
+    touch-action: manipulation !important;
+    -ms-touch-action: manipulation !important;
+  }
+
+  /* 7. Images: allow pan and pinch */
+  img {
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
+  }
+}
