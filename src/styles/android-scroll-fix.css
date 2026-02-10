@@ -72,6 +72,12 @@
     width: 100% !important;
     max-width: 100% !important;
   }
+
+  /* Product detail: when image is NOT zoomed, ensure container never blocks page scroll. */
+  .product-detail .main-image-container:not(.is-zoomed) {
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
+  }
 }
 
 /* ============================================================================
@@ -79,30 +85,17 @@
    ============================================================================ */
 
 @media (max-width: 768px) {
-  /* Allow default selection behavior on Android for scrolling */
-  * {
-    /* Remove restrictive user-select on Android */
-    -webkit-user-select: auto !important;
-    -moz-user-select: auto !important;
-    -ms-user-select: auto !important;
-    user-select: auto !important;
-    /* Ensure touch events propagate */
-    pointer-events: auto !important;
+  /* Allow text selection; do NOT set pointer-events on * (breaks modals) */
+  p, h1, h2, h3, h4, h5, h6, span, li {
+    -webkit-user-select: text !important;
+    user-select: text !important;
   }
 
-  /* Keep user-select: none only for strictly interactive elements */
   button,
   .navbar-toggle,
   .whatsapp-button {
     -webkit-user-select: none !important;
     user-select: none !important;
-    touch-action: manipulation !important;
-  }
-
-  /* Allow text selection in content areas */
-  p, h1, h2, h3, h4, h5, h6, span, li, a {
-    -webkit-user-select: text !important;
-    user-select: text !important;
   }
 }
 
@@ -111,18 +104,10 @@
    ============================================================================ */
 
 @media (max-width: 768px) {
-  /* Interactive elements */
-  button,
-  a,
-  input,
-  select,
-  textarea,
-  .clickable {
-    touch-action: manipulation !important;
-    -ms-touch-action: manipulation !important;
-  }
+  /* touch-action for interactive elements set in mobile-scroll-priority.css
+     (links use pan-y for smooth scroll; buttons/inputs use manipulation) */
 
-  /* Images can be zoomed */
+  /* Images: allow pan and pinch */
   img {
     touch-action: pan-y pinch-zoom !important;
     -ms-touch-action: pan-y pinch-zoom !important;
@@ -142,21 +127,28 @@
 }
 
 /* ============================================================================
-   PREVENT POSITION: FIXED LOCKOUT
+   PREVENT POSITION: FIXED LOCKOUT (ANDROID)
+   Ensure NOTHING can permanently lock page scroll on small devices.
    ============================================================================ */
 
 @media (max-width: 768px) {
-  /* Ensure body is never fixed when menu is closed */
-  body:not(.menu-open):not(.sort-modal-open) {
+  /* Always allow vertical scrolling on Android */
+  body {
     position: static !important;
     width: 100% !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    -ms-touch-action: pan-y !important;
   }
 
-  /* Fix for when menu IS open - allow menu scrolling if needed */
-  body.menu-open {
-    position: fixed !important;
+  /* Even when mobile menu or sort modal is open, do NOT lock body scroll.
+     Menus/modals themselves stay fixed via their own CSS. */
+  body.menu-open,
+  body.sort-modal-open {
+    position: static !important;
     width: 100% !important;
-    overflow: hidden !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 }

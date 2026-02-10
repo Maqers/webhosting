@@ -195,52 +195,58 @@
 
 
 
-import { forwardRef, useState } from 'react'
+import { forwardRef } from 'react'
 import './ImageWithFallback.css'
 
-const ImageWithFallback = forwardRef(({
-  src,
-  alt = '',
-  className = '',
-  style,
-  loading = 'lazy',
-  priority = false,
-  sizes,
-  srcSet,
-  ...props
-}, ref) => {
-  const [loaded, setLoaded] = useState(false)
-  const [failed, setFailed] = useState(false)
-  console.log("**************",src)
-  if (!src || failed) {
-    return null // 👈 IMPORTANT: do nothing, don’t replace
-  }
+// Lightweight, hook-free image component to avoid invalid hook issues.
+// - If src is missing, renders nothing (lets layout decide).
+// - On error, hides the broken image element instead of crashing.
+const ImageWithFallback = forwardRef(
+  (
+    {
+      src,
+      alt = '',
+      className = '',
+      style,
+      loading = 'lazy',
+      priority = false,
+      sizes,
+      srcSet,
+      ...props
+    },
+    ref
+  ) => {
+    // If there is no source, don't render anything
+    if (!src) return null
 
-  return (
-    <img
-      ref={ref}
-      src={src}
-      alt={alt}
-      className={className}
-      loading={priority ? 'eager' : loading}
-      decoding={priority ? 'sync' : 'async'}
-      sizes={sizes}
-      srcSet={srcSet}
-      onLoad={() => setLoaded(true)}
-      onError={() => setFailed(true)}
-      style={{
-        opacity: loaded ? 1 : 0,
-        transition: 'opacity 0.2s ease',
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        display: 'block',
-        ...style
-      }}
-      {...props}
-    />
-  )
-})
+    const handleError = (event) => {
+      // Hide the broken image but do not throw React errors
+      event.currentTarget.style.display = 'none'
+    }
+
+    return (
+      <img
+        ref={ref}
+        src={src}
+        alt={alt}
+        className={className}
+        loading={priority ? 'eager' : loading}
+        decoding={priority ? 'sync' : 'async'}
+        sizes={sizes}
+        srcSet={srcSet}
+        onError={handleError}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          display: 'block',
+          ...style,
+        }}
+        {...props}
+      />
+    )
+  }
+)
 
 ImageWithFallback.displayName = 'ImageWithFallback'
 export default ImageWithFallback
