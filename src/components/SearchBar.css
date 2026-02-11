@@ -1,3 +1,10 @@
+/* Laptop/desktop: hide search dropdown (no right-side modal with images); search only navigates to products page */
+@media (min-width: 969px) {
+  .search-suggestions {
+    display: none !important;
+  }
+}
+
 .search-bar-container {
   position: relative;
   width: 100%;
