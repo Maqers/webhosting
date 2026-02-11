@@ -94,11 +94,11 @@ export const categories = [
       keywords: ["art","resin","frames","flowers"],
     },
   },
-  /*{
-    id: "wedding-occasions",
-    name: "Wedding & Special Occasions",
-    slug: "wedding-occasions",
-    description: "Special gifts for weddings and celebrations",
+  {
+    id: "Handmade-Accessories",
+    name: "Handmade Accessories",
+    slug: "Handmade-Accessories",
+    description: "Accessories for weddings and celebrations",
     icon: "wedding",
     order: 7,
     featured: true,
@@ -106,7 +106,7 @@ export const categories = [
       keywords: ["wedding", "occasion", "celebration", "gift", "special"],
     },
   },
-  {
+  /*{
     id: "kids-baby",
     name: "Kids & Baby Gifts",
     slug: "kids-baby",
@@ -348,6 +348,40 @@ export const productsByCategory = {
         "A super-cute set of crochet keychains in multiple designs—flowers, strawberries, cherries, and more—each one made to stand out. Lightweight, durable, and perfect for gifting or adding instant fresh pop to your keys or bag.",
       price: 79,
       images: ["/images/6.png"],
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["keychain", "crochet", "collection", "cute", "gift"],
+      meta: {
+        keywords: ["keychain", "handmade", "cute gift", "strawberry", "cherry"],
+      },
+    },
+    {
+      id: 56,
+      categoryId: "Crochet",
+      title: "Crochet Keychain Collection",
+      slug: "crochet-keychain-collection",
+      description:
+        "A super-cute set of crochet keychains in multiple designs—flowers, strawberries, cherries, and more—each one made to stand out. Lightweight, durable, and perfect for gifting or adding instant fresh pop to your keys or bag.",
+      price: 2199,
+      images: ["/images/39.png"], //hooksndhheart
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["keychain", "crochet", "collection", "cute", "gift"],
+      meta: {
+        keywords: ["keychain", "handmade", "cute gift", "strawberry", "cherry"],
+      },
+    },
+    {
+      id: 57,
+      categoryId: "Crochet",
+      title: "Crochet Keychain Collection",
+      slug: "crochet-keychain-collection",
+      description:
+        "A super-cute set of crochet keychains in multiple designs—flowers, strawberries, cherries, and more—each one made to stand out. Lightweight, durable, and perfect for gifting or adding instant fresh pop to your keys or bag.",
+      price: 1749,
+      images: ["/images/43.png","/images/44.png","/images/43.png"], //hooksndhheart
       popular: true,
       featured: true,
       inStock: true,
@@ -961,17 +995,51 @@ export const productsByCategory = {
         keywords: ["resin", "nameplate", "handmade", "flower"],
       },
     },
+    {
+      id: 59,
+      categoryId: "resin-products",
+      title: "Resin flower name plate",
+      slug: "Resin-flower-name-plate",
+      description:
+        "Add a personal touch to your space with this custom resin flower name plate. Featuring real flowers sealed forever in high-quality resin, it’s a timeless décor piece that welcomes with elegance.",
+      price: 579,
+      images: ["/images/45.png"], //AneraArt
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["resin", "nameplate", "handmade", "flower"],
+      meta: {
+        keywords: ["resin", "nameplate", "handmade", "flower"],
+      },
+    },
+    {
+      id: 60,
+      categoryId: "resin-products",
+      title: "Resin flower name plate",
+      slug: "Resin-flower-name-plate",
+      description:
+        "Add a personal touch to your space with this custom resin flower name plate. Featuring real flowers sealed forever in high-quality resin, it’s a timeless décor piece that welcomes with elegance.",
+      price: 579,
+      images: ["/images/46.png"], //AneraArt
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["resin", "nameplate", "handmade", "flower"],
+      meta: {
+        keywords: ["resin", "nameplate", "handmade", "flower"],
+      },
+    },
   ],
-  /*"wedding-occasions": [
+  "Handmade-Accessories": [
     {
       id: 42,
-      categoryId: "wedding-occasions",
+      categoryId: "Handmade-Accessories",
       title: "Custom Wedding Favor Box Set",
       slug: "custom-wedding-favor-box-set",
       description:
         "Beautiful custom wedding favor boxes with couple names and wedding date. Made from premium materials. Perfect for gifting to wedding guests. Can be customized with colors, designs, and messages.",
-      price: 1999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 179,
+      images: ["/images/33.png"],//craftsCorner
       popular: true,
       featured: true,
       inStock: true,
@@ -982,13 +1050,13 @@ export const productsByCategory = {
     },
     {
       id: 43,
-      categoryId: "wedding-occasions",
+      categoryId: "Handmade-Accessories",
       title: "Engraved Wedding Plaque",
       slug: "engraved-wedding-plaque",
       description:
         "Elegant wedding plaque with couple names, wedding date, and special message. Made from premium wood or metal. Perfect for wedding decoration or as a keepsake. Can be customized with designs.",
-      price: 2499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 149,
+      images: ["/images/34.png"],//craftsCorner
       popular: true,
       featured: false,
       inStock: true,
@@ -999,13 +1067,13 @@ export const productsByCategory = {
     },
     {
       id: 44,
-      categoryId: "wedding-occasions",
+      categoryId: "Handmade-Accessories",
       title: "Traditional Wedding Gift Set",
       slug: "traditional-wedding-gift-set",
       description:
         "Complete traditional wedding gift set including brass items, decorative pieces, and traditional accessories. Perfect for gifting to newlyweds. Packaged beautifully in traditional style.",
-      price: 4999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 349,
+      images: ["/images/35.png"],//craftsCorner
       popular: true,
       featured: true,
       inStock: true,
@@ -1016,13 +1084,81 @@ export const productsByCategory = {
     },
     {
       id: 45,
-      categoryId: "wedding-occasions",
+      categoryId: "Handmade-Accessories",
       title: "Custom Anniversary Gift Box",
       slug: "custom-anniversary-gift-box",
       description:
         "Beautiful custom anniversary gift box with couple names and anniversary date. Includes curated traditional gifts. Perfect for celebrating milestones. Can be customized with items and messages.",
-      price: 2999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+      price: 299,
+      images: ["/images/36.png"],//craftsCorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "gift"],
+      },
+    },
+   {
+      id: 54,
+      categoryId: "Handmade-Accessories",
+      title: "Custom Anniversary Gift Box",
+      slug: "custom-anniversary-gift-box",
+      description:
+        "Beautiful custom anniversary gift box with couple names and anniversary date. Includes curated traditional gifts. Perfect for celebrating milestones. Can be customized with items and messages.",
+      price: 149,
+      images: ["/images/37.png"],//craftsCorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "gift"],
+      },
+    },
+    {
+      id: 55,
+      categoryId: "Handmade-Accessories",
+      title: "Custom Anniversary Gift Box",
+      slug: "custom-anniversary-gift-box",
+      description:
+        "Beautiful custom anniversary gift box with couple names and anniversary date. Includes curated traditional gifts. Perfect for celebrating milestones. Can be customized with items and messages.",
+      price: 299,
+      images: ["/images/38.png"], //craftsCorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "gift"],
+      },
+    },
+    {
+      id: 58,
+      categoryId: "Handmade-Accessories",
+      title: "Custom Anniversary Gift Box",
+      slug: "custom-anniversary-gift-box",
+      description:
+        "Beautiful custom anniversary gift box with couple names and anniversary date. Includes curated traditional gifts. Perfect for celebrating milestones. Can be customized with items and messages.",
+      price: 749,
+      images: ["/images/40.png","/images/41.png","/images/42.png"], //hooksndheart
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "gift"],
+      },
+    },
+    {
+      id: 61,
+      categoryId: "Handmade-Accessories",
+      title: "Custom Anniversary Gift Box",
+      slug: "custom-anniversary-gift-box",
+      description:
+        "Beautiful custom anniversary gift box with couple names and anniversary date. Includes curated traditional gifts. Perfect for celebrating milestones. Can be customized with items and messages.",
+      price: 749,
+      images: ["/images/47.png"], //aneraArt
       popular: false,
       featured: false,
       inStock: true,
@@ -1032,7 +1168,7 @@ export const productsByCategory = {
       },
     },
   ],
-  "kids-baby": [
+  /*"kids-baby": [
     {
       id: 46,
       categoryId: "kids-baby",
