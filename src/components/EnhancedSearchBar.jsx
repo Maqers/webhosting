@@ -276,23 +276,14 @@ const EnhancedSearchBar = ({ onSearch }) => {
         query: sanitizedQuery
       }
 
-      // Only navigate if not already on products page to prevent throttling
-      if (location.pathname !== '/products') {
-        navigate('/products', {
-          state: {
-            searchQuery: sanitizedQuery,
-            searchResults: results
-          },
-          replace: false
-        })
-      } else {
-        // Update URL state without navigation if already on products page
-        window.history.replaceState(
-          { searchQuery: sanitizedQuery, searchResults: results },
-          '',
-          location.pathname
-        )
-      }
+      // Always use navigate so React Router gets new state and Products page re-renders with correct results
+      navigate('/products', {
+        state: {
+          searchQuery: sanitizedQuery,
+          searchResults: results
+        },
+        replace: location.pathname === '/products'
+      })
 
       setShowResults(false)
       if (onSearch) {
@@ -646,4 +637,3 @@ const EnhancedSearchBar = ({ onSearch }) => {
 }
 
 export default EnhancedSearchBar
-
