@@ -76,9 +76,11 @@ const Products = () => {
 
   // Filter and sort products - optimized with cached data
   const filteredProducts = useMemo(() => {
-    // Use search results if available, otherwise use cached all products
-    // let filtered = searchResultsData?.products || searchResults?.products || getCachedAllProducts()
-let filtered = searchResultsData?.products || searchResults?.products || getAllProducts()
+    // When user has searched: show ONLY search results (never fall back to all products)
+    const hasSearch = searchQuery && searchQuery.trim().length >= 1
+    let filtered = hasSearch
+      ? (searchResultsData?.products ?? searchResults?.products ?? [])
+      : (searchResultsData?.products ?? searchResults?.products ?? getAllProducts())
 
     // Filter by multiple categories if any are selected (OR logic - show products from ANY selected category)
     if (selectedCategories.length > 0) {
@@ -334,4 +336,3 @@ const ProductCard = memo(({ product, index, categoryMap, priority = false }) => 
 ProductCard.displayName = 'ProductCard'
 
 export default Products
-
