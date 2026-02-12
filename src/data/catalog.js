@@ -261,7 +261,7 @@ export const productsByCategory = {
       slug: "Handcrafted-yarn-tulip-single-stem",
       description:
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
-      price: 199,
+      price: 219,  //199
       images: ["/images/1.png"],
       popular: true,
       featured: true,
@@ -278,7 +278,7 @@ export const productsByCategory = {
       slug: "handmade-crochet-flower-bouquet",
       description:
       "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
-      price: 249,
+      price: 269,    //249
       images: ["/images/2.png"],
       popular: true,
       featured: false,
@@ -295,7 +295,7 @@ export const productsByCategory = {
       slug: "handmade-crochet-flower-pot",
       description:
         "A charming mini flower pot made with crochet—bright, durable, and zero-maintenance. Available in multiple colors and styles, it’s a perfect desk décor piece or a cute gifting add-on.",
-      price: 299,
+      price: 329,   //299
       images: ["/images/3.png","/images/3-1.png"],
       popular: false,
       featured: false,
@@ -312,7 +312,7 @@ export const productsByCategory = {
       slug: "crochet-flower-bouquet",
       description:
         "A detailed crochet bouquet with layered florals and greens, wrapped in a premium pastel sleeve and ribbon. A forever keepsake for birthdays, anniversaries, or proposals—available in multiple color themes.",
-      price: 399,
+      price: 439,  //399
       images: ["/images/4.png"],
       popular: false,
       featured: false,
@@ -329,7 +329,7 @@ export const productsByCategory = {
       slug: "crochet-flower-keychain",
       description:
         "A cute crochet flower keychain with soft petals and a sturdy key ring—instant fresh pop for your keys or bag. Available in multiple flower designs and colors; lightweight but eye-catching for everyday use.",
-      price: 79,
+      price: 89,  //79
       images: ["/images/5.png"],
       popular: false,
       featured: false,
@@ -346,7 +346,7 @@ export const productsByCategory = {
       slug: "crochet-keychain-collection",
       description:
         "A super-cute set of crochet keychains in multiple designs—flowers, strawberries, cherries, and more—each one made to stand out. Lightweight, durable, and perfect for gifting or adding instant fresh pop to your keys or bag.",
-      price: 79,
+      price: 89,  //79
       images: ["/images/6.png"],
       popular: true,
       featured: true,
@@ -363,7 +363,7 @@ export const productsByCategory = {
       slug: "handmade-crochet-flower-bouquet",
       description:
         "A beautifully handcrafted crochet flower bouquet designed to last forever. Made with soft yarn and detailed stitching, it’s a thoughtful alternative to fresh flowers that fade away. Perfect for birthdays, anniversaries, or anyone who prefers a meaningful and permanent gift.",
-      price: 2199,
+      price: 2199,  
       images: ["/images/39.png"], //hooksndhheart
       popular: true,
       featured: true,
@@ -501,7 +501,7 @@ export const productsByCategory = {
       slug: "strawberry-dessert-candle",
       description:
         "A dessert-style candle crafted to look like a strawberry parfait—complete with a creamy top layer and berry detailing. Perfect for gifting or home décor; looks delicious on a bedside table, desk, or vanity.",
-      price: 518,
+      price: 569,  //518
       images: ["/images/7.png"],
       popular: true,
       featured: true,
@@ -518,7 +518,7 @@ export const productsByCategory = {
       slug: "heart-layered-jar-candle",
       description:
         "A romantic layered candle in a glass jar with heart detailing—made to set the mood instantly. Perfect for date nights, anniversaries, and gifting; looks stunning as table décor even when unlit..",
-      price: 599,
+      price: 659, //599
       images: ["/images/8.png"],
       popular: false,
       featured: false,
@@ -535,7 +535,7 @@ export const productsByCategory = {
       slug: "rose-layered-jar-candle",
       description:
         "A romantic layered candle in a glass jar with rose-toned detailing—made to set the mood instantly. Perfect for date nights, anniversaries, and gifting; looks elegant as table décor even when unlit.",
-      price: 599,
+      price: 659, //599
       images: ["/images/9.png"],
       popular: true,
       featured: false,
@@ -552,7 +552,7 @@ export const productsByCategory = {
       slug: "ocean-breeze-dessert-candle",
       description:
         "A beach-inspired dessert candle in a glass jar with ocean-blue layers, whipped wax topping, and seashell detailing. Perfect for gifting or coastal home décor—looks like a mini seaside treat even when unlit.",
-      price: 879,
+      price: 949, //899
       images: ["/images/10.png"],
       popular: false,
       featured: false,
@@ -569,7 +569,7 @@ export const productsByCategory = {
       slug: "mini-bucket-candle",
       description:
         "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
-      price: 899,
+      price: 949,  //899
       images: ["/images/11.png"],
       popular: true,
       featured: false,
@@ -656,7 +656,7 @@ export const productsByCategory = {
       slug: "fiery-tote-bag",
       description:
         "A bold everyday tote with a flame print that adds instant edge to your fit and your carry. Spacious, lightweight, and easy to sling on—perfect for college, work, or quick errands.",
-      price: 249,
+      price: 279, //249
       images: ["/images/12.png"],
       popular: false,
       featured: false,
@@ -673,7 +673,7 @@ export const productsByCategory = {
       slug: "heart-print-tote-bag",
       description:
         "A clean canvas tote with playful heart prints—easy to style and roomy enough for everyday essentials. Lightweight, comfortable to carry, and perfect for college, work, or casual outings.",
-      price: 249,
+      price: 279, //249
       images: ["/images/13.png"],
       popular: true,
       featured: true,
@@ -690,7 +690,7 @@ export const productsByCategory = {
       slug: "sunflower-butterfly-tote-bag",
       description:
         "A statement black tote with a sunflower-and-butterflies artwork that instantly brightens your everyday carry. Roomy, lightweight, and sturdy—perfect for college, work, errands, or gifting.",
-      price: 299,
+      price: 329, //299
       images: ["/images/14.png"],
       popular: true,
       featured: false,
@@ -707,7 +707,7 @@ export const productsByCategory = {
       slug: "sunflower-butterfly-tote-bag",
       description:
         "A statement black tote with a sunflower-and-butterflies artwork that instantly brightens your everyday carry. Roomy, lightweight, and sturdy—perfect for college, work, errands, or gifting.",
-      price: 349,
+      price: 389, //349 
       images: ["/images/15.png"],
       popular: false,
       featured: false,
@@ -724,7 +724,7 @@ export const productsByCategory = {
       slug: "hand-painted-boot-tote-bag",
       description:
         "A sleek black tote with a hand-painted boot motif and bead detailing—subtle, artsy, and statement-worthy. Roomy and lightweight for everyday use; perfect for college, work, or gifting to someone with bold style.",
-      price: 349,
+      price: 389, //349
       images: ["/images/16.png"],
       popular: false,
       featured: false,
@@ -847,7 +847,7 @@ export const productsByCategory = {
       slug: "Spiral Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with Spiral rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 1499,
+      price: 1649, //1499
       images: ["/images/23.png"],
       popular: true,
       featured: false,
@@ -864,7 +864,7 @@ export const productsByCategory = {
       slug: "Twirl Rhinestone Champagne Flutes",
       description:
         "A luxe pair of twirl rhinestone flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 1499,
+      price: 1649, //1499
       images: ["/images/24.png"],
       popular: true,
       featured: true,
@@ -881,7 +881,7 @@ export const productsByCategory = {
       slug: "Minimal Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with minimal rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 1499,
+      price: 1649, //1499
       images: ["/images/25.png"],
       popular: false,
       featured: false,
@@ -898,7 +898,7 @@ export const productsByCategory = {
       slug: "Beaded Neck Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with Beaded Neck detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2199,
+      price: 2149, //2199
       images: ["/images/26.png"],
       popular: true,
       featured: false,
@@ -915,7 +915,7 @@ export const productsByCategory = {
       slug: "Rhinestoned Champagne Flutes",
       description:
         "A luxe pair of Rhinestoned champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2199,
+      price: 2149, //2199
       images: ["/images/27.png"],
       popular: false,
       featured: false,
@@ -934,7 +934,7 @@ export const productsByCategory = {
       slug: "Resin-flower-clock",
       description:
         "This beautiful resin flower clock is handcrafted using real dried flowers sealed in premium resin, turning every second into a piece of art.",
-      price: 999,
+      price: 1099, //999
       images: ["/images/29.png"],
       popular: false,
       featured: true,
@@ -951,7 +951,7 @@ export const productsByCategory = {
       slug: "Resin-keychain",
       description:
         "A beautiful resin keychain featuring real dried flowers preserved forever in crystal-clear resin. Each piece is one of a kind, capturing nature in its most delicate form.",
-      price: 99,
+      price: 109, //99
       images: ["/images/31.png"],
       popular: true,
       featured: true,
@@ -968,7 +968,7 @@ export const productsByCategory = {
       slug: "Resin-flower-photo",
       description:
         "A beautiful resin with a picture featuring real dried flowers preserved forever in crystal-clear resin. Each piece is one of a kind, capturing nature in its most delicate form.",
-      price: 279,
+      price: 309, //279
       images: ["/images/30.png"],
       popular: false,
       featured: false,
@@ -985,7 +985,7 @@ export const productsByCategory = {
       slug: "Resin-flower-name-plate",
       description:
         "Add a personal touch to your space with this custom resin flower name plate. Featuring real flowers sealed forever in high-quality resin, it’s a timeless décor piece that welcomes with elegance.",
-      price: 579,
+      price: 639, //579
       images: ["/images/32.png"],
       popular: true,
       featured: true,
