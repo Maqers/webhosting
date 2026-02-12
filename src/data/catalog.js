@@ -1009,7 +1009,7 @@ export const productsByCategory = {
       inStock: true,
       tags: ["resin", "tissue", "holder", "floral", "decor"],
       meta: {
-        keywords: ["homedecor", "handmade", "luxury", "table", "gift"],
+        keywords: ["homedecor", "handmade", "luxury", "table", "resin","tissueholder"],
       },
     },
     {
@@ -1157,14 +1157,14 @@ export const productsByCategory = {
       slug: "vintage-art-statement-earrings",
       description:
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
-      price: 749,
+      price: 399,
       images: ["/images/48.png"], //aneraArt
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["anniversary", "gift box", "custom", "traditional"],
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin" , "earrings"],
       meta: {
-        keywords: ["anniversary gift", "custom", "gift box", "gift"],
+        keywords: ["anniversary gift", "custom", "gift box", "resin" , "earrings"],
       },
     },
   ],
