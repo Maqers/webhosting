@@ -94,11 +94,11 @@ export const categories = [
       keywords: ["art","resin","frames","flowers"],
     },
   },
-  /*{
-    id: "wedding-occasions",
-    name: "Wedding & Special Occasions",
-    slug: "wedding-occasions",
-    description: "Special gifts for weddings and celebrations",
+  {
+    id: "Handmade-Accessories",
+    name: "Handmade Accessories",
+    slug: "Handmade-Accessories",
+    description: "Accessories for weddings and celebrations",
     icon: "wedding",
     order: 7,
     featured: true,
@@ -106,7 +106,7 @@ export const categories = [
       keywords: ["wedding", "occasion", "celebration", "gift", "special"],
     },
   },
-  {
+  /*{
     id: "kids-baby",
     name: "Kids & Baby Gifts",
     slug: "kids-baby",
@@ -354,6 +354,40 @@ export const productsByCategory = {
       tags: ["keychain", "crochet", "collection", "cute", "gift"],
       meta: {
         keywords: ["keychain", "handmade", "cute gift", "strawberry", "cherry"],
+      },
+    },
+    {
+      id: 56,
+      categoryId: "Crochet",
+      title: "Handmade Crochet Flower Bouquet",
+      slug: "handmade-crochet-flower-bouquet",
+      description:
+        "A beautifully handcrafted crochet flower bouquet designed to last forever. Made with soft yarn and detailed stitching, it’s a thoughtful alternative to fresh flowers that fade away. Perfect for birthdays, anniversaries, or anyone who prefers a meaningful and permanent gift.",
+      price: 2199,
+      images: ["/images/39.png"], //hooksndhheart
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "handmade", "gift"],
+      meta: {
+        keywords: ["everlasting", "yarn", "floral", "decor", "keepsake"],
+      },
+    },
+    {
+      id: 57,
+      categoryId: "Crochet",
+      title: "Pink Crochet Flower Bouquet",
+      slug: "pink-crochet-flower-bouquet",
+      description:
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 1749,
+      images: ["/images/43.png","/images/44.png","/images/43.png"], //hooksndhheart
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
       },
     },
     /*{
@@ -961,68 +995,170 @@ export const productsByCategory = {
         keywords: ["resin", "nameplate", "handmade", "flower"],
       },
     },
-  ],
-  /*"wedding-occasions": [
     {
-      id: 42,
-      categoryId: "wedding-occasions",
-      title: "Custom Wedding Favor Box Set",
-      slug: "custom-wedding-favor-box-set",
+      id: 59,
+      categoryId: "resin-products",
+      title: "Resin Floral Tissue Holder",
+      slug: "Resin-floral-tissue-holder",
       description:
-        "Beautiful custom wedding favor boxes with couple names and wedding date. Made from premium materials. Perfect for gifting to wedding guests. Can be customized with colors, designs, and messages.",
-      price: 1999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+        "A handcrafted resin tissue holder designed with elegant floral detailing and gold accents. Combining utility with artistic home decor, it keeps tissues organised while adding a stylish touch to your table or console. A beautiful decor piece that enhances modern and classic interiors alike.",
+      price: 579,
+      images: ["/images/45.png"], //AneraArt
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["wedding favor", "custom", "wedding", "personalized"],
+      tags: ["resin", "tissue", "holder", "floral", "decor"],
       meta: {
-        keywords: ["wedding favor", "custom", "wedding", "gift"],
+        keywords: ["homedecor", "handmade", "luxury", "table", "gift"],
+      },
+    },
+    {
+      id: 60,
+      categoryId: "resin-products",
+      title: "Resin flower name plate",
+      slug: "Resin-flower-name-plate",
+      description:
+        "Add a personal touch to your space with this custom resin flower name plate. Featuring real flowers sealed forever in high-quality resin, it’s a timeless décor piece that welcomes with elegance.",
+      price: 579,
+      images: ["/images/46.png"], //AneraArt
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["resin", "nameplate", "handmade", "flower"],
+      meta: {
+        keywords: ["resin", "nameplate", "handmade", "flower"],
+      },
+    },
+  ],
+  "Handmade-Accessories": [
+    {
+      id: 42,
+      categoryId: "Handmade-Accessories",
+      title: "Festive Thread Bangles",
+      slug: "festive-thread-bangles",
+      description:
+        "Vibrant thread-wrapped bangles detailed with intricate gold-toned embellishments and delicate stones. Lightweight and comfortable, they’re perfect for college celebrations, wedding functions, or adding a bold pop of colour to everyday ethnic outfits. A subtle statement that instantly elevates your look.",
+      price: 179,
+      images: ["/images/33.png"],//craftsCorner
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["bangles", "thread", "festive", "ethnic", "colourful"],
+      meta: {
+        keywords: ["jewellery", "wedding", "college", "traditional", "handmade"],
       },
     },
     {
       id: 43,
-      categoryId: "wedding-occasions",
-      title: "Engraved Wedding Plaque",
-      slug: "engraved-wedding-plaque",
+      categoryId: "Handmade-Accessories",
+      title: "Vintage Gold Minimal Bangles",
+      slug: "vintage-gold-minimal-bangles",
       description:
-        "Elegant wedding plaque with couple names, wedding date, and special message. Made from premium wood or metal. Perfect for wedding decoration or as a keepsake. Can be customized with designs.",
-      price: 2499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+        "Delicately crafted gold-toned bangles featuring subtle stone detailing for a refined, retro ethnic charm. Lightweight and versatile, they complement sarees, suits, or even minimalist fusion outfits effortlessly. Perfect for those who love understated elegance with a timeless touch.",
+      price: 149,
+      images: ["/images/34.png"],//craftsCorner
       popular: true,
       featured: false,
       inStock: true,
-      tags: ["wedding plaque", "engraved", "wedding", "keepsake"],
+      tags: ["vintage", "gold", "minimal", "ethnic", "classic"],
       meta: {
-        keywords: ["wedding plaque", "engraved", "wedding", "gift"],
+        keywords: ["bangles", "retro", "traditional", "minimalist", "jewellery"],
       },
     },
     {
       id: 44,
-      categoryId: "wedding-occasions",
-      title: "Traditional Wedding Gift Set",
-      slug: "traditional-wedding-gift-set",
+      categoryId: "Handmade-Accessories",
+      title: "Gold Lotus Design Bangles",
+      slug: "gold-lotus-design-bangles",
       description:
-        "Complete traditional wedding gift set including brass items, decorative pieces, and traditional accessories. Perfect for gifting to newlyweds. Packaged beautifully in traditional style.",
-      price: 4999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+        "Beautiful gold-toned bangles with detailed lotus designs and soft coloured accents. Perfect for weddings, festivals, or adding a traditional touch to your ethnic outfits. A graceful piece that blends classic style with everyday elegance.",
+      price: 349,
+      images: ["/images/35.png"],//craftsCorner
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["wedding gift", "traditional", "set", "brass"],
+      tags: ["lotus", "gold", "ethnic", "wedding", "festive"],
       meta: {
-        keywords: ["wedding gift", "traditional", "set", "gift"],
+        keywords: ["bangles", "traditional", "lotus", "ethnic", "design", "jewellery"],
       },
     },
     {
       id: 45,
-      categoryId: "wedding-occasions",
-      title: "Custom Anniversary Gift Box",
+      categoryId: "Handmade-Accessories",
+      title: "Colourful Traditional Bangles Set",
+      slug: "colourful-traditional-bangles-set",
+      description:
+        "A vibrant set of gold-toned bangles with multi-design detailing, red and green accents, and traditional patterns. Perfect for weddings, festive celebrations, casual ethnic wear, or thoughtful gifting. A beautiful bridal jewellery piece that adds colour, richness, and charm to any outfit.",
+      price: 299,
+      images: ["/images/36.png"],//craftsCorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["colourful", "bridal", "traditional", "festive", "gifting"],
+      meta: {
+        keywords: ["bangles", "wedding", "ethnic", "jewellery", "ornaments"],
+      },
+    },
+   {
+      id: 54,
+      categoryId: "Handmade-Accessories",
+      title: "Teal Thread Gold Detail Bangles",
+      slug: "teal-thread-gold-detail-bangles",
+      description:
+        "Beautiful teal-threaded bangles with gold detailing and intricate patterns. Lightweight and elegant, they are perfect for adding a touch of sophistication to any ethnic outfit. Ideal for weddings, festivals, or everyday wear.A stylish accessory that adds colour and shine without feeling heavy.",
+      price: 149,
+      images: ["/images/37.png"],//craftsCorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["teal", "thread", "festive", "ethnic", "gifting"],
+      meta: {
+        keywords: ["bangles", "traditional", "jewellery", "fashion", "accessories"],
+      },
+    },
+    {
+      id: 55,
+      categoryId: "Handmade-Accessories",
+      title: "Gold Leaf Pattern Bangles",
+      slug: "gold-leaf-pattern-bangles",
+      description:
+        "Stylish bangles with gold-toned edges and layered stone detailing for a rich traditional look. Designed to stand out at festive events, family functions, or special occasions. A bold yet elegant accessory that instantly adds colour and shine to ethnic outfits.",
+      price: 299,
+      images: ["/images/38.png"], //craftsCorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["gold", "leaf", "festive", "traditional", "statement"],
+      meta: {
+        keywords: ["bangles", "jewellery", "ethnic", "fashion", "accessories"],
+      },
+    },
+    {
+      id: 58,
+      categoryId: "Handmade-Accessories",
+      title: "Floral Crochet Parandi",
       slug: "custom-anniversary-gift-box",
       description:
-        "Beautiful custom anniversary gift box with couple names and anniversary date. Includes curated traditional gifts. Perfect for celebrating milestones. Can be customized with items and messages.",
-      price: 2999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+        "A beautifully handmade crochet parandi with delicate white flowers and soft green detailing. Designed to add a soft statement look to braids, it makes your hairstyle stand out effortlessly. Perfect for festive wear, cultural events, or adding a graceful touch to everyday ethnic outfits.",
+      price: 749,
+      images: ["/images/40.png","/images/41.png","/images/42.png"], //hooksndheart
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["parandi", "crochet", "floral", "ethnic", "handmade"],
+      meta: {
+        keywords: ["braid", "hairaccessory", "traditional", "festive", "fashion"],
+      },
+    },
+    {
+      id: 61,
+      categoryId: "Handmade-Accessories",
+      title: "Vintage Art Statement Earrings",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 749,
+      images: ["/images/47.png"], //aneraArt
       popular: false,
       featured: false,
       inStock: true,
@@ -1032,7 +1168,7 @@ export const productsByCategory = {
       },
     },
   ],
-  "kids-baby": [
+  /*"kids-baby": [
     {
       id: 46,
       categoryId: "kids-baby",
