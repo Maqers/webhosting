@@ -33,7 +33,7 @@ export const contactInfo = {
     }
   },
   whatsapp: {
-    number: '7973981938', // Primary WhatsApp number (same as primary phone)
+    number: '9650800399', // Primary WhatsApp number (same as primary phone)
     label: 'WhatsApp'
   },
   instagram: {
