@@ -1038,7 +1038,7 @@ export const productsByCategory = {
       slug: "festive-thread-bangles",
       description:
         "Vibrant thread-wrapped bangles detailed with intricate gold-toned embellishments and delicate stones. Lightweight and comfortable, they’re perfect for college celebrations, wedding functions, or adding a bold pop of colour to everyday ethnic outfits. A subtle statement that instantly elevates your look.",
-      price: 179,
+      price: 199, //179
       images: ["/images/33.png"],//craftsCorner
       popular: true,
       featured: true,
@@ -1055,7 +1055,7 @@ export const productsByCategory = {
       slug: "vintage-gold-minimal-bangles",
       description:
         "Delicately crafted gold-toned bangles featuring subtle stone detailing for a refined, retro ethnic charm. Lightweight and versatile, they complement sarees, suits, or even minimalist fusion outfits effortlessly. Perfect for those who love understated elegance with a timeless touch.",
-      price: 149,
+      price: 165, //149
       images: ["/images/34.png"],//craftsCorner
       popular: true,
       featured: false,
@@ -1072,7 +1072,7 @@ export const productsByCategory = {
       slug: "gold-lotus-design-bangles",
       description:
         "Beautiful gold-toned bangles with detailed lotus designs and soft coloured accents. Perfect for weddings, festivals, or adding a traditional touch to your ethnic outfits. A graceful piece that blends classic style with everyday elegance.",
-      price: 349,
+      price: 389, //349
       images: ["/images/35.png"],//craftsCorner
       popular: true,
       featured: true,
@@ -1089,7 +1089,7 @@ export const productsByCategory = {
       slug: "colourful-traditional-bangles-set",
       description:
         "A vibrant set of gold-toned bangles with multi-design detailing, red and green accents, and traditional patterns. Perfect for weddings, festive celebrations, casual ethnic wear, or thoughtful gifting. A beautiful bridal jewellery piece that adds colour, richness, and charm to any outfit.",
-      price: 299,
+      price: 329, //299
       images: ["/images/36.png"],//craftsCorner
       popular: false,
       featured: false,
@@ -1106,7 +1106,7 @@ export const productsByCategory = {
       slug: "teal-thread-gold-detail-bangles",
       description:
         "Beautiful teal-threaded bangles with gold detailing and intricate patterns. Lightweight and elegant, they are perfect for adding a touch of sophistication to any ethnic outfit. Ideal for weddings, festivals, or everyday wear.A stylish accessory that adds colour and shine without feeling heavy.",
-      price: 149,
+      price: 169, //149
       images: ["/images/37.png"],//craftsCorner
       popular: false,
       featured: false,
@@ -1123,7 +1123,7 @@ export const productsByCategory = {
       slug: "gold-leaf-pattern-bangles",
       description:
         "Stylish bangles with gold-toned edges and layered stone detailing for a rich traditional look. Designed to stand out at festive events, family functions, or special occasions. A bold yet elegant accessory that instantly adds colour and shine to ethnic outfits.",
-      price: 299,
+      price: 329, //299
       images: ["/images/38.png"], //craftsCorner
       popular: false,
       featured: false,
