@@ -1158,7 +1158,7 @@ export const productsByCategory = {
       description:
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
       price: 399,
-      images: ["/images/48.png"], //aneraArt
+      images: ["/images/47.png"], //aneraArt
       popular: false,
       featured: false,
       inStock: true,
