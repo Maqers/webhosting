@@ -106,30 +106,30 @@ export const categories = [
       keywords: ["wedding", "occasion", "celebration", "gift", "special"],
     },
   },
-  /*{
-    id: "kids-baby",
-    name: "Kids & Baby Gifts",
-    slug: "kids-baby",
-    description: "Thoughtful gifts for children and babies",
-    icon: "kids",
+  {
+    id: "Customised-Hampers",
+    name: "Customised Hampers",
+    slug: "Customised-Hampers",
+    description: "Thoughtful gifts for hampers",
+    icon: "hampers",
     order: 8,
     featured: false,
     meta: {
-      keywords: ["kids", "baby", "children", "toys", "gifts"],
+      keywords: ["gifts", "hampers", "rakhi", "anniversary", "birthday","gift"],
     },
   },
   {
-    id: "office-stationery",
-    name: "Office & Stationery",
-    slug: "office-stationery",
-    description: "Handcrafted office supplies and stationery",
-    icon: "office",
+    id: "Handmade-Soaps",
+    name: "Handmade Soaps",
+    slug: "Handmade-Soaps",
+    description: "Handcrafted soaps in various fragnances",
+    icon: "soaps",
     order: 9,
     featured: false,
     meta: {
-      keywords: ["office", "stationery", "desk", "organizer", "supplies"],
+      keywords: ["soaps", "handwash", "fragnance", "soap", "hanging"],
     },
-  },*/
+  },
 ];
 
 // ============================================================================
@@ -382,6 +382,57 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 1749,
       images: ["/images/43.png","/images/44.png","/images/43.png"], //hooksndhheart
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    {
+      id: 62,
+      categoryId: "Crochet",
+      title: "Dancing Daisies",
+      slug: "Dancing-Daisies",
+      description:
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 349,
+      images: ["/images/53.png","/images/53-1.png"], //LillyPad
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    {
+      id: 63,
+      categoryId: "Crochet",
+      title: "Single Flower Pot",
+      slug: "Dancing-Daisies",
+      description:
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 149,
+      images: ["/images/49.png","/images/49-1.png","/images/49-2.png"], //LillyPad
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    {
+      id: 66,
+      categoryId: "Crochet",
+      title: "Handmade Colourful Shawl ",
+      slug: "Dancing-Daisies",
+      description:
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 2299,
+      images: ["/images/54.png","/images/54-1.png","/images/54-2.png"], //Reena's Crochet
       popular: true,
       featured: true,
       inStock: true,
@@ -732,6 +783,23 @@ export const productsByCategory = {
       tags: ["tote", "boot", "hand-painted", "artsy", "statement"],
       meta: {
         keywords: ["hand-painted tote", "boot tote", "artsy bag", "canvas", "beaded"],
+      },
+    },
+    {
+      id: 67,
+      categoryId: "Handbags",
+      title: "Sunflower Granny tote bag",
+      slug: "Sunflower Granny crochet bag",
+      description:
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 999,
+      images: ["/images/55.png","/images/55-1.png","/images/55-2.png"], //Reena's Crochet
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "handbag", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
       },
     },
   ],
@@ -1168,42 +1236,59 @@ export const productsByCategory = {
       },
     },
   ],
-  /*"kids-baby": [
+  "Customised-Hampers": [
     {
-      id: 46,
-      categoryId: "kids-baby",
-      title: "Handmade Wooden Toys Set",
-      slug: "handmade-wooden-toys-set",
+      id: 64,
+      categoryId: "Customised-Hampers",
+      title: "Tshirt-Hampers",
+      slug: "Dancing-Daisies",
       description:
-        "Set of traditional handmade wooden toys including puzzles, blocks, and figurines. Made from safe, non-toxic materials. Perfect for developing motor skills and creativity. Safe for children.",
-      price: 1499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 0,
+      images: ["/images/48.png","/images/48-1.png","/images/48-2.png"], //LillyPad
+      popular: false,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    {
+      id: 65,
+      categoryId: "Customised-Hampers",
+      title: "Custom Hampers",
+      slug: "Dancing-Daisies",
+      description:
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 0,
+      images: ["/images/52.png","/images/52-1.png","/images/52-2.png"], //LillyPad
+      popular: false,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    {
+      id: 71,
+      categoryId: "Customised-Hampers",
+      title: "Photo Album",
+      slug: "Photo-Album",
+      description:
+        "pages wise",
+      price: 119,
+      images: ["/images/51.png"], //LillyPad
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["wooden toys", "handmade", "kids", "safe"],
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
-        keywords: ["wooden toys", "handmade", "kids", "toys"],
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
       },
     },
-    {
-      id: 47,
-      categoryId: "kids-baby",
-      title: "Personalized Baby Name Plate",
-      slug: "personalized-baby-name-plate",
-      description:
-        "Beautiful personalized name plate for baby room. Made from premium wood with custom engraving. Includes baby name, birth date, and optional design. Perfect for nursery decoration.",
-      price: 999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
-      popular: true,
-      featured: false,
-      inStock: true,
-      tags: ["baby name plate", "personalized", "nursery", "custom"],
-      meta: {
-        keywords: ["baby name plate", "personalized", "nursery", "gift"],
-      },
-    },
-    {
+    /*{
       id: 48,
       categoryId: "kids-baby",
       title: "Handwoven Baby Blanket",
@@ -1236,63 +1321,63 @@ export const productsByCategory = {
       meta: {
         keywords: ["storybook", "personalized", "kids", "gift"],
       },
-    },
+    },*/
   ],
-  "office-stationery": [
+  "Handmade-Soaps": [
     {
-      id: 50,
-      categoryId: "office-stationery",
-      title: "Handcrafted Wooden Pen Stand",
-      slug: "handcrafted-wooden-pen-stand",
+      id: 68,
+      categoryId: "Handmade-Soaps",
+      title: "Grape soap on rope",
+      slug: "Grape-soap-on-rope",
       description:
-        "Elegant handcrafted wooden pen stand with multiple compartments. Made from premium quality wood with smooth finish. Perfect for organizing pens, pencils, and office supplies. Adds elegance to any desk.",
-      price: 799,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
-      popular: true,
-      featured: false,
-      inStock: true,
-      tags: ["pen stand", "wooden", "handcrafted", "office"],
-      meta: {
-        keywords: ["pen stand", "wooden", "handcrafted", "office"],
-      },
-    },
-    {
-      id: 51,
-      categoryId: "office-stationery",
-      title: "Custom Engraved Business Card Holder",
-      slug: "custom-engraved-business-card-holder",
-      description:
-        "Premium business card holder with custom engraving. Made from wood or metal. Perfect for professional use. Can be personalized with name, company, or logo. Elegant and professional design.",
-      price: 1299,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
-      popular: false,
-      featured: false,
-      inStock: true,
-      tags: ["business card holder", "engraved", "custom", "office"],
-      meta: {
-        keywords: ["business card holder", "engraved", "custom", "office"],
-      },
-    },
-    {
-      id: 52,
-      categoryId: "office-stationery",
-      title: "Handmade Leather Journal",
-      slug: "handmade-leather-journal",
-      description:
-        "Beautiful handmade leather journal with traditional binding. Made from premium quality leather. Features lined or blank pages. Perfect for writing, journaling, or as a gift. Can be personalized with initials.",
-      price: 1499,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 349,
+      images: ["/images/52.png","/images/52-1.png","/images/52-2.png"], //Divine Ember
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["journal", "leather", "handmade", "writing"],
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
-        keywords: ["journal", "leather", "handmade", "stationery"],
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
       },
     },
     {
+      id: 69,
+      categoryId: "Handmade-Soaps",
+      title: "Glycerin Strawberry grape soap",
+      slug: "Glycerin-Strawberry-grape-soap",
+      description:
+        "33pcs charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 549,
+      images: ["/images/57.png"], //Soaps
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    {
+      id: 70,
+      categoryId: "Handmade-Soaps",
+      title: "Multicolor grape soap",
+      slug: "Multicolor-grape-soap",
+      description:
+        "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 549,
+      images: ["/images/58.png"], //Soaps
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
+    },
+    /*{
       id: 53,
-      categoryId: "office-stationery",
+      categoryId: "Handmade-Soaps",
       title: "Traditional Brass Paperweight Set",
       slug: "traditional-brass-paperweight-set",
       description:
@@ -1306,8 +1391,8 @@ export const productsByCategory = {
       meta: {
         keywords: ["paperweight", "brass", "traditional", "office"],
       },
-    },
-  ],*/
+    },*/
+  ],
 };
 
 // ============================================================================
