@@ -277,7 +277,8 @@ const Navbar = () => {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
     { path: '/faqs', label: 'FAQs' },
-    { path: '/contact', label: 'Contact Us' }
+    { path: '/contact', label: 'Contact Us' },
+    { path: '/seller-registration', label: 'Seller Registration' }
   ]
 
   return (

@@ -40,6 +40,7 @@
   .products-title,
   .about-title,
   .contact-title,
+  .seller-title,
   .faqs-title {
     font-size: clamp(1.75rem, 8%, 2.5rem) !important;
   }
@@ -48,6 +49,7 @@
   .products-subtitle,
   .about-subtitle,
   .contact-subtitle,
+  .seller-subtitle,
   .faqs-subtitle {
     font-size: clamp(1rem, 3%, 1.25rem) !important;
   }
@@ -311,6 +313,7 @@ html {
     .about-us,
     .contact-page,
     .faqs-page,
+    .seller-page,
     .categories-page {
       min-height: -webkit-fill-available;
       min-height: 100dvh;

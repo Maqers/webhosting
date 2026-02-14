@@ -30,6 +30,7 @@
   .about-us,
   .contact-page,
   .faqs-page,
+  .seller-page,
   .categories-page,
   .product-detail {
     min-height: -webkit-fill-available;
@@ -42,6 +43,7 @@
   .about-hero,
   .contact-hero,
   .faqs-hero,
+  .seller-hero,
   .categories-hero {
     min-height: -webkit-fill-available;
     min-height: 100dvh;
@@ -196,6 +198,7 @@
   .products-hero,
   .about-hero,
   .contact-hero,
+  .seller-hero,
   .faqs-hero {
     padding-left: env(safe-area-inset-left) !important;
     padding-right: env(safe-area-inset-right) !important;

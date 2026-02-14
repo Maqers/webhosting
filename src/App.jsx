@@ -15,6 +15,8 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const FAQs = lazy(() => import('./pages/FAQs'))
 const Contact = lazy(() => import('./pages/Contact'))
+const SellerRegistration = lazy(() => import('./pages/SellerRegistration'))
+
 
 // Loading fallback component
 const RouteLoadingFallback = () => (
@@ -60,6 +62,7 @@ function AppContent() {
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/seller-registration" element={<SellerRegistration />} />
         </Routes>
       </Suspense>
       <Footer />

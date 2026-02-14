@@ -1587,6 +1587,7 @@ body.menu-open #root.menu-open-blur .product-detail,
 body.menu-open #root.menu-open-blur .about-page,
 body.menu-open #root.menu-open-blur .faqs,
 body.menu-open #root.menu-open-blur .contact-page,
+body.menu-open #root.menu-open-blur .seller-page,
 body.menu-open #root.menu-open-blur footer {
   filter: blur(8px) brightness(0.6);
   transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);

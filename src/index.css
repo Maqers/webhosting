@@ -733,6 +733,8 @@ img {
 .products-subtitle,
 .faqs-title,
 .faqs-subtitle,
+.seller-title,
+.seller-subtitle,
 .cta-content h2,
 .cta-content p {
   color: var(--text-on-primary);
