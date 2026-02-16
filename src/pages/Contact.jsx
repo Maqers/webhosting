@@ -308,7 +308,8 @@ Call: ${formData.phone}
    */
   const handleWhatsAppAction = () => {
     const message = "Hello! I just submitted a contact form. Could you please get back to me?"
-    const url = `https://wa.me/${contactWhatsApp}?text=${encodeURIComponent(message)}`
+    //const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${contactInfo.whatsapp.number}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank')
     setShowSuccessModal(false)
   }

@@ -261,7 +261,7 @@ export const productsByCategory = {
       slug: "Handcrafted-yarn-tulip-single-stem",
       description:
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
-      price: 219,  //199
+      price: 219,  //199 
       images: ["/images/1.png"],
       popular: true,
       featured: true,
@@ -348,7 +348,7 @@ export const productsByCategory = {
         "A super-cute set of crochet keychains in multiple designs—flowers, strawberries, cherries, and more—each one made to stand out. Lightweight, durable, and perfect for gifting or adding instant fresh pop to your keys or bag.",
       price: 89,  //79
       images: ["/images/6.png"],
-      popular: true,
+      popular: false,
       featured: true,
       inStock: true,
       tags: ["keychain", "crochet", "collection", "cute", "gift"],
@@ -537,7 +537,7 @@ export const productsByCategory = {
       slug: "fiery-tote-bag",
       description:
         "A bold everyday tote with a flame print that adds instant edge to your fit and your carry. Spacious, lightweight, and easy to sling on—perfect for college, work, or quick errands.",
-      price: 279, //249
+      price: 275, //249
       images: ["/images/12.png"],
       popular: false,
       featured: false,
@@ -554,9 +554,9 @@ export const productsByCategory = {
       slug: "heart-print-tote-bag",
       description:
         "A clean canvas tote with playful heart prints—easy to style and roomy enough for everyday essentials. Lightweight, comfortable to carry, and perfect for college, work, or casual outings.",
-      price: 279, //249
+      price: 275, //249
       images: ["/images/13.png"],
-      popular: true,
+      popular: false,
       featured: true,
       inStock: true,
       tags: ["tote", "heart", "canvas", "playful", "everyday"],
@@ -584,18 +584,18 @@ export const productsByCategory = {
     {
       id: 25,
       categoryId: "Handbags",
-      title: "Sunflower Butterfly Tote Bag",
-      slug: "sunflower-butterfly-tote-bag",
+      title: "Blue Checkered Tote Bag",
+      slug: "Blue-Checkered-tote-bag",
       description:
-        "A statement black tote with a sunflower-and-butterflies artwork that instantly brightens your everyday carry. Roomy, lightweight, and sturdy—perfect for college, work, errands, or gifting.",
+        "Add a touch of soft summer charm to your everyday look with the Blue Checkered Tote Bag. Designed in a refreshing blue gingham pattern, this lightweight yet spacious tote is perfect for carrying your daily essentials in style. The delicate floral accent adds a playful, feminine touch that makes it ideal for brunches, beach days, shopping trips, or casual outings.",
       price: 389, //349 
       images: ["/images/15.png"],
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["tote", "sunflower", "butterfly", "statement", "art"],
+      tags: ["tote", "blue", "check", "statement", "art"],
       meta: {
-        keywords: ["sunflower tote", "butterfly tote", "statement bag", "canvas", "artwork"],
+        keywords: ["blue tote", "check tote", "statement bag", "canvas", "artwork"],
       },
     },
     {
@@ -728,10 +728,10 @@ export const productsByCategory = {
       slug: "rhinestone-heart-champagne-flutes-set-of-2",
       description:
         "A luxe pair of champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2199,
+      price: 2399,
       images: ["/images/28.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
@@ -765,7 +765,7 @@ export const productsByCategory = {
       price: 1649, //1499
       images: ["/images/24.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
@@ -796,7 +796,7 @@ export const productsByCategory = {
       slug: "Beaded Neck Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with Beaded Neck detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2149, //2199
+      price: 2399, //2199
       images: ["/images/26.png"],
       popular: true,
       featured: false,
@@ -813,7 +813,7 @@ export const productsByCategory = {
       slug: "Rhinestoned Champagne Flutes",
       description:
         "A luxe pair of Rhinestoned champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2149, //2199
+      price: 2399, //2199
       images: ["/images/27.png"],
       popular: false,
       featured: false,
@@ -900,7 +900,7 @@ export const productsByCategory = {
       slug: "Resin-flower-clock",
       description:
         "This 12-inch beautiful resin flower clock is handcrafted using real dried flowers sealed in premium resin, turning every second into a piece of art. Sizes Available 14, 16, 18, 24 inches",
-      price: 1299,
+      price: 1245,
       images: ["/images/45.png"], //AneraArt
       popular: false,
       featured: false,
@@ -917,7 +917,7 @@ export const productsByCategory = {
       slug: "Resin-floral-tissue-holder",
       description:
         "A handcrafted resin tissue holder designed with elegant floral detailing and gold accents. Combining utility with artistic home decor, it keeps tissues organised while adding a stylish touch to your table or console. A beautiful decor piece that enhances modern and classic interiors alike.",
-      price: 599,
+      price: 449,
       images: ["/images/46.png"], //AneraArt
       popular: true,
       featured: true,
@@ -970,7 +970,7 @@ export const productsByCategory = {
       slug: "gold-lotus-design-bangles",
       description:
         "Beautiful gold-toned bangles with detailed lotus designs and soft coloured accents. Perfect for weddings, festivals, or adding a traditional touch to your ethnic outfits. A graceful piece that blends classic style with everyday elegance.",
-      price: 389, //349
+      price: 385, //349
       images: ["/images/35.png"],//craftsCorner
       popular: true,
       featured: true,
@@ -1004,7 +1004,7 @@ export const productsByCategory = {
       slug: "teal-thread-gold-detail-bangles",
       description:
         "Beautiful teal-threaded bangles with gold detailing and intricate patterns. Lightweight and elegant, they are perfect for adding a touch of sophistication to any ethnic outfit. Ideal for weddings, festivals, or everyday wear.A stylish accessory that adds colour and shine without feeling heavy.",
-      price: 169, //149
+      price: 165, //149
       images: ["/images/37.png"],//craftsCorner
       popular: false,
       featured: false,
@@ -1055,7 +1055,7 @@ export const productsByCategory = {
       slug: "vintage-art-statement-earrings",
       description:
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
-      price: 399,
+      price: 345,
       images: ["/images/47.png"], //aneraArt
       popular: false,
       featured: false,
