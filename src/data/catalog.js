@@ -25,7 +25,7 @@ export const categories = [
     order: 1, // Display order
     featured: true, // Show in featured sections
     meta: {
-      keywords: ["crochet", "flowers", "bouquets", "handmade", "anniversary","gift"],
+      keywords: ["crochet", "flowers", "bouquets", "handmade", "anniversary", "gift"],
     },
   },
   {
@@ -37,7 +37,7 @@ export const categories = [
     order: 2,
     featured: true,
     meta: {
-      keywords: ["personalized", "candles", "gift", "candle", "birthday","anniversary"],
+      keywords: ["personalized", "candles", "gift", "candle", "birthday", "anniversary"],
     },
   },
   {
@@ -91,7 +91,7 @@ export const categories = [
     order: 6,
     featured: true,
     meta: {
-      keywords: ["art","resin","frames","flowers"],
+      keywords: ["art", "resin", "frames", "flowers"],
     },
   },
   {
@@ -115,7 +115,7 @@ export const categories = [
     order: 8,
     featured: false,
     meta: {
-      keywords: ["gifts", "hampers", "rakhi", "anniversary", "birthday","gift"],
+      keywords: ["gifts", "hampers", "rakhi", "anniversary", "birthday", "gift"],
     },
   },
   {
@@ -277,7 +277,7 @@ export const productsByCategory = {
       title: "Crochet Flower Bouquet",
       slug: "handmade-crochet-flower-bouquet",
       description:
-      "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
+        "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
       price: 269,    //249
       images: ["/images/2.png"],
       popular: true,
@@ -296,7 +296,7 @@ export const productsByCategory = {
       description:
         "A charming mini flower pot made with crochet—bright, durable, and zero-maintenance. Available in multiple colors and styles, it’s a perfect desk décor piece or a cute gifting add-on.",
       price: 329,   //299
-      images: ["/images/3.png","/images/3-1.png"],
+      images: ["/images/3.png", "/images/3-1.png"],
       popular: false,
       featured: false,
       inStock: true,
@@ -363,7 +363,7 @@ export const productsByCategory = {
       slug: "handmade-crochet-flower-bouquet",
       description:
         "A beautifully handcrafted crochet flower bouquet designed to last forever. Made with soft yarn and detailed stitching, it’s a thoughtful alternative to fresh flowers that fade away. Perfect for birthdays, anniversaries, or anyone who prefers a meaningful and permanent gift.",
-      price: 2199,  
+      price: 2199,
       images: ["/images/39.png"], //hooksndhheart
       popular: true,
       featured: true,
@@ -381,7 +381,7 @@ export const productsByCategory = {
       description:
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 1749,
-      images: ["/images/43.png","/images/44.png","/images/43.png"], //hooksndhheart
+      images: ["/images/43.png", "/images/44.png", "/images/43.png"], //hooksndhheart
       popular: true,
       featured: true,
       inStock: true,
@@ -398,7 +398,7 @@ export const productsByCategory = {
       description:
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 349,
-      images: ["/images/53.png","/images/53-1.png"], //LillyPad
+      images: ["/images/53.png", "/images/53-1.png"], //LillyPad
       popular: true,
       featured: true,
       inStock: true,
@@ -415,7 +415,7 @@ export const productsByCategory = {
       description:
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 149,
-      images: ["/images/49.png","/images/49-1.png","/images/49-2.png"], //LillyPad
+      images: ["/images/49.png", "/images/49-1.png", "/images/49-2.png"], //LillyPad
       popular: true,
       featured: true,
       inStock: true,
@@ -427,18 +427,33 @@ export const productsByCategory = {
     {
       id: 66,
       categoryId: "Crochet",
-      title: "Handmade Colourful Shawl ",
-      slug: "Dancing-Daisies",
+      title: "Crochet Granny Square Wrap",
+      slug: "crochet-granny-square-wrap",
       description:
-        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+        "A handmade crochet patchwork wrap featuring colorful granny square patterns stitched together in a cozy, timeless design. Soft, warm, and perfect for layering during cooler days.",
       price: 2299,
-      images: ["/images/54.png","/images/54-1.png","/images/54-2.png"], //Reena's Crochet
+      images: ["/images/54.png", "/images/54-1.png", "/images/54-2.png"], //Reena's Crochet
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      "tags": [
+        "crochet wrap",
+        "crochet shawl",
+        "granny square wrap",
+        "patchwork crochet",
+        "boho wrap",
+        "handmade crochet",
+        "winter layer"
+      ],
       meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+        "keywords": [
+          "handmade crochet wrap",
+          "crochet patchwork shawl",
+          "granny square wrap",
+          "boho crochet shawl",
+          "colorful crochet wrap",
+          "winter crochet layer"
+        ],
       },
     },
   ],
@@ -618,18 +633,33 @@ export const productsByCategory = {
     {
       id: 67,
       categoryId: "Handbags",
-      title: "Sunflower Granny tote bag",
-      slug: "Sunflower Granny crochet bag",
+      title: "Sunflower Crochet Tote Bag",
+      slug: "sunflower-crochet-tote-bag",
       description:
-        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+        "A handmade crochet tote featuring vibrant sunflower granny squares on a soft blue base. Lightweight yet sturdy, it’s perfect for picnics, market runs, and sunny day outings.",
       price: 999,
-      images: ["/images/55.png","/images/55-1.png","/images/55-2.png"], //Reena's Crochet
+      images: ["/images/55.png", "/images/55-1.png", "/images/55-2.png"], //Reena's Crochet
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["crochet", "handbag", "flowers", "pink", "gift"],
+      tags: [
+        "crochet tote",
+        "sunflower bag",
+        "granny square bag",
+        "picnic tote",
+        "handmade crochet bag",
+        "boho tote",
+        "summer bag"
+      ],
       meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+        keywords: [
+          "sunflower crochet tote",
+          "granny square tote bag",
+          "handmade crochet picnic bag",
+          "boho sunflower bag",
+          "summer crochet tote",
+          "aesthetic handmade bag"
+        ],
       },
     },
   ],
@@ -784,7 +814,7 @@ export const productsByCategory = {
       popular: false,
       featured: false,
       inStock: true,
-         tags: ["brass", "serving set", "traditional", "dining"],
+      tags: ["brass", "serving set", "traditional", "dining"],
       meta: {
         keywords: ["brass serving set", "traditional", "dining", "kitchen"],
       },
@@ -905,7 +935,7 @@ export const productsByCategory = {
       popular: false,
       featured: false,
       inStock: true,
-     tags: ["resin", "clock", "handmade", "flower"],
+      tags: ["resin", "clock", "handmade", "flower"],
       meta: {
         keywords: ["resin", "clock", "handmade", "flower"],
       },
@@ -913,7 +943,7 @@ export const productsByCategory = {
     {
       id: 60,
       categoryId: "resin-products",
-     title: "Resin Floral Tissue Holder",
+      title: "Resin Floral Tissue Holder",
       slug: "Resin-floral-tissue-holder",
       description:
         "A handcrafted resin tissue holder designed with elegant floral detailing and gold accents. Combining utility with artistic home decor, it keeps tissues organised while adding a stylish touch to your table or console. A beautiful decor piece that enhances modern and classic interiors alike.",
@@ -922,9 +952,9 @@ export const productsByCategory = {
       popular: true,
       featured: true,
       inStock: true,
-     tags: ["resin", "tissue", "holder", "floral", "decor"],
+      tags: ["resin", "tissue", "holder", "floral", "decor"],
       meta: {
-        keywords: ["homedecor", "handmade", "luxury", "table", "resin","tissueholder"],
+        keywords: ["homedecor", "handmade", "luxury", "table", "resin", "tissueholder"],
       },
     },
   ],
@@ -997,7 +1027,7 @@ export const productsByCategory = {
         keywords: ["bangles", "wedding", "ethnic", "jewellery", "ornaments"],
       },
     },
-   {
+    {
       id: 54,
       categoryId: "Handmade-Accessories",
       title: "Teal Thread Gold Detail Bangles",
@@ -1039,7 +1069,7 @@ export const productsByCategory = {
       description:
         "A beautifully handmade crochet parandi with delicate white flowers and soft green detailing. Designed to add a soft statement look to braids, it makes your hairstyle stand out effortlessly. Perfect for festive wear, cultural events, or adding a graceful touch to everyday ethnic outfits.",
       price: 749,
-      images: ["/images/40.png","/images/41.png","/images/42.png"], //hooksndheart
+      images: ["/images/40.png", "/images/41.png", "/images/42.png"], //hooksndheart
       popular: false,
       featured: false,
       inStock: true,
@@ -1060,9 +1090,9 @@ export const productsByCategory = {
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["anniversary", "gift box", "custom", "traditional", "resin" , "earrings"],
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
       meta: {
-        keywords: ["anniversary gift", "custom", "gift box", "resin" , "earrings"],
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
       },
     },
   ],
@@ -1070,125 +1100,171 @@ export const productsByCategory = {
     {
       id: 64,
       categoryId: "Customised-Hampers",
-      title: "Tshirt-Hampers",
-      slug: "Dancing-Daisies",
+      title: "Luxury Chocolate & Memory Gift Hamper",
+      slug: "luxury-chocolate-memory-gift-hamper",
       description:
-        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 0,
-      images: ["/images/48.png","/images/48-1.png","/images/48-2.png"], //LillyPad
+        "A thoughtfully curated luxury gift hamper featuring premium Ferrero Rocher chocolates arranged in a floral-style bouquet, delicately wrapped with golden accents and baby's breath detailing. Paired with a soft fabric stole/scarf and a personalized photo card, all beautifully presented in a transparent hard gift box with elegant rope handles. Crafted for special moments, this hamper blends sweetness, sentiment, and sophistication — making it perfect for anniversaries, birthdays, proposal surprises, bridesmaid gifts, or heartfelt celebrations. A complete keepsake gift that feels intimate, premium, and memorable. Starting from 400 onwards, with customizable options.",
+      price: 400,
+      images: ["/images/48.png", "/images/48-1.png", "/images/48-2.png"], //LillyPad
       popular: false,
       featured: true,
       inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      tags: ["gift hamper", "chocolate bouquet", "luxury gifting", "personalized gift", "anniversary gift"],
       meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+        keywords: ["premium gift box", "ferrero rocher bouquet", "romantic hamper", "memory gift", "custom photo gift", "luxury chocolate gift", "celebration hamper"],
       },
     },
     {
       id: 65,
       categoryId: "Customised-Hampers",
-      title: "Custom Hampers",
-      slug: "Dancing-Daisies",
+      title: "Memory Gift Box",
+      slug: "memory-gift-box",
       description:
-        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 0,
-      images: ["/images/52.png","/images/52-1.png","/images/52-2.png"], //LillyPad
+        "A thoughtfully curated memory gift box designed to turn special moments into lasting keepsakes. Includes a mini scrapbook album, photo frame, dried floral accents, and elegant kraft-style detailing. Select variations also include chocolates for a sweet touch. Perfect for anniversaries, birthdays, best friends, farewells, and relationship milestones. A meaningful gift that feels more personal than just a box of chocolates.",
+      price: 400,
+      images: ["/images/52.png", "/images/52-1.png", "/images/52-2.png"], //LillyPad
       popular: false,
       featured: true,
       inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
-      meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
-      },
+      tags: ["memory gift box", "anniversary gift", "best friend gift", "photo frame gift", "scrapbook hamper"],
+    meta: {
+      "keywords": [
+        "anniversary gift box India",
+        "best friend memory gift",
+        "photo frame gift hamper",
+        "scrapbook gift box",
+        "romantic gift for girlfriend",
+        "birthday surprise gift box",
+        "handmade gift hamper India"
+      ],
     },
-    {
-      id: 71,
-      categoryId: "Customised-Hampers",
-      title: "Photo Album",
-      slug: "Photo-Album",
-      description:
-        "pages wise",
-      price: 119,
-      images: ["/images/51.png"], //LillyPad
-      popular: true,
-      featured: true,
-      inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
-      meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+    },
+  {
+    id: 71,
+    categoryId: "Customised-Hampers",
+    title: "DIY Memory Scrapbook Album",
+    slug: "DIY-Memory-Scrapbook-Album",
+    description:
+        "A handcrafted DIY memory scrapbook album designed for you to personalize in your own creative way. Made with a sturdy kraft cover and thick, high-quality blank pages, this ring-bound scrapbook provides the perfect canvas to paste photos, write heartfelt notes, doodle, decorate with stickers, and create a one-of-a-kind memory book. Ideal for anniversaries, birthdays, farewell gifts, relationship milestones, friendship memories, or surprise keepsakes. Available in multiple page options to match your story: 8 pages (₹120), 12 pages (₹180), 16 pages (₹240), 18 pages (₹280), and 20 pages (₹310). A thoughtful, affordable DIY gift that allows you to turn your memories into something deeply personal and meaningful.",
+    price: 119,
+    images: ["/images/51.png"], //LillyPad
+    popular: true,
+    featured: true,
+    inStock: true,
+    tags: ["DIY scrapbook", "memory album", "blank photo book", "anniversary gift idea", "creative gift"],
+    meta: {
+      "keywords": [
+          "DIY scrapbook album India",
+      "blank photo album gift",
+      "memory book for couples",
+      "anniversary DIY gift",
+      "creative handmade gift idea",
+      "romantic scrapbook album",
+      "affordable gift under 500"
+        ]
       },
     },
   ],
-  "Handmade-Soaps": [
-    {
-      id: 68,
-      categoryId: "Handmade-Soaps",
-      title: "Grape soap on rope",
-      slug: "Grape-soap-on-rope",
-      description:
-        "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 349,
-      images: ["/images/52.png","/images/52-1.png","/images/52-2.png"], //Divine Ember
-      popular: true,
-      featured: true,
-      inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
-      meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
-      },
+"Handmade-Soaps": [
+  {
+    id: 68,
+    categoryId: "Handmade-Soaps",
+    title: "Grape Soap On Rope",
+    slug: "grape-soap-on-rope",
+    description:
+      "A sculpted grape-shaped soap designed to add a playful yet aesthetic touch to your kitchen or bathroom. Functional, decorative, and perfect as a unique gift.",
+    price: 349,
+    images: ["/images/56.png", "/images/56-1.png", "/images/56-2.png"], //Divine Ember
+    popular: true,
+    featured: true,
+    inStock: true,
+    tags: [
+      "grape soap",
+      "cluster soap",
+      "aesthetic soap",
+      "decorative soap",
+      "designer soap",
+      "kitchen sink accessory",
+      "unique gift idea"
+    ],
+    meta: {
+      keywords: [
+        "grape shaped soap",
+        "grape cluster soap",
+        "aesthetic decorative soap",
+        "unique gift soap",
+        "designer soap bar",
+        "trendy home accessory"
+      ],
     },
-    {
-      id: 69,
-      categoryId: "Handmade-Soaps",
-      title: "Glycerin Strawberry grape soap",
-      slug: "Glycerin-Strawberry-grape-soap",
-      description:
-        "33pcs charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 549,
-      images: ["/images/57.png"], //Soaps
-      popular: true,
-      featured: true,
-      inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
-      meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
-      },
+  },
+  {
+    id: 69,
+    categoryId: "Handmade-Soaps",
+    title: "Glycerin Strawberry grape soap",
+    slug: "Glycerin-Strawberry-grape-soap",
+    description:
+      "A playful strawberry-shaped soap designed to brighten up your kitchen or bathroom. Decorative yet functional, this hanging soap adds a sweet, aesthetic touch to any space.",
+    price: 549,
+    images: ["/images/57.png"], //Soaps
+    popular: true,
+    featured: true,
+    inStock: true,
+    tags: [
+      "strawberry soap",
+      "fruit shaped soap",
+      "aesthetic soap",
+      "decorative soap",
+      "hanging soap",
+      "cute bathroom accessory",
+      "gift soap"
+    ],
+    meta: {
+      keywords: [
+        "strawberry shaped soap",
+        "fruit soap bar",
+        "aesthetic hanging soap",
+        "cute decorative soap",
+        "unique gift soap",
+        "designer bathroom soap"
+      ],
     },
-    {
-      id: 70,
-      categoryId: "Handmade-Soaps",
-      title: "Multicolor grape soap",
-      slug: "Multicolor-grape-soap",
-      description:
-        "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 549,
-      images: ["/images/58.png"], //Soaps
-      popular: true,
-      featured: true,
-      inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
-      meta: {
-        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
-      },
+  },
+  {
+    id: 70,
+    categoryId: "Handmade-Soaps",
+    title: "Multicolor grape soap",
+    slug: "Multicolor-grape-soap",
+    description:
+      "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+    price: 549,
+    images: ["/images/58.png"], //Soaps
+    popular: true,
+    featured: true,
+    inStock: true,
+    tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+    meta: {
+      keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
     },
-    /*{
-      id: 53,
-      categoryId: "Handmade-Soaps",
-      title: "Traditional Brass Paperweight Set",
-      slug: "traditional-brass-paperweight-set",
-      description:
-        "Set of 2 traditional brass paperweights with intricate designs. Handcrafted by skilled artisans. Perfect for keeping papers organized. Adds elegance to any desk. Makes a great gift.",
-      price: 999,
-      images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
-      popular: false,
-      featured: false,
-      inStock: true,
-      tags: ["paperweight", "brass", "traditional", "office"],
-      meta: {
-        keywords: ["paperweight", "brass", "traditional", "office"],
-      },
-    },*/
-  ],
+  },
+  /*{
+    id: 53,
+    categoryId: "Handmade-Soaps",
+    title: "Traditional Brass Paperweight Set",
+    slug: "traditional-brass-paperweight-set",
+    description:
+      "Set of 2 traditional brass paperweights with intricate designs. Handcrafted by skilled artisans. Perfect for keeping papers organized. Adds elegance to any desk. Makes a great gift.",
+    price: 999,
+    images: [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER],
+    popular: false,
+    featured: false,
+    inStock: true,
+    tags: ["paperweight", "brass", "traditional", "office"],
+    meta: {
+      keywords: ["paperweight", "brass", "traditional", "office"],
+    },
+  },*/
+],
 };
 
 // ============================================================================
