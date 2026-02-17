@@ -20,7 +20,8 @@ const WhatsAppButton = () => {
     : "Hello! I'm interested in your products. Could you please provide more information?";
 
   const handleWhatsAppClick = () => {
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    //const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${contactInfo.whatsapp.number}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
     setIsOpen(false);
   };
