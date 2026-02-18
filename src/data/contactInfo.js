@@ -19,9 +19,9 @@ export const contactInfo = {
       type: 'primary'
     },
     alternate: {
-      display: '+91 96508 00399',
-      raw: '9650800399',
-      full: '+919650800399',
+      display: '+91 92899 55099', 
+      raw: '9289955099',
+      full: '+919289955099',
       label: 'Alternate Contact',
       type: 'alternate'
     }
@@ -33,7 +33,7 @@ export const contactInfo = {
     }
   },
   whatsapp: {
-    number: '919650800399', // Primary WhatsApp number (same as primary phone)
+    number: '919289955099', // Primary WhatsApp number (same as primary phone)
     label: 'WhatsApp'
   },
   instagram: {
