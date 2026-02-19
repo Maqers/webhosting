@@ -397,7 +397,7 @@ export const productsByCategory = {
       slug: "Dancing-Daisies",
       description:
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 349,
+      price: 385,
       images: ["/images/53.png", "/images/53-1.png"], //LillyPad
       popular: true,
       featured: true,
@@ -411,10 +411,10 @@ export const productsByCategory = {
       id: 63,
       categoryId: "Crochet",
       title: "Single Flower Pot",
-      slug: "Dancing-Daisies",
+      slug: "Single-Flower-Pot",
       description:
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-      price: 149,
+      price: 160,
       images: ["/images/49.png", "/images/49-1.png", "/images/49-2.png"], //LillyPad
       popular: true,
       featured: true,
@@ -1104,7 +1104,7 @@ export const productsByCategory = {
       slug: "luxury-chocolate-memory-gift-hamper",
       description:
         "A thoughtfully curated luxury gift hamper featuring premium Ferrero Rocher chocolates arranged in a floral-style bouquet, delicately wrapped with golden accents and baby's breath detailing. Paired with a soft fabric stole/scarf and a personalized photo card, all beautifully presented in a transparent hard gift box with elegant rope handles. Crafted for special moments, this hamper blends sweetness, sentiment, and sophistication — making it perfect for anniversaries, birthdays, proposal surprises, bridesmaid gifts, or heartfelt celebrations. A complete keepsake gift that feels intimate, premium, and memorable. Starting from 400 onwards, with customizable options.",
-      price: 400,
+      price: 440,
       images: ["/images/48.png", "/images/48-1.png", "/images/48-2.png"], //LillyPad
       popular: false,
       featured: true,
@@ -1121,7 +1121,7 @@ export const productsByCategory = {
       slug: "memory-gift-box",
       description:
         "A thoughtfully curated memory gift box designed to turn special moments into lasting keepsakes. Includes a mini scrapbook album, photo frame, dried floral accents, and elegant kraft-style detailing. Select variations also include chocolates for a sweet touch. Perfect for anniversaries, birthdays, best friends, farewells, and relationship milestones. A meaningful gift that feels more personal than just a box of chocolates.",
-      price: 400,
+      price: 440,
       images: ["/images/52.png", "/images/52-1.png", "/images/52-2.png"], //LillyPad
       popular: false,
       featured: true,
@@ -1146,7 +1146,7 @@ export const productsByCategory = {
     slug: "DIY-Memory-Scrapbook-Album",
     description:
         "A handcrafted DIY memory scrapbook album designed for you to personalize in your own creative way. Made with a sturdy kraft cover and thick, high-quality blank pages, this ring-bound scrapbook provides the perfect canvas to paste photos, write heartfelt notes, doodle, decorate with stickers, and create a one-of-a-kind memory book. Ideal for anniversaries, birthdays, farewell gifts, relationship milestones, friendship memories, or surprise keepsakes. Available in multiple page options to match your story: 8 pages (₹120), 12 pages (₹180), 16 pages (₹240), 18 pages (₹280), and 20 pages (₹310). A thoughtful, affordable DIY gift that allows you to turn your memories into something deeply personal and meaningful.",
-    price: 119,
+    price: 130,
     images: ["/images/51.png"], //LillyPad
     popular: true,
     featured: true,
