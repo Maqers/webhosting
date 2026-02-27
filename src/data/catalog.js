@@ -288,23 +288,23 @@ export const productsByCategory = {
         keywords: ["bouquet", "yarn flowers", "gift", "birthday", "anniversary", "flowers"],
       },
     },
-    {
-      id: 6,
-      categoryId: "Crochet",
-      title: "Crochet Flower Pot",
-      slug: "handmade-crochet-flower-pot",
-      description:
-        "A charming mini flower pot made with crochet—bright, durable, and zero-maintenance. Available in multiple colors and styles, it’s a perfect desk décor piece or a cute gifting add-on.",
-      price: 329,   //299
-      images: ["/images/3.png", "/images/3-1.png"],
-      popular: false,
-      featured: false,
-      inStock: true,
-      tags: ["crochet", "pot", "decor", "handmade", "gift"],
-      meta: {
-        keywords: ["crochet pot", "flower pot", "desk decor", "handmade", "gift"],
-      },
-    },
+    // {
+    //   id: 6,
+    //   categoryId: "Crochet",
+    //   title: "Handmade Flower Pot Decor",
+    //   slug: "handmade-flower-pot-decor",
+    //   description:
+    //     "A bright and cheerful handcrafted flower pot designed to add colour to your desk, shelf, or workspace. Made using soft craft wire stems shaped into detailed petals and leaves, it offers a long-lasting, zero-maintenance decor option. A cute and thoughtful gift for birthdays, return gifts, or home decor lovers.",
+    //   price: 329,   //299
+    //   images: ["/images/3.png", "/images/3-1.png"],
+    //   popular: false,
+    //   featured: false,
+    //   inStock: true,
+    //   tags: ["flowerpot", "handmade", "decor", "gift", "desk"],
+    //   meta: {
+    //     keywords: ["floral", "homedecor", "craft", "colourful", "keepsake"],
+    //   },
+    // },
     {
       id: 8,
       categoryId: "Crochet",
@@ -323,12 +323,12 @@ export const productsByCategory = {
       },
     },
     {
-      id: 10,
-      categoryId: "Crochet",
-      title: "Crochet Flower Keychain",
-      slug: "crochet-flower-keychain",
+      id: 10,  
+      categoryId: "Crochet", //to be changed 
+      title: "Floral Keychain",
+      slug: "floral-keychain",
       description:
-        "A cute crochet flower keychain with soft petals and a sturdy key ring—instant fresh pop for your keys or bag. Available in multiple flower designs and colors; lightweight but eye-catching for everyday use.",
+        "A vibrant handmade floral keychain designed to add a fun pop of colour to your keys, bags, or backpacks. Crafted using soft textured craft stems shaped into detailed petals, it’s lightweight, durable, and perfect for everyday use. A cute and budget-friendly gift for friends, return gifts, or small surprises.",
       price: 89,  //79
       images: ["/images/5.png"],
       popular: false,
@@ -341,19 +341,19 @@ export const productsByCategory = {
     },
     {
       id: 12,
-      categoryId: "Crochet",
-      title: "Crochet Keychain Collection",
-      slug: "crochet-keychain-collection",
+      categoryId: "Crochet",   //to be changed
+      title: "Handmade Floral Keychain Collection",
+      slug: "handmade-floral-keychain-collection",
       description:
-        "A super-cute set of crochet keychains in multiple designs—flowers, strawberries, cherries, and more—each one made to stand out. Lightweight, durable, and perfect for gifting or adding instant fresh pop to your keys or bag.",
+        "A colourful collection of handmade floral and fruit keychains designed to brighten up your keys, bags, or backpacks. Crafted using soft textured craft stems shaped into detailed flowers and mini fruit designs, each piece is lightweight, durable, and eye-catching. Perfect for return gifts, small surprises, or everyday accessories.",
       price: 89,  //79
       images: ["/images/6.png"],
       popular: false,
       featured: true,
       inStock: true,
-      tags: ["keychain", "crochet", "collection", "cute", "gift"],
+      tags: ["keychain", "handmade", "floral", "cute", "gift"],
       meta: {
-        keywords: ["keychain", "handmade", "cute gift", "strawberry", "cherry"],
+        keywords: ["bagcharm", "accessories", "colourful", "fashion", "craft"],
       },
     },
     {
@@ -410,8 +410,8 @@ export const productsByCategory = {
     {
       id: 63,
       categoryId: "Crochet",
-      title: "Single Flower Pot",
-      slug: "Single-Flower-Pot",
+      title: "Handmade Single Flower Pot Decor",
+      slug: "handmade-single-flower-pot-decor",
       description:
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 160,
@@ -419,7 +419,7 @@ export const productsByCategory = {
       popular: true,
       featured: true,
       inStock: true,
-      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      tags: ["handmade", "floral", "decor", "pink", "gift"],
       meta: {
         keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
       },
