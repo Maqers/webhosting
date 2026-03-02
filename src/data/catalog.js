@@ -1095,6 +1095,227 @@ export const productsByCategory = {
         keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
       },
     },
+    {
+      id: 72,
+      categoryId: "Handmade-Accessories",
+      title: "Shabnam Chaandbaali Earrings",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/59.png","/images/59-1.png","/images/59-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 73,
+      categoryId: "Handmade-Accessories",
+      title: "Kamal Rani Haar",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/60.png","/images/60-1.png","/images/60-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 74,
+      categoryId: "Handmade-Accessories",
+      title: "Adira Earrings ",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/61.png","/images/61-1.png","/images/61-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 75,
+      categoryId: "Handmade-Accessories",
+      title: "Surkhaab Chaandbaalis",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/62.png","/images/62-1.png","/images/62-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 76,
+      categoryId: "Handmade-Accessories",
+      title: "Gauhar chaandbaalis",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/62.png","/images/62-1.png","/images/62-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 77,
+      categoryId: "Handmade-Accessories",
+      title: "Zubeida Necklace Set",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/63.png","/images/63-1.png","/images/63-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 78,
+      categoryId: "Handmade-Accessories",
+      title: "Idra chandbaalis",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/64.png","/images/64-1.png","/images/64-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 79,
+      categoryId: "Handmade-Accessories",
+      title: "Idra chandbaalis",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/65.png","/images/65-1.png","/images/65-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 80,
+      categoryId: "Handmade-Accessories",
+      title: "Rabaab Kashmiri Earrings",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/66.png","/images/66-1.png","/images/66-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 81,
+      categoryId: "Handmade-Accessories",
+      title: "Rabari Coin Necklace",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/67.png","/images/67-1.png","/images/67-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 82,
+      categoryId: "Handmade-Accessories",
+      title: "Morni necklace set",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/68.png","/images/68-1.png","/images/68-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 83,
+      categoryId: "Handmade-Accessories",
+      title: "Zareen jhumka",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/69.png","/images/69-1.png","/images/69-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
+    {
+      id: 84,
+      categoryId: "Handmade-Accessories",
+      title: "Trisha jhumki necklace set",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/70.png","/images/70-1.png","/images/70-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      meta: {
+        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+      },
+    },
   ],
   "Customised-Hampers": [
     {
