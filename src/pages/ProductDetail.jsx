@@ -148,7 +148,8 @@ const ProductDetail = () => {
 
             <div className="product-actions">
               <button type="button" onClick={handleContactUs} className="contact-us-button">
-                Contact Us via WhatsApp
+                {/* Contact Us via WhatsApp */}
+                Place an order via WhatsApp
               </button>
               <p className="inquiry-text">Click to inquire about this product.</p>
             </div>
