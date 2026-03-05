@@ -23,7 +23,7 @@ export const categories = [
     description: "Beautiful crochet handmade products",
     icon: "home",
     order: 1, // Display order
-    featured: true, // Show in featured sections
+    featured: false, // Show in featured sections
     meta: {
       keywords: [
         "crochet",
@@ -42,7 +42,7 @@ export const categories = [
     description: "Beautiful fragnant candles, customisations available",
     icon: "gift",
     order: 2,
-    featured: true,
+    featured: false,
     meta: {
       keywords: [
         "personalized",
@@ -61,7 +61,7 @@ export const categories = [
     description: "Elegant fashion items and bags",
     icon: "fashion",
     order: 3,
-    featured: true,
+    featured: false,
     meta: {
       keywords: ["bags", "handbags", "prints", "printed", "bag"],
     },
@@ -73,7 +73,7 @@ export const categories = [
     description: "Handmade paintings in beautiful frames",
     icon: "jewelry",
     order: 4,
-    featured: true,
+    featured: false,
     meta: {
       keywords: [
         "jewelry",
@@ -91,7 +91,7 @@ export const categories = [
     description: "Fancy home and dining utilities",
     icon: "kitchen",
     order: 5,
-    featured: true,
+    featured: false,
     meta: {
       keywords: ["homedecor", "decor", "glasses", "glass", "homeutilities"],
     },
@@ -103,7 +103,7 @@ export const categories = [
     description: "Resin art and collectible items",
     icon: "art",
     order: 6,
-    featured: true,
+    featured: false,
     meta: {
       keywords: ["art", "resin", "frames", "flowers"],
     },
@@ -115,7 +115,7 @@ export const categories = [
     description: "Accessories for weddings and celebrations",
     icon: "wedding",
     order: 7,
-    featured: true,
+    featured: false,
     meta: {
       keywords: ["wedding", "occasion", "celebration", "gift", "special"],
     },
@@ -158,7 +158,7 @@ export const categories = [
     description: "Beautiful oxidised jewellery pieces for all occasions",
     icon: "jewellery",
     order: 10,
-    featured: false,
+    featured: true,
     meta: {
       keywords: ["jewellery", "silver", "boho", "oxidised", "jhumka"],
     },
@@ -297,7 +297,7 @@ export const productsByCategory = {
       price: 219, //199
       images: ["/images/1.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"],
       meta: {
@@ -401,7 +401,7 @@ export const productsByCategory = {
       price: 89, //79
       images: ["/images/6.png"],
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["keychain", "handmade", "floral", "cute", "gift"],
       meta: {
@@ -418,7 +418,7 @@ export const productsByCategory = {
       price: 2199,
       images: ["/images/39.png"], //hooksndhheart
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "handmade", "gift"],
       meta: {
@@ -435,7 +435,7 @@ export const productsByCategory = {
       price: 1749,
       images: ["/images/43.png", "/images/44.png", "/images/43.png"], //hooksndhheart
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
@@ -452,7 +452,7 @@ export const productsByCategory = {
       price: 385,
       images: ["/images/53.png", "/images/53-1.png"], //LillyPad
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
@@ -469,7 +469,7 @@ export const productsByCategory = {
       price: 160,
       images: ["/images/49.png", "/images/49-1.png", "/images/49-2.png"], //LillyPad
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["handmade", "floral", "decor", "pink", "gift"],
       meta: {
@@ -486,7 +486,7 @@ export const productsByCategory = {
       price: 2299,
       images: ["/images/54.png", "/images/54-1.png", "/images/54-2.png"], //Reena's Crochet
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "crochet wrap",
@@ -520,7 +520,7 @@ export const productsByCategory = {
       price: 569, //518
       images: ["/images/7.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["candle", "strawberry", "dessert", "scented", "gift"],
       meta: {
@@ -642,7 +642,7 @@ export const productsByCategory = {
       price: 275, //249
       images: ["/images/13.png"],
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["tote", "heart", "canvas", "playful", "everyday"],
       meta: {
@@ -734,7 +734,7 @@ export const productsByCategory = {
       price: 999,
       images: ["/images/55.png", "/images/55-1.png", "/images/55-2.png"], //Reena's Crochet
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "crochet tote",
@@ -768,7 +768,7 @@ export const productsByCategory = {
       price: 1859,
       images: ["/images/17.png", "/images/17-1.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["flowers", "memory", "frame", "keepsake", "wedding"],
       meta: {
@@ -814,7 +814,7 @@ export const productsByCategory = {
       price: 1509,
       images: ["/images/19.png", "/images/19-1.png", "/images/19-2.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["earrings", "jhumka", "traditional", "handcrafted"],
       meta: {
@@ -971,7 +971,7 @@ export const productsByCategory = {
       price: 1099, //999
       images: ["/images/29.png"],
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["resin", "clock", "handmade", "flower"],
       meta: {
@@ -988,7 +988,7 @@ export const productsByCategory = {
       price: 109, //99
       images: ["/images/31.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["resin", "keychain", "handmade", "flower"],
       meta: {
@@ -1022,7 +1022,7 @@ export const productsByCategory = {
       price: 639, //579
       images: ["/images/32.png"],
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["resin", "nameplate", "handmade", "flower"],
       meta: {
@@ -1056,7 +1056,7 @@ export const productsByCategory = {
       price: 449,
       images: ["/images/46.png"], //AneraArt
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["resin", "tissue", "holder", "floral", "decor"],
       meta: {
@@ -1082,7 +1082,7 @@ export const productsByCategory = {
       price: 199, //179
       images: ["/images/33.png"], //craftsCorner
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["bangles", "thread", "festive", "ethnic", "colourful"],
       meta: {
@@ -1128,7 +1128,7 @@ export const productsByCategory = {
       price: 385, //349
       images: ["/images/35.png"], //craftsCorner
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["lotus", "gold", "ethnic", "wedding", "festive"],
       meta: {
@@ -1511,7 +1511,7 @@ export const productsByCategory = {
       price: 599,
       images: ["/images/67.png", "/images/67-1.png"], //Banjara
       popular: false,
-      featured: false,
+      featured: true,
       inStock: true,
       tags: [
         "jhumka earrings",
@@ -1542,7 +1542,7 @@ export const productsByCategory = {
       price: 599,
       images: ["/images/68.png", "/images/68-1.png", "/images/68-2.png"], //Banjara
       popular: false,
-      featured: false,
+      featured: true,
       inStock: true,
       tags: [
         "oxidized earrings",
@@ -1604,7 +1604,7 @@ export const productsByCategory = {
       price: 599,
       images: ["/images/70.png", "/images/70-1.png", "/images/70-2.png"], //Banjara
       popular: false,
-      featured: false,
+      featured: true,
       inStock: true,
       tags: [
         "oxidized necklace set",
@@ -1637,7 +1637,7 @@ export const productsByCategory = {
       price: 440,
       images: ["/images/48.png", "/images/48-1.png", "/images/48-2.png"], //LillyPad
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "gift hamper",
@@ -1668,7 +1668,7 @@ export const productsByCategory = {
       price: 440,
       images: ["/images/52.png", "/images/52-1.png", "/images/52-2.png"], //LillyPad
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "memory gift box",
@@ -1699,7 +1699,7 @@ export const productsByCategory = {
       price: 130,
       images: ["/images/51.png"], //LillyPad
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "DIY scrapbook",
@@ -1732,7 +1732,7 @@ export const productsByCategory = {
       price: 349,
       images: ["/images/56.png", "/images/56-1.png", "/images/56-2.png"], //Divine Ember
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "grape soap",
@@ -1764,7 +1764,7 @@ export const productsByCategory = {
       price: 549,
       images: ["/images/57.png"], //Soaps
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "strawberry soap",
@@ -1792,11 +1792,11 @@ export const productsByCategory = {
       title: "Multicolor grape soap",
       slug: "Multicolor-grape-soap",
       description:
-        "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+        "A vibrant multicolored grape-shaped soap designed to add a fun and aesthetic touch to your kitchen or bathroom. Functional and decorative, this soap makes for a unique gift or a playful home accessory.",
       price: 549,
       images: ["/images/58.png"], //Soaps
       popular: true,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
