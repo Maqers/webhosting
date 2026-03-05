@@ -296,7 +296,7 @@ export const productsByCategory = {
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
       price: 219, //199
       images: ["/images/1.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"],
@@ -313,7 +313,7 @@ export const productsByCategory = {
         "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
       price: 269, //249
       images: ["/images/2.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["bouquet", "crochet", "yarn", "birthday", "gift"],
@@ -417,7 +417,7 @@ export const productsByCategory = {
         "A beautifully handcrafted crochet flower bouquet designed to last forever. Made with soft yarn and detailed stitching, it’s a thoughtful alternative to fresh flowers that fade away. Perfect for birthdays, anniversaries, or anyone who prefers a meaningful and permanent gift.",
       price: 2199,
       images: ["/images/39.png"], //hooksndhheart
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "handmade", "gift"],
@@ -434,7 +434,7 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 1749,
       images: ["/images/43.png", "/images/44.png", "/images/43.png"], //hooksndhheart
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
@@ -451,7 +451,7 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 385,
       images: ["/images/53.png", "/images/53-1.png"], //LillyPad
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
@@ -468,7 +468,7 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 160,
       images: ["/images/49.png", "/images/49-1.png", "/images/49-2.png"], //LillyPad
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["handmade", "floral", "decor", "pink", "gift"],
@@ -485,7 +485,7 @@ export const productsByCategory = {
         "A handmade crochet patchwork wrap featuring colorful granny square patterns stitched together in a cozy, timeless design. Soft, warm, and perfect for layering during cooler days.",
       price: 2299,
       images: ["/images/54.png", "/images/54-1.png", "/images/54-2.png"], //Reena's Crochet
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -519,7 +519,7 @@ export const productsByCategory = {
         "A dessert-style candle crafted to look like a strawberry parfait—complete with a creamy top layer and berry detailing. Perfect for gifting or home décor; looks delicious on a bedside table, desk, or vanity.",
       price: 569, //518
       images: ["/images/7.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["candle", "strawberry", "dessert", "scented", "gift"],
@@ -559,7 +559,7 @@ export const productsByCategory = {
         "A romantic layered candle in a glass jar with rose-toned detailing—made to set the mood instantly. Perfect for date nights, anniversaries, and gifting; looks elegant as table décor even when unlit.",
       price: 659, //599
       images: ["/images/9.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["candle", "romantic", "rose", "anniversary", "scented"],
@@ -599,7 +599,7 @@ export const productsByCategory = {
         "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
       price: 949, //899
       images: ["/images/11.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["candle", "mini", "bucket", "colorful", "scented"],
@@ -664,7 +664,7 @@ export const productsByCategory = {
         "A statement black tote with a sunflower-and-butterflies artwork that instantly brightens your everyday carry. Roomy, lightweight, and sturdy—perfect for college, work, errands, or gifting.",
       price: 329, //299
       images: ["/images/14.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["tote", "sunflower", "butterfly", "statement", "art"],
@@ -733,7 +733,7 @@ export const productsByCategory = {
         "A handmade crochet tote featuring vibrant sunflower granny squares on a soft blue base. Lightweight yet sturdy, it’s perfect for picnics, market runs, and sunny day outings.",
       price: 999,
       images: ["/images/55.png", "/images/55-1.png", "/images/55-2.png"], //Reena's Crochet
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -767,7 +767,7 @@ export const productsByCategory = {
         "Preserve your special moments with real pressed flowers, arranged into an elegant keepsake frame. Perfect for gifting or home décor—ideal for wedding flowers, anniversaries, or meaningful memories you want to keep forever.",
       price: 1859,
       images: ["/images/17.png", "/images/17-1.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["flowers", "memory", "frame", "keepsake", "wedding"],
@@ -790,7 +790,7 @@ export const productsByCategory = {
         "Real pressed flowers arranged in a minimal, elegant frame—perfect for adding a soft, natural touch to your space. A timeless décor piece for bedrooms, living rooms, or gifting to someone who loves subtle aesthetics.",
       price: 1439,
       images: ["/images/18-1.png", "/images/18.png", "/images/18-2.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["flowers", "frame", "minimal", "natural", "decor"],
@@ -813,7 +813,7 @@ export const productsByCategory = {
         "A romantic wall frame made with real pressed petals, arranged around a heart cut-out for a warm, timeless look. Perfect for anniversaries, weddings, and meaningful gifts—adds a soft pop of color to any room.",
       price: 1509,
       images: ["/images/19.png", "/images/19-1.png", "/images/19-2.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["earrings", "jhumka", "traditional", "handcrafted"],
@@ -883,7 +883,7 @@ export const productsByCategory = {
         "A luxe pair of champagne flutes with Spiral rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1649, //1499
       images: ["/images/23.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
@@ -900,7 +900,7 @@ export const productsByCategory = {
         "A luxe pair of twirl rhinestone flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1649, //1499
       images: ["/images/24.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
@@ -934,7 +934,7 @@ export const productsByCategory = {
         "A luxe pair of champagne flutes with Beaded Neck detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 2399, //2199
       images: ["/images/26.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
@@ -987,7 +987,7 @@ export const productsByCategory = {
         "A beautiful resin keychain featuring real dried flowers preserved forever in crystal-clear resin. Each piece is one of a kind, capturing nature in its most delicate form.",
       price: 109, //99
       images: ["/images/31.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["resin", "keychain", "handmade", "flower"],
@@ -1021,7 +1021,7 @@ export const productsByCategory = {
         "Add a personal touch to your space with this custom resin flower name plate. Featuring real flowers sealed forever in high-quality resin, it’s a timeless décor piece that welcomes with elegance.",
       price: 639, //579
       images: ["/images/32.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["resin", "nameplate", "handmade", "flower"],
@@ -1055,7 +1055,7 @@ export const productsByCategory = {
         "A handcrafted resin tissue holder designed with elegant floral detailing and gold accents. Combining utility with artistic home decor, it keeps tissues organised while adding a stylish touch to your table or console. A beautiful decor piece that enhances modern and classic interiors alike.",
       price: 449,
       images: ["/images/46.png"], //AneraArt
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["resin", "tissue", "holder", "floral", "decor"],
@@ -1081,7 +1081,7 @@ export const productsByCategory = {
         "Vibrant thread-wrapped bangles detailed with intricate gold-toned embellishments and delicate stones. Lightweight and comfortable, they’re perfect for college celebrations, wedding functions, or adding a bold pop of colour to everyday ethnic outfits. A subtle statement that instantly elevates your look.",
       price: 199, //179
       images: ["/images/33.png"], //craftsCorner
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["bangles", "thread", "festive", "ethnic", "colourful"],
@@ -1104,7 +1104,7 @@ export const productsByCategory = {
         "Delicately crafted gold-toned bangles featuring subtle stone detailing for a refined, retro ethnic charm. Lightweight and versatile, they complement sarees, suits, or even minimalist fusion outfits effortlessly. Perfect for those who love understated elegance with a timeless touch.",
       price: 165, //149
       images: ["/images/34.png"], //craftsCorner
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["vintage", "gold", "minimal", "ethnic", "classic"],
@@ -1127,7 +1127,7 @@ export const productsByCategory = {
         "Beautiful gold-toned bangles with detailed lotus designs and soft coloured accents. Perfect for weddings, festivals, or adding a traditional touch to your ethnic outfits. A graceful piece that blends classic style with everyday elegance.",
       price: 385, //349
       images: ["/images/35.png"], //craftsCorner
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["lotus", "gold", "ethnic", "wedding", "festive"],
@@ -1263,7 +1263,7 @@ export const productsByCategory = {
         "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.",
       price: 599,
       images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], //Banjara
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -1698,7 +1698,7 @@ export const productsByCategory = {
         "A handcrafted DIY memory scrapbook album designed for you to personalize in your own creative way. Made with a sturdy kraft cover and thick, high-quality blank pages, this ring-bound scrapbook provides the perfect canvas to paste photos, write heartfelt notes, doodle, decorate with stickers, and create a one-of-a-kind memory book. Ideal for anniversaries, birthdays, farewell gifts, relationship milestones, friendship memories, or surprise keepsakes. Available in multiple page options to match your story: 8 pages (₹120), 12 pages (₹180), 16 pages (₹240), 18 pages (₹280), and 20 pages (₹310). A thoughtful, affordable DIY gift that allows you to turn your memories into something deeply personal and meaningful.",
       price: 130,
       images: ["/images/51.png"], //LillyPad
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -1731,7 +1731,7 @@ export const productsByCategory = {
         "A sculpted grape-shaped soap designed to add a playful yet aesthetic touch to your kitchen or bathroom. Functional, decorative, and perfect as a unique gift.",
       price: 349,
       images: ["/images/56.png", "/images/56-1.png", "/images/56-2.png"], //Divine Ember
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -1763,7 +1763,7 @@ export const productsByCategory = {
         "A playful strawberry-shaped soap designed to brighten up your kitchen or bathroom. Decorative yet functional, this hanging soap adds a sweet, aesthetic touch to any space.",
       price: 549,
       images: ["/images/57.png"], //Soaps
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -1795,7 +1795,7 @@ export const productsByCategory = {
         "A vibrant multicolored grape-shaped soap designed to add a fun and aesthetic touch to your kitchen or bathroom. Functional and decorative, this soap makes for a unique gift or a playful home accessory.",
       price: 549,
       images: ["/images/58.png"], //Soaps
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
