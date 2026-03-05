@@ -72,7 +72,7 @@ export const categories = [
     slug: "Frames&Paintings",
     description: "Handmade paintings in beautiful frames",
     icon: "jewelry",
-    order: 4,
+    order: 10,
     featured: true,
     meta: {
       keywords: [
@@ -157,7 +157,7 @@ export const categories = [
     slug: "Oxidised-jewellery",
     description: "Beautiful oxidised jewellery pieces for all occasions",
     icon: "jewellery",
-    order: 10,
+    order: 4,
     featured: false,
     meta: {
       keywords: ["jewellery", "silver", "boho", "oxidised", "jhumka"],
