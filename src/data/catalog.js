@@ -1292,7 +1292,7 @@ export const productsByCategory = {
       slug: "kamal-rani-haar",
       description:
         "Full festive drama, zero extra effort—an oxidised silver-tone haar with chandbali motifs, a coin pendant, and matching earrings + maang tikka. Wear it with sarees, kurtas, or lehengas for weddings, poojas, and night functions.",
-      price: 599,
+      price: 649,
       images: ["/images/60.png", "/images/60-1.png", "/images/60-2.png"], //Banjara
       popular: false,
       featured: false,
@@ -1323,7 +1323,7 @@ export const productsByCategory = {
       slug: "adira-earrings",
       description:
         "Statement danglers with a pastel teardrop centerpiece, kundan-style detailing, and a pearl-bead fringe that adds soft movement. Available in dreamy shades (teal, blush pink, and amber)—perfect for mehendi/sangeet nights, festive dinners, poojas, and wedding-guest looks. Best for anyone who wants one standout accessory with sarees, kurtas, lehengas, or even a solid fusion dress.",
-      price: 599,
+      price: 499,
       images: ["/images/61.png", "/images/61-1.png", "/images/61-2.png"], //Banjara
       popular: false,
       featured: false,
@@ -1354,7 +1354,7 @@ export const productsByCategory = {
       slug: "surkhaab-chaandbaalis",
       description:
         "Two-tone statement chandelier earrings with an oxidised-silver base, antique-gold bead drops, and bold red/green accents—made for maximum drama in one move. Wear them to mehendi/sangeet nights, wedding functions, festive dinners, garba nights, or anytime your outfit is simple and you want the earrings to do the talking. Best for bridesmaids, wedding guests, dancers, and anyone who loves boho-ethnic jewellery with movement.",
-      price: 599,
+      price: 549,
       images: ["/images/62.png", "/images/62-1.png", "/images/62-2.png"], //Banjara
       popular: false,
       featured: false,
@@ -1385,7 +1385,7 @@ export const productsByCategory = {
       slug: "gauhar-chaandbaalis",
       description:
         "Dramatic black chandbalis with a teardrop top, layered antique detailing, and a pearl fringe that adds soft movement. Made for sangeet nights, cocktail + saree looks, festive dinners, or even an all-black Indo-western outfit when you want the earrings to be the main character. Best for bridesmaids, wedding guests, and anyone who loves bold, elegant statement jewellery.",
-      price: 599,
+      price: 649,
       images: ["/images/63.png", "/images/63-1.png", "/images/63-2.png"], //Banjara
       popular: false,
       featured: false,
@@ -1447,7 +1447,7 @@ export const productsByCategory = {
       slug: "idra-chaandbaalis",
       description:
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
-      price: 599,
+      price: 399,
       images: ["/images/65.png", "/images/65-1.png", "/images/65-2.png"], //Banjara
       popular: false,
       featured: false,
@@ -1477,7 +1477,7 @@ export const productsByCategory = {
       slug: "rabaab-kashmiri-earrings",
       description:
         "Big-fat-festive energy—antique-finish long jhumkas with stone accents and chain tassels. Wear them with sarees, lehengas, or a plain kurta set when your outfit needs a shortcut to “wow”. Best for anyone who loves bold traditional jewellery with a little drama.",
-      price: 599,
+      price: 649,
       images: ["/images/66.png", "/images/66-1.png", "/images/66-2.png"], //Banjara
       popular: false,
       featured: false,
@@ -1570,7 +1570,7 @@ export const productsByCategory = {
       slug: "zareen-jhumka-necklace-set",
       description:
         "Antique-gold dome jhumkas with an ornate crescent stud, tiny side jhumki charms, and a delicate hanging fringe for soft movement. Easy to wear for poojas, festive dinners, family functions, and wedding events—pairs best with kurtas, sarees, and lehengas when you want a classic traditional look without going too heavy.",
-      price: 599,
+      price: 399,
       images: ["/images/69-1.png", "/images/69.png", "/images/69-2.png"], //Banjara
       popular: false,
       featured: false,
