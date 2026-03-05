@@ -155,12 +155,12 @@ export const categories = [
     id: "Oxidised-jewellery",
     name: "Oxidised Jewellery",
     slug: "Oxidised-jewellery",
-    description: "Handcrafted soaps in various fragnances",
+    description: "Beautiful oxidised jewellery pieces for all occasions",
     icon: "jewellery",
     order: 10,
     featured: false,
     meta: {
-      keywords: ["jewellery", "handwash", "fragnance", "soap", "hanging"],
+      keywords: ["jewellery", "silver", "boho", "oxidised", "jhumka"],
     },
   },
 ];
@@ -1258,7 +1258,7 @@ export const productsByCategory = {
       id: 72,
       categoryId: "Oxidised-jewellery",
       title: "Shabnam Chaandbaali Earrings",
-      slug: "vintage-art-statement-earrings",
+      slug: "shabnam-chaandbaali-earrings",
       description:
         "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.",
       price: 599,
@@ -1289,9 +1289,9 @@ export const productsByCategory = {
       id: 73,
       categoryId: "Oxidised-jewellery",
       title: "Kamal Rani Haar",
-      slug: "vintage-art-statement-earrings",
+      slug: "kamal-rani-haar",
       description:
-        "Oxidised jhumka-style danglers with a floral stud, engraved shield motif, and a ghungroo fringe that adds movement and a subtle jingle. Wear them for office ethnic days, college fits, poojas, festive nights, and wedding functions—especially with kurtas, sarees, and lehengas. A great pick for anyone who likes traditional statement jewellery without going over-the-top.",
+        "Full festive drama, zero extra effort—an oxidised silver-tone haar with chandbali motifs, a coin pendant, and matching earrings + maang tikka. Wear it with sarees, kurtas, or lehengas for weddings, poojas, and night functions.",
       price: 599,
       images: ["/images/60.png", "/images/60-1.png", "/images/60-2.png"], //Banjara
       popular: false,
@@ -1319,8 +1319,8 @@ export const productsByCategory = {
     {
       id: 74,
       categoryId: "Oxidised-jewellery",
-      title: "Adira Earrings ",
-      slug: "vintage-art-statement-earrings",
+      title: "Adira Earrings",
+      slug: "adira-earrings",
       description:
         "Statement danglers with a pastel teardrop centerpiece, kundan-style detailing, and a pearl-bead fringe that adds soft movement. Available in dreamy shades (teal, blush pink, and amber)—perfect for mehendi/sangeet nights, festive dinners, poojas, and wedding-guest looks. Best for anyone who wants one standout accessory with sarees, kurtas, lehengas, or even a solid fusion dress.",
       price: 599,
@@ -1351,7 +1351,7 @@ export const productsByCategory = {
       id: 75,
       categoryId: "Oxidised-jewellery",
       title: "Surkhaab Chaandbaalis",
-      slug: "vintage-art-statement-earrings",
+      slug: "surkhaab-chaandbaalis",
       description:
         "Two-tone statement chandelier earrings with an oxidised-silver base, antique-gold bead drops, and bold red/green accents—made for maximum drama in one move. Wear them to mehendi/sangeet nights, wedding functions, festive dinners, garba nights, or anytime your outfit is simple and you want the earrings to do the talking. Best for bridesmaids, wedding guests, dancers, and anyone who loves boho-ethnic jewellery with movement.",
       price: 599,
@@ -1382,7 +1382,7 @@ export const productsByCategory = {
       id: 76,
       categoryId: "Oxidised-jewellery",
       title: "Gauhar chaandbaalis",
-      slug: "vintage-art-statement-earrings",
+      slug: "gauhar-chaandbaalis",
       description:
         "Dramatic black chandbalis with a teardrop top, layered antique detailing, and a pearl fringe that adds soft movement. Made for sangeet nights, cocktail + saree looks, festive dinners, or even an all-black Indo-western outfit when you want the earrings to be the main character. Best for bridesmaids, wedding guests, and anyone who loves bold, elegant statement jewellery.",
       price: 599,
@@ -1413,7 +1413,7 @@ export const productsByCategory = {
       id: 77,
       categoryId: "Oxidised-jewellery",
       title: "Zubeida Necklace Set",
-      slug: "vintage-art-statement-earrings",
+      slug: "zubeida-necklace-set",
       description:
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
       price: 599,
@@ -1422,20 +1422,21 @@ export const productsByCategory = {
       featured: false,
       inStock: true,
       tags: [
-        "anniversary",
-        "gift box",
-        "custom",
-        "traditional",
-        "resin",
-        "earrings",
+        "chandbali earrings",
+        "black statement earrings",
+        "pearl fringe",
+        "oxidized earrings",
+        "wedding jewellery",
+        "festive wear"
       ],
       meta: {
         keywords: [
-          "anniversary gift",
-          "custom",
-          "gift box",
-          "resin",
-          "earrings",
+          "black chandbali earrings",
+          "pearl chandbali earrings",
+          "oxidized statement earrings",
+          "wedding guest earrings",
+          "festive ethnic earrings",
+          "indo western earrings"
         ],
       },
     },
@@ -1443,7 +1444,7 @@ export const productsByCategory = {
       id: 78,
       categoryId: "Oxidised-jewellery",
       title: "Idra chandbaalis",
-      slug: "vintage-art-statement-earrings",
+      slug: "idra-chaandbaalis",
       description:
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
       price: 599,
@@ -1473,9 +1474,9 @@ export const productsByCategory = {
       id: 79,
       categoryId: "Oxidised-jewellery",
       title: "Rabaab Kashmiri Earrings",
-      slug: "vintage-art-statement-earrings",
+      slug: "rabaab-kashmiri-earrings",
       description:
-        "Grand layered chandeliers in an oxidised antique-gold finish, stacked with intricate motifs and a ghungroo fringe for full movement. Made for weddings, festivals, poojas, and stage/dance looks—especially when you’re wearing a simple saree, lehenga, or kurta set and want one bold accessory to carry the outfit. Best for bridesmaids, wedding guests, and anyone who loves maximal traditional jewellery.",
+        "Big-fat-festive energy—antique-finish long jhumkas with stone accents and chain tassels. Wear them with sarees, lehengas, or a plain kurta set when your outfit needs a shortcut to “wow”. Best for anyone who loves bold traditional jewellery with a little drama.",
       price: 599,
       images: ["/images/66.png", "/images/66-1.png", "/images/66-2.png"], //Banjara
       popular: false,
@@ -1504,9 +1505,9 @@ export const productsByCategory = {
       id: 80,
       categoryId: "Oxidised-jewellery",
       title: "Rabari Coin Necklace",
-      slug: "vintage-art-statement-earrings",
+      slug: "rabari-coin-necklace",
       description:
-        "Statement jhumka drop earrings with a kundan-style floral disc, red-green accents, and chain tassels that end in ghungroo beads for extra movement. Built for mehendi/sangeet nights, festive dinners, poojas, and wedding-guest looks—especially with sarees, lehengas, and solid kurta sets when you want the earrings to be the hero. Best for bridesmaids, dancers, and anyone who loves bold traditional jewellery with a little drama.",
+        "Mini oxidised danglers with a crescent centerpiece and ghungroo fringe—small in size, big on vibe. Easy to wear for office ethnic days, college fits, poojas, and casual festive plans, especially with kurtas, cotton sarees, and Indo-western outfits. Best for anyone who wants a subtle traditional statement without heavy earrings.",
       price: 599,
       images: ["/images/67.png", "/images/67-1.png"], //Banjara
       popular: false,
@@ -1534,10 +1535,10 @@ export const productsByCategory = {
     {
       id: 81,
       categoryId: "Oxidised-jewellery",
-      title: "Morni necklace set",
-      slug: "vintage-art-statement-earrings",
+      title: "Morni Necklace Set",
+      slug: "morni-necklace-set",
       description:
-        "Mini oxidised danglers with a crescent centerpiece and ghungroo fringe—small in size, big on vibe. Easy to wear for office ethnic days, college fits, poojas, and casual festive plans, especially with kurtas, cotton sarees, and Indo-western outfits. Best for anyone who wants a subtle traditional statement without heavy earrings.",
+        "Oxidised necklace set featuring repeated shield motifs with ghungroo drops and a bold peacock centerpiece, paired with matching earrings. Made for festive dinners, poojas, Navratri nights, and wedding functions—especially with cotton/silk sarees, kurtas, and boho Indo-western outfits. Best for anyone who loves temple/tribal-inspired jewellery with a strong statement finish.",
       price: 599,
       images: ["/images/68.png", "/images/68-1.png", "/images/68-2.png"], //Banjara
       popular: false,
@@ -1565,10 +1566,10 @@ export const productsByCategory = {
     {
       id: 82,
       categoryId: "Oxidised-jewellery",
-      title: "Zareen jhumka",
-      slug: "vintage-art-statement-earrings",
+      title: "Zareen Jhumka",
+      slug: "zareen-jhumka-necklace-set",
       description:
-        "Oxidised necklace set featuring repeated shield motifs with ghungroo drops and a bold peacock centerpiece, paired with matching earrings. Made for festive dinners, poojas, Navratri nights, and wedding functions—especially with cotton/silk sarees, kurtas, and boho Indo-western outfits. Best for anyone who loves temple/tribal-inspired jewellery with a strong statement finish.",
+        "Antique-gold dome jhumkas with an ornate crescent stud, tiny side jhumki charms, and a delicate hanging fringe for soft movement. Easy to wear for poojas, festive dinners, family functions, and wedding events—pairs best with kurtas, sarees, and lehengas when you want a classic traditional look without going too heavy.",
       price: 599,
       images: ["/images/69-1.png", "/images/69.png", "/images/69-2.png"], //Banjara
       popular: false,
@@ -1596,31 +1597,31 @@ export const productsByCategory = {
     {
       id: 83,
       categoryId: "Oxidised-jewellery",
-      title: "Trisha jhumki necklace set",
-      slug: "vintage-art-statement-earrings",
+      title: "Trisha Jhumki Necklace Set",
+      slug: "trisha-jhumki-necklace-set",
       description:
-        "Antique-gold dome jhumkas with an ornate crescent stud, tiny side jhumki charms, and a delicate hanging fringe for soft movement. Easy to wear for poojas, festive dinners, family functions, and wedding events—pairs best with kurtas, sarees, and lehengas when you want a classic traditional look without going too heavy.",
+        "Oxidised tribal-inspired necklace set with a cylindrical pendant, ghungroo jhumki drops, and matching long earrings for a complete boho-ethnic look. Wear it for Navratri nights, festive dinners, poojas, and wedding functions—especially with cotton sarees, kurtas, or Indo-western outfits when you want a strong statement without heavy stones.",
       price: 599,
       images: ["/images/70.png", "/images/70-1.png", "/images/70-2.png"], //Banjara
       popular: false,
       featured: false,
       inStock: true,
       tags: [
-        "jhumka earrings",
-        "antique gold",
-        "traditional earrings",
+        "oxidized necklace set",
+        "tribal jewellery",
+        "boho ethnic",
+        "pendant necklace",
         "festive wear",
-        "wedding jewellery",
-        "ethnic jewellery",
+        "statement set"
       ],
       meta: {
         keywords: [
-          "antique gold jhumka earrings",
-          "dome jhumka earrings",
-          "traditional indian earrings",
-          "festive jhumka earrings",
-          "wedding jhumka earrings",
-          "jhumka earrings for saree",
+          "oxidized pendant necklace set",
+          "tribal necklace set",
+          "boho ethnic jewellery set",
+          "navratri jewellery set",
+          "oxidized jewellery with earrings",
+          "ghungroo pendant necklace",
         ],
       },
     },
