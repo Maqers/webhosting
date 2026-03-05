@@ -25,7 +25,14 @@ export const categories = [
     order: 1, // Display order
     featured: true, // Show in featured sections
     meta: {
-      keywords: ["crochet", "flowers", "bouquets", "handmade", "anniversary", "gift"],
+      keywords: [
+        "crochet",
+        "flowers",
+        "bouquets",
+        "handmade",
+        "anniversary",
+        "gift",
+      ],
     },
   },
   {
@@ -37,7 +44,14 @@ export const categories = [
     order: 2,
     featured: true,
     meta: {
-      keywords: ["personalized", "candles", "gift", "candle", "birthday", "anniversary"],
+      keywords: [
+        "personalized",
+        "candles",
+        "gift",
+        "candle",
+        "birthday",
+        "anniversary",
+      ],
     },
   },
   {
@@ -115,7 +129,14 @@ export const categories = [
     order: 8,
     featured: false,
     meta: {
-      keywords: ["gifts", "hampers", "rakhi", "anniversary", "birthday", "gift"],
+      keywords: [
+        "gifts",
+        "hampers",
+        "rakhi",
+        "anniversary",
+        "birthday",
+        "gift",
+      ],
     },
   },
   {
@@ -128,6 +149,18 @@ export const categories = [
     featured: false,
     meta: {
       keywords: ["soaps", "handwash", "fragnance", "soap", "hanging"],
+    },
+  },
+  {
+    id: "Oxidised-jewellery",
+    name: "Oxidised Jewellery",
+    slug: "Oxidised-jewellery",
+    description: "Beautiful oxidised jewellery pieces for all occasions",
+    icon: "jewellery",
+    order: 10,
+    featured: false,
+    meta: {
+      keywords: ["jewellery", "silver", "boho", "oxidised", "jhumka"],
     },
   },
 ];
@@ -253,7 +286,7 @@ export const categories = [
 // To add a product: Add object to appropriate category array
 // To add a category: Add category above + create new array below
 export const productsByCategory = {
-  "Crochet": [
+  Crochet: [
     {
       id: 1,
       categoryId: "Crochet",
@@ -261,7 +294,7 @@ export const productsByCategory = {
       slug: "Handcrafted-yarn-tulip-single-stem",
       description:
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
-      price: 219,  //199 
+      price: 219, //199
       images: ["/images/1.png"],
       popular: true,
       featured: true,
@@ -278,14 +311,21 @@ export const productsByCategory = {
       slug: "handmade-crochet-flower-bouquet",
       description:
         "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
-      price: 269,    //249
+      price: 269, //249
       images: ["/images/2.png"],
       popular: true,
       featured: false,
       inStock: true,
       tags: ["bouquet", "crochet", "yarn", "birthday", "gift"],
       meta: {
-        keywords: ["bouquet", "yarn flowers", "gift", "birthday", "anniversary", "flowers"],
+        keywords: [
+          "bouquet",
+          "yarn flowers",
+          "gift",
+          "birthday",
+          "anniversary",
+          "flowers",
+        ],
       },
     },
     // {
@@ -312,41 +352,53 @@ export const productsByCategory = {
       slug: "crochet-flower-bouquet",
       description:
         "A detailed crochet bouquet with layered florals and greens, wrapped in a premium pastel sleeve and ribbon. A forever keepsake for birthdays, anniversaries, or proposals—available in multiple color themes.",
-      price: 439,  //399
+      price: 439, //399
       images: ["/images/4.png"],
       popular: false,
       featured: false,
       inStock: true,
       tags: ["bouquet", "crochet", "keepsake", "layered", "gift"],
       meta: {
-        keywords: ["bouquet", "flowers", "proposal gift", "anniversary", "keepsake"],
+        keywords: [
+          "bouquet",
+          "flowers",
+          "proposal gift",
+          "anniversary",
+          "keepsake",
+        ],
       },
     },
     {
-      id: 10,  
-      categoryId: "Crochet", //to be changed 
+      id: 10,
+      categoryId: "Crochet", //to be changed
       title: "Floral Keychain",
       slug: "floral-keychain",
       description:
         "A vibrant handmade floral keychain designed to add a fun pop of colour to your keys, bags, or backpacks. Crafted using soft textured craft stems shaped into detailed petals, it’s lightweight, durable, and perfect for everyday use. A cute and budget-friendly gift for friends, return gifts, or small surprises.",
-      price: 89,  //79
+      price: 89, //79
       images: ["/images/5.png"],
       popular: false,
       featured: false,
       inStock: true,
       tags: ["keychain", "crochet", "flower", "cute", "handmade"],
       meta: {
-        keywords: ["crochet keychain", "flower keychain", "cute", "handmade", "gift"],
+        keywords: [
+          "crochet keychain",
+          "flower keychain",
+          "cute",
+          "handmade",
+          "gift",
+        ],
       },
     },
     {
       id: 12,
-      categoryId: "Crochet",   //to be changed
+      categoryId: "Crochet", //to be changed
       title: "Handmade Floral Keychain Collection",
       slug: "handmade-floral-keychain-collection",
       description:
         "A colourful collection of handmade floral and fruit keychains designed to brighten up your keys, bags, or backpacks. Crafted using soft textured craft stems shaped into detailed flowers and mini fruit designs, each piece is lightweight, durable, and eye-catching. Perfect for return gifts, small surprises, or everyday accessories.",
-      price: 89,  //79
+      price: 89, //79
       images: ["/images/6.png"],
       popular: false,
       featured: true,
@@ -436,28 +488,28 @@ export const productsByCategory = {
       popular: true,
       featured: true,
       inStock: true,
-      "tags": [
+      tags: [
         "crochet wrap",
         "crochet shawl",
         "granny square wrap",
         "patchwork crochet",
         "boho wrap",
         "handmade crochet",
-        "winter layer"
+        "winter layer",
       ],
       meta: {
-        "keywords": [
+        keywords: [
           "handmade crochet wrap",
           "crochet patchwork shawl",
           "granny square wrap",
           "boho crochet shawl",
           "colorful crochet wrap",
-          "winter crochet layer"
+          "winter crochet layer",
         ],
       },
     },
   ],
-  "Candles": [
+  Candles: [
     {
       id: 2,
       categoryId: "Candles",
@@ -465,7 +517,7 @@ export const productsByCategory = {
       slug: "strawberry-dessert-candle",
       description:
         "A dessert-style candle crafted to look like a strawberry parfait—complete with a creamy top layer and berry detailing. Perfect for gifting or home décor; looks delicious on a bedside table, desk, or vanity.",
-      price: 569,  //518
+      price: 569, //518
       images: ["/images/7.png"],
       popular: true,
       featured: true,
@@ -489,7 +541,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["candle", "romantic", "layered", "anniversary", "scented"],
       meta: {
-        keywords: ["romantic", "layered", "anniversary", "scented", "date night"],
+        keywords: [
+          "romantic",
+          "layered",
+          "anniversary",
+          "scented",
+          "date night",
+        ],
       },
     },
     {
@@ -506,7 +564,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["candle", "romantic", "rose", "anniversary", "scented"],
       meta: {
-        keywords: ["rose", "romantic", "layered candle", "anniversary", "scented"],
+        keywords: [
+          "rose",
+          "romantic",
+          "layered candle",
+          "anniversary",
+          "scented",
+        ],
       },
     },
     {
@@ -533,7 +597,7 @@ export const productsByCategory = {
       slug: "mini-bucket-candle",
       description:
         "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
-      price: 949,  //899
+      price: 949, //899
       images: ["/images/11.png"],
       popular: true,
       featured: false,
@@ -544,7 +608,7 @@ export const productsByCategory = {
       },
     },
   ],
-  "Handbags": [
+  Handbags: [
     {
       id: 3,
       categoryId: "Handbags",
@@ -559,7 +623,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["tote", "flame", "bold", "everyday", "canvas"],
       meta: {
-        keywords: ["tote bag", "flame print", "everyday bag", "canvas", "college"],
+        keywords: [
+          "tote bag",
+          "flame print",
+          "everyday bag",
+          "canvas",
+          "college",
+        ],
       },
     },
     {
@@ -576,7 +646,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["tote", "heart", "canvas", "playful", "everyday"],
       meta: {
-        keywords: ["heart print tote", "canvas tote", "everyday bag", "college bag", "cute"],
+        keywords: [
+          "heart print tote",
+          "canvas tote",
+          "everyday bag",
+          "college bag",
+          "cute",
+        ],
       },
     },
     {
@@ -593,7 +669,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["tote", "sunflower", "butterfly", "statement", "art"],
       meta: {
-        keywords: ["sunflower tote", "butterfly tote", "statement bag", "canvas", "artwork"],
+        keywords: [
+          "sunflower tote",
+          "butterfly tote",
+          "statement bag",
+          "canvas",
+          "artwork",
+        ],
       },
     },
     {
@@ -603,14 +685,20 @@ export const productsByCategory = {
       slug: "Blue-Checkered-tote-bag",
       description:
         "Add a touch of soft summer charm to your everyday look with the Blue Checkered Tote Bag. Designed in a refreshing blue gingham pattern, this lightweight yet spacious tote is perfect for carrying your daily essentials in style. The delicate floral accent adds a playful, feminine touch that makes it ideal for brunches, beach days, shopping trips, or casual outings.",
-      price: 389, //349 
+      price: 389, //349
       images: ["/images/15.png"],
       popular: false,
       featured: false,
       inStock: true,
       tags: ["tote", "blue", "check", "statement", "art"],
       meta: {
-        keywords: ["blue tote", "check tote", "statement bag", "canvas", "artwork"],
+        keywords: [
+          "blue tote",
+          "check tote",
+          "statement bag",
+          "canvas",
+          "artwork",
+        ],
       },
     },
     {
@@ -627,7 +715,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["tote", "boot", "hand-painted", "artsy", "statement"],
       meta: {
-        keywords: ["hand-painted tote", "boot tote", "artsy bag", "canvas", "beaded"],
+        keywords: [
+          "hand-painted tote",
+          "boot tote",
+          "artsy bag",
+          "canvas",
+          "beaded",
+        ],
       },
     },
     {
@@ -649,7 +743,7 @@ export const productsByCategory = {
         "picnic tote",
         "handmade crochet bag",
         "boho tote",
-        "summer bag"
+        "summer bag",
       ],
       meta: {
         keywords: [
@@ -658,7 +752,7 @@ export const productsByCategory = {
           "handmade crochet picnic bag",
           "boho sunflower bag",
           "summer crochet tote",
-          "aesthetic handmade bag"
+          "aesthetic handmade bag",
         ],
       },
     },
@@ -678,7 +772,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["flowers", "memory", "frame", "keepsake", "wedding"],
       meta: {
-        keywords: ["pressed flower frame", "memory keepsake", "wedding flowers", "home decor", "gift"],
+        keywords: [
+          "pressed flower frame",
+          "memory keepsake",
+          "wedding flowers",
+          "home decor",
+          "gift",
+        ],
       },
     },
     {
@@ -695,7 +795,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["flowers", "frame", "minimal", "natural", "decor"],
       meta: {
-        keywords: ["pressed flower frame", "wall decor", "minimal aesthetic", "home decor", "gift"],
+        keywords: [
+          "pressed flower frame",
+          "wall decor",
+          "minimal aesthetic",
+          "home decor",
+          "gift",
+        ],
       },
     },
     {
@@ -954,7 +1060,14 @@ export const productsByCategory = {
       inStock: true,
       tags: ["resin", "tissue", "holder", "floral", "decor"],
       meta: {
-        keywords: ["homedecor", "handmade", "luxury", "table", "resin", "tissueholder"],
+        keywords: [
+          "homedecor",
+          "handmade",
+          "luxury",
+          "table",
+          "resin",
+          "tissueholder",
+        ],
       },
     },
   ],
@@ -967,13 +1080,19 @@ export const productsByCategory = {
       description:
         "Vibrant thread-wrapped bangles detailed with intricate gold-toned embellishments and delicate stones. Lightweight and comfortable, they’re perfect for college celebrations, wedding functions, or adding a bold pop of colour to everyday ethnic outfits. A subtle statement that instantly elevates your look.",
       price: 199, //179
-      images: ["/images/33.png"],//craftsCorner
+      images: ["/images/33.png"], //craftsCorner
       popular: true,
       featured: true,
       inStock: true,
       tags: ["bangles", "thread", "festive", "ethnic", "colourful"],
       meta: {
-        keywords: ["jewellery", "wedding", "college", "traditional", "handmade"],
+        keywords: [
+          "jewellery",
+          "wedding",
+          "college",
+          "traditional",
+          "handmade",
+        ],
       },
     },
     {
@@ -984,13 +1103,19 @@ export const productsByCategory = {
       description:
         "Delicately crafted gold-toned bangles featuring subtle stone detailing for a refined, retro ethnic charm. Lightweight and versatile, they complement sarees, suits, or even minimalist fusion outfits effortlessly. Perfect for those who love understated elegance with a timeless touch.",
       price: 165, //149
-      images: ["/images/34.png"],//craftsCorner
+      images: ["/images/34.png"], //craftsCorner
       popular: true,
       featured: false,
       inStock: true,
       tags: ["vintage", "gold", "minimal", "ethnic", "classic"],
       meta: {
-        keywords: ["bangles", "retro", "traditional", "minimalist", "jewellery"],
+        keywords: [
+          "bangles",
+          "retro",
+          "traditional",
+          "minimalist",
+          "jewellery",
+        ],
       },
     },
     {
@@ -1001,13 +1126,20 @@ export const productsByCategory = {
       description:
         "Beautiful gold-toned bangles with detailed lotus designs and soft coloured accents. Perfect for weddings, festivals, or adding a traditional touch to your ethnic outfits. A graceful piece that blends classic style with everyday elegance.",
       price: 385, //349
-      images: ["/images/35.png"],//craftsCorner
+      images: ["/images/35.png"], //craftsCorner
       popular: true,
       featured: true,
       inStock: true,
       tags: ["lotus", "gold", "ethnic", "wedding", "festive"],
       meta: {
-        keywords: ["bangles", "traditional", "lotus", "ethnic", "design", "jewellery"],
+        keywords: [
+          "bangles",
+          "traditional",
+          "lotus",
+          "ethnic",
+          "design",
+          "jewellery",
+        ],
       },
     },
     {
@@ -1018,7 +1150,7 @@ export const productsByCategory = {
       description:
         "A vibrant set of gold-toned bangles with multi-design detailing, red and green accents, and traditional patterns. Perfect for weddings, festive celebrations, casual ethnic wear, or thoughtful gifting. A beautiful bridal jewellery piece that adds colour, richness, and charm to any outfit.",
       price: 329, //299
-      images: ["/images/36.png"],//craftsCorner
+      images: ["/images/36.png"], //craftsCorner
       popular: false,
       featured: false,
       inStock: true,
@@ -1035,13 +1167,19 @@ export const productsByCategory = {
       description:
         "Beautiful teal-threaded bangles with gold detailing and intricate patterns. Lightweight and elegant, they are perfect for adding a touch of sophistication to any ethnic outfit. Ideal for weddings, festivals, or everyday wear.A stylish accessory that adds colour and shine without feeling heavy.",
       price: 165, //149
-      images: ["/images/37.png"],//craftsCorner
+      images: ["/images/37.png"], //craftsCorner
       popular: false,
       featured: false,
       inStock: true,
       tags: ["teal", "thread", "festive", "ethnic", "gifting"],
       meta: {
-        keywords: ["bangles", "traditional", "jewellery", "fashion", "accessories"],
+        keywords: [
+          "bangles",
+          "traditional",
+          "jewellery",
+          "fashion",
+          "accessories",
+        ],
       },
     },
     {
@@ -1075,7 +1213,13 @@ export const productsByCategory = {
       inStock: true,
       tags: ["parandi", "crochet", "floral", "ethnic", "handmade"],
       meta: {
-        keywords: ["braid", "hairaccessory", "traditional", "festive", "fashion"],
+        keywords: [
+          "braid",
+          "hairaccessory",
+          "traditional",
+          "festive",
+          "fashion",
+        ],
       },
     },
     {
@@ -1090,9 +1234,395 @@ export const productsByCategory = {
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["anniversary", "gift box", "custom", "traditional", "resin", "earrings"],
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
       meta: {
-        keywords: ["anniversary gift", "custom", "gift box", "resin", "earrings"],
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+  ],
+  "Oxidised-jewellery": [
+    {
+      id: 72,
+      categoryId: "Oxidised-jewellery",
+      title: "Shabnam Chaandbaali Earrings",
+      slug: "shabnam-chaandbaali-earrings",
+      description:
+        "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.",
+      price: 599,
+      images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], //Banjara
+      popular: true,
+      featured: false,
+      inStock: true,
+      tags: [
+        "chaandbaali",
+        "kundan earrings",
+        "antique gold",
+        "statement earrings",
+        "wedding jewellery",
+        "festive jewellery",
+      ],
+      meta: {
+        keywords: [
+          "chaandbaali earrings",
+          "kundan chandbali earrings",
+          "antique gold earrings",
+          "statement ethnic earrings",
+          "wedding chandbali earrings",
+          "festive indian earrings",
+        ],
+      },
+    },
+    {
+      id: 73,
+      categoryId: "Oxidised-jewellery",
+      title: "Kamal Rani Haar",
+      slug: "kamal-rani-haar",
+      description:
+        "Full festive drama, zero extra effort—an oxidised silver-tone haar with chandbali motifs, a coin pendant, and matching earrings + maang tikka. Wear it with sarees, kurtas, or lehengas for weddings, poojas, and night functions.",
+      price: 599,
+      images: ["/images/60.png", "/images/60-1.png", "/images/60-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "oxidized earrings",
+        "jhumka",
+        "ghungroo",
+        "statement earrings",
+        "ethnic jewellery",
+        "festive wear",
+      ],
+      meta: {
+        keywords: [
+          "oxidized jhumka earrings",
+          "floral stud earrings",
+          "ghungroo earrings",
+          "traditional ethnic earrings",
+          "festive oxidised earrings",
+          "jhumka earrings for saree",
+        ],
+      },
+    },
+    {
+      id: 74,
+      categoryId: "Oxidised-jewellery",
+      title: "Adira Earrings",
+      slug: "adira-earrings",
+      description:
+        "Statement danglers with a pastel teardrop centerpiece, kundan-style detailing, and a pearl-bead fringe that adds soft movement. Available in dreamy shades (teal, blush pink, and amber)—perfect for mehendi/sangeet nights, festive dinners, poojas, and wedding-guest looks. Best for anyone who wants one standout accessory with sarees, kurtas, lehengas, or even a solid fusion dress.",
+      price: 599,
+      images: ["/images/61.png", "/images/61-1.png", "/images/61-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "pastel earrings",
+        "kundan earrings",
+        "pearl fringe",
+        "wedding jewellery",
+        "festive wear",
+        "ethnic earrings",
+      ],
+      meta: {
+        keywords: [
+          "pastel kundan earrings",
+          "pearl fringe earrings",
+          "wedding guest earrings",
+          "festive ethnic earrings",
+          "teal pink amber earrings",
+          "kundan dangler earrings",
+        ],
+      },
+    },
+    {
+      id: 75,
+      categoryId: "Oxidised-jewellery",
+      title: "Surkhaab Chaandbaalis",
+      slug: "surkhaab-chaandbaalis",
+      description:
+        "Two-tone statement chandelier earrings with an oxidised-silver base, antique-gold bead drops, and bold red/green accents—made for maximum drama in one move. Wear them to mehendi/sangeet nights, wedding functions, festive dinners, garba nights, or anytime your outfit is simple and you want the earrings to do the talking. Best for bridesmaids, wedding guests, dancers, and anyone who loves boho-ethnic jewellery with movement.",
+      price: 599,
+      images: ["/images/62.png", "/images/62-1.png", "/images/62-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "oxidized earrings",
+        "afghani earrings",
+        "chandelier earrings",
+        "statement earrings",
+        "wedding jewellery",
+        "festive wear",
+      ],
+      meta: {
+        keywords: [
+          "oxidized chandelier earrings",
+          "afghani statement earrings",
+          "boho ethnic earrings",
+          "wedding function earrings",
+          "festive earrings for saree",
+          "sangeet mehendi earrings",
+        ],
+      },
+    },
+    {
+      id: 76,
+      categoryId: "Oxidised-jewellery",
+      title: "Gauhar chaandbaalis",
+      slug: "gauhar-chaandbaalis",
+      description:
+        "Dramatic black chandbalis with a teardrop top, layered antique detailing, and a pearl fringe that adds soft movement. Made for sangeet nights, cocktail + saree looks, festive dinners, or even an all-black Indo-western outfit when you want the earrings to be the main character. Best for bridesmaids, wedding guests, and anyone who loves bold, elegant statement jewellery.",
+      price: 599,
+      images: ["/images/63.png", "/images/63-1.png", "/images/63-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "chandbali earrings",
+        "black statement earrings",
+        "pearl fringe",
+        "oxidized earrings",
+        "wedding jewellery",
+        "festive wear",
+      ],
+      meta: {
+        keywords: [
+          "black chandbali earrings",
+          "pearl chandbali earrings",
+          "oxidized statement earrings",
+          "wedding guest earrings",
+          "festive ethnic earrings",
+          "indo western earrings",
+        ],
+      },
+    },
+    {
+      id: 77,
+      categoryId: "Oxidised-jewellery",
+      title: "Zubeida Necklace Set",
+      slug: "zubeida-necklace-set",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/64.png", "/images/64-1.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "chandbali earrings",
+        "black statement earrings",
+        "pearl fringe",
+        "oxidized earrings",
+        "wedding jewellery",
+        "festive wear"
+      ],
+      meta: {
+        keywords: [
+          "black chandbali earrings",
+          "pearl chandbali earrings",
+          "oxidized statement earrings",
+          "wedding guest earrings",
+          "festive ethnic earrings",
+          "indo western earrings"
+        ],
+      },
+    },
+    {
+      id: 78,
+      categoryId: "Oxidised-jewellery",
+      title: "Idra chandbaalis",
+      slug: "idra-chaandbaalis",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 599,
+      images: ["/images/65.png", "/images/65-1.png", "/images/65-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 79,
+      categoryId: "Oxidised-jewellery",
+      title: "Rabaab Kashmiri Earrings",
+      slug: "rabaab-kashmiri-earrings",
+      description:
+        "Big-fat-festive energy—antique-finish long jhumkas with stone accents and chain tassels. Wear them with sarees, lehengas, or a plain kurta set when your outfit needs a shortcut to “wow”. Best for anyone who loves bold traditional jewellery with a little drama.",
+      price: 599,
+      images: ["/images/66.png", "/images/66-1.png", "/images/66-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "oxidized earrings",
+        "layered jhumka",
+        "chandelier earrings",
+        "statement earrings",
+        "wedding jewellery",
+        "festive jewellery",
+      ],
+      meta: {
+        keywords: [
+          "layered jhumka earrings",
+          "oxidized chandelier earrings",
+          "statement ethnic earrings",
+          "wedding function earrings",
+          "ghungroo earrings",
+          "traditional indian earrings",
+        ],
+      },
+    },
+    {
+      id: 80,
+      categoryId: "Oxidised-jewellery",
+      title: "Rabari Coin Necklace",
+      slug: "rabari-coin-necklace",
+      description:
+        "Mini oxidised danglers with a crescent centerpiece and ghungroo fringe—small in size, big on vibe. Easy to wear for office ethnic days, college fits, poojas, and casual festive plans, especially with kurtas, cotton sarees, and Indo-western outfits. Best for anyone who wants a subtle traditional statement without heavy earrings.",
+      price: 599,
+      images: ["/images/67.png", "/images/67-1.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "jhumka earrings",
+        "kundan earrings",
+        "statement earrings",
+        "wedding jewellery",
+        "festive wear",
+        "ghungroo earrings",
+      ],
+      meta: {
+        keywords: [
+          "kundan jhumka earrings",
+          "jhumka drop earrings",
+          "statement ethnic earrings",
+          "wedding function earrings",
+          "festive indian earrings",
+          "ghungroo chain earrings",
+        ],
+      },
+    },
+    {
+      id: 81,
+      categoryId: "Oxidised-jewellery",
+      title: "Morni Necklace Set",
+      slug: "morni-necklace-set",
+      description:
+        "Oxidised necklace set featuring repeated shield motifs with ghungroo drops and a bold peacock centerpiece, paired with matching earrings. Made for festive dinners, poojas, Navratri nights, and wedding functions—especially with cotton/silk sarees, kurtas, and boho Indo-western outfits. Best for anyone who loves temple/tribal-inspired jewellery with a strong statement finish.",
+      price: 599,
+      images: ["/images/68.png", "/images/68-1.png", "/images/68-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "oxidized earrings",
+        "mini earrings",
+        "ghungroo earrings",
+        "daily wear",
+        "ethnic jewellery",
+        "festive wear",
+      ],
+      meta: {
+        keywords: [
+          "mini oxidized earrings",
+          "small ghungroo earrings",
+          "everyday ethnic earrings",
+          "oxidized dangler earrings",
+          "office wear ethnic earrings",
+          "casual festive earrings",
+        ],
+      },
+    },
+    {
+      id: 82,
+      categoryId: "Oxidised-jewellery",
+      title: "Zareen Jhumka",
+      slug: "zareen-jhumka-necklace-set",
+      description:
+        "Antique-gold dome jhumkas with an ornate crescent stud, tiny side jhumki charms, and a delicate hanging fringe for soft movement. Easy to wear for poojas, festive dinners, family functions, and wedding events—pairs best with kurtas, sarees, and lehengas when you want a classic traditional look without going too heavy.",
+      price: 599,
+      images: ["/images/69-1.png", "/images/69.png", "/images/69-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "oxidized necklace set",
+        "peacock necklace",
+        "temple jewellery",
+        "ethnic jewellery",
+        "festive wear",
+        "statement set",
+      ],
+      meta: {
+        keywords: [
+          "oxidized peacock necklace set",
+          "silver look necklace set",
+          "temple jewellery set",
+          "traditional necklace earrings set",
+          "festive oxidised jewellery",
+          "navratri jewellery set",
+        ],
+      },
+    },
+    {
+      id: 83,
+      categoryId: "Oxidised-jewellery",
+      title: "Trisha Jhumki Necklace Set",
+      slug: "trisha-jhumki-necklace-set",
+      description:
+        "Oxidised tribal-inspired necklace set with a cylindrical pendant, ghungroo jhumki drops, and matching long earrings for a complete boho-ethnic look. Wear it for Navratri nights, festive dinners, poojas, and wedding functions—especially with cotton sarees, kurtas, or Indo-western outfits when you want a strong statement without heavy stones.",
+      price: 599,
+      images: ["/images/70.png", "/images/70-1.png", "/images/70-2.png"], //Banjara
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "oxidized necklace set",
+        "tribal jewellery",
+        "boho ethnic",
+        "pendant necklace",
+        "festive wear",
+        "statement set"
+      ],
+      meta: {
+        keywords: [
+          "oxidized pendant necklace set",
+          "tribal necklace set",
+          "boho ethnic jewellery set",
+          "navratri jewellery set",
+          "oxidized jewellery with earrings",
+          "ghungroo pendant necklace",
+        ],
       },
     },
   ],
@@ -1109,9 +1639,23 @@ export const productsByCategory = {
       popular: false,
       featured: true,
       inStock: true,
-      tags: ["gift hamper", "chocolate bouquet", "luxury gifting", "personalized gift", "anniversary gift"],
+      tags: [
+        "gift hamper",
+        "chocolate bouquet",
+        "luxury gifting",
+        "personalized gift",
+        "anniversary gift",
+      ],
       meta: {
-        keywords: ["premium gift box", "ferrero rocher bouquet", "romantic hamper", "memory gift", "custom photo gift", "luxury chocolate gift", "celebration hamper"],
+        keywords: [
+          "premium gift box",
+          "ferrero rocher bouquet",
+          "romantic hamper",
+          "memory gift",
+          "custom photo gift",
+          "luxury chocolate gift",
+          "celebration hamper",
+        ],
       },
     },
     {
@@ -1126,128 +1670,140 @@ export const productsByCategory = {
       popular: false,
       featured: true,
       inStock: true,
-      tags: ["memory gift box", "anniversary gift", "best friend gift", "photo frame gift", "scrapbook hamper"],
-    meta: {
-      "keywords": [
-        "anniversary gift box India",
-        "best friend memory gift",
-        "photo frame gift hamper",
-        "scrapbook gift box",
-        "romantic gift for girlfriend",
-        "birthday surprise gift box",
-        "handmade gift hamper India"
+      tags: [
+        "memory gift box",
+        "anniversary gift",
+        "best friend gift",
+        "photo frame gift",
+        "scrapbook hamper",
       ],
+      meta: {
+        keywords: [
+          "anniversary gift box India",
+          "best friend memory gift",
+          "photo frame gift hamper",
+          "scrapbook gift box",
+          "romantic gift for girlfriend",
+          "birthday surprise gift box",
+          "handmade gift hamper India",
+        ],
+      },
     },
-    },
-  {
-    id: 71,
-    categoryId: "Customised-Hampers",
-    title: "DIY Memory Scrapbook Album",
-    slug: "DIY-Memory-Scrapbook-Album",
-    description:
+    {
+      id: 71,
+      categoryId: "Customised-Hampers",
+      title: "DIY Memory Scrapbook Album",
+      slug: "DIY-Memory-Scrapbook-Album",
+      description:
         "A handcrafted DIY memory scrapbook album designed for you to personalize in your own creative way. Made with a sturdy kraft cover and thick, high-quality blank pages, this ring-bound scrapbook provides the perfect canvas to paste photos, write heartfelt notes, doodle, decorate with stickers, and create a one-of-a-kind memory book. Ideal for anniversaries, birthdays, farewell gifts, relationship milestones, friendship memories, or surprise keepsakes. Available in multiple page options to match your story: 8 pages (₹120), 12 pages (₹180), 16 pages (₹240), 18 pages (₹280), and 20 pages (₹310). A thoughtful, affordable DIY gift that allows you to turn your memories into something deeply personal and meaningful.",
-    price: 130,
-    images: ["/images/51.png"], //LillyPad
-    popular: true,
-    featured: true,
-    inStock: true,
-    tags: ["DIY scrapbook", "memory album", "blank photo book", "anniversary gift idea", "creative gift"],
-    meta: {
-      "keywords": [
+      price: 130,
+      images: ["/images/51.png"], //LillyPad
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: [
+        "DIY scrapbook",
+        "memory album",
+        "blank photo book",
+        "anniversary gift idea",
+        "creative gift",
+      ],
+      meta: {
+        keywords: [
           "DIY scrapbook album India",
-      "blank photo album gift",
-      "memory book for couples",
-      "anniversary DIY gift",
-      "creative handmade gift idea",
-      "romantic scrapbook album",
-      "affordable gift under 500"
-        ]
+          "blank photo album gift",
+          "memory book for couples",
+          "anniversary DIY gift",
+          "creative handmade gift idea",
+          "romantic scrapbook album",
+          "affordable gift under 500",
+        ],
       },
     },
   ],
-"Handmade-Soaps": [
-  {
-    id: 68,
-    categoryId: "Handmade-Soaps",
-    title: "Grape Soap On Rope",
-    slug: "grape-soap-on-rope",
-    description:
-      "A sculpted grape-shaped soap designed to add a playful yet aesthetic touch to your kitchen or bathroom. Functional, decorative, and perfect as a unique gift.",
-    price: 349,
-    images: ["/images/56.png", "/images/56-1.png", "/images/56-2.png"], //Divine Ember
-    popular: true,
-    featured: true,
-    inStock: true,
-    tags: [
-      "grape soap",
-      "cluster soap",
-      "aesthetic soap",
-      "decorative soap",
-      "designer soap",
-      "kitchen sink accessory",
-      "unique gift idea"
-    ],
-    meta: {
-      keywords: [
-        "grape shaped soap",
-        "grape cluster soap",
-        "aesthetic decorative soap",
-        "unique gift soap",
-        "designer soap bar",
-        "trendy home accessory"
+  "Handmade-Soaps": [
+    {
+      id: 68,
+      categoryId: "Handmade-Soaps",
+      title: "Grape Soap On Rope",
+      slug: "grape-soap-on-rope",
+      description:
+        "A sculpted grape-shaped soap designed to add a playful yet aesthetic touch to your kitchen or bathroom. Functional, decorative, and perfect as a unique gift.",
+      price: 349,
+      images: ["/images/56.png", "/images/56-1.png", "/images/56-2.png"], //Divine Ember
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: [
+        "grape soap",
+        "cluster soap",
+        "aesthetic soap",
+        "decorative soap",
+        "designer soap",
+        "kitchen sink accessory",
+        "unique gift idea",
       ],
+      meta: {
+        keywords: [
+          "grape shaped soap",
+          "grape cluster soap",
+          "aesthetic decorative soap",
+          "unique gift soap",
+          "designer soap bar",
+          "trendy home accessory",
+        ],
+      },
     },
-  },
-  {
-    id: 69,
-    categoryId: "Handmade-Soaps",
-    title: "Glycerin Strawberry grape soap",
-    slug: "Glycerin-Strawberry-grape-soap",
-    description:
-      "A playful strawberry-shaped soap designed to brighten up your kitchen or bathroom. Decorative yet functional, this hanging soap adds a sweet, aesthetic touch to any space.",
-    price: 549,
-    images: ["/images/57.png"], //Soaps
-    popular: true,
-    featured: true,
-    inStock: true,
-    tags: [
-      "strawberry soap",
-      "fruit shaped soap",
-      "aesthetic soap",
-      "decorative soap",
-      "hanging soap",
-      "cute bathroom accessory",
-      "gift soap"
-    ],
-    meta: {
-      keywords: [
-        "strawberry shaped soap",
-        "fruit soap bar",
-        "aesthetic hanging soap",
-        "cute decorative soap",
-        "unique gift soap",
-        "designer bathroom soap"
+    {
+      id: 69,
+      categoryId: "Handmade-Soaps",
+      title: "Glycerin Strawberry grape soap",
+      slug: "Glycerin-Strawberry-grape-soap",
+      description:
+        "A playful strawberry-shaped soap designed to brighten up your kitchen or bathroom. Decorative yet functional, this hanging soap adds a sweet, aesthetic touch to any space.",
+      price: 549,
+      images: ["/images/57.png"], //Soaps
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: [
+        "strawberry soap",
+        "fruit shaped soap",
+        "aesthetic soap",
+        "decorative soap",
+        "hanging soap",
+        "cute bathroom accessory",
+        "gift soap",
       ],
+      meta: {
+        keywords: [
+          "strawberry shaped soap",
+          "fruit soap bar",
+          "aesthetic hanging soap",
+          "cute decorative soap",
+          "unique gift soap",
+          "designer bathroom soap",
+        ],
+      },
     },
-  },
-  {
-    id: 70,
-    categoryId: "Handmade-Soaps",
-    title: "Multicolor grape soap",
-    slug: "Multicolor-grape-soap",
-    description:
-      "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
-    price: 549,
-    images: ["/images/58.png"], //Soaps
-    popular: true,
-    featured: true,
-    inStock: true,
-    tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
-    meta: {
-      keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+    {
+      id: 70,
+      categoryId: "Handmade-Soaps",
+      title: "Multicolor grape soap",
+      slug: "Multicolor-grape-soap",
+      description:
+        "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+      price: 549,
+      images: ["/images/58.png"], //Soaps
+      popular: true,
+      featured: true,
+      inStock: true,
+      tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
+      meta: {
+        keywords: ["everlasting", "handmade", "floral", "keepsake", "decor"],
+      },
     },
-  },
-  /*{
+    /*{
     id: 53,
     categoryId: "Handmade-Soaps",
     title: "Traditional Brass Paperweight Set",
@@ -1264,7 +1820,7 @@ export const productsByCategory = {
       keywords: ["paperweight", "brass", "traditional", "office"],
     },
   },*/
-],
+  ],
 };
 
 // ============================================================================
