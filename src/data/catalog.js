@@ -72,7 +72,7 @@ export const categories = [
     slug: "Frames&Paintings",
     description: "Handmade paintings in beautiful frames",
     icon: "jewelry",
-    order: 4,
+    order: 10,
     featured: false,
     meta: {
       keywords: [
@@ -102,7 +102,7 @@ export const categories = [
     slug: "resin-products",
     description: "Resin art and collectible items",
     icon: "art",
-    order: 6,
+    order: 7,
     featured: false,
     meta: {
       keywords: ["art", "resin", "frames", "flowers"],
@@ -114,7 +114,7 @@ export const categories = [
     slug: "Handmade-Accessories",
     description: "Accessories for weddings and celebrations",
     icon: "wedding",
-    order: 7,
+    order: 6,
     featured: false,
     meta: {
       keywords: ["wedding", "occasion", "celebration", "gift", "special"],
@@ -157,7 +157,7 @@ export const categories = [
     slug: "Oxidised-jewellery",
     description: "Beautiful oxidised jewellery pieces for all occasions",
     icon: "jewellery",
-    order: 10,
+    order: 4,
     featured: true,
     meta: {
       keywords: ["jewellery", "silver", "boho", "oxidised", "jhumka"],
@@ -1231,6 +1231,96 @@ export const productsByCategory = {
         "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
       price: 345,
       images: ["/images/47.png"], //aneraArt
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 84,
+      categoryId: "Handmade-Accessories",
+      title: "Vintage Art Statement Earrings",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "Beautiful vintage-style earrings with intricate art detailing and gold accents. These statement pieces are handcrafted with attention to detail, making them perfect for adding a touch of elegance to any outfit. A bold yet wearable accessory that instantly refreshes your everyday ethnic or fusion look.",
+      price: 249,
+      images: ["/images/71.png"], //craftscorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 85,
+      categoryId: "Handmade-Accessories",
+      title: "Vintage Art Statement Earrings",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 799,
+      images: ["/images/72.png"], //craftscorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 86,
+      categoryId: "Handmade-Accessories",
+      title: "Vintage Art Statement Earrings",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 299,
+      images: ["/images/73.png"], //craftscorner
       popular: false,
       featured: false,
       inStock: true,
