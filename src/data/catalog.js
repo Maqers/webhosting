@@ -1342,6 +1342,546 @@ export const productsByCategory = {
         ],
       },
     },
+    {
+      id: 87,
+      categoryId: "Handmade-Accessories",
+      title: "Emerald grace",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 180,
+      images: ["/images/74.png","/images/74-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 88,
+      categoryId: "Handmade-Accessories",
+      title: "Aurora",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 180,
+      images: ["/images/75.png","/images/75-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 89,
+      categoryId: "Handmade-Accessories",
+      title: "Shahi",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 279,
+      images: ["/images/76.png","/images/76-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 90,
+      categoryId: "Handmade-Accessories",
+      title: "Regalia",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 235,
+      images: ["/images/77.png","/images/77-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 91,
+      categoryId: "Handmade-Accessories",
+      title: "Golden Aura",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 270,
+      images: ["/images/78.png","/images/78-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 92,
+      categoryId: "Handmade-Accessories",
+      title: "Mystic",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 340,
+      images: ["/images/79.png","/images/79-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 93,
+      categoryId: "Handmade-Accessories",
+      title: "Lotus",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 380,
+      images: ["/images/80.png","/images/80-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+     {
+      id: 94,
+      categoryId: "Handmade-Accessories",
+      title: "Luminous",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 299,
+      images: ["/images/81.png","/images/81-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 95,
+      categoryId: "Handmade-Accessories",
+      title: "Aurelia",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 269,
+      images: ["/images/82.png","/images/82-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 96,
+      categoryId: "Handmade-Accessories",
+      title: "Maya",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 239,
+      images: ["/images/83.png","/images/83-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 97,
+      categoryId: "Handmade-Accessories",
+      title: "Anika",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 199,
+      images: ["/images/84.png","/images/84-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 98,
+      categoryId: "Handmade-Accessories",
+      title: "ViridianBloom",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 329,
+      images: ["/images/85.png","/images/85-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 99,
+      categoryId: "Handmade-Accessories",
+      title: "Radiance",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 379,
+      images: ["/images/86.png","/images/86-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 100,
+      categoryId: "Handmade-Accessories",
+      title: "Florencia",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 529,
+      images: ["/images/87.png","/images/87-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+     {
+      id: 101,
+      categoryId: "Handmade-Accessories",
+      title: "Mayura",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 349,
+      images: ["/images/88.png","/images/88-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 102,
+      categoryId: "Handmade-Accessories",
+      title: "pinklotus",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 469,
+      images: ["/images/89.png","/images/89-1.png","/images/89-2.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 103,
+      categoryId: "Handmade-Accessories",
+      title: "Ganapati",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 589,
+      images: ["/images/90.png","/images/90-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 104,
+      categoryId: "Handmade-Accessories",
+      title: "Vividra",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 249,
+      images: ["/images/91.png","/images/91-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
   ],
   "Oxidised-jewellery": [
     {
