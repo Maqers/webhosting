@@ -279,6 +279,7 @@ const Products = () => {
 
 // Memoized ProductCard to prevent unnecessary re-renders
 const ProductCard = memo(({ product, index, categoryMap, priority = false }) => {
+  const location = useLocation()
   // Memoize category lookup
   const categoryName = useMemo(() => {
     if (product.categoryId) {
@@ -293,6 +294,7 @@ const ProductCard = memo(({ product, index, categoryMap, priority = false }) => 
   return (
     <Link
       to={`/product/${product.id}`}
+       state={{ from: location.pathname + location.search }}
       className="product-card hover-lift hover-zoom touch-feedback"
       data-animate="scale"
       data-delay={index * 50}

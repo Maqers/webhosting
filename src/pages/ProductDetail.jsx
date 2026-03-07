@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getProductById, getCategoryByIdOrSlug } from '../data/catalog'
 import { getWhatsAppNumber } from '../data/contactInfo'
 import ImageWithFallback from '../components/ImageWithFallback'
@@ -7,6 +7,19 @@ import './ProductDetail.css'
 
 const ProductDetail = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const handleBack = () => {
+    if (location.state?.from) {
+      navigate(location.state.from);
+    } else if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/products");
+    }
+  };
+
   const product = getProductById(id)
   const [selectedImage, setSelectedImage] = useState(0)
   const [lensVisible, setLensVisible] = useState(false)
@@ -63,13 +76,15 @@ const ProductDetail = () => {
     )
   }
 
+
   const currentImage = images[selectedImage]
   const categoryName = product.category || (product.categoryId ? getCategoryByIdOrSlug(product.categoryId)?.name : '') || ''
 
   return (
     <div className="product-detail">
       <div className="container">
-        <Link to="/products" className="back-button">← Back to Products</Link>
+        {/* <Link to="/products" className="back-button">← Back to Products</Link> */}
+        <button onClick={handleBack} className="back-button">← Back </button>
 
         <div className="product-detail-content">
           {/* Left 50%: Sliding image + zoom lens only */}

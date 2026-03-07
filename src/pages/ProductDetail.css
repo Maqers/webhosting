@@ -58,6 +58,7 @@
 .back-link.secondary:hover { background: var(--bg-primary); border-color: var(--primary-color); }
 
 .back-button {
+  background:none;
   display: inline-block;
   color: var(--primary-color);
   text-decoration: none;
