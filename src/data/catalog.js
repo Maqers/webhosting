@@ -1293,7 +1293,7 @@ export const productsByCategory = {
       description:
         "Full festive drama, zero extra effort—an oxidised silver-tone haar with chandbali motifs, a coin pendant, and matching earrings + maang tikka. Wear it with sarees, kurtas, or lehengas for weddings, poojas, and night functions.",
       price: 649,
-      images: ["/images/60.png", "/images/60-1.png", "/images/60-2.png"], //Banjara
+      images: ["/images/60.png", "/images/60-1.png"], //Banjara
       popular: false,
       featured: false,
       inStock: true,
@@ -1355,7 +1355,7 @@ export const productsByCategory = {
       description:
         "Two-tone statement chandelier earrings with an oxidised-silver base, antique-gold bead drops, and bold red/green accents—made for maximum drama in one move. Wear them to mehendi/sangeet nights, wedding functions, festive dinners, garba nights, or anytime your outfit is simple and you want the earrings to do the talking. Best for bridesmaids, wedding guests, dancers, and anyone who loves boho-ethnic jewellery with movement.",
       price: 549,
-      images: ["/images/62.png", "/images/62-1.png", "/images/62-2.png"], //Banjara
+      images: ["/images/62.png", "/images/62-1.png"], //Banjara
       popular: false,
       featured: false,
       inStock: true,
