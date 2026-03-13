@@ -1744,7 +1744,7 @@ export const productsByCategory = {
     {
       id: 99,
       categoryId: "Handmade-Accessories",
-      itle: "Rani Pink Floral Kundan Statement Kada",
+      title: "Rani Pink Floral Kundan Statement Kada",
   slug: "rani-pink-floral-kundan-statement-kada",
   description:
     "A rani pink kada packed with floral kundan-style stones in a gold finish—bright, bold, and meant to be worn solo. Pair it with plain sarees, solid lehengas, or minimal suits for a sharp colour pop.",
