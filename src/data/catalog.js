@@ -23,7 +23,7 @@ export const categories = [
     description: "Beautiful crochet handmade products",
     icon: "home",
     order: 1, // Display order
-    featured: true, // Show in featured sections
+    featured: false, // Show in featured sections
     meta: {
       keywords: [
         "crochet",
@@ -42,7 +42,7 @@ export const categories = [
     description: "Beautiful fragnant candles, customisations available",
     icon: "gift",
     order: 2,
-    featured: true,
+    featured: false,
     meta: {
       keywords: [
         "personalized",
@@ -61,7 +61,7 @@ export const categories = [
     description: "Elegant fashion items and bags",
     icon: "fashion",
     order: 3,
-    featured: true,
+    featured: false,
     meta: {
       keywords: ["bags", "handbags", "prints", "printed", "bag"],
     },
@@ -73,7 +73,7 @@ export const categories = [
     description: "Handmade paintings in beautiful frames",
     icon: "jewelry",
     order: 10,
-    featured: true,
+    featured: false,
     meta: {
       keywords: [
         "jewelry",
@@ -91,7 +91,7 @@ export const categories = [
     description: "Fancy home and dining utilities",
     icon: "kitchen",
     order: 5,
-    featured: true,
+    featured: false,
     meta: {
       keywords: ["homedecor", "decor", "glasses", "glass", "homeutilities"],
     },
@@ -102,8 +102,8 @@ export const categories = [
     slug: "resin-products",
     description: "Resin art and collectible items",
     icon: "art",
-    order: 6,
-    featured: true,
+    order: 7,
+    featured: false,
     meta: {
       keywords: ["art", "resin", "frames", "flowers"],
     },
@@ -114,8 +114,8 @@ export const categories = [
     slug: "Handmade-Accessories",
     description: "Accessories for weddings and celebrations",
     icon: "wedding",
-    order: 7,
-    featured: true,
+    order: 6,
+    featured: false,
     meta: {
       keywords: ["wedding", "occasion", "celebration", "gift", "special"],
     },
@@ -158,7 +158,7 @@ export const categories = [
     description: "Beautiful oxidised jewellery pieces for all occasions",
     icon: "jewellery",
     order: 4,
-    featured: false,
+    featured: true,
     meta: {
       keywords: ["jewellery", "silver", "boho", "oxidised", "jhumka"],
     },
@@ -296,8 +296,8 @@ export const productsByCategory = {
         "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won’t wilt, won’t fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..",
       price: 219, //199
       images: ["/images/1.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"],
       meta: {
@@ -313,7 +313,7 @@ export const productsByCategory = {
         "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a “just because” gift.",
       price: 269, //249
       images: ["/images/2.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["bouquet", "crochet", "yarn", "birthday", "gift"],
@@ -401,7 +401,7 @@ export const productsByCategory = {
       price: 89, //79
       images: ["/images/6.png"],
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["keychain", "handmade", "floral", "cute", "gift"],
       meta: {
@@ -417,8 +417,8 @@ export const productsByCategory = {
         "A beautifully handcrafted crochet flower bouquet designed to last forever. Made with soft yarn and detailed stitching, it’s a thoughtful alternative to fresh flowers that fade away. Perfect for birthdays, anniversaries, or anyone who prefers a meaningful and permanent gift.",
       price: 2199,
       images: ["/images/39.png"], //hooksndhheart
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "handmade", "gift"],
       meta: {
@@ -434,8 +434,8 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 1749,
       images: ["/images/43.png", "/images/44.png", "/images/43.png"], //hooksndhheart
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
@@ -451,8 +451,8 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 385,
       images: ["/images/53.png", "/images/53-1.png"], //LillyPad
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
@@ -468,8 +468,8 @@ export const productsByCategory = {
         "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
       price: 160,
       images: ["/images/49.png", "/images/49-1.png", "/images/49-2.png"], //LillyPad
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["handmade", "floral", "decor", "pink", "gift"],
       meta: {
@@ -485,8 +485,8 @@ export const productsByCategory = {
         "A handmade crochet patchwork wrap featuring colorful granny square patterns stitched together in a cozy, timeless design. Soft, warm, and perfect for layering during cooler days.",
       price: 2299,
       images: ["/images/54.png", "/images/54-1.png", "/images/54-2.png"], //Reena's Crochet
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: [
         "crochet wrap",
@@ -519,8 +519,8 @@ export const productsByCategory = {
         "A dessert-style candle crafted to look like a strawberry parfait—complete with a creamy top layer and berry detailing. Perfect for gifting or home décor; looks delicious on a bedside table, desk, or vanity.",
       price: 569, //518
       images: ["/images/7.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["candle", "strawberry", "dessert", "scented", "gift"],
       meta: {
@@ -560,7 +560,7 @@ export const productsByCategory = {
       price: 659, //599
       images: ["/images/9.png"],
       popular: true,
-      featured: false,
+      featured: true,
       inStock: true,
       tags: ["candle", "romantic", "rose", "anniversary", "scented"],
       meta: {
@@ -599,7 +599,7 @@ export const productsByCategory = {
         "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
       price: 949, //899
       images: ["/images/11.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["candle", "mini", "bucket", "colorful", "scented"],
@@ -642,7 +642,7 @@ export const productsByCategory = {
       price: 275, //249
       images: ["/images/13.png"],
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["tote", "heart", "canvas", "playful", "everyday"],
       meta: {
@@ -664,7 +664,7 @@ export const productsByCategory = {
         "A statement black tote with a sunflower-and-butterflies artwork that instantly brightens your everyday carry. Roomy, lightweight, and sturdy—perfect for college, work, errands, or gifting.",
       price: 329, //299
       images: ["/images/14.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["tote", "sunflower", "butterfly", "statement", "art"],
@@ -733,8 +733,8 @@ export const productsByCategory = {
         "A handmade crochet tote featuring vibrant sunflower granny squares on a soft blue base. Lightweight yet sturdy, it’s perfect for picnics, market runs, and sunny day outings.",
       price: 999,
       images: ["/images/55.png", "/images/55-1.png", "/images/55-2.png"], //Reena's Crochet
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: [
         "crochet tote",
@@ -767,8 +767,8 @@ export const productsByCategory = {
         "Preserve your special moments with real pressed flowers, arranged into an elegant keepsake frame. Perfect for gifting or home décor—ideal for wedding flowers, anniversaries, or meaningful memories you want to keep forever.",
       price: 1859,
       images: ["/images/17.png", "/images/17-1.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["flowers", "memory", "frame", "keepsake", "wedding"],
       meta: {
@@ -790,7 +790,7 @@ export const productsByCategory = {
         "Real pressed flowers arranged in a minimal, elegant frame—perfect for adding a soft, natural touch to your space. A timeless décor piece for bedrooms, living rooms, or gifting to someone who loves subtle aesthetics.",
       price: 1439,
       images: ["/images/18-1.png", "/images/18.png", "/images/18-2.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["flowers", "frame", "minimal", "natural", "decor"],
@@ -813,8 +813,8 @@ export const productsByCategory = {
         "A romantic wall frame made with real pressed petals, arranged around a heart cut-out for a warm, timeless look. Perfect for anniversaries, weddings, and meaningful gifts—adds a soft pop of color to any room.",
       price: 1509,
       images: ["/images/19.png", "/images/19-1.png", "/images/19-2.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["earrings", "jhumka", "traditional", "handcrafted"],
       meta: {
@@ -883,7 +883,7 @@ export const productsByCategory = {
         "A luxe pair of champagne flutes with Spiral rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1649, //1499
       images: ["/images/23.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
@@ -900,7 +900,7 @@ export const productsByCategory = {
         "A luxe pair of twirl rhinestone flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 1649, //1499
       images: ["/images/24.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
@@ -934,7 +934,7 @@ export const productsByCategory = {
         "A luxe pair of champagne flutes with Beaded Neck detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
       price: 2399, //2199
       images: ["/images/26.png"],
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["brass", "serving set", "traditional", "dining"],
@@ -971,7 +971,7 @@ export const productsByCategory = {
       price: 1099, //999
       images: ["/images/29.png"],
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: ["resin", "clock", "handmade", "flower"],
       meta: {
@@ -987,8 +987,8 @@ export const productsByCategory = {
         "A beautiful resin keychain featuring real dried flowers preserved forever in crystal-clear resin. Each piece is one of a kind, capturing nature in its most delicate form.",
       price: 109, //99
       images: ["/images/31.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["resin", "keychain", "handmade", "flower"],
       meta: {
@@ -1021,8 +1021,8 @@ export const productsByCategory = {
         "Add a personal touch to your space with this custom resin flower name plate. Featuring real flowers sealed forever in high-quality resin, it’s a timeless décor piece that welcomes with elegance.",
       price: 639, //579
       images: ["/images/32.png"],
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["resin", "nameplate", "handmade", "flower"],
       meta: {
@@ -1055,8 +1055,8 @@ export const productsByCategory = {
         "A handcrafted resin tissue holder designed with elegant floral detailing and gold accents. Combining utility with artistic home decor, it keeps tissues organised while adding a stylish touch to your table or console. A beautiful decor piece that enhances modern and classic interiors alike.",
       price: 449,
       images: ["/images/46.png"], //AneraArt
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["resin", "tissue", "holder", "floral", "decor"],
       meta: {
@@ -1081,8 +1081,8 @@ export const productsByCategory = {
         "Vibrant thread-wrapped bangles detailed with intricate gold-toned embellishments and delicate stones. Lightweight and comfortable, they’re perfect for college celebrations, wedding functions, or adding a bold pop of colour to everyday ethnic outfits. A subtle statement that instantly elevates your look.",
       price: 199, //179
       images: ["/images/33.png"], //craftsCorner
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["bangles", "thread", "festive", "ethnic", "colourful"],
       meta: {
@@ -1104,7 +1104,7 @@ export const productsByCategory = {
         "Delicately crafted gold-toned bangles featuring subtle stone detailing for a refined, retro ethnic charm. Lightweight and versatile, they complement sarees, suits, or even minimalist fusion outfits effortlessly. Perfect for those who love understated elegance with a timeless touch.",
       price: 165, //149
       images: ["/images/34.png"], //craftsCorner
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: ["vintage", "gold", "minimal", "ethnic", "classic"],
@@ -1127,8 +1127,8 @@ export const productsByCategory = {
         "Beautiful gold-toned bangles with detailed lotus designs and soft coloured accents. Perfect for weddings, festivals, or adding a traditional touch to your ethnic outfits. A graceful piece that blends classic style with everyday elegance.",
       price: 385, //349
       images: ["/images/35.png"], //craftsCorner
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["lotus", "gold", "ethnic", "wedding", "festive"],
       meta: {
@@ -1252,6 +1252,692 @@ export const productsByCategory = {
         ],
       },
     },
+    {
+      id: 84,
+      categoryId: "Handmade-Accessories",
+      title: "Royal Purple Bangles Set",
+      slug: "royal-purple-kundan-silk-thread-bangles-set",
+      description:
+        "Royal purple silk-thread bangles with kundan-style stones and sparkle lines—made for instant festive polish. Wear with sarees, lehengas, or anarkalis for weddings, sangeet, and poojas.",
+      price: 249,
+      images: ["/images/71.png"], //craftscorner
+      popular: true,
+      featured: false,
+      inStock: true,
+      tags: [
+        "silk thread bangles",
+        "purple bangles set",
+        "kundan bangles",
+        "bridal bangles",
+        "festive bangles",
+        "ethnic jewellery",
+      ],
+      meta: {
+        keywords: [
+          "royal purple silk thread bangles",
+          "purple kundan bangles set",
+          "silk thread bangles with stones",
+          "kundan style bangles for saree",
+          "wedding bangles set for women",
+          "bridal purple bangles",
+          "festive bangles set",
+          "traditional Indian bangles set",
+        ],
+      },
+    },
+    {
+      id: 85,
+      categoryId: "Handmade-Accessories",
+      title: "Rang-Mahal Multicolour Silk Thread Bangles Set",
+      slug: "rang-mahal-multicolour-silk-thread-bangles-set",
+      description:
+        "Silk-thread bangles with kundan-style sparkle, available in multiple colours to match any outfit. Pair with sarees, lehengas, or suits for poojas, weddings, and festive nights. The full set costs 799/-, each pair costs 115/-",
+      price: 799,
+      images: ["/images/72.png"], //craftscorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 86,
+      categoryId: "Handmade-Accessories",
+      title: "Purple Silk Thread Bangle Set",
+      slug: "purple-silk-thread-bangle-set",
+      description:
+        "A bold silk-thread bangle in royal purple with kundan-style detailing—easy to stack, hard to miss. Wear it with sarees, suits, or even a plain dress for festive and wedding looks.",
+      price: 299,
+      images: ["/images/73.png"], //craftscorner
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "silk thread bangle",
+        "purple bangle",
+        "silk thread cuff",
+        "kundan kada",
+        "festive bracelet",
+        "ethnic jewellery",
+      ],
+      meta: {
+        keywords: [
+          "royal purple silk thread kada",
+          "purple silk thread bracelet",
+          "silk thread kada cuff for women",
+          "kundan style kada bracelet",
+          "festive kada for saree",
+          "wedding kada bracelet",
+          "traditional silk thread bangle cuff",
+          "purple ethnic bracelet",
+        ],
+      },
+    },
+    {
+      id: 87,
+      categoryId: "Handmade-Accessories",
+      title: "Emerald Leaf Pearl Kada Bangle",
+      slug: "emerald-leaf-pearl-kada-bangle",
+      description:
+        "Emerald velvet kada bangle with leaf-cut stones and pearl detailing—regal and wedding-ready. Pair with sarees, lehengas, or solid suits for mehendi, sangeet, and festive functions.",
+      price: 180,
+      images: ["/images/74.png", "/images/74-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "green kada",
+        "emerald bangle",
+        "pearl kada",
+        "leaf motif bangle",
+        "festive jewellery",
+        "wedding bangles",
+      ],
+      meta: {
+        keywords: [
+          "emerald green kada cuff",
+          "green velvet kada for women",
+          "leaf design kada bracelet",
+          "pearl kada bangle",
+          "green wedding kada",
+          "green bangle for saree",
+          "festive kada bracelet",
+          "emerald green ethnic bangle",
+        ],
+      },
+    },
+    {
+      id: 88,
+      categoryId: "Handmade-Accessories",
+      title: "Navrang Kundan Velvet Bangles Set",
+      slug: "navrang-kundan-velvet-bangles-set",
+      description:
+        "Multicolour kundan-style bangles with a soft velvet finish—bright, festive, and easy to match. Wear them with sarees, lehengas, or solid suits for weddings, poojas, and parties.",
+      price: 180,
+      images: ["/images/75.png", "/images/75-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "kundan bangles",
+        "multicolour bangles",
+        "velvet bangles",
+        "navrang bangles",
+        "festive bangles",
+        "wedding bangles",
+      ],
+      meta: {
+        keywords: [
+          "navrang kundan bangles set",
+          "multicolour kundan bangles",
+          "velvet bangles for women",
+          "kundan style bangles for saree",
+          "wedding bangles multicolour",
+          "festive bangles set",
+          "party wear bangles set",
+          "traditional Indian bangles",
+        ],
+      },
+    },
+    {
+      id: 89,
+      categoryId: "Handmade-Accessories",
+      title: "Black-Gold Coin Charm Silk Thread Bangles Set",
+      slug: "black-gold-coin-charm-silk-thread-bangles-set",
+      description:
+        "Black-gold silk thread bangles with mirror-style stones, floral accents, and coin charms for that temple-meets-party vibe. Pair with sarees, lehengas, or festive suits for weddings, poojas, and family functions.",
+      price: 279,
+      images: ["/images/76.png", "/images/76-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "silk thread bangles",
+        "black gold bangles",
+        "coin charm bangles",
+        "mirror work bangles",
+        "festive bangles set",
+        "wedding bangles",
+      ],
+      meta: {
+        keywords: [
+          "black gold silk thread bangles set",
+          "coin charm bangles set",
+          "mirror work bangles for women",
+          "floral design silk thread bangles",
+          "wedding bangles black gold",
+          "festive bangles for saree",
+          "traditional coin bangles set",
+          "ethnic bangles set for women",
+        ],
+      },
+    },
+    {
+      id: 90,
+      categoryId: "Handmade-Accessories",
+      title: "Regalia",
+      slug: "vintage-art-statement-earrings",
+      description:
+        "full set 800",
+      price: 235,
+      images: ["/images/77.png", "/images/77-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "anniversary",
+        "gift box",
+        "custom",
+        "traditional",
+        "resin",
+        "earrings",
+      ],
+      meta: {
+        keywords: [
+          "anniversary gift",
+          "custom",
+          "gift box",
+          "resin",
+          "earrings",
+        ],
+      },
+    },
+    {
+      id: 91,
+      categoryId: "Handmade-Accessories",
+      title: "Mirror Pearl Statement Kada Bangle",
+      slug: "mirror-pearl-statement-kada-bangle",
+      description:
+        "A gold-tone statement kada packed with mirror-cut stones and pearl lines for that full-glam finish. Style it with sarees, lehengas, or even a solid gown for receptions, cocktails, and wedding functions.",
+      price: 270,
+      images: ["/images/78.png", "/images/78-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "mirror work kada",
+        "pearl kada bangle",
+        "gold tone bangle",
+        "statement bangle",
+        "bridal kada",
+        "party wear jewellery",
+      ],
+      meta: {
+        keywords: [
+          "mirror work kada bangle",
+          "mirror stone pearl bangle",
+          "gold statement kada for women",
+          "bridal kada bangle",
+          "reception party wear kada",
+          "mirror bangle for saree",
+          "pearl studded kada bangle",
+          "wedding jewellery kada bangle",
+        ],
+      },
+    },
+    {
+      id: 92,
+      categoryId: "Handmade-Accessories",
+      title: "Peacock Kundan Silk Thread Bangles Set",
+      slug: "peacock-kundan-silk-thread-bangles-set",
+      description:
+        "Silk-thread bangles in mustard and wine with kundan-style stones and peacock motifs. Made for sarees, lehengas, and bridal functions like mehendi, sangeet, and weddings.",
+      price: 340,
+      images: ["/images/79.png", "/images/79-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "silk thread bangles",
+        "kundan bangles",
+        "peacock bangles",
+        "bridal bangles set",
+        "mehendi bangles",
+        "wedding bangles",
+      ],
+      meta: {
+        keywords: [
+          "peacock kundan silk thread bangles",
+          "mustard maroon silk thread bangles set",
+          "bridal peacock bangles set",
+          "kundan bangles for lehenga",
+          "wedding silk thread bangles",
+          "mehendi bangles set",
+          "traditional peacock design bangles",
+          "kundan stone bangles set",
+        ],
+      },
+    },
+    {
+      id: 93,
+      categoryId: "Handmade-Accessories",
+      title: "Emerald Leaf Silk Thread Bangles Set",
+      slug: "emerald-leaf-silk-thread-bangles-set",
+      description:
+        "Emerald silk-thread bangles edged with leaf-cut stones and tiny pearl-like beads for a clean traditional look. Best with sarees, anarkalis, and lehengas—especially for mehendi and family functions.",
+      price: 380,
+      images: ["/images/80.png", "/images/80-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "green silk thread bangles",
+        "emerald bangles set",
+        "leaf design bangles",
+        "kundan style bangles",
+        "mehendi bangles",
+        "ethnic bangles",
+      ],
+      meta: {
+        keywords: [
+          "emerald green silk thread bangles set",
+          "green leaf design bangles",
+          "silk thread bangles for saree",
+          "kundan style green bangles",
+          "mehendi green bangles set",
+          "wedding guest green bangles",
+          "traditional green bangles set",
+          "green ethnic bangles for women",
+        ],
+      },
+    },
+    {
+      id: 94,
+      categoryId: "Handmade-Accessories",
+      title: "Royal Blue Thread Bangles Set",
+      slug: "royal-blue-kundan-silk-thread-bangles-set",
+      description:
+        "Royal blue silk-thread bangles with kundan-style florals and a clean stone-studded center line. Pair with sarees, lehengas, or monochrome suits for sangeet nights, receptions, and pujas.",
+      price: 299,
+      images: ["/images/81.png", "/images/81-1.png"], //ThreadedByCharm
+      popular: true,
+      featured: false,
+      inStock: true,
+      tags: [
+        "blue silk thread bangles",
+        "kundan style bangles",
+        "royal blue bangles set",
+        "party wear bangles",
+        "ethnic bangles",
+        "traditional jewellery",
+      ],
+      meta: {
+        keywords: [
+          "royal blue silk thread bangles set",
+          "blue kundan style bangles for women",
+          "blue bangles for saree",
+          "silk thread bangles royal blue",
+          "party wear blue bangles set",
+          "blue bangles for lehenga",
+          "traditional blue bangles set",
+          "stone work blue bangles",
+        ],
+      },
+    },
+    {
+      id: 95,
+      categoryId: "Handmade-Accessories",
+      title: "Sky Blue Kundan Velvet Bangles (Pair)",
+      slug: "sky-blue-kundan-velvet-bangles-pair",
+      description:
+        "Two gold-tone bangles lined with sky-blue velvet and packed with kundan-style stones, finished with bold blue center accents. Wear them with sarees, shararas, or solid co-ords when you want a clean pop of colour.",
+      price: 269,
+      images: ["/images/82.png", "/images/82-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "sky blue bangles",
+        "kundan style bangles",
+        "velvet bangles",
+        "bangles pair",
+        "party wear bangles",
+        "ethnic bangles",
+      ],
+      meta: {
+        keywords: [
+          "sky blue kundan velvet bangles pair",
+          "light blue velvet bangles for women",
+          "kundan style blue bangles",
+          "blue bangles for saree",
+          "party wear blue bangles pair",
+          "stone work blue bangles",
+          "gold tone blue bangles",
+          "sky blue ethnic bangles",
+        ],
+      },
+    },
+    {
+      id: 96,
+      categoryId: "Handmade-Accessories",
+      title: "Black Mirror Velvet Bangles (Pair)",
+      slug: "black-mirror-velvet-bangles-pair",
+      description:
+        "A sleek pair of black velvet-lined bangles with mirror-cut squares in a gold-tone grid. Style them with a black saree, satin dress, or any solid outfit that needs sharp contrast.",
+      price: 239,
+      images: ["/images/83-1.png", "/images/83.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+        "black bangles pair",
+        "mirror work bangles",
+        "velvet bangles",
+        "gold tone bangles",
+        "party wear bangles",
+        "statement bangles",
+      ],
+      meta: {
+        keywords: [
+          "black mirror velvet bangles pair",
+          "black mirror work bangles",
+          "black and gold bangles for women",
+          "velvet lined bangles black",
+          "mirror square bangles pair",
+          "black bangles for saree",
+          "party wear black bangles",
+          "black stone work bangles",
+        ],
+      },
+    },
+    {
+      id: 97,
+      categoryId: "Handmade-Accessories",
+      title: "Lavender Kundan Silk Thread Bangles Set",
+  slug: "lavender-kundan-silk-thread-bangles-set",
+  description:
+    "Soft lavender silk-thread bangles with tiny kundan-style floral clusters in a gold finish. Easy match for pastel sarees, chikankari suits, and day-event outfits.",
+      price: 199,
+      images: ["/images/84.png", "/images/84-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "lavender bangles",
+    "silk thread bangles",
+    "kundan style bangles",
+    "pastel bangles",
+    "gold finish bangles",
+    "ethnic bangles",
+  ],
+  meta: {
+    keywords: [
+      "lavender silk thread bangles set",
+      "lavender kundan style bangles",
+      "pastel bangles for women",
+      "lavender bangles for saree",
+      "silk thread bangles lavender",
+      "kundan floral bangles set",
+      "lavender bangles for suit",
+      "light purple ethnic bangles",
+    ],
+      },
+    },
+    {
+      id: 98,
+      categoryId: "Handmade-Accessories",
+      title: "Emerald Floral Kundan Statement Kada",
+  slug: "emerald-floral-kundan-statement-kada",
+  description:
+    "An emerald satin kada covered in floral kundan-style stones with a gold finish—made to be worn solo. Best with plain sarees, solid lehengas, and minimal outfits.",
+      price: 329,
+      images: ["/images/85.png", "/images/85-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "emerald green kada",
+    "floral kundan bangle",
+    "statement kada",
+    "stone work bangle",
+    "gold finish jewellery",
+    "ethnic bracelet",
+  ],
+  meta: {
+    keywords: [
+      "emerald floral kundan kada",
+      "green statement kada bangle",
+      "floral stone work kada",
+      "kundan style kada bracelet",
+      "emerald green bangle for saree",
+      "gold finish green kada",
+      "bridal style statement kada",
+      "flower design kada bangle",
+    ],
+      },
+    },
+    {
+      id: 99,
+      categoryId: "Handmade-Accessories",
+      itle: "Rani Pink Floral Kundan Statement Kada",
+  slug: "rani-pink-floral-kundan-statement-kada",
+  description:
+    "A rani pink kada packed with floral kundan-style stones in a gold finish—bright, bold, and meant to be worn solo. Pair it with plain sarees, solid lehengas, or minimal suits for a sharp colour pop.",
+      price: 379,
+      images: ["/images/86.png", "/images/86-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "pink kada",
+    "floral kundan bangle",
+    "statement kada",
+    "rani pink bangle",
+    "stone work bangle",
+    "gold finish jewellery",
+  ],
+  meta: {
+    keywords: [
+      "rani pink floral kundan kada",
+      "pink statement kada bangle",
+      "floral stone work pink kada",
+      "kundan style kada bracelet pink",
+      "pink bangle for saree",
+      "gold finish pink kada",
+      "party wear pink kada",
+      "flower design pink kada bangle",
+    ],
+      },
+    },
+    {
+      id: 100,
+      categoryId: "Handmade-Accessories",
+      title: "Antique Gold Floral Enamel Bangles (Set of 4)",
+  slug: "antique-gold-floral-enamel-bangles-set-of-4",
+  description:
+    "Antique gold-tone bangles with raised floral motifs, black enamel accents, and tiny stone highlights. Stack them with sarees, kurta sets, or even a plain dress when you want texture over sparkle.",
+      price: 529,
+      images: ["/images/87.png", "/images/87-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "antique gold bangles",
+    "floral bangles set",
+    "enamel bangles",
+    "black and gold bangles",
+    "stackable bangles",
+    "traditional bangles",
+  ],
+  meta: {
+    keywords: [
+      "antique gold floral bangles set",
+      "floral enamel bangles set of 4",
+      "black enamel gold bangles",
+      "stackable floral bangles for women",
+      "black and gold bangles for saree",
+      "traditional floral bangles set",
+      "statement stack bangles",
+      "ethnic gold bangles set",
+    ],
+      },
+    },
+    {
+      id: 101,
+      categoryId: "Handmade-Accessories",
+      title: "Peacock Silk Thread Bangles Set (Aqua & Lime)",
+  slug: "peacock-silk-thread-bangles-set-aqua-lime",
+  description:
+    "Aqua and lime silk-thread bangles with peacock motifs and stone accents in a gold finish. Works best with white, teal, green, or any solid outfit that can take a bright pop.",
+      price: 349,
+      images: ["/images/88.png", "/images/88-1.png"], //ThreadedByCharm
+      popular: true,
+      featured: false,
+      inStock: true,
+      tags: [
+    "silk thread bangles",
+    "peacock bangles",
+    "aqua blue bangles",
+    "green bangles",
+    "stone work bangles",
+    "gold finish bangles",
+  ],
+  meta: {
+    keywords: [
+      "aqua lime silk thread bangles set",
+      "peacock silk thread bangles",
+      "blue green bangles for women",
+      "peacock design bangles set",
+      "stone work silk thread bangles",
+      "aqua bangles for saree",
+      "green bangles set",
+      "peacock motif bangles",
+    ],
+      },
+    },
+    {
+      id: 102,
+      categoryId: "Handmade-Accessories",
+      title: "Lotus Stonework Silk Thread Bangles (Pair)",
+  slug: "lotus-stonework-silk-thread-bangles-pair",
+  description:
+    "A bold pair with lotus motifs, square-cut stones, and a pop of pink + green on a silk-thread base. Wear with plain sarees, solid lehengas, or monochrome suits when you want colour without clutter.",
+      price: 469,
+      images: ["/images/89.png", "/images/89-1.png", "/images/89-2.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "silk thread bangles",
+    "lotus bangles",
+    "pink green bangles",
+    "stonework bangles",
+    "kundan style bangles",
+    "statement bangles pair",
+  ],
+  meta: {
+    keywords: [
+      "lotus silk thread bangles pair",
+      "pink green lotus bangles",
+      "stonework silk thread bangles",
+      "kundan style lotus bangles",
+      "pink green bangles for saree",
+      "lotus design bangles for women",
+      "square stone bangles pair",
+      "gold tone lotus bangles",
+    ],
+      },
+    },
+    {
+      id: 103,
+      categoryId: "Handmade-Accessories",
+      title: "Emerald Coin Charm Silk Thread Bangles Set",
+  slug: "emerald-coin-charm-silk-thread-bangles-set",
+  description:
+    "Emerald silk-thread bangles stacked with coin charms and tiny gold motifs for a rich, traditional look. Pair with sarees, kurtas, or lehengas—especially in gold, maroon, or green.",
+      price: 589,
+      images: ["/images/90.png", "/images/90-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "green silk thread bangles",
+    "coin charm bangles",
+    "emerald bangles set",
+    "traditional bangles",
+    "gold tone bangles",
+    "ethnic jewellery",
+  ],
+  meta: {
+    keywords: [
+      "emerald coin charm silk thread bangles",
+      "green coin bangles set",
+      "silk thread bangles with coin charms",
+      "traditional green bangles for women",
+      "green bangles for saree",
+      "gold coin charm bangles set",
+      "ethnic silk thread bangles green",
+      "coin design bangles set",
+    ],
+      },
+    },
+    {
+      id: 104,
+      categoryId: "Handmade-Accessories",
+      title: "Emerald Coin Charm Silk Thread Bangles Set",
+  slug: "emerald-coin-charm-silk-thread-bangles-set",
+  description:
+    "Emerald silk-thread bangles stacked with coin charms and tiny gold motifs for a rich, traditional look. Pair with sarees, kurtas, or lehengas—especially in gold, maroon, or green.",
+      price: 249,
+      images: ["/images/91.png", "/images/91-1.png"], //ThreadedByCharm
+      popular: false,
+      featured: false,
+      inStock: true,
+      tags: [
+    "green silk thread bangles",
+    "coin charm bangles",
+    "emerald bangles set",
+    "traditional bangles",
+    "gold tone bangles",
+    "ethnic jewellery",
+  ],
+  meta: {
+    keywords: [
+      "emerald coin charm silk thread bangles",
+      "green coin bangles set",
+      "silk thread bangles with coin charms",
+      "traditional green bangles for women",
+      "green bangles for saree",
+      "gold coin charm bangles set",
+      "ethnic silk thread bangles green",
+    ],
+      },
+    },
   ],
   "Oxidised-jewellery": [
     {
@@ -1263,7 +1949,7 @@ export const productsByCategory = {
         "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.",
       price: 599,
       images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], //Banjara
-      popular: true,
+      popular: false,
       featured: false,
       inStock: true,
       tags: [
@@ -1479,8 +2165,8 @@ export const productsByCategory = {
         "Big-fat-festive energy—antique-finish long jhumkas with stone accents and chain tassels. Wear them with sarees, lehengas, or a plain kurta set when your outfit needs a shortcut to “wow”. Best for anyone who loves bold traditional jewellery with a little drama.",
       price: 649,
       images: ["/images/66.png", "/images/66-1.png", "/images/66-2.png"], //Banjara
-      popular: false,
-      featured: false,
+      popular: true,
+      featured: true,
       inStock: true,
       tags: [
         "oxidized earrings",
@@ -1572,7 +2258,7 @@ export const productsByCategory = {
         "Antique-gold dome jhumkas with an ornate crescent stud, tiny side jhumki charms, and a delicate hanging fringe for soft movement. Easy to wear for poojas, festive dinners, family functions, and wedding events—pairs best with kurtas, sarees, and lehengas when you want a classic traditional look without going too heavy.",
       price: 399,
       images: ["/images/69-1.png", "/images/69.png", "/images/69-2.png"], //Banjara
-      popular: false,
+      popular: true,
       featured: false,
       inStock: true,
       tags: [
@@ -1603,8 +2289,8 @@ export const productsByCategory = {
         "Oxidised tribal-inspired necklace set with a cylindrical pendant, ghungroo jhumki drops, and matching long earrings for a complete boho-ethnic look. Wear it for Navratri nights, festive dinners, poojas, and wedding functions—especially with cotton sarees, kurtas, or Indo-western outfits when you want a strong statement without heavy stones.",
       price: 599,
       images: ["/images/70.png", "/images/70-1.png", "/images/70-2.png"], //Banjara
-      popular: false,
-      featured: false,
+      popular: true,
+      featured: true,
       inStock: true,
       tags: [
         "oxidized necklace set",
@@ -1637,7 +2323,7 @@ export const productsByCategory = {
       price: 440,
       images: ["/images/48.png", "/images/48-1.png", "/images/48-2.png"], //LillyPad
       popular: false,
-      featured: true,
+      featured: false,
       inStock: true,
       tags: [
         "gift hamper",
@@ -1667,8 +2353,8 @@ export const productsByCategory = {
         "A thoughtfully curated memory gift box designed to turn special moments into lasting keepsakes. Includes a mini scrapbook album, photo frame, dried floral accents, and elegant kraft-style detailing. Select variations also include chocolates for a sweet touch. Perfect for anniversaries, birthdays, best friends, farewells, and relationship milestones. A meaningful gift that feels more personal than just a box of chocolates.",
       price: 440,
       images: ["/images/52.png", "/images/52-1.png", "/images/52-2.png"], //LillyPad
-      popular: false,
-      featured: true,
+      popular: true,
+      featured: false,
       inStock: true,
       tags: [
         "memory gift box",
@@ -1698,8 +2384,8 @@ export const productsByCategory = {
         "A handcrafted DIY memory scrapbook album designed for you to personalize in your own creative way. Made with a sturdy kraft cover and thick, high-quality blank pages, this ring-bound scrapbook provides the perfect canvas to paste photos, write heartfelt notes, doodle, decorate with stickers, and create a one-of-a-kind memory book. Ideal for anniversaries, birthdays, farewell gifts, relationship milestones, friendship memories, or surprise keepsakes. Available in multiple page options to match your story: 8 pages (₹120), 12 pages (₹180), 16 pages (₹240), 18 pages (₹280), and 20 pages (₹310). A thoughtful, affordable DIY gift that allows you to turn your memories into something deeply personal and meaningful.",
       price: 130,
       images: ["/images/51.png"], //LillyPad
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: [
         "DIY scrapbook",
@@ -1731,8 +2417,8 @@ export const productsByCategory = {
         "A sculpted grape-shaped soap designed to add a playful yet aesthetic touch to your kitchen or bathroom. Functional, decorative, and perfect as a unique gift.",
       price: 349,
       images: ["/images/56.png", "/images/56-1.png", "/images/56-2.png"], //Divine Ember
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: [
         "grape soap",
@@ -1763,8 +2449,8 @@ export const productsByCategory = {
         "A playful strawberry-shaped soap designed to brighten up your kitchen or bathroom. Decorative yet functional, this hanging soap adds a sweet, aesthetic touch to any space.",
       price: 549,
       images: ["/images/57.png"], //Soaps
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: [
         "strawberry soap",
@@ -1792,11 +2478,11 @@ export const productsByCategory = {
       title: "Multicolor grape soap",
       slug: "Multicolor-grape-soap",
       description:
-        "33 pcscharming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it’s a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.",
+        "A vibrant multicolored grape-shaped soap designed to add a fun and aesthetic touch to your kitchen or bathroom. Functional and decorative, this soap makes for a unique gift or a playful home accessory.",
       price: 549,
       images: ["/images/58.png"], //Soaps
-      popular: true,
-      featured: true,
+      popular: false,
+      featured: false,
       inStock: true,
       tags: ["crochet", "bouquet", "flowers", "pink", "gift"],
       meta: {
