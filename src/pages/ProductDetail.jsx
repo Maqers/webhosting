@@ -29,7 +29,7 @@ const ProductDetail = () => {
 
   const whatsappNumber = getWhatsAppNumber()
   const handleContactUs = () => {
-    const message = `Hello! I'm interested in Product ID: ${id} - ${product.title}. Could you please provide more information about availability, pricing, and delivery options?`
+    const message = `Hello! I want to buy Product ID: ${id} - ${product.title}.`
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     //const url = `https://wa.me/${contactInfo.whatsapp.number}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank')

@@ -16,7 +16,7 @@ const WhatsAppButton = () => {
 
   const whatsappNumber = getWhatsAppNumber();
   const message = productId
-    ? `Hello! I'm interested in product ID: ${productId}. Could you please provide more information?`
+    ? `Hello! I want to buy Product ID: ${productId}.`
     : "Hello! I'm interested in your products. Could you please provide more information?";
 
   const handleWhatsAppClick = () => {
