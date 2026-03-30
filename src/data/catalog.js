@@ -647,13 +647,13 @@ export const productsByCategory = {
       title: "Aqua Reed Diffuser", //diyabati
       slug: "aqua-reed-diffuser",
       description:
-        "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
+        "Bring a breath of freshness into your space with the DIYABTI Aqua Reed Diffuser — a fragrance designed to evoke clarity, calm, and effortless elegance.Infused with a crisp, aquatic blend, this diffuser releases a light and refreshing aroma that instantly revitalizes your surroundings. The scent captures the essence of clean waters and open air, creating a serene and rejuvenating ambience. Encased in an elegant glass bottle with subtle gold accents, it seamlessly complements modern interiors while adding a refined decorative touch.",
       price: 350, 
       images: ["/images/93-2.png","/images/93-1.png","/images/93.png"],
       popular: false,
       featured: false,
       inStock: true,
-      tags: ["candle", "mini", "bucket", "colorful", "scented"],
+      tags: ["candle", "diffuser", "bucket", "colorful", "scented"],
       meta: {
         keywords: ["candle", "bucket", "desk", "scented", "colorful"],
       },
