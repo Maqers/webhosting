@@ -649,7 +649,7 @@ export const productsByCategory = {
       description:
         "A fun mini candle poured in a colorful bucket jar—cute, compact, and perfect for brightening up any corner. Great for gifting or desk décor; available in multiple colors and (optionally) different fragrances.",
       price: 350, 
-      images: ["/images/93.png","/images/93-1.png","/images/93-2.png"],
+      images: ["/images/93-2.png","/images/93-1.png","/images/93.png"],
       popular: false,
       featured: false,
       inStock: true,
