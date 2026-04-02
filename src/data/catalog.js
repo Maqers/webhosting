@@ -983,7 +983,7 @@ export const productsByCategory = {
       slug: "rhinestone-heart-champagne-flutes-set-of-2",
       description:
         "A luxe pair of champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2399,
+      price: 1650,
       images: ["/images/28.png"],
       popular: false,
       featured: false,
@@ -1000,7 +1000,7 @@ export const productsByCategory = {
       slug: "Spiral Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with Spiral rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 1649, //1499
+      price: 1350, //1499
       images: ["/images/23.png"],
       popular: false,
       featured: false,
@@ -1017,7 +1017,7 @@ export const productsByCategory = {
       slug: "Twirl Rhinestone Champagne Flutes",
       description:
         "A luxe pair of twirl rhinestone flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 1649, //1499
+      price: 1350, //1499
       images: ["/images/24.png"],
       popular: false,
       featured: false,
@@ -1034,7 +1034,7 @@ export const productsByCategory = {
       slug: "Minimal Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with minimal rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 1649, //1499
+      price: 1250, //1499
       images: ["/images/25.png"],
       popular: false,
       featured: false,
@@ -1051,7 +1051,7 @@ export const productsByCategory = {
       slug: "Beaded Neck Champagne Flutes",
       description:
         "A luxe pair of champagne flutes with Beaded Neck detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2399, //2199
+      price: 1650, //2199
       images: ["/images/26.png"],
       popular: false,
       featured: false,
@@ -1068,7 +1068,7 @@ export const productsByCategory = {
       slug: "Rhinestoned Champagne Flutes",
       description:
         "A luxe pair of Rhinestoned champagne flutes with heart-shaped rhinestone detailing and elegant gold accents for a glam toast. Perfect for weddings, anniversaries, proposals, and gifting—made to elevate any celebration table.",
-      price: 2399, //2199
+      price: 1650, //2199
       images: ["/images/27.png"],
       popular: false,
       featured: false,
