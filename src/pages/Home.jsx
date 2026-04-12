@@ -1,9 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import ImageWithFallback from "../components/ImageWithFallback";
 import "./Home.css";
-import { useRef } from "react";
 
 import heroBg from "../assets/images/hero/slide1.png";
 
@@ -11,22 +10,39 @@ const Home = () => {
   const popularProducts = useMemo(() => getPopularProducts(), []);
   const categories = useMemo(() => getSortedCategories(), []);
   const scrollRef = useRef(null);
+  const [canLeft, setCanLeft]   = useState(false);
+  const [canRight, setCanRight] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const checkEdges = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 2);
+    setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const checkAll = () => {
+      setIsMobile(window.innerWidth <= 768);
+      checkEdges();
+    };
+    checkAll();
+    el.addEventListener("scroll", checkEdges, { passive: true });
+    window.addEventListener("resize", checkAll);
+    return () => {
+      el.removeEventListener("scroll", checkEdges);
+      window.removeEventListener("resize", checkAll);
+    };
+  }, []);
 
   const scroll = (dir) => {
-  const el = scrollRef.current
-  if (!el) return
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * 180, behavior: "smooth" });
+  };
 
-  const max = el.scrollWidth - el.clientWidth
-  const step = 200
-
-  let next = dir === "left"
-    ? el.scrollLeft - step
-    : el.scrollLeft + step
-
-  next = Math.max(0, Math.min(next, max))
-
-  el.scrollTo({ left: next, behavior: "smooth" })
-}
   return (
     <div className="home">
       <section
@@ -40,10 +56,19 @@ const Home = () => {
           <p className="hero-banner-subtitle">
             Handcrafted with love, delivered with care
           </p>
+
+          {/* Wrapper — only visible on mobile */}
           <div className="hero-category-wrapper">
-            <button className="scroll-btn left" onClick={() => scroll("left")}>
-              ‹
-            </button>
+            {isMobile && (
+              <button
+                className={`scroll-btn left${canLeft ? " visible" : ""}`}
+                onClick={() => scroll(-1)}
+                aria-label="Scroll left"
+                type="button"
+              >
+                ‹
+              </button>
+            )}
 
             <div className="hero-category-links" ref={scrollRef}>
               <Link to="/products" className="hero-category-chip all">
@@ -60,12 +85,16 @@ const Home = () => {
               ))}
             </div>
 
-            <button
-              className="scroll-btn right"
-              onClick={() => scroll("right")}
-            >
-              ›
-            </button>
+            {isMobile && (
+              <button
+                className={`scroll-btn right${canRight ? " visible" : ""}`}
+                onClick={() => scroll(1)}
+                aria-label="Scroll right"
+                type="button"
+              >
+                ›
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -73,43 +102,23 @@ const Home = () => {
       <section className="trust-bar">
         <div className="container trust-bar-inner">
           <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="search">
-              🔍
-            </span>
-            <div>
-              <strong>Hand-picked sellers</strong>
-              <span>Every business vetted personally</span>
-            </div>
+            <span className="trust-icon" role="img" aria-label="search">🔍</span>
+            <div><strong>Hand-picked sellers</strong><span>Every business vetted personally</span></div>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="gift">
-              🎁
-            </span>
-            <div>
-              <strong>Genuinely handmade</strong>
-              <span>No generic products, only real craft</span>
-            </div>
+            <span className="trust-icon" role="img" aria-label="gift">🎁</span>
+            <div><strong>Genuinely handmade</strong><span>No generic products, only real craft</span></div>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="chat">
-              💬
-            </span>
-            <div>
-              <strong>Order via WhatsApp</strong>
-              <span>No DM anxiety — we handle it</span>
-            </div>
+            <span className="trust-icon" role="img" aria-label="chat">💬</span>
+            <div><strong>Order via WhatsApp</strong><span>No DM anxiety — we handle it</span></div>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="India flag">
-              🇮🇳
-            </span>
-            <div>
-              <strong>Support small</strong>
-              <span>Every rupee goes to an Indian home biz</span>
-            </div>
+            <span className="trust-icon" role="img" aria-label="India flag">🇮🇳</span>
+            <div><strong>Support small</strong><span>Every rupee goes to an Indian home biz</span></div>
           </div>
         </div>
       </section>
@@ -121,9 +130,7 @@ const Home = () => {
               <p className="section-eyebrow">Crowd favourites</p>
               <h2 className="section-title">Most loved right now</h2>
             </div>
-            <Link to="/products" className="view-all-link">
-              View all →
-            </Link>
+            <Link to="/products" className="view-all-link">View all →</Link>
           </div>
           <div className="products-grid">
             {popularProducts.slice(0, 6).map((product, index) => (
@@ -137,17 +144,10 @@ const Home = () => {
         <div className="container">
           <div className="home-cta-content">
             <h2>Not sure what to get?</h2>
-            <p>
-              Chat with us on WhatsApp — tell us who you're buying for and your
-              budget, and we'll find the right gift in minutes.
-            </p>
+            <p>Chat with us on WhatsApp — tell us who you're buying for and your budget, and we'll find the right gift in minutes.</p>
             <div className="home-cta-buttons">
-              <Link to="/products" className="home-cta-btn">
-                Browse All Gifts
-              </Link>
-              <Link to="/contact" className="home-cta-btn">
-                Chat with us on WhatsApp
-              </Link>
+              <Link to="/products" className="home-cta-btn">Browse All Gifts</Link>
+              <Link to="/contact" className="home-cta-btn">Chat with us on WhatsApp</Link>
             </div>
           </div>
         </div>
@@ -173,7 +173,6 @@ const ProductCard = ({ product, index }) => (
     </div>
     <div className="product-info">
       <h3 className="product-title">{product.title}</h3>
-      <p className="product-id">Product ID: {product.id}</p>
       <p className="product-category">{product.category}</p>
       <div className="product-meta">
         <span className="product-price">₹{product.price}</span>
