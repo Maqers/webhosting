@@ -76,9 +76,24 @@
 .trust-divider { width: 1px; height: 38px; background: rgba(255,255,255,.08); flex-shrink: 0; }
 @media (max-width: 900px) { .trust-item { padding: .6rem 1.25rem; } }
 @media (max-width: 768px) {
-  .trust-bar-inner { flex-direction: column; align-items: flex-start; padding: 0 1.25rem; }
-  .trust-divider { display: none; }
-  .trust-item { padding: .6rem 0; min-width: unset; width: 100%; }
+  .hero-category-links {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    padding-bottom: 6px;
+
+    /* smooth scroll */
+    -webkit-overflow-scrolling: touch;
+
+    /* optional: smooth programmatic scroll */
+    scroll-behavior: smooth;
+  }
+
+  .hero-category-chip {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
 }
 
 /* ── SHARED UTILITIES ──────────────────────────────────────────── */
