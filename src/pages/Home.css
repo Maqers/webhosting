@@ -153,21 +153,48 @@
 /* ── MOBILE: chips scroll horizontally in one row, no wrapping ─── */
 @media (max-width: 768px) {
   .hero-category-links {
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    justify-content: flex-start !important;
-    padding-bottom: 6px !important;
-    max-width: 100% !important;
-    /* Hide scrollbar but keep scroll */
+    display: flex;
+    flex-wrap: nowrap;              /* force single row */
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.5rem;
+
+    width: 100%;
+    max-width: 100%;
+
+    padding: 0 1rem 6px;
+    margin: 0;
+
+    justify-content: flex-start;
+
+    /* smooth scroll */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+
+    /* scroll snapping (feels premium like Amazon) */
+    scroll-snap-type: x mandatory;
+
+    /* hide scrollbar */
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  .hero-category-links::-webkit-scrollbar { display: none; }
 
+  .hero-category-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero-category-links::after {
+  content: '';
+  min-width: 10px;
+  }
+  
   .hero-category-chip {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
-    padding: .4rem .9rem !important;
-    font-size: .82rem !important;
+    flex: 0 0 auto;                /* 🔥 IMPORTANT: prevents shrinking */
+    scroll-snap-align: start;
+
+    white-space: nowrap;
+
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
   }
 }
