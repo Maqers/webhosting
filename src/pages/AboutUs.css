@@ -615,3 +615,213 @@
     font-size: 0.8125rem;
   }
 }
+/* ================================================================
+   ABOUT US PATCH — paste at the VERY BOTTOM of src/pages/AboutUs.css
+   Adds: stat boxes grid, verify steps timeline
+   ================================================================ */
+
+/* ── STAT BOXES ─────────────────────────────────────────────────── */
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.about-stat-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.about-stat-card:hover {
+  box-shadow: 0 4px 20px rgba(118,9,9,.1);
+  border-color: var(--primary-color);
+}
+
+.about-stat-num {
+  font-family: var(--font-family-heading);
+  font-size: 2.2rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.about-stat-num.about-stat-emoji {
+  font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif;
+  font-size: 2rem;
+}
+
+.about-stat-label {
+  font-family: var(--font-family-primary);
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.about-stat-sub {
+  font-family: var(--font-family-primary);
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  line-height: 1.45;
+  /* override the centered text from .about-section p */
+  text-align: left !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+@media (max-width: 900px) {
+  .about-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .about-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .about-stat-num { font-size: 1.75rem; }
+}
+
+/* ── VERIFY STEPS TIMELINE ──────────────────────────────────────── */
+.verify-steps {
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid var(--primary-color);
+  margin-top: 1.5rem;
+  padding-left: 0;
+}
+
+.verify-step {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1.4rem 0 1.4rem 2rem;
+  position: relative;
+}
+
+.verify-step-num {
+  font-family: var(--font-family-heading);
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  opacity: 0.22;
+  flex-shrink: 0;
+  line-height: 1;
+  min-width: 2.5rem;
+}
+
+.verify-step-body h3 {
+  font-family: var(--font-family-heading);
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+  text-align: left;
+}
+
+.verify-step-body p {
+  font-family: var(--font-family-primary);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 !important;
+  text-align: left !important;
+  max-width: none !important;
+}
+
+@media (max-width: 640px) {
+  .verify-step { padding: 1.1rem 0 1.1rem 1.25rem; gap: 1rem; }
+  .verify-step-num { font-size: 1.5rem; }
+}
+/* ================================================================
+   ABOUT US PATCH — paste at VERY BOTTOM of src/pages/AboutUs.css
+   ================================================================ */
+
+/* ── STAT BOXES ─────────────────────────────────────────────────── */
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  text-align: left;
+}
+.about-stat-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: box-shadow .2s, border-color .2s;
+}
+.about-stat-card:hover { box-shadow: 0 4px 20px rgba(118,9,9,.1); border-color: var(--primary-color); }
+.about-stat-num {
+  font-family: var(--font-family-heading);
+  font-size: 2.2rem; font-weight: var(--font-weight-bold);
+  color: var(--primary-color); line-height: 1; display: block;
+  margin-bottom: 4px;
+}
+.about-stat-num.about-stat-emoji {
+  font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif;
+  font-size: 2rem;
+}
+.about-stat-label {
+  font-family: var(--font-family-primary);
+  font-size: .95rem; font-weight: var(--font-weight-semibold);
+  color: var(--text-primary); display: block; margin-bottom: 4px;
+}
+.about-stat-sub {
+  font-family: var(--font-family-primary);
+  font-size: .8rem; color: var(--text-tertiary);
+  line-height: 1.45; display: block;
+  /* override centered text from parent */
+  text-align: left !important; margin: 0 !important; max-width: none !important;
+}
+@media (max-width: 900px) { .about-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .about-stats-grid { gap: .75rem; } }
+
+/* ── VERIFY STEPS ───────────────────────────────────────────────── */
+.verify-steps {
+  display: flex; flex-direction: column;
+  border-left: 2px solid var(--primary-color);
+  margin-top: 1.5rem;
+}
+.verify-step {
+  display: flex; gap: 1.5rem;
+  align-items: flex-start; padding: 1.4rem 0 1.4rem 2rem;
+}
+.verify-step-num {
+  font-family: var(--font-family-heading); font-size: 2rem;
+  font-weight: var(--font-weight-bold); color: var(--primary-color);
+  opacity: .22; flex-shrink: 0; line-height: 1; min-width: 2.5rem;
+}
+.verify-step-body h3 {
+  font-family: var(--font-family-heading); font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold); color: var(--text-primary);
+  margin: 0 0 .35rem; text-align: left;
+}
+.verify-step-body p {
+  font-family: var(--font-family-primary); font-size: .95rem;
+  color: var(--text-secondary); line-height: 1.65;
+  margin: 0 !important; text-align: left !important; max-width: none !important;
+}
+@media (max-width: 640px) {
+  .verify-step { padding: 1.1rem 0 1.1rem 1.25rem; gap: 1rem; }
+  .verify-step-num { font-size: 1.5rem; }
+}
+
+/* ── CATEGORIES PAGE SECTION HEADINGS ───────────────────────────── */
+.categories-section-heading { margin-bottom: 1.5rem; }
+.categories-section-heading h2 {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0 0 .25rem;
+}
+.categories-section-heading p {
+  font-family: var(--font-family-primary);
+  font-size: .95rem; color: var(--text-tertiary); margin: 0;
+}
+.category-card-emoji {
+  font-size: 2rem; line-height: 1; margin-bottom: .5rem; display: block;
+  font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif;
+}
