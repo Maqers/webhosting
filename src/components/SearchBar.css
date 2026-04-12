@@ -251,11 +251,3 @@
     border-radius: var(--radius-lg);
   }
 }
-
-/* Subtle, smaller placeholder */
-.search-input::placeholder {
-  color: var(--text-tertiary);
-  font-size: 0.78rem;
-  font-style: italic;
-  opacity: 0.7;
-}
