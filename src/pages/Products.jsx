@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, memo, useCallback } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import { getAllProducts, getSortedCategories, getProductsByCategory } from '../data/catalog'
+import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
@@ -8,22 +8,11 @@ import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
 import './Products.css'
 
-// Memoize expensive operations - cache getAllProducts result
-// let cachedAllProducts = null
 let cachedCategories = null
 let cachedCategoryMap = null
 
-// const getCachedAllProducts = () => {
-//   if (!cachedAllProducts) {
-//     cachedAllProducts = getAllProducts()
-//   }
-//   return cachedAllProducts
-// }
-
 const getCachedCategories = () => {
-  if (!cachedCategories) {
-    cachedCategories = getSortedCategories()
-  }
+  if (!cachedCategories) cachedCategories = getSortedCategories()
   return cachedCategories
 }
 
@@ -31,11 +20,8 @@ const getCachedCategoryMap = () => {
   if (!cachedCategoryMap) {
     const categories = getCachedCategories()
     cachedCategoryMap = new Map(categories.map(cat => [cat.id, cat]))
-    // Also map by name for legacy support
     categories.forEach(cat => {
-      if (!cachedCategoryMap.has(cat.name)) {
-        cachedCategoryMap.set(cat.name, cat)
-      }
+      if (!cachedCategoryMap.has(cat.name)) cachedCategoryMap.set(cat.name, cat)
     })
   }
   return cachedCategoryMap
@@ -44,95 +30,80 @@ const getCachedCategoryMap = () => {
 const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  // Multi-select: Use array to store selected category IDs
   const [selectedCategories, setSelectedCategories] = useState([])
 
-  // Get sort from URL or default
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
-
-  // Get search query or results from location state
   const searchQuery = location.state?.searchQuery
   const searchResults = location.state?.searchResults
 
-  // Memoize categories lookup
   const categories = useMemo(() => getCachedCategories(), [])
   const categoryMap = useMemo(() => getCachedCategoryMap(), [])
 
-  // Perform search if query exists
   const searchResultsData = useMemo(() => {
     if (searchQuery && searchQuery.trim().length >= 1) {
-      return searchAll(searchQuery, {
-        productLimit: 50,
-        categoryLimit: 10
-      })
+      return searchAll(searchQuery, { productLimit: 50, categoryLimit: 10 })
     }
     return null
   }, [searchQuery])
 
-  // Extract relevance scores for relevance sorting
   const relevanceScores = useMemo(() => {
     return extractRelevanceScores(searchResultsData || searchResults)
   }, [searchResultsData, searchResults])
 
-  // Filter and sort products - optimized with cached data
   const filteredProducts = useMemo(() => {
-    // When user has searched: show ONLY search results (never fall back to all products)
     const hasSearch = searchQuery && searchQuery.trim().length >= 1
+
+    // Base product list
     let filtered = hasSearch
       ? (searchResultsData?.products ?? searchResults?.products ?? [])
       : (searchResultsData?.products ?? searchResults?.products ?? getAllProducts())
 
-    // Filter by multiple categories if any are selected (OR logic - show products from ANY selected category)
+    // ── KEY FIX ──────────────────────────────────────────────────
+    // Occasion categories (e.g. "for-your-best-friend") are resolved
+    // via occasionProductMap — not by matching product.categoryId.
+    // Source categories (e.g. "Crochet") match product.categoryId directly.
     if (selectedCategories.length > 0) {
-      const selectedSet = new Set(selectedCategories) // Use Set for O(1) lookup
+      // Separate selected into occasion vs source categories
+      const occasionSelected = selectedCategories.filter(id => occasionProductMap[id])
+      const sourceSelected   = selectedCategories.filter(id => !occasionProductMap[id])
+
+      // Collect product IDs from all selected occasion categories
+      const occasionIds = new Set(
+        occasionSelected.flatMap(id => occasionProductMap[id] || [])
+      )
+      const sourceSet = new Set(sourceSelected)
+
       filtered = filtered.filter(product => {
-        if (product.categoryId) {
-          return selectedSet.has(product.categoryId)
-        }
-        // Fallback for legacy products - check category name using cached map
-        const category = categoryMap.get(product.category)
-        return category && selectedSet.has(category.id)
+        // Match via occasion map
+        if (occasionSelected.length > 0 && occasionIds.has(product.id)) return true
+        // Match via source categoryId
+        if (sourceSelected.length > 0 && sourceSet.has(product.categoryId)) return true
+        return false
       })
     }
+    // ─────────────────────────────────────────────────────────────
 
-    // Apply sorting using the sorting utility
     filtered = sortProducts(filtered, sortBy, {
       searchQuery: searchQuery || null,
       relevanceScores
     })
 
     return filtered
-  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores, categoryMap])
+  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
 
-  // Products are computed synchronously from cache, so they're ready immediately
-  // But show skeletons as fallback if somehow products aren't ready (shouldn't happen)
-  const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults
+  const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
 
-  // Handle category toggle for multi-select - memoized with useCallback
   const handleCategoryToggle = useCallback((categoryId) => {
     setSelectedCategories(prev => {
-      // If "All" is clicked, clear all selections
-      if (categoryId === 'All') {
-        return []
-      }
-      
-      // Toggle category selection
-      if (prev.includes(categoryId)) {
-        // Remove category if already selected
-        return prev.filter(id => id !== categoryId)
-      } else {
-        // Add category if not selected
-        return [...prev, categoryId]
-      }
+      if (categoryId === 'All') return []
+      if (prev.includes(categoryId)) return prev.filter(id => id !== categoryId)
+      return [...prev, categoryId]
     })
-    
-    // Reset to page 1 if pagination exists
     const newParams = new URLSearchParams(searchParams)
     newParams.delete('page')
     setSearchParams(newParams, { replace: true })
   }, [searchParams, setSearchParams])
-  
-  // Clear all selections - memoized
+
   const handleClearAll = useCallback(() => {
     setSelectedCategories([])
     const newParams = new URLSearchParams(searchParams)
@@ -140,24 +111,12 @@ const Products = () => {
     setSearchParams(newParams, { replace: true })
   }, [searchParams, setSearchParams])
 
-  // Remove Intersection Observer for animations - use CSS animations instead for better performance
-  // CSS animations are handled by CSS classes, no JS needed
-
-  // Force re-render on iPhone after sort changes to fix rendering issues
   useEffect(() => {
-    // iPhone Safari sometimes needs a forced reflow after sort/filter changes
-    // This ensures products are visible after UI interactions
     if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      // Use requestAnimationFrame to ensure DOM has updated
       requestAnimationFrame(() => {
         const productsGrid = document.querySelector('.products-grid')
-        if (productsGrid) {
-          // Force layout recalculation to fix rendering
-          void productsGrid.offsetHeight
-        }
-        // Ensure all product cards are visible
-        const productCards = document.querySelectorAll('.product-card')
-        productCards.forEach(card => {
+        if (productsGrid) void productsGrid.offsetHeight
+        document.querySelectorAll('.product-card').forEach(card => {
           card.style.visibility = 'visible'
           card.style.opacity = '1'
         })
@@ -200,18 +159,10 @@ const Products = () => {
                     aria-pressed={isSelected}
                     type="button"
                   >
-                    <span>{category.name}</span>
+                    <span>{category.emoji} {category.name}</span>
                     {isSelected && (
-                      <svg 
-                        className="check-icon" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="3"
-                        aria-hidden="true"
-                      >
+                      <svg className="check-icon" width="16" height="16" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     )}
@@ -219,9 +170,7 @@ const Products = () => {
                 )
               })}
             </div>
-            <ProductSort onSortChange={(newSort) => {
-              // Sort change is handled by URL params in ProductSort component
-            }} />
+            <ProductSort onSortChange={() => {}} />
           </div>
         </div>
       </div>
@@ -230,14 +179,11 @@ const Products = () => {
         <div className="container">
           {(searchQuery || searchResults) && (
             <div className="search-results-header">
-              <h2>
-                {searchQuery ? `Search Results for "${searchQuery}"` : 'Search Results'}
-              </h2>
+              <h2>{searchQuery ? `Search Results for "${searchQuery}"` : 'Search Results'}</h2>
               <p>{filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found</p>
             </div>
           )}
-          
-          {/* Show products immediately - they're computed synchronously from cache */}
+
           {showSkeletons ? (
             <div className="products-grid">
               {Array.from({ length: 12 }).map((_, index) => (
@@ -247,12 +193,11 @@ const Products = () => {
           ) : filteredProducts.length > 0 ? (
             <div className="products-grid">
               {filteredProducts.map((product, index) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
+                <ProductCard
+                  key={product.id}
+                  product={product}
                   index={index}
                   categoryMap={categoryMap}
-                  // Load first 12 images eagerly (above fold)
                   priority={index < 12}
                 />
               ))}
@@ -277,24 +222,21 @@ const Products = () => {
   )
 }
 
-// Memoized ProductCard to prevent unnecessary re-renders
 const ProductCard = memo(({ product, index, categoryMap, priority = false }) => {
   const location = useLocation()
-  // Memoize category lookup
   const categoryName = useMemo(() => {
     if (product.categoryId) {
       const category = categoryMap.get(product.categoryId)
-      return category ? category.name : 'Product'
+      return category ? category.name : 'Handmade Gift'
     }
-    // Fallback for legacy products
     const category = categoryMap.get(product.category)
-    return category ? category.name : (product.category || 'Product')
+    return category ? category.name : (product.category || 'Handmade Gift')
   }, [product.categoryId, product.category, categoryMap])
 
   return (
     <Link
       to={`/product/${product.id}`}
-       state={{ from: location.pathname + location.search }}
+      state={{ from: location.pathname + location.search }}
       className="product-card hover-lift hover-zoom touch-feedback"
       data-animate="scale"
       data-delay={index * 50}
@@ -320,20 +262,16 @@ const ProductCard = memo(({ product, index, categoryMap, priority = false }) => 
       </div>
     </Link>
   )
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo
-  // Only re-render if product data actually changes
-  return (
-    prevProps.product.id === nextProps.product.id &&
-    prevProps.product.title === nextProps.product.title &&
-    prevProps.product.price === nextProps.product.price &&
-    prevProps.product.images[0] === nextProps.product.images[0] &&
-    prevProps.product.popular === nextProps.product.popular &&
-    prevProps.product.categoryId === nextProps.product.categoryId &&
-    prevProps.index === nextProps.index &&
-    prevProps.priority === nextProps.priority
-  )
-})
+}, (prevProps, nextProps) => (
+  prevProps.product.id === nextProps.product.id &&
+  prevProps.product.title === nextProps.product.title &&
+  prevProps.product.price === nextProps.product.price &&
+  prevProps.product.images[0] === nextProps.product.images[0] &&
+  prevProps.product.popular === nextProps.product.popular &&
+  prevProps.product.categoryId === nextProps.product.categoryId &&
+  prevProps.index === nextProps.index &&
+  prevProps.priority === nextProps.priority
+))
 
 ProductCard.displayName = 'ProductCard'
 

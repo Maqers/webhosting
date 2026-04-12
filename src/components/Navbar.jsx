@@ -1,390 +1,196 @@
-/**
- * NAVBAR COMPONENT - MOBILE-FIRST REDESIGN
- * 
- * Senior-level, production-ready navbar implementation
- * - Mobile-first responsive design
- * - Clear hierarchy: Logo → Menu Trigger → Actions
- * - Full-screen mobile menu drawer
- * - No logo overlap or visual conflicts
- * - Accessibility-first approach
- */
-
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import EnhancedSearchBar from './EnhancedSearchBar'
 import { getSortedCategories } from '../data/catalog'
 import './Navbar.css'
 
+const OCCASION_CATEGORIES = [
+  { id: 'for-your-best-friend',  name: 'For Your Best Friend',    slug: 'for-your-best-friend',  emoji: '🫂' },
+  { id: 'for-your-partner',      name: 'For Your Partner',         slug: 'for-your-partner',       emoji: '💕' },
+  { id: 'situationship',         name: 'For Your Situationship',   slug: 'situationship',           emoji: '🫠' },
+  { id: 'self-love-kits',        name: 'Self-Love Kits',           slug: 'self-love-kits',          emoji: '🌸' },
+  { id: 'breakup-hampers',       name: 'Breakup Hampers',          slug: 'breakup-hampers',         emoji: '🫶' },
+  { id: 'late-night-cravings',   name: 'Midnight Crisis Gifts',    slug: 'late-night-cravings',     emoji: '🌙' },
+  { id: 'the-main-character',    name: 'Main Character Energy',    slug: 'the-main-character',      emoji: '✨' },
+  { id: 'for-your-work-friend',  name: 'For Your Work Friend',     slug: 'for-your-work-friend',    emoji: '☕' },
+  { id: 'for-your-mom',          name: 'For Your Mom',             slug: 'for-your-mom',            emoji: '🌷' },
+  { id: 'for-your-dad',          name: 'For Your Dad',             slug: 'for-your-dad',            emoji: '🫡' },
+  { id: 'for-your-sibling',      name: 'For Your Sibling',         slug: 'for-your-sibling',        emoji: '👀' },
+  { id: 'the-host-gift',         name: 'The Host Gift',            slug: 'the-host-gift',           emoji: '🥂' },
+  { id: 'occasion-gifts',        name: 'Occasion Gifts',           slug: 'occasion-gifts',          emoji: '🎉' },
+]
+
+const PRODUCT_CATEGORIES = [
+  { id: 'Crochet',              name: 'Handmade Crochet',     slug: 'Crochet'              },
+  { id: 'Candles',              name: 'Candles & Diffusers',  slug: 'Candles'              },
+  { id: 'Handbags',             name: 'Handbags & Totes',     slug: 'Handbags'             },
+  { id: 'Frames&Paintings',     name: 'Frames & Paintings',   slug: 'Frames&Paintings'     },
+  { id: 'Home-decor',           name: 'Home Decor',           slug: 'Home-decor'           },
+  { id: 'resin-products',       name: 'Resin Products',       slug: 'resin-products'       },
+  { id: 'Handmade-Accessories', name: 'Jewellery & Accessories', slug: 'Handmade-Accessories' },
+  { id: 'Customised-Hampers',   name: 'Customised Hampers',   slug: 'Customised-Hampers'   },
+  { id: 'Handmade-Soaps',       name: 'Handmade Soaps',       slug: 'Handmade-Soaps'       },
+]
+
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [isOpen, setIsOpen]           = useState(false)
+  const [scrolled, setScrolled]       = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
-  const [categoriesPanelOpen, setCategoriesPanelOpen] = useState(false)
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [mobileOccasionOpen, setMobileOccasionOpen] = useState(false)
+  const [mobileProductOpen, setMobileProductOpen]   = useState(false)
+
+  const location  = useLocation()
+  const navigate  = useNavigate()
   const navbarRef = useRef(null)
-  const menuRef = useRef(null)
-  const categoriesRef = useRef(null)
-  const categoriesTimeoutRef = useRef(null)
-  const firstMenuItemRef = useRef(null)
-  const lastMenuItemRef = useRef(null)
-  const previousActiveElementRef = useRef(null)
-  const categories = getSortedCategories()
+  const menuRef   = useRef(null)
+  const catRef    = useRef(null)
+  const catTimerRef = useRef(null)
+  const firstItemRef = useRef(null)
+  const prevActiveRef = useRef(null)
 
-  const isActive = (path) => location.pathname === path
-
-  const isCategoryActive = (categorySlug) => {
-    return location.pathname === `/category/${categorySlug}` ||
-      location.pathname.startsWith(`/category/${categorySlug}/`)
-  }
-
-  const isProductsActive = () => {
-    return location.pathname === '/products' ||
-      location.pathname.startsWith('/product/')
-  }
+  const isActive    = (path) => location.pathname === path
+  const isCatActive = (slug) => location.pathname === `/category/${slug}` || location.pathname.startsWith(`/category/${slug}/`)
+  const isProductsActive = () => location.pathname === '/products' || location.pathname.startsWith('/product/')
 
   const handleSearch = useCallback((results) => {
-    // Prevent navigation if already on products page with same query
-    if (location.pathname === '/products' && results?.query) {
-      // Just update state without navigation to prevent throttling
-      return
-    }
-    
-    if (results && results.query) {
-      navigate('/products', {
-        state: {
-          searchQuery: results.query,
-          searchResults: results
-        },
-        replace: false
-      })
-    } else if (results && results.hasResults) {
-      navigate('/products', { 
-        state: { searchResults: results },
-        replace: false
-      })
-    }
+    if (location.pathname === '/products' && results?.query) return
+    if (results?.query) navigate('/products', { state: { searchQuery: results.query, searchResults: results } })
+    else if (results?.hasResults) navigate('/products', { state: { searchResults: results } })
     setIsOpen(false)
   }, [navigate, location.pathname])
 
   const closeMenu = useCallback(() => {
-    setIsOpen(false)
-    setCategoriesPanelOpen(false)
-    setCategoriesOpen(false)
+    setIsOpen(false); setCategoriesOpen(false)
+    setMobileOccasionOpen(false); setMobileProductOpen(false)
   }, [])
 
-  const openCategoriesPanel = useCallback(() => {
-    setCategoriesPanelOpen(true)
-  }, [])
-
-  const closeCategoriesPanel = useCallback(() => {
-    setCategoriesPanelOpen(false)
-  }, [])
-
-  // Close categories panel when mobile menu closes
   useEffect(() => {
-    if (!isOpen) {
-      setCategoriesPanelOpen(false)
-    }
-  }, [isOpen])
-
-  // Handle scroll behavior for navbar shadow enhancement
-  useEffect(() => {
-    let lastScrollY = window.scrollY
-    let ticking = false
-
-    const updateScrollState = () => {
-      const currentScrollY = window.scrollY
-      setScrolled(currentScrollY > 10)
-      lastScrollY = currentScrollY
-      ticking = false
-    }
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateScrollState)
-        ticking = true
-      }
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    let t = false
+    const fn = () => { if (!t) { window.requestAnimationFrame(() => { setScrolled(window.scrollY > 10); t = false }); t = true } }
+    window.addEventListener('scroll', fn, { passive: true })
+    return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  // Prevent body scroll and blur page content when mobile menu is open
   useEffect(() => {
     if (isOpen) {
-      // Store current scroll position
-      const scrollY = window.scrollY
-      const rootElement = document.getElementById('root')
-
-      // Prevent body scroll
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.width = '100%'
-      document.body.classList.add('menu-open')
-
-      // Add blur class to root for page content blurring
-      if (rootElement) {
-        rootElement.classList.add('menu-open-blur')
-      }
-
-      // Store previously active element for focus restoration
-      previousActiveElementRef.current = document.activeElement
-
-      // Focus first menu item after animation starts
-      setTimeout(() => {
-        if (firstMenuItemRef.current) {
-          firstMenuItemRef.current.focus()
-        }
-      }, 150)
+      const y = window.scrollY, root = document.getElementById('root')
+      document.body.style.position = 'fixed'; document.body.style.top = `-${y}px`
+      document.body.style.width = '100%'; document.body.classList.add('menu-open')
+      if (root) root.classList.add('menu-open-blur')
+      prevActiveRef.current = document.activeElement
+      setTimeout(() => firstItemRef.current?.focus(), 150)
     } else {
-      // Restore scroll position
-      const scrollY = document.body.style.top
-      const rootElement = document.getElementById('root')
-
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      document.body.classList.remove('menu-open')
-
-      // Remove blur class from root
-      if (rootElement) {
-        rootElement.classList.remove('menu-open-blur')
-      }
-
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1)
-      }
-
-      // Restore focus to previously active element
-      if (previousActiveElementRef.current) {
-        previousActiveElementRef.current.focus()
-      }
+      const y = document.body.style.top, root = document.getElementById('root')
+      document.body.style.position = ''; document.body.style.top = ''
+      document.body.style.width = ''; document.body.classList.remove('menu-open')
+      if (root) root.classList.remove('menu-open-blur')
+      if (y) window.scrollTo(0, parseInt(y || '0') * -1)
+      prevActiveRef.current?.focus()
     }
     return () => {
-      const rootElement = document.getElementById('root')
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      document.body.classList.remove('menu-open')
-      if (rootElement) {
-        rootElement.classList.remove('menu-open-blur')
-      }
+      const root = document.getElementById('root')
+      document.body.style.position = ''; document.body.style.top = ''
+      document.body.style.width = ''; document.body.classList.remove('menu-open')
+      if (root) root.classList.remove('menu-open-blur')
     }
   }, [isOpen])
 
-  // Focus trap and keyboard navigation for mobile menu and categories panel
-  useEffect(() => {
-    if (!isOpen && !categoriesPanelOpen) return
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        if (categoriesPanelOpen) {
-          closeCategoriesPanel()
-        } else {
-        closeMenu()
-        }
-        return
-      }
-
-      // Focus trap: Tab key navigation
-      if (event.key === 'Tab') {
-        const currentPanel = categoriesPanelOpen 
-          ? document.querySelector('.categories-panel-content')
-          : menuRef.current
-        
-        const focusableElements = currentPanel?.querySelectorAll(
-          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-
-        if (!focusableElements || focusableElements.length === 0) return
-
-        const firstElement = focusableElements[0]
-        const lastElement = focusableElements[focusableElements.length - 1]
-
-        if (event.shiftKey) {
-          // Shift + Tab: going backwards
-          if (document.activeElement === firstElement) {
-            event.preventDefault()
-            lastElement.focus()
-          }
-        } else {
-          // Tab: going forwards
-          if (document.activeElement === lastElement) {
-            event.preventDefault()
-            firstElement.focus()
-          }
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, categoriesPanelOpen, closeMenu, closeCategoriesPanel])
-
-  // Close menu on outside click
   useEffect(() => {
     if (!isOpen) return
-
-    const handleClickOutside = (event) => {
-      if (
-        navbarRef.current &&
-        !navbarRef.current.contains(event.target) &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
-        closeMenu()
+    const fn = (e) => {
+      if (e.key === 'Escape') { closeMenu(); return }
+      if (e.key === 'Tab') {
+        const els = menuRef.current?.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')
+        if (!els?.length) return
+        const first = els[0], last = els[els.length - 1]
+        if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus() } }
+        else { if (document.activeElement === last) { e.preventDefault(); first.focus() } }
       }
     }
-
-    // Use capture phase to catch clicks before they bubble
-    document.addEventListener('mousedown', handleClickOutside, true)
-    return () => document.removeEventListener('mousedown', handleClickOutside, true)
+    document.addEventListener('keydown', fn)
+    return () => document.removeEventListener('keydown', fn)
   }, [isOpen, closeMenu])
 
-  // Handle categories dropdown outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categoriesRef.current && !categoriesRef.current.contains(event.target)) {
-        // Clear any pending timeout
-        if (categoriesTimeoutRef.current) {
-          clearTimeout(categoriesTimeoutRef.current)
-          categoriesTimeoutRef.current = null
-        }
-        setCategoriesOpen(false)
-      }
-    }
+    if (!isOpen) return
+    const fn = (e) => { if (navbarRef.current && !navbarRef.current.contains(e.target) && menuRef.current && !menuRef.current.contains(e.target)) closeMenu() }
+    document.addEventListener('mousedown', fn, true)
+    return () => document.removeEventListener('mousedown', fn, true)
+  }, [isOpen, closeMenu])
 
-    if (categoriesOpen) {
-      // Use capture phase to catch clicks before they bubble
-      document.addEventListener('mousedown', handleClickOutside, true)
-      return () => document.removeEventListener('mousedown', handleClickOutside, true)
-    }
+  useEffect(() => {
+    if (!categoriesOpen) return
+    const fn = (e) => { if (catRef.current && !catRef.current.contains(e.target)) { if (catTimerRef.current) clearTimeout(catTimerRef.current); setCategoriesOpen(false) } }
+    document.addEventListener('mousedown', fn, true)
+    return () => document.removeEventListener('mousedown', fn, true)
   }, [categoriesOpen])
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (categoriesTimeoutRef.current) {
-        clearTimeout(categoriesTimeoutRef.current)
-      }
-    }
-  }, [])
+  useEffect(() => () => { if (catTimerRef.current) clearTimeout(catTimerRef.current) }, [])
 
-  // Menu items configuration
   const menuItems = [
-    { path: '/', label: 'Home' },
-    { path: '/about', label: 'About' },
-    { path: '/faqs', label: 'FAQs' },
-    { path: '/contact', label: 'Contact Us' }
+    { path: '/',        label: 'Home'       },
+    { path: '/about',   label: 'About'      },
+    { path: '/faqs',    label: 'FAQs'       },
+    { path: '/contact', label: 'Contact Us' },
   ]
 
   return (
     <>
-      <nav
-        className={`navbar ${scrolled ? 'scrolled' : ''} ${isOpen ? 'menu-open-search-hidden' : ''}`}
-        ref={navbarRef}
-        role="navigation"
-        aria-label="Main navigation"
-      >
-        <div className={`navbar-container ${isOpen ? 'menu-open-search-hidden' : ''}`}>
-          {/* Top Row: Logo + Hamburger (Mobile) / Logo + Products/Categories + Menu (Desktop) */}
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} ref={navbarRef} role="navigation" aria-label="Main navigation">
+        <div className="navbar-container">
           <div className="navbar-top-row">
-            {/* Left Section: Logo + Products/Categories */}
+
+            {/* LEFT: Logo + desktop categories */}
             <div className="navbar-left-section">
-              {/* Logo - Always left-aligned */}
-              <Link
-                to="/"
-                className="navbar-logo"
-                onClick={closeMenu}
-                aria-label="Home"
-              >
+              <Link to="/" className="navbar-logo" onClick={closeMenu} aria-label="Home">
                 <span className="logo-text">maqers.in</span>
               </Link>
 
-              {/* Products & Categories Dropdown - Beside Logo (Desktop Only) */}
-              <div className="navbar-products-categories" ref={categoriesRef}>
-                {/* All Products Link */}
-                <Link
-                  to="/products"
-                  className={`navbar-dropdown-trigger ${isProductsActive() ? 'active' : ''}`}
-                  onMouseEnter={() => setCategoriesOpen(false)}
-                >
+              {/* Desktop dropdown — hidden on mobile via CSS */}
+              <div className="navbar-products-categories" ref={catRef}>
+                <Link to="/products" className={`navbar-dropdown-trigger ${isProductsActive() ? 'active' : ''}`} onMouseEnter={() => setCategoriesOpen(false)}>
                   All Products
                 </Link>
-
-                {/* Categories Dropdown */}
                 <div
                   className="navbar-dropdown-wrapper"
-                  onMouseEnter={() => {
-                    if (categoriesTimeoutRef.current) {
-                      clearTimeout(categoriesTimeoutRef.current)
-                      categoriesTimeoutRef.current = null
-                    }
-                    setCategoriesOpen(true)
-                  }}
-                  onMouseLeave={() => {
-                    categoriesTimeoutRef.current = setTimeout(() => {
-                      setCategoriesOpen(false)
-                    }, 150)
-                  }}
+                  onMouseEnter={() => { if (catTimerRef.current) { clearTimeout(catTimerRef.current); catTimerRef.current = null } setCategoriesOpen(true) }}
+                  onMouseLeave={() => { catTimerRef.current = setTimeout(() => setCategoriesOpen(false), 150) }}
                 >
                   <button
-                    className={`navbar-dropdown-trigger ${location.pathname.startsWith('/category/') || location.pathname === '/categories' ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setCategoriesOpen(!categoriesOpen)
-                    }}
-                    aria-expanded={categoriesOpen}
-                    aria-haspopup="true"
-                    type="button"
+                    className={`navbar-dropdown-trigger ${location.pathname.startsWith('/category/') ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCategoriesOpen(!categoriesOpen) }}
+                    aria-expanded={categoriesOpen} aria-haspopup="true" type="button"
                   >
                     Categories
-                    <svg
-                      className={`dropdown-arrow ${categoriesOpen ? 'open' : ''}`}
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                    >
-                      <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg className={`dropdown-arrow ${categoriesOpen ? 'open' : ''}`} width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
-
                   {categoriesOpen && (
                     <div
-                      className="navbar-dropdown-menu"
-                      onMouseEnter={() => {
-                        // Keep open when hovering over dropdown
-                        if (categoriesTimeoutRef.current) {
-                          clearTimeout(categoriesTimeoutRef.current)
-                          categoriesTimeoutRef.current = null
-                        }
-                      }}
-                      onMouseLeave={() => {
-                        // Close when leaving dropdown
-                        categoriesTimeoutRef.current = setTimeout(() => {
-                          setCategoriesOpen(false)
-                        }, 150)
-                      }}
-                      >
-                      {/* Show all categories directly - no "View All Categories" button */}
-                      <div className="navbar-categories-list">
-                        {categories.map((category, index) => (
-                        <Link
-                          key={category.id}
-                          to={`/category/${category.slug}`}
-                            className={`navbar-dropdown-item navbar-category-item ${isCategoryActive(category.slug) ? 'active' : ''}`}
-                            onClick={() => {
-                              setCategoriesOpen(false)
-                            }}
-                            style={{ '--delay': `${index * 0.03}s` }}
-                        >
-                            <span>{category.name}</span>
-                        </Link>
-                      ))}
+                      className="navbar-dropdown-menu navbar-dropdown-menu--wide"
+                      onMouseEnter={() => { if (catTimerRef.current) { clearTimeout(catTimerRef.current); catTimerRef.current = null } }}
+                      onMouseLeave={() => { catTimerRef.current = setTimeout(() => setCategoriesOpen(false), 150) }}
+                    >
+                      <div className="navbar-dropdown-two-col">
+                        <div className="navbar-dropdown-col">
+                          <div className="navbar-dropdown-col-heading">Shop by Occasion</div>
+                          {OCCASION_CATEGORIES.map((cat) => (
+                            <Link key={cat.id} to={`/category/${cat.slug}`} className={`navbar-dropdown-item navbar-category-item ${isCatActive(cat.slug) ? 'active' : ''}`} onClick={() => setCategoriesOpen(false)}>
+                              <span className="navbar-cat-emoji">{cat.emoji}</span><span>{cat.name}</span>
+                            </Link>
+                          ))}
+                        </div>
+                        <div className="navbar-dropdown-divider" />
+                        <div className="navbar-dropdown-col">
+                          <div className="navbar-dropdown-col-heading">Shop by Product</div>
+                          {PRODUCT_CATEGORIES.map((cat) => (
+                            <Link key={cat.id} to={`/category/${cat.slug}`} className={`navbar-dropdown-item navbar-category-item ${isCatActive(cat.slug) ? 'active' : ''}`} onClick={() => setCategoriesOpen(false)}>
+                              <span>{cat.name}</span>
+                            </Link>
+                          ))}
+                          <Link to="/categories" className="navbar-dropdown-view-all" onClick={() => setCategoriesOpen(false)}>View all →</Link>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -392,193 +198,91 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Center Section: Search Bar (Desktop) */}
+            {/* CENTER: Desktop search */}
             <div className="navbar-center-section navbar-search-desktop">
               <EnhancedSearchBar onSearch={handleSearch} />
             </div>
 
-            {/* Right Section: Menu + Hamburger */}
+            {/* MOBILE: inline search — sits between logo and hamburger */}
+            <div className="navbar-mobile-search-inline">
+              <EnhancedSearchBar onSearch={handleSearch} />
+            </div>
+
+            {/* RIGHT: Desktop nav links + hamburger */}
             <div className="navbar-right-section">
-              {/* Desktop Menu */}
               <div className="navbar-menu-desktop">
                 {menuItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`navbar-link ${isActive(item.path) ? 'active' : ''}`}
-                  >
-                    {item.label}
-                  </Link>
+                  <Link key={item.path} to={item.path} className={`navbar-link ${isActive(item.path) ? 'active' : ''}`}>{item.label}</Link>
                 ))}
               </div>
-
-              {/* Mobile Menu Toggle Button */}
-              <button
-                className={`navbar-toggle ${isOpen ? 'active' : ''}`}
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label={isOpen ? 'Close menu' : 'Open menu'}
-                aria-expanded={isOpen}
-                aria-controls="mobile-menu"
-                type="button"
-              >
-                <span className="hamburger-line"></span>
-                <span className="hamburger-line"></span>
-                <span className="hamburger-line"></span>
+              <button className={`navbar-toggle ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? 'Close menu' : 'Open menu'} aria-expanded={isOpen} type="button">
+                <span className="hamburger-line"/><span className="hamburger-line"/><span className="hamburger-line"/>
               </button>
             </div>
           </div>
-
-          {/* Mobile Search Bar Section - Below Logo/Hamburger Row */}
-          <div className={`navbar-mobile-search-section ${isOpen ? 'hidden' : ''}`}>
-            <EnhancedSearchBar onSearch={handleSearch} />
-          </div>
+          {/* No second row — search is inline on mobile now */}
         </div>
       </nav>
 
-      {/* Mobile Menu Backdrop */}
-      <div
-        className={`navbar-menu-backdrop ${isOpen ? 'active' : ''}`}
-        onClick={closeMenu}
-        aria-hidden="true"
-      />
+      <div className={`navbar-menu-backdrop ${isOpen ? 'active' : ''}`} onClick={closeMenu} aria-hidden="true" />
 
-      {/* Mobile Menu Drawer */}
-      <div
-        id="mobile-menu"
-        ref={menuRef}
-        className={`navbar-menu-mobile ${isOpen ? 'active' : ''}`}
-        aria-hidden={!isOpen}
-        role="dialog"
-        aria-modal={isOpen}
-        aria-label="Mobile navigation menu"
-        style={{ display: isOpen ? 'flex' : 'none' }}
-      >
+      {/* Mobile drawer */}
+      <div id="mobile-menu" ref={menuRef} className={`navbar-menu-mobile ${isOpen ? 'active' : ''}`} aria-hidden={!isOpen} role="dialog" aria-modal={isOpen} style={{ display: isOpen ? 'flex' : 'none' }}>
         <div className="mobile-menu-header">
           <div className="mobile-menu-header-content">
-          {/* Logo at top-left */}
-          <Link
-            to="/"
-            className="mobile-menu-logo"
-            onClick={closeMenu}
-            aria-label="Home"
-          >
-            <span className="logo-text">maqers.in</span>
-          </Link>
-          <button
-            className="mobile-menu-close"
-            onClick={closeMenu}
-            aria-label="Close menu"
-            type="button"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu Content - Scrollable */}
-        <nav className="mobile-menu-nav" aria-label="Mobile navigation">
-          {/* All Menu Items in Order: Home, All Products, Categories, About, FAQs, Contact Us */}
-          <div className="mobile-menu-items">
-            {/* Home */}
-            <Link
-              to="/"
-              className={`mobile-menu-link ${isActive('/') ? 'active' : ''}`}
-              onClick={closeMenu}
-              tabIndex={isOpen ? 0 : -1}
-            >
-              Home
-            </Link>
-
-            {/* All Products */}
-            <Link
-              to="/products"
-              className={`mobile-menu-link ${isProductsActive() ? 'active' : ''}`}
-              onClick={closeMenu}
-              tabIndex={isOpen ? 0 : -1}
-            >
-              All Products
-            </Link>
-
-            {/* Categories */}
-            <Link
-              to="/categories"
-              className={`mobile-menu-link ${location.pathname === '/categories' || location.pathname.startsWith('/category/') ? 'active' : ''}`}
-              onClick={closeMenu}
-              tabIndex={isOpen ? 0 : -1}
-            >
-              Categories
-            </Link>
-
-            {/* About, FAQs, Contact Us */}
-            {menuItems.filter(item => item.path !== '/').map((item, index) => (
-              <Link
-                key={item.path}
-                ref={index === 0 ? firstMenuItemRef : null}
-                to={item.path}
-                className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`}
-                onClick={closeMenu}
-                tabIndex={isOpen ? 0 : -1}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
-      </div>
-
-      {/* Categories Panel - Separate Slide-in Modal */}
-      <div
-        className={`categories-panel ${categoriesPanelOpen ? 'active' : ''}`}
-        aria-hidden={!categoriesPanelOpen}
-        role="dialog"
-        aria-modal={categoriesPanelOpen}
-        aria-label="Categories"
-      >
-        <div className="categories-panel-backdrop" onClick={closeCategoriesPanel} aria-hidden="true" />
-        <div className="categories-panel-content">
-          <div className="categories-panel-header">
-            <h2 className="categories-panel-title">All Categories</h2>
-            <button
-              className="categories-panel-close"
-              onClick={closeCategoriesPanel}
-              aria-label="Close categories"
-              type="button"
-            >
+            <Link to="/" className="mobile-menu-logo" onClick={closeMenu}><span className="logo-text">maqers.in</span></Link>
+            <button className="mobile-menu-close" onClick={closeMenu} type="button" aria-label="Close menu">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
-          <div className="categories-panel-list">
-            {categories.map((category, index) => (
-                <Link
-                  key={category.id}
-                  to={`/category/${category.slug}`}
-                className={`categories-panel-item ${isCategoryActive(category.slug) ? 'active' : ''}`}
-                onClick={() => {
-                  closeCategoriesPanel()
-                  closeMenu()
-                }}
-                style={{ '--delay': `${index * 0.02}s` }}
-                >
-                <span className="categories-panel-item-name">{category.name}</span>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className="categories-panel-item-arrow"
-                >
-                  <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                </Link>
-              ))}
-            </div>
+        </div>
+
+        <nav className="mobile-menu-nav" aria-label="Mobile navigation">
+          <div className="mobile-menu-items">
+            <Link ref={firstItemRef} to="/" className={`mobile-menu-link ${isActive('/') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>Home</Link>
+            <Link to="/products" className={`mobile-menu-link ${isProductsActive() ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>All Products</Link>
+
+            {/* Accordion: Shop by Occasion */}
+            <button type="button" className="mobile-accordion-trigger" onClick={() => setMobileOccasionOpen(o => !o)} aria-expanded={mobileOccasionOpen}>
+              <span>Shop by Occasion</span>
+              <svg className={`mobile-accordion-arrow ${mobileOccasionOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 14 14" fill="none">
+                <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            {mobileOccasionOpen && (
+              <div className="mobile-accordion-content">
+                {OCCASION_CATEGORIES.map((cat) => (
+                  <Link key={cat.id} to={`/category/${cat.slug}`} className={`mobile-accordion-item ${isCatActive(cat.slug) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>
+                    <span className="mobile-acc-emoji">{cat.emoji}</span>{cat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Accordion: Shop by Product */}
+            <button type="button" className="mobile-accordion-trigger" onClick={() => setMobileProductOpen(o => !o)} aria-expanded={mobileProductOpen}>
+              <span>Shop by Product</span>
+              <svg className={`mobile-accordion-arrow ${mobileProductOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 14 14" fill="none">
+                <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            {mobileProductOpen && (
+              <div className="mobile-accordion-content">
+                {PRODUCT_CATEGORIES.map((cat) => (
+                  <Link key={cat.id} to={`/category/${cat.slug}`} className={`mobile-accordion-item ${isCatActive(cat.slug) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {menuItems.filter(i => i.path !== '/').map((item) => (
+              <Link key={item.path} to={item.path} className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>{item.label}</Link>
+            ))}
           </div>
+        </nav>
       </div>
     </>
   )

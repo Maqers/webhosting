@@ -1,16 +1,3 @@
-/**
- * ENHANCED SEARCH BAR COMPONENT
- * 
- * Senior-level search implementation with:
- * - Product-only search (no categories in dropdown)
- * - Proper regex validation for search queries
- * - Enhanced focus management
- * - Keyboard navigation (arrow keys, enter, escape)
- * - Text highlighting
- * - Clean dropdown UI
- * - Professional UX
- */
-
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { searchProducts, highlightMatch } from '../utils/search'
@@ -19,615 +6,188 @@ import ImageWithFallback from './ImageWithFallback'
 import './SearchBar.css'
 
 const EnhancedSearchBar = ({ onSearch }) => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showResults, setShowResults] = useState(false)
+  const [searchQuery, setSearchQuery]     = useState('')
+  const [showResults, setShowResults]     = useState(false)
   const [searchResults, setSearchResults] = useState(null)
   const [selectedIndex, setSelectedIndex] = useState(-1)
-  const [isLoading, setIsLoading] = useState(false)
 
-  const navigate = useNavigate()
-  const location = useLocation()
-  const inputRef = useRef(null)
+  const navigate   = useNavigate()
+  const location   = useLocation()
+  const inputRef   = useRef(null)
   const resultsRef = useRef(null)
-  const debounceTimerRef = useRef(null)
-  const previousPathnameRef = useRef(location.pathname)
+  const timerRef   = useRef(null)
+  const prevPathRef = useRef(location.pathname)
 
-  /**
-   * Validate and sanitize search query using regex
-   * Only allows alphanumeric characters, spaces, hyphens, and common punctuation
-   * Removes invalid characters and excessive whitespace
-   */
-  const validateAndSanitizeQuery = useCallback((query) => {
-    if (!query) return ''
-
-    // Remove leading/trailing whitespace
-    let sanitized = query.trim()
-
-    // Remove any characters that could cause regex issues or are invalid
-    // Allow: letters, numbers, spaces, hyphens, apostrophes, and common punctuation
-    sanitized = sanitized.replace(/[^\w\s\-'.,!?]/gi, '')
-
-    // Replace multiple spaces with single space
-    sanitized = sanitized.replace(/\s+/g, ' ')
-
-    // Limit query length to prevent performance issues
-    if (sanitized.length > 100) {
-      sanitized = sanitized.substring(0, 100).trim()
-    }
-
-    return sanitized
+  const sanitize = useCallback((q) => {
+    if (!q) return ''
+    return q.trim().replace(/[^\w\s\-'.,!?]/gi, '').replace(/\s+/g, ' ').substring(0, 100)
   }, [])
 
-  /**
-   * Check if query is valid for searching
-   * Minimum 1 character, must contain at least one letter or number
-   */
-  const isValidQuery = useCallback((query) => {
-    if (!query || query.trim().length < 1) return false
+  const isValid = useCallback((q) => q && q.trim().length >= 1 && /[\w]/.test(q), [])
 
-    // Must contain at least one alphanumeric character
-    const hasValidChars = /[\w]/.test(query.trim())
-
-    return hasValidChars
-  }, [])
-
-  /**
-   * Perform search with debouncing and validation
-   * Enhanced debouncing: 300ms delay for better UX and performance
-   * Only searches products (no categories in dropdown)
-   */
-  const performSearch = useCallback((query) => {
-    // Validate and sanitize query
-    const sanitizedQuery = validateAndSanitizeQuery(query)
-
-    if (!isValidQuery(sanitizedQuery)) {
-      setSearchResults(null)
-      setShowResults(false)
-      if (onSearch) {
-        onSearch({ products: [], all: [], totalResults: 0, hasResults: false })
-      }
-      return
-    }
-
-    setIsLoading(true)
-
-    // Clear existing debounce timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    // Enhanced debouncing: 300ms delay for smoother UX
-    debounceTimerRef.current = setTimeout(() => {
+  // Updates dropdown suggestions only — never navigates
+  const updateSuggestions = useCallback((q) => {
+    const sq = sanitize(q)
+    if (!isValid(sq)) { setSearchResults(null); setShowResults(false); return }
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
       try {
-        // Only search products, not categories
-        const productResults = searchProducts(sanitizedQuery, {
-          limit: 10, // Show more products since we're not showing categories
-          minScore: 5 // Higher threshold for better quality results
-        })
+        const prods = searchProducts(sq, { limit: 10, minScore: 5 })
+        setSearchResults({ products: prods, all: prods, totalResults: prods.length, hasResults: prods.length > 0, query: sq })
+        setShowResults(true); setSelectedIndex(-1)
+      } catch { setSearchResults(null) }
+    }, 150)
+  }, [sanitize, isValid])
 
-        // Format results to match expected structure
-        const results = {
-          products: productResults,
-          all: productResults, // Only products in dropdown
-          totalResults: productResults.length,
-          hasResults: productResults.length > 0,
-          query: sanitizedQuery
-        }
+  // Navigate — only on explicit Enter or result click
+  const executeSearch = useCallback((q) => {
+    const sq = sanitize(q)
+    if (!isValid(sq)) return
+    const prods = searchProducts(sq, { limit: 50, minScore: 3 })
+    const results = { products: prods, all: prods, totalResults: prods.length, hasResults: prods.length > 0, query: sq }
+    navigate('/products', { state: { searchQuery: sq, searchResults: results }, replace: location.pathname === '/products' })
+    setShowResults(false)
+    if (onSearch) onSearch(results)
+  }, [sanitize, isValid, navigate, location.pathname, onSearch])
 
-        setSearchResults(results)
-        setShowResults(true)
-        setSelectedIndex(-1)
-        setIsLoading(false)
-
-        // Focus management: ensure input stays focused
-        if (inputRef.current && document.activeElement !== inputRef.current) {
-          inputRef.current.focus()
-        }
-
-        if (onSearch) {
-          onSearch(results)
-        }
-      } catch (error) {
-        console.error('Search error:', error)
-        setIsLoading(false)
-        setSearchResults({ products: [], all: [], totalResults: 0, hasResults: false })
-        if (onSearch) {
-          onSearch({ products: [], all: [], totalResults: 0, hasResults: false })
-        }
-      }
-    }, 300) // 300ms debounce for optimal performance and UX
-  }, [onSearch, validateAndSanitizeQuery, isValidQuery])
-
-  /**
-   * Handle input change with validation
-   */
   const handleInputChange = (e) => {
-    const value = e.target.value
-    const sanitized = validateAndSanitizeQuery(value)
-    setSearchQuery(sanitized)
-    performSearch(sanitized)
+    const v = sanitize(e.target.value)
+    setSearchQuery(v); updateSuggestions(v)
   }
 
-  /**
-   * Handle keyboard navigation with improved focus management
-   */
+  const handleResultClick = (item) => {
+    navigate(`/product/${item.id}`)
+    setShowResults(false); setSearchQuery(''); setSelectedIndex(-1)
+    setTimeout(() => inputRef.current?.blur(), 100)
+  }
+
   const handleKeyDown = (e) => {
-    if (!searchResults || !showResults) {
-      // Allow normal typing if dropdown is closed
-      return
-    }
-
-    const allResults = searchResults.all || []
-    const maxIndex = allResults.length - 1
-
+    const all = searchResults?.all || []
     switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault()
-        e.stopPropagation()
-        if (maxIndex >= 0) {
-          const newIndex = selectedIndex < maxIndex ? selectedIndex + 1 : 0
-          setSelectedIndex(newIndex)
-          // Ensure focus stays on input for better UX
-          inputRef.current?.focus()
-        }
-        break
-
-      case 'ArrowUp':
-        e.preventDefault()
-        e.stopPropagation()
-        if (maxIndex >= 0) {
-          const newIndex = selectedIndex > 0 ? selectedIndex - 1 : maxIndex
-          setSelectedIndex(newIndex)
-          // Ensure focus stays on input for better UX
-          inputRef.current?.focus()
-        }
-        break
-
+      case 'ArrowDown': e.preventDefault(); if (all.length) setSelectedIndex(i => i < all.length - 1 ? i + 1 : 0); break
+      case 'ArrowUp':   e.preventDefault(); if (all.length) setSelectedIndex(i => i > 0 ? i - 1 : all.length - 1); break
       case 'Enter':
         e.preventDefault()
-        e.stopPropagation()
-        if (selectedIndex >= 0 && allResults[selectedIndex]) {
-          handleResultClick(allResults[selectedIndex])
-        } else if (isValidQuery(searchQuery)) {
-          // Navigate to search results page with validated query
-          const sanitizedQuery = validateAndSanitizeQuery(searchQuery)
-          // Only navigate if not already on products page
-          if (location.pathname !== '/products') {
-            navigate('/products', {
-              state: { searchQuery: sanitizedQuery },
-              replace: false
-            })
-          }
-          setShowResults(false)
-        }
+        if (selectedIndex >= 0 && all[selectedIndex]) handleResultClick(all[selectedIndex])
+        else if (isValid(searchQuery)) executeSearch(searchQuery)
         break
-
-      case 'Escape':
-        e.preventDefault()
-        e.stopPropagation()
-        setShowResults(false)
-        setSelectedIndex(-1)
-        // Keep focus on input for better UX
-        inputRef.current?.focus()
-        break
-
-      default:
-        break
+      case 'Escape': e.preventDefault(); setShowResults(false); setSelectedIndex(-1); break
+      default: break
     }
   }
 
-  /**
-   * Handle result click - only products now
-   */
-  const handleResultClick = (item) => {
-    // Only handle products (categories removed from dropdown)
-    if (item._type === 'product' || !item._type) {
-      // Navigate to product page
-      navigate(`/product/${item.id}`)
-    }
-
-    // Close dropdown and reset state
-    setShowResults(false)
-    setSearchQuery('')
-    setSelectedIndex(-1)
-
-    // Maintain focus for better UX
-    setTimeout(() => {
-      inputRef.current?.blur()
-    }, 100)
-  }
-
-  /**
-   * Clear search with focus management
-   */
   const handleClear = () => {
-    setSearchQuery('')
-    setSearchResults(null)
-    setShowResults(false)
-    setSelectedIndex(-1)
-    if (onSearch) {
-      onSearch({ products: [], all: [], totalResults: 0, hasResults: false })
-    }
-    // Maintain focus on input for better UX
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 0)
+    setSearchQuery(''); setSearchResults(null); setShowResults(false); setSelectedIndex(-1)
+    if (onSearch) onSearch({ products: [], all: [], totalResults: 0, hasResults: false })
+    setTimeout(() => inputRef.current?.focus(), 0)
   }
 
-  /**
-   * Handle form submit with validation
-   */
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const sanitizedQuery = validateAndSanitizeQuery(searchQuery)
+  const handleSubmit = (e) => { e.preventDefault(); executeSearch(searchQuery) }
 
-    if (isValidQuery(sanitizedQuery)) {
-      // Perform search and navigate with results (products only)
-      const productResults = searchProducts(sanitizedQuery, {
-        limit: 50,
-        minScore: 3
-      })
-
-      const results = {
-        products: productResults,
-        all: productResults,
-        totalResults: productResults.length,
-        hasResults: productResults.length > 0,
-        query: sanitizedQuery
-      }
-
-      // Always use navigate so React Router gets new state and Products page re-renders with correct results
-      navigate('/products', {
-        state: {
-          searchQuery: sanitizedQuery,
-          searchResults: results
-        },
-        replace: location.pathname === '/products'
-      })
-
-      setShowResults(false)
-      if (onSearch) {
-        onSearch(results)
-      }
-    }
-  }
-
-  /**
-   * Close results when clicking outside
-   * Enhanced: Also handle scroll and resize events
-   * Prevent body scroll when dropdown is open on mobile
-   * Improved focus management
-   */
+  // Outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        resultsRef.current &&
-        !resultsRef.current.contains(event.target) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target)
-      ) {
-        setShowResults(false)
-        setSelectedIndex(-1)
-        // Maintain focus on input if it was focused
-        if (document.activeElement === inputRef.current ||
-          inputRef.current.contains(document.activeElement)) {
-          inputRef.current.focus()
-        }
+    if (!showResults) return
+    const fn = (e) => {
+      if (resultsRef.current && !resultsRef.current.contains(e.target) && inputRef.current && !inputRef.current.contains(e.target)) {
+        setShowResults(false); setSelectedIndex(-1)
       }
     }
-
-    const handleResize = () => {
-      // Recalculate dropdown position on resize
-      if (showResults && resultsRef.current) {
-        // Trigger reflow to ensure correct positioning
-        const wasVisible = resultsRef.current.style.display !== 'none'
-        resultsRef.current.style.display = 'none'
-        setTimeout(() => {
-          if (resultsRef.current && wasVisible) {
-            resultsRef.current.style.display = ''
-          }
-        }, 0)
-      }
-    }
-
-    // Prevent body scroll when dropdown is open on mobile
-    if (showResults) {
-      const originalOverflow = document.body.style.overflow
-      const isMobile = window.matchMedia('(max-width: 768px)').matches
-
-      if (isMobile) {
-        // Prevent body scroll but allow dropdown scroll
-        document.body.style.overflow = 'hidden'
-      }
-
-      // Ensure input maintains focus when dropdown is open
-      if (inputRef.current && document.activeElement !== inputRef.current) {
-        inputRef.current.focus()
-      }
-
-      document.addEventListener('mousedown', handleClickOutside, true)
-      window.addEventListener('resize', handleResize)
-
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside, true)
-        window.removeEventListener('resize', handleResize)
-        if (isMobile) {
-          document.body.style.overflow = originalOverflow
-        }
-      }
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside, true)
-      window.removeEventListener('resize', handleResize)
-    }
+    document.addEventListener('mousedown', fn, true)
+    return () => document.removeEventListener('mousedown', fn, true)
   }, [showResults])
 
-  /**
-   * Clear search bar when navigating to different pages
-   * This ensures the search query doesn't persist when user changes pages
-   */
+  // Clear on route change
   useEffect(() => {
-    // Only clear if pathname actually changed (not on initial mount or same page)
-    if (previousPathnameRef.current !== location.pathname) {
-      // Clear search state when location changes
-      setSearchQuery('')
-      setSearchResults(null)
-      setShowResults(false)
-      setSelectedIndex(-1)
-
-      // Clear any pending debounce timers
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-        debounceTimerRef.current = null
-      }
-
-      // Update previous pathname
-      previousPathnameRef.current = location.pathname
+    if (prevPathRef.current !== location.pathname) {
+      setSearchQuery(''); setSearchResults(null); setShowResults(false); setSelectedIndex(-1)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      prevPathRef.current = location.pathname
     }
-    // Removed onSearch callback to prevent infinite loop
-    // Parent component doesn't need to be notified on every route change
-  }, [location.pathname]) // Only depend on pathname, not onSearch
+  }, [location.pathname])
 
-  /**
-   * Scroll selected item into view
-   */
+  // Scroll selected item
   useEffect(() => {
     if (selectedIndex >= 0 && resultsRef.current) {
-      const selectedElement = resultsRef.current.querySelector(
-        `[data-index="${selectedIndex}"]`
-      )
-      if (selectedElement) {
-        selectedElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest'
-        })
-      }
+      const el = resultsRef.current.querySelector(`[data-index="${selectedIndex}"]`)
+      el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   }, [selectedIndex])
 
-  /**
-   * Calculate and update dropdown position dynamically
-   * Ensures dropdown aligns with search input and appears above all elements
-   */
+  // Dropdown position
   useEffect(() => {
     if (!showResults || !resultsRef.current || !inputRef.current) return
-
-    const updatePosition = () => {
-      const input = inputRef.current
-      const dropdown = resultsRef.current
-      const container = input?.closest('.search-bar-container')
-
-      if (!input || !dropdown || !container) return
-
-      const inputRect = input.getBoundingClientRect()
-      const containerRect = container.getBoundingClientRect()
-      const scrollY = window.scrollY || window.pageYOffset
-
-      // Calculate position: below search input, aligned with container
-      let topPosition = inputRect.bottom + 8 // 8px gap below input
-      let leftPosition = containerRect.left
-      let containerWidth = containerRect.width
-
-      // Ensure dropdown doesn't go off-screen
-      const isMobile = window.matchMedia('(max-width: 768px)').matches
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-
-      // Adjust left position if dropdown would overflow right edge
-      if (leftPosition + containerWidth > viewportWidth - 8) {
-        leftPosition = Math.max(8, viewportWidth - containerWidth - 8)
-      }
-
-      // Ensure minimum left margin on mobile
-      if (isMobile && leftPosition < 8) {
-        leftPosition = 8
-        containerWidth = Math.min(containerWidth, viewportWidth - 16)
-      }
-
-      // Adjust width to fit viewport
-      const maxWidth = isMobile
-        ? Math.min(containerWidth, viewportWidth - 16) // 16px padding
-        : Math.min(containerWidth, 700) // Max 700px on desktop
-
-      // Ensure dropdown doesn't overflow bottom of viewport
-      const dropdownMaxHeight = parseInt(getComputedStyle(dropdown).maxHeight) || 400
-      const availableHeight = viewportHeight - topPosition - 8 // 8px bottom margin
-      if (availableHeight < dropdownMaxHeight) {
-        dropdown.style.maxHeight = `${Math.max(200, availableHeight)}px`
-      } else {
-        dropdown.style.maxHeight = ''
-      }
-
-      dropdown.style.top = `${topPosition}px`
-      dropdown.style.left = `${leftPosition}px`
-      dropdown.style.width = `${maxWidth}px`
-      dropdown.style.maxWidth = `${maxWidth}px`
+    const update = () => {
+      const inp = inputRef.current, drop = resultsRef.current
+      const container = inp?.closest('.search-bar-container')
+      if (!inp || !drop || !container) return
+      const iRect = inp.getBoundingClientRect(), cRect = container.getBoundingClientRect()
+      const vw = window.innerWidth, isMobile = vw <= 768
+      let left = cRect.left, width = cRect.width
+      if (left + width > vw - 8) left = Math.max(8, vw - width - 8)
+      if (isMobile && left < 8) { left = 8; width = Math.min(width, vw - 16) }
+      const maxW = isMobile ? Math.min(width, vw - 16) : Math.min(width, 700)
+      drop.style.top = `${iRect.bottom + 8}px`; drop.style.left = `${left}px`
+      drop.style.width = `${maxW}px`; drop.style.maxWidth = `${maxW}px`
     }
-
-    // Initial position calculation
-    const timeoutId = setTimeout(updatePosition, 0)
-
-    // Update on scroll and resize
-    window.addEventListener('scroll', updatePosition, true)
-    window.addEventListener('resize', updatePosition)
-
-    return () => {
-      clearTimeout(timeoutId)
-      window.removeEventListener('scroll', updatePosition, true)
-      window.removeEventListener('resize', updatePosition)
-    }
+    const id = setTimeout(update, 0)
+    window.addEventListener('scroll', update, true); window.addEventListener('resize', update)
+    return () => { clearTimeout(id); window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update) }
   }, [showResults, searchQuery])
 
-  const allResults = searchResults?.all || []
-  const hasResults = searchResults?.hasResults || allResults.length > 0
+  const all = searchResults?.all || []
   const hasQuery = searchQuery.trim().length >= 1
 
   return (
     <div className="search-bar-container">
-      <form onSubmit={handleSubmit} className="search-form">
+      {/* Form exists for Enter-key semantics — no submit button rendered */}
+      <form onSubmit={handleSubmit} className="search-form search-form--no-btn">
         <div className="search-input-wrapper">
-          <svg
-            className="search-icon"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
+          <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
-
           <input
-            ref={inputRef}
-            type="text"
-            className="search-input"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            onFocus={() => {
-              if (hasQuery && searchResults) {
-                setShowResults(true)
-                // Ensure focus is maintained
-                inputRef.current?.focus()
-              }
-            }}
-            aria-label="Search products"
-            aria-expanded={showResults}
-            aria-controls="search-results"
-            autoComplete="off"
+            ref={inputRef} type="text" className="search-input"
+            placeholder="Search…" value={searchQuery}
+            onChange={handleInputChange} onKeyDown={handleKeyDown}
+            onFocus={() => { if (hasQuery && searchResults) setShowResults(true) }}
+            aria-label="Search products" aria-expanded={showResults}
+            aria-controls="search-results" autoComplete="off"
           />
-
-          {isLoading && (
-            <div className="search-loading" aria-label="Searching">
-              <div className="search-spinner"></div>
-            </div>
-          )}
-
-          {searchQuery && !isLoading && (
-            <button
-              type="button"
-              className="clear-search"
-              onClick={handleClear}
-              aria-label="Clear search"
-            >
-              ×
-            </button>
+          {searchQuery && (
+            <button type="button" className="clear-search" onClick={handleClear} aria-label="Clear search">×</button>
           )}
         </div>
-
-        <button
-          type="submit"
-          className="search-submit-btn"
-          aria-label="Submit search"
-        >
-          Search
-        </button>
+        {/* No submit button */}
       </form>
 
-      {/* Search Results Dropdown */}
       {showResults && hasQuery && (
-        <div
-          id="search-results"
-          ref={resultsRef}
-          className="search-suggestions"
-          role="listbox"
-          aria-label="Search results"
-        >
-          {hasResults ? (
-            <>
-              {/* Products Only Section - No Categories */}
-              {searchResults.products.length > 0 && (
-                <div className="search-results-section">
-                  <div className="search-results-header">
-                    Products ({searchResults.products.length})
-                  </div>
-                  {searchResults.products.map((product, idx) => {
-                    const globalIndex = allResults.indexOf(product)
-                    return (
-                      <div
-                        key={product.id}
-                        data-index={globalIndex}
-                        className={`suggestion-item ${selectedIndex === globalIndex ? 'selected' : ''
-                          }`}
-                        onClick={() => handleResultClick(product)}
-                        role="option"
-                        aria-selected={selectedIndex === globalIndex}
-                        tabIndex={-1}
-                      >
-                        <ImageWithFallback
-                          src={product.images[0]}
-                          alt={product.title}
-                          className="suggestion-image"
-                        />
-                        <div className="suggestion-info">
-                          <div
-                            className="suggestion-title"
-                            dangerouslySetInnerHTML={{
-                              __html: highlightMatch(product.title, searchQuery)
-                            }}
-                          />
-                          <div className="suggestion-meta">
-                            <span>{(() => {
-                              // Get category name from categoryId
-                              if (product.categoryId) {
-                                const category = categories.find(cat => cat.id === product.categoryId)
-                                return category ? category.name : 'Product'
-                              }
-                              // Fallback for legacy products
-                              return product.category || 'Product'
-                            })()}</span>
-                            <span>•</span>
-                            <span>₹{product.price}</span>
-                          </div>
-                        </div>
+        <div id="search-results" ref={resultsRef} className="search-suggestions" role="listbox" aria-label="Search results">
+          {searchResults?.hasResults ? (
+            <div className="search-results-section">
+              <div className="search-results-header">Products ({searchResults.products.length})</div>
+              {searchResults.products.map((product) => {
+                const idx = all.indexOf(product)
+                return (
+                  <div key={product.id} data-index={idx} className={`suggestion-item ${selectedIndex === idx ? 'selected' : ''}`} onClick={() => handleResultClick(product)} role="option" aria-selected={selectedIndex === idx} tabIndex={-1}>
+                    <ImageWithFallback src={product.images[0]} alt={product.title} className="suggestion-image" />
+                    <div className="suggestion-info">
+                      <div className="suggestion-title" dangerouslySetInnerHTML={{ __html: highlightMatch(product.title, searchQuery) }} />
+                      <div className="suggestion-meta">
+                        <span>{(() => { const cat = categories.find(c => c.id === product.categoryId); return cat?.name || product.category || 'Product' })()}</span>
+                        <span>•</span><span>₹{product.price}</span>
                       </div>
-                    )
-                  })}
-                </div>
-              )}
-            </>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           ) : (
             <div className="search-empty-state">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
-              <p>No results found for "{searchQuery}"</p>
+              <p>No results for "{searchQuery}"</p>
               <p className="search-empty-hint">Try different keywords or browse categories</p>
-              <div className="search-suggestions-help">
-                <p className="search-help-title">Search tips:</p>
-                <ul className="search-help-list">
-                  <li>Try synonyms (e.g., "house" for home decor)</li>
-                  <li>Use singular or plural forms</li>
-                  <li>Check spelling or try shorter keywords</li>
-                  <li>Browse categories to discover products</li>
-                </ul>
-              </div>
             </div>
           )}
         </div>
