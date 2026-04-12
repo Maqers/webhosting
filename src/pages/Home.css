@@ -180,34 +180,59 @@
     white-space: nowrap;
   }
 
-  /* 🔥 Scroll Buttons */
+  /* 🔥 EDGE FADE (premium look) */
+  .hero-category-wrapper::before,
+  .hero-category-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-category-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(26,23,20,1), transparent);
+  }
+
+  .hero-category-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(26,23,20,1), transparent);
+  }
+
+  /* 🔥 BUTTONS (now inside fade area, not over chips) */
   .scroll-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
 
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
 
     border: none;
+    border-radius: 50%;
+
     background: rgba(0,0,0,0.6);
     color: white;
-    font-size: 18px;
+    font-size: 16px;
 
     display: flex;
     align-items: center;
     justify-content: center;
-
-    cursor: pointer;
   }
 
   .scroll-btn.left {
-    left: 5px;
+    left: 6px;
   }
 
   .scroll-btn.right {
-    right: 5px;
+    right: 6px;
   }
+}
+
+.scroll-btn {
+  display: none;
 }

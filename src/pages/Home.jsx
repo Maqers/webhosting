@@ -13,14 +13,19 @@ const Home = () => {
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
-    if (!scrollRef.current) return;
+  const el = scrollRef.current
+  if (!el) return
 
-    const scrollAmount = 150;
-    scrollRef.current.scrollBy({
-      left: direction === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth",
-    });
-  };
+  const maxScroll = el.scrollWidth - el.clientWidth
+
+  if (direction === "left") {
+    if (el.scrollLeft <= 0) return   // ✅ stop at start
+    el.scrollBy({ left: -150, behavior: "smooth" })
+  } else {
+    if (el.scrollLeft >= maxScroll) return   // ✅ stop at end
+    el.scrollBy({ left: 150, behavior: "smooth" })
+  }
+}
   return (
     <div className="home">
       <section
