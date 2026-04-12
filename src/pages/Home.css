@@ -152,29 +152,21 @@
 
 /* ── MOBILE: chips scroll horizontally in one row, no wrapping ─── */
 @media (max-width: 768px) {
+
+  .hero-category-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
   .hero-category-links {
     display: flex;
-    flex-wrap: nowrap;              /* force single row */
     overflow-x: auto;
-    overflow-y: hidden;
     gap: 0.5rem;
 
-    width: 100%;
-    max-width: 100%;
-
-    padding: 0 1rem 6px;
-    margin: 0;
-
-    justify-content: flex-start;
-
-    /* smooth scroll */
-    -webkit-overflow-scrolling: touch;
+    padding: 0 2.5rem; /* space for buttons */
     scroll-behavior: smooth;
 
-    /* scroll snapping (feels premium like Amazon) */
-    scroll-snap-type: x mandatory;
-
-    /* hide scrollbar */
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
@@ -183,18 +175,39 @@
     display: none;
   }
 
-  .hero-category-links::after {
-  content: '';
-  min-width: 10px;
-  }
-  
   .hero-category-chip {
-    flex: 0 0 auto;                /* 🔥 IMPORTANT: prevents shrinking */
-    scroll-snap-align: start;
-
+    flex: 0 0 auto;
     white-space: nowrap;
+  }
 
-    padding: 0.45rem 1rem;
-    font-size: 0.85rem;
+  /* 🔥 Scroll Buttons */
+  .scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+
+    border: none;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+  }
+
+  .scroll-btn.left {
+    left: 5px;
+  }
+
+  .scroll-btn.right {
+    right: 5px;
   }
 }
