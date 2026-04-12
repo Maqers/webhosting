@@ -72,10 +72,7 @@
 .hero-category-chip:hover { background: var(--secondary-color); color: var(--primary-color); border-color: var(--secondary-color); transform: translateY(-1px); }
 .hero-category-chip.all:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
 
-/* Scroll arrow buttons — NEVER shown on desktop */
-.scroll-btn {
-  display: none !important;
-}
+/* Scroll arrows — desktop handled via @media(min-width:769px) below */
 
 /* ── MOBILE ONLY ───────────────────────────────────────────────── */
 /* Extra insurance: hide on tablet/desktop */
@@ -118,31 +115,38 @@
     font-size: .83rem;
   }
 
-  /* Arrow buttons */
+  /* Arrow buttons row — sits BELOW the chips, centered */
+  .scroll-arrows {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 8px;
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
+
   .scroll-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 1.5px solid rgba(255,255,255,.5);
-    background: rgba(0,0,0,.35);
+    background: rgba(0,0,0,.4);
     color: white;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
     padding: 0;
     outline: none;
     -webkit-tap-highlight-color: transparent;
-    /* invisible until needed */
     opacity: 0;
     pointer-events: none;
     transition: opacity .2s;
   }
 
-  /* Show arrow only when scrollable in that direction */
   .scroll-btn.visible {
     opacity: 1;
     pointer-events: auto;
@@ -150,7 +154,7 @@
 
   .scroll-btn:active {
     background: rgba(255,255,255,.25);
-    transform: scale(.9);
+    transform: scale(.92);
   }
 }
 
