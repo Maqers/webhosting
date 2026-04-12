@@ -12,19 +12,20 @@ const Home = () => {
   const categories = useMemo(() => getSortedCategories(), []);
   const scrollRef = useRef(null);
 
-  const scroll = (direction) => {
+  const scroll = (dir) => {
   const el = scrollRef.current
   if (!el) return
 
-  const maxScroll = el.scrollWidth - el.clientWidth
+  const max = el.scrollWidth - el.clientWidth
+  const step = 200
 
-  if (direction === "left") {
-    if (el.scrollLeft <= 0) return   // ✅ stop at start
-    el.scrollBy({ left: -150, behavior: "smooth" })
-  } else {
-    if (el.scrollLeft >= maxScroll) return   // ✅ stop at end
-    el.scrollBy({ left: 150, behavior: "smooth" })
-  }
+  let next = dir === "left"
+    ? el.scrollLeft - step
+    : el.scrollLeft + step
+
+  next = Math.max(0, Math.min(next, max))
+
+  el.scrollTo({ left: next, behavior: "smooth" })
 }
   return (
     <div className="home">

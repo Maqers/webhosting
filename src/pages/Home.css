@@ -75,26 +75,6 @@
 }
 .trust-divider { width: 1px; height: 38px; background: rgba(255,255,255,.08); flex-shrink: 0; }
 @media (max-width: 900px) { .trust-item { padding: .6rem 1.25rem; } }
-@media (max-width: 768px) {
-  .hero-category-links {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    justify-content: flex-start;
-    padding-bottom: 6px;
-
-    /* smooth scroll */
-    -webkit-overflow-scrolling: touch;
-
-    /* optional: smooth programmatic scroll */
-    scroll-behavior: smooth;
-  }
-
-  .hero-category-chip {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-}
 
 /* ── SHARED UTILITIES ──────────────────────────────────────────── */
 .section-eyebrow { font-family: var(--font-family-primary); font-size: .82rem; font-weight: var(--font-weight-semibold); letter-spacing: .12em; text-transform: uppercase; color: var(--primary-color); margin: 0 0 .4rem; }
@@ -153,18 +133,14 @@
 /* ── MOBILE: chips scroll horizontally in one row, no wrapping ─── */
 @media (max-width: 768px) {
 
-  .hero-category-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
   .hero-category-links {
-    display: flex;
+    flex-wrap: nowrap;              /* 🔥 single row */
     overflow-x: auto;
-    gap: 0.5rem;
+    justify-content: flex-start;
 
-    padding: 0 2.5rem; /* space for buttons */
+    padding: 0 2.5rem;
+
+    -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 
     -ms-overflow-style: none;
@@ -180,59 +156,31 @@
     white-space: nowrap;
   }
 
-  /* 🔥 EDGE FADE (premium look) */
-  .hero-category-wrapper::before,
-  .hero-category-wrapper::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 40px;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .hero-category-wrapper::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(26,23,20,1), transparent);
-  }
-
-  .hero-category-wrapper::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(26,23,20,1), transparent);
-  }
-
-  /* 🔥 BUTTONS (now inside fade area, not over chips) */
   .scroll-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-
-    width: 28px;
-    height: 28px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: rgba(0,0,0,0.6);
-    color: white;
-    font-size: 16px;
-
     display: flex;
+    position: absolute;
+    top: 60%;
+    transform: translateY(-50%);
+    z-index: 5;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 18px;
+
     align-items: center;
     justify-content: center;
   }
 
-  .scroll-btn.left {
-    left: 6px;
-  }
+  .scroll-btn.left { left: 8px; }
+  .scroll-btn.right { right: 8px; }
 
-  .scroll-btn.right {
-    right: 6px;
+  .hero-banner {
+    position: relative; /* anchor buttons */
   }
-}
-
-.scroll-btn {
-  display: none;
 }
