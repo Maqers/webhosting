@@ -1,29 +1,102 @@
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { getPopularProducts, getSortedCategories } from '../data/catalog'
-import ImageWithFallback from '../components/ImageWithFallback'
-import './Home.css'
+import { useMemo, useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { getPopularProducts, getSortedCategories } from "../data/catalog";
+import ImageWithFallback from "../components/ImageWithFallback";
+import "./Home.css";
 
-import heroBg from '../assets/images/hero/slide1.png'
+import heroBg from "../assets/images/hero/slide1.png";
 
 const Home = () => {
-  const popularProducts = useMemo(() => getPopularProducts(), [])
-  const categories      = useMemo(() => getSortedCategories(), [])
+  const popularProducts = useMemo(() => getPopularProducts(), []);
+  const categories = useMemo(() => getSortedCategories(), []);
+  const scrollRef = useRef(null);
+  const [canLeft, setCanLeft]   = useState(false);
+  const [canRight, setCanRight] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const checkEdges = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 2);
+    setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const checkAll = () => {
+      setIsMobile(window.innerWidth <= 768);
+      checkEdges();
+    };
+    checkAll();
+    el.addEventListener("scroll", checkEdges, { passive: true });
+    window.addEventListener("resize", checkAll);
+    return () => {
+      el.removeEventListener("scroll", checkEdges);
+      window.removeEventListener("resize", checkAll);
+    };
+  }, []);
+
+  const scroll = (dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const next = Math.max(0, Math.min(el.scrollLeft + dir * 160, max));
+    el.scrollTo({ left: next, behavior: "smooth" });
+  };
 
   return (
     <div className="home">
-
-      <section className="hero-banner" style={{ backgroundImage: `url(${heroBg})` }}>
+      <section
+        className="hero-banner"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      >
         <div className="hero-banner-content">
-          <h1 className="hero-banner-title">Custom Gifts from Indian Home Businesses</h1>
-          <p className="hero-banner-subtitle">Handcrafted with love, delivered with care</p>
-          <div className="hero-category-links">
-            <Link to="/products" className="hero-category-chip all">All Products</Link>
-            {categories.map((category) => (
-              <Link key={category.id} to={`/category/${category.slug || category.name}`} className="hero-category-chip">
-                {category.name}
+          <h1 className="hero-banner-title">
+            Custom Gifts from Indian Home Businesses
+          </h1>
+          <p className="hero-banner-subtitle">
+            Handcrafted with love, delivered with care
+          </p>
+
+          {/* Wrapper — only visible on mobile */}
+          <div className="hero-category-wrapper">
+            {isMobile && (
+              <button
+                className={`scroll-btn left${canLeft ? " visible" : ""}`}
+                onClick={() => scroll(-1)}
+                aria-label="Scroll left"
+                type="button"
+              >
+                ‹
+              </button>
+            )}
+
+            <div className="hero-category-links" ref={scrollRef}>
+              <Link to="/products" className="hero-category-chip all">
+                All Products
               </Link>
-            ))}
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  to={`/category/${category.slug || category.name}`}
+                  className="hero-category-chip"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+
+            {isMobile && (
+              <button
+                className={`scroll-btn right${canRight ? " visible" : ""}`}
+                onClick={() => scroll(1)}
+                aria-label="Scroll right"
+                type="button"
+              >
+                ›
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -81,24 +154,33 @@ const Home = () => {
           </div>
         </div>
       </section>
-
     </div>
-  )
-}
+  );
+};
 
 const ProductCard = ({ product, index }) => (
-  <Link to={`/product/${product.id}`} className="product-card hover-lift hover-zoom touch-feedback" style={{ '--i': index }}>
+  <Link
+    to={`/product/${product.id}`}
+    className="product-card hover-lift hover-zoom touch-feedback"
+    style={{ "--i": index }}
+  >
     <div className="product-image-container">
-      <ImageWithFallback src={product.images[0]} alt={product.title} className="product-image" loading="lazy" />
+      <ImageWithFallback
+        src={product.images[0]}
+        alt={product.title}
+        className="product-image"
+        loading="lazy"
+      />
       {product.popular && <div className="popular-badge">Popular</div>}
     </div>
     <div className="product-info">
       <h3 className="product-title">{product.title}</h3>
-      <p className="product-id">Product ID: {product.id}</p>
       <p className="product-category">{product.category}</p>
-      <div className="product-meta"><span className="product-price">₹{product.price}</span></div>
+      <div className="product-meta">
+        <span className="product-price">₹{product.price}</span>
+      </div>
     </div>
   </Link>
-)
+);
 
-export default Home
+export default Home;

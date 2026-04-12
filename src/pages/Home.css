@@ -35,7 +35,30 @@
   font-size: clamp(1rem, 2.2vw, 1.25rem);
   color: rgba(255,255,255,.88); margin-bottom: var(--spacing-lg); line-height: 1.6;
 }
-.hero-category-links { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; max-width: 720px; margin: 0 auto; }
+
+/* ── CHIP WRAPPER + CHIPS ──────────────────────────────────────── */
+
+/* Desktop: wrapper is transparent, arrows hidden */
+.hero-category-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  gap: 0;
+}
+
+/* Desktop: chips wrap normally */
+.hero-category-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
 .hero-category-chip {
   display: inline-flex; align-items: center; justify-content: center;
   padding: .55rem 1.3rem; border-radius: 9999px;
@@ -43,20 +66,95 @@
   text-decoration: none; transition: all .3s cubic-bezier(.4,0,.2,1);
   background: white; color: var(--primary-color); border: 1.5px solid white;
   white-space: nowrap; min-height: 38px; box-shadow: 0 2px 8px rgba(0,0,0,.1);
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent; flex-shrink: 0;
 }
 .hero-category-chip.all { background: var(--primary-color); color: white; font-weight: var(--font-weight-semibold); }
 .hero-category-chip:hover { background: var(--secondary-color); color: var(--primary-color); border-color: var(--secondary-color); transform: translateY(-1px); }
 .hero-category-chip.all:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
-@media (max-width: 640px) {
+
+/* Scroll arrow buttons — NEVER shown on desktop */
+.scroll-btn {
+  display: none !important;
+}
+
+/* ── MOBILE ONLY ───────────────────────────────────────────────── */
+/* Extra insurance: hide on tablet/desktop */
+@media (min-width: 769px) {
+  .scroll-btn { display: none !important; }
+}
+
+@media (max-width: 768px) {
   .hero-banner { padding: 2rem 0 1.75rem; }
   .hero-banner-content { padding: 1.25rem 1rem 1.5rem; }
   .hero-banner-title { font-size: clamp(1.4rem, 6vw, 1.9rem); }
   .hero-banner-subtitle { font-size: clamp(.95rem, 3vw, 1.1rem); margin-bottom: var(--spacing-md); }
-  .hero-category-chip { padding: .45rem 1rem; font-size: .88rem; }
+
+  /* Wrapper: row with arrows on each side */
+  .hero-category-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  /* Chips: single scrollable row */
+  .hero-category-links {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    /* no scrollbar — arrows do the job */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 4px 0;
+  }
+  .hero-category-links::-webkit-scrollbar { display: none; }
+
+  .hero-category-chip {
+    padding: .42rem .95rem;
+    font-size: .83rem;
+  }
+
+  /* Arrow buttons */
+  .scroll-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,.5);
+    background: rgba(0,0,0,.35);
+    color: white;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    /* invisible until needed */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+
+  /* Show arrow only when scrollable in that direction */
+  .scroll-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .scroll-btn:active {
+    background: rgba(255,255,255,.25);
+    transform: scale(.9);
+  }
 }
 
-/* ── TRUST BAR — legible fonts ─────────────────────────────────── */
+/* ── TRUST BAR ─────────────────────────────────────────────────── */
 .trust-bar { background: #1a1714; padding: 1.4rem 0; }
 .trust-bar-inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
 .trust-item { display: flex; align-items: center; gap: 13px; padding: .6rem 2rem; flex: 1; min-width: 180px; }
@@ -105,8 +203,12 @@
 
 /* ── POPULAR PRODUCTS ─────────────────────────────────────────── */
 .popular-section { background: var(--bg-secondary); padding: var(--spacing-2xl) 0; }
+@media (max-width: 768px) {
+  .popular-section { padding: var(--spacing-xl) 0; }
+  .section-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-sm); }
+}
 
-/* ── CTA — both buttons red ────────────────────────────────────── */
+/* ── CTA ───────────────────────────────────────────────────────── */
 .home-cta-section { background: #1a1714; padding: 3rem 0; text-align: center; }
 .home-cta-content { max-width: 600px; margin: 0 auto; padding: 0 var(--spacing-lg); }
 .home-cta-content h2 {
@@ -125,9 +227,7 @@
   padding: .7rem 1.6rem; font-family: var(--font-family-primary);
   font-weight: var(--font-weight-semibold); font-size: .95rem;
   border-radius: var(--radius-lg); text-decoration: none;
-  /* Both buttons: red background, white text */
-  background: var(--primary-color) !important;
-  color: #fff !important;
+  background: var(--primary-color) !important; color: #fff !important;
   border: 1.5px solid var(--primary-color) !important;
   transition: background .2s, transform .2s;
 }
@@ -137,37 +237,6 @@
   .home-cta-buttons { flex-direction: column; align-items: center; }
   .home-cta-btn { width: 100%; }
 }
-@media (max-width: 768px) {
-  .popular-section { padding: var(--spacing-xl) 0; }
-  .section-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-sm); }
-}
 
-/* ── MOBILE SEARCH: narrower ───────────────────────────────────── */
-@media (max-width: 768px) {
-  .navbar-mobile-search-section .search-bar-container {
-    max-width: 85% !important;
-    margin: 0 auto !important;
-  }
-}
-
-/* ── MOBILE: chips scroll horizontally in one row, no wrapping ─── */
-@media (max-width: 768px) {
-  .hero-category-links {
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    justify-content: flex-start !important;
-    padding-bottom: 6px !important;
-    max-width: 100% !important;
-    /* Hide scrollbar but keep scroll */
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .hero-category-links::-webkit-scrollbar { display: none; }
-
-  .hero-category-chip {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
-    padding: .4rem .9rem !important;
-    font-size: .82rem !important;
-  }
-}
+/* ── Product ID hidden everywhere ──────────────────────────────── */
+.product-id { display: none !important; }
