@@ -60,44 +60,37 @@ const Home = () => {
           </p>
 
           {/* Wrapper — only visible on mobile */}
-          <div className="hero-category-wrapper">
-            {isMobile && (
+          <div className="hero-category-links" ref={scrollRef}>
+            <Link to="/products" className="hero-category-chip all">
+              All Products
+            </Link>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                to={`/category/${category.slug || category.name}`}
+                className="hero-category-chip"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+
+          {isMobile && (
+            <div className="scroll-arrows">
               <button
                 className={`scroll-btn left${canLeft ? " visible" : ""}`}
                 onClick={() => scroll(-1)}
                 aria-label="Scroll left"
                 type="button"
-              >
-                ‹
-              </button>
-            )}
-
-            <div className="hero-category-links" ref={scrollRef}>
-              <Link to="/products" className="hero-category-chip all">
-                All Products
-              </Link>
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={`/category/${category.slug || category.name}`}
-                  className="hero-category-chip"
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-
-            {isMobile && (
+              >‹</button>
               <button
                 className={`scroll-btn right${canRight ? " visible" : ""}`}
                 onClick={() => scroll(1)}
                 aria-label="Scroll right"
                 type="button"
-              >
-                ›
-              </button>
-            )}
-          </div>
+              >›</button>
+            </div>
+          )}
         </div>
       </section>
 
