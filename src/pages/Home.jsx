@@ -40,7 +40,9 @@ const Home = () => {
   const scroll = (dir) => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * 180, behavior: "smooth" });
+    const max = el.scrollWidth - el.clientWidth;
+    const next = Math.max(0, Math.min(el.scrollLeft + dir * 160, max));
+    el.scrollTo({ left: next, behavior: "smooth" });
   };
 
   return (
