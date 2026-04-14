@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy } from 'react'
+import { useEffect, Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -7,7 +7,6 @@ import PageLoader from './components/PageLoader'
 import { initScrollAnimations, cleanupScrollAnimations } from './utils/scrollAnimations'
 import './App.css'
 
-// Lazy load routes for code splitting and faster initial load
 const Home = lazy(() => import('./pages/Home'))
 const Products = lazy(() => import('./pages/Products'))
 const Categories = lazy(() => import('./pages/Categories'))
@@ -15,8 +14,8 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const FAQs = lazy(() => import('./pages/FAQs'))
 const Contact = lazy(() => import('./pages/Contact'))
+const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 
-// Loading fallback component
 const RouteLoadingFallback = () => (
   <div style={{ 
     display: 'flex', 
@@ -34,14 +33,9 @@ function AppContent() {
   const location = useLocation()
 
   useEffect(() => {
-    // Initialize enhanced scroll animations
     const observers = initScrollAnimations()
-
-    // Scroll to top on route change
     window.scrollTo({ top: 0, behavior: 'smooth' })
-
     return () => {
-      // Cleanup observers
       cleanupScrollAnimations(observers)
     }
   }, [location.pathname])
@@ -60,6 +54,7 @@ function AppContent() {
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/admin" element={<AdminPortal />} />
         </Routes>
       </Suspense>
       <Footer />
