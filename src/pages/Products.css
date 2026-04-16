@@ -181,10 +181,6 @@
   z-index: 1;
 }
 
-.product-card:active {
-  transform: translateY(-2px) scale(1.005);
-  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
 /* ============================================================================
    PRODUCT IMAGE — consistent square container, contain on mobile
