@@ -45,6 +45,8 @@ export const productsByCategory = {
     { id: 109, categoryId: "Candles", title: "Royal White Musk Soy Candle", slug: "royal-white-musk-soy-candle", description: "Experience understated luxury with the Royal White Musk Candle, crafted to bring a sense of calm sophistication and quiet elegance to your space. Infused with the soft, sensual notes of white musk, this candle offers a clean and refined fragrance that lingers beautifully without overpowering. Its smooth, powdery aroma creates a serene ambience—perfect for unwinding after a long day or elevating your everyday surroundings. Housed in a sleek matte black jar with a wooden lid, this candle embodies modern minimalism with a royal touch—making it a statement piece for any décor style.", price: 599, images: ["/images/95.png", "/images/95-1.png", "/images/95-2.png"], popular: false, featured: false, inStock: true, tags: ["candle", "jar", "white musk", "colorful", "scented"], meta: { keywords: ["candle","desk","scented","colorful"] } },
     { id: 110, categoryId: "Candles", title: "Pink Champagne Celebration Soy Candle", slug: "pink-champagne-celebration-soy-candle", description: "Bright, joyful, and effortlessly elegant, Pink Champagne Celebration is crafted to capture the sparkling spirit of special moments. Hand-poured in small batches using 100% natural soy wax, this candle carries a lively fragrance inspired by sweet berries and bubbly champagne. Set in a refined minimal glass jar, it brings a luxurious yet playful touch to your space — perfect for celebrations, gatherings, or simply elevating everyday moments. The scent feels festive and uplifting, with a soft sweetness that lingers beautifully, creating a warm and cheerful ambience wherever it's placed.", price: 499, images: ["/images/96.png","/images/96-1.png"], popular: false, featured: false, inStock: true, tags: ["candle","colorful","scented"], meta: { keywords: ["candle","desk","scented","colorful"] } },
     { id: 111, categoryId: "Candles", title: "Black Currant & Orchid Twilight Soy Candle", slug: "black-currant-orchid-twilight-soy-candle", description: "Step into a dreamy twilight escape with the Black Currant & Orchid Candle—where fruity richness meets delicate florals in a beautifully balanced blend. Infused with the deep, juicy notes of black currant and the soft elegance of blooming orchid, this candle creates a captivating fragrance that feels both vibrant and soothing. The layered design, enhanced with suspended botanicals, adds a touch of artisanal beauty—making it a statement piece even when unlit. Hand-poured with natural soy wax, it offers a clean, slow burn that gently fills your space with a luxurious and long-lasting aroma.", price: 649, images: ["/images/97-2.png","/images/97-1.png","/images/97.png"], popular: false, featured: false, inStock: true, tags: ["candle","black currant","colorful","scented"], meta: { keywords: ["candle","desk","scented","colorful"] } },
+    { id: 113, categoryId: "Candles", title: "Poetry Candle Book", slug: "poetry-candle-book", description: "A gift crafted for the thoughtful ones. Inside, you’ll find a curated collection of timeless poems by celebrated writers, paired with 4 mini, charming jar candles. Fragranced with a calming blend of mahogany and lavender, it’s designed to be felt, not just gifted.", price: 577, images: ["/images/poetry-candle-book.png", "/images/pcb01.png", "/images/pcb02.png"], popular: false, featured: false, inStock: true, tags: ["candle", "fragrance", "poem", "homedecor", "home-decor"], meta: { keywords: ["candle", "fragrance", "poem", "homedecor"] } },
+
   ],
   Handbags: [
     { id: 3, categoryId: "Handbags", title: "Fiery Tote Bag", slug: "fiery-tote-bag", description: "A bold everyday tote with a flame print that adds instant edge to your fit and your carry. Spacious, lightweight, and easy to sling on—perfect for college, work, or quick errands.", price: 275, images: ["/images/12.png"], popular: false, featured: false, inStock: true, tags: ["tote","flame","bold","everyday","canvas"], meta: { keywords: ["tote bag","flame print","everyday bag","canvas","college"] } },
@@ -139,19 +141,19 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112],
-  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112],
-  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112],
-  'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71],
-  'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110],
-  'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110],
-  'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67],
-  'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112],
-  'for-your-dad':          [38, 59, 41, 40, 60],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113],
+  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113],
+  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113],
+  'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113],
+  'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
+  'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
+  'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113],
+  'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113],
+  'for-your-dad':          [38, 59, 41, 40, 60, 113],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67],
-  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8],
+  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
