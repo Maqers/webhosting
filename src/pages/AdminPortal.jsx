@@ -257,6 +257,8 @@ export default function AdminPortal() {
   const [formError, setFormError] = useState("");
   const [productStep, setProductStep] = useState("form");
   const fileInputRef = useRef();
+  const editFileInputRef = useRef();
+  const [editImageFiles, setEditImageFiles] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productFilter, setProductFilter] = useState("");
   const [productFilterCat, setProductFilterCat] = useState("all");
@@ -356,7 +358,37 @@ export default function AdminPortal() {
 
   function handleStageProductEdit(edited) {
     setPendingChanges(prev => ({ ...prev, [edited.id]: edited }));
-    setEditingProduct(null); showToast("Staged — hit Publish All to save.", "info");
+    setEditingProduct(null); setEditImageFiles([]);
+    showToast("Staged — hit Publish All to save.", "info");
+  }
+
+  function processEditFiles(files) {
+    Array.from(files).filter(f => f.type.startsWith("image/")).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => setEditImageFiles(prev => [...prev, {
+        preview: ev.target.result,
+        name: file.name.toLowerCase().replace(/\s+/g, "-"),
+        base64: ev.target.result.split(",")[1],
+      }]);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadEditImages() {
+    if (!editImageFiles.length) return;
+    setPublishing(true);
+    try {
+      const newPaths = [];
+      for (const img of editImageFiles) {
+        let sha; try { const ex = await ghGet(`public/images/${img.name}`, creds); sha = ex.sha; } catch {}
+        await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
+        newPaths.push(`/images/${img.name}`);
+      }
+      setEditingProduct(p => ({ ...p, images: [...p.images, ...newPaths] }));
+      setEditImageFiles([]);
+      showToast(`${newPaths.length} image(s) uploaded and added.`);
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
   }
 
   async function handlePublishAllChanges() {
@@ -725,14 +757,47 @@ export default function AdminPortal() {
                         </label>
                       ))}
                     </div>
-                    <label style={ts.label}>Image paths (one per line)</label>
-                    <textarea style={{ ...ts.input, height: 130, resize: "vertical", fontSize: 12 }}
-                      value={editingProduct.images.join("\n")}
-                      onChange={e => setEditingProduct(p => ({ ...p, images: e.target.value.split("\n").map(s => s.trim()).filter(Boolean) }))} />
+                    <label style={ts.label}>Images</label>
+                    {/* Current images as removable thumbnails */}
+                    {editingProduct.images.length > 0 && (
+                      <div style={{ ...ts.thumbGrid, marginBottom: 10 }}>
+                        {editingProduct.images.map((src, i) => (
+                          <div key={i} style={ts.thumb}>
+                            <img src={src} alt="" style={ts.thumbImg} onError={e => { e.target.style.display = "none"; }} />
+                            {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
+                            <button type="button"
+                              onClick={() => setEditingProduct(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
+                              style={ts.removeBtn}>x</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {/* Upload new images */}
+                    <div style={ts.editDropzone} onClick={() => editFileInputRef.current?.click()}>
+                      <input ref={editFileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }}
+                        onChange={e => processEditFiles(e.target.files)} />
+                      <span style={{ fontSize: 12, color: "#aaa" }}>+ Upload more images</span>
+                    </div>
+                    {editImageFiles.length > 0 && (
+                      <div>
+                        <div style={{ ...ts.thumbGrid, margin: "8px 0 6px" }}>
+                          {editImageFiles.map((img, i) => (
+                            <div key={i} style={ts.thumb}>
+                              <img src={img.preview} alt="" style={ts.thumbImg} />
+                              <button type="button" onClick={() => setEditImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
+                            </div>
+                          ))}
+                        </div>
+                        <button type="button" style={{ ...ts.ghostBtn, padding: "7px 14px", fontSize: 11 }}
+                          onClick={uploadEditImages} disabled={publishing}>
+                          {publishing ? "Uploading..." : `Upload ${editImageFiles.length} image(s) to GitHub`}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                  <button style={ts.ghostBtn} onClick={() => setEditingProduct(null)}>Cancel</button>
+                  <button style={ts.ghostBtn} onClick={() => { setEditingProduct(null); setEditImageFiles([]); }}>Cancel</button>
                   <button style={ts.primaryBtn} onClick={() => handleStageProductEdit(editingProduct)}>Stage Changes</button>
                 </div>
               </div>
@@ -969,7 +1034,7 @@ const ts = {
   chipGrid: { display: "flex", flexWrap: "wrap", gap: 7 },
   chip: { padding: "5px 11px", border: "1px solid #e0dbd2", borderRadius: 20, fontSize: 11, background: "#fafaf9", color: "#666", cursor: "pointer" },
   chipActive: { padding: "5px 11px", border: "1px solid #c8a96e", borderRadius: 20, fontSize: 11, background: "#fdf8f0", color: "#a07840", cursor: "pointer", fontWeight: 600 },
-  dropzone: { border: "2px dashed #d9d4cc", borderRadius: 10, padding: 28, textAlign: "center", cursor: "pointer", marginBottom: 14 },
+  editDropzone: { border: "1px dashed #d9d4cc", borderRadius: 8, padding: "10px 14px", textAlign: "center", cursor: "pointer", background: "#fafaf9" },
   dropzoneActive: { border: "2px dashed #c8a96e", background: "#fdf8f0" },
   dropzoneIcon: { fontSize: 24, color: "#ccc", marginBottom: 6 },
   dropzoneText: { fontSize: 13, color: "#666", margin: 0 },
