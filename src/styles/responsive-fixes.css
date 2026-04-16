@@ -243,6 +243,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 /* Desktop: cover fills the square cleanly */
