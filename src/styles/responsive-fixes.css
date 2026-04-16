@@ -232,21 +232,10 @@ img {
   max-width: 100%;
   height: auto;
   display: block;
+  object-fit: cover;
 }
 
-/* Product image container — always square */
-.product-image-container {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  overflow: hidden;
-  background: var(--bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-/* Desktop: cover fills the square cleanly */
+/* Product images - maintain aspect ratio */
 .product-image,
 .product-image-container img {
   width: 100%;
@@ -255,13 +244,10 @@ img {
   object-position: center;
 }
 
-/* Mobile: contain — full product visible, no cropping */
-@media (max-width: 767px) {
-  .product-image,
-  .product-image-container img {
-    object-fit: contain;
-    background: var(--bg-secondary);
-  }
+.product-image-container {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Hero images */
@@ -494,3 +480,4 @@ input:focus-visible,
     transition-duration: 0.01ms !important;
   }
 }
+
