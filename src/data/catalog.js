@@ -29,6 +29,12 @@ export const productsByCategory = {
     { id: 62, categoryId: "Crochet", title: "Dancing Daisies", slug: "Dancing-Daisies", description: "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it's a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.", price: 385, images: ["/images/53.png","/images/53-1.png"], popular: false, featured: false, inStock: true, tags: ["crochet","bouquet","flowers","pink","gift"], meta: { keywords: ["everlasting","handmade","floral","keepsake","decor"] } },
     { id: 63, categoryId: "Crochet", title: "Handmade Single Flower Pot Decor", slug: "handmade-single-flower-pot-decor", description: "A charming handmade crochet flower bouquet in soft pink shades, crafted to stay beautiful forever. Wrapped elegantly and designed with detailed yarn flowers, it's a thoughtful gift for birthdays, anniversaries, or special moments. A lasting floral keepsake that never fades.", price: 160, images: ["/images/49.png","/images/49-1.png","/images/49-2.png"], popular: false, featured: false, inStock: true, tags: ["handmade","floral","decor","pink","gift"], meta: { keywords: ["everlasting","handmade","floral","keepsake","decor"] } },
     { id: 66, categoryId: "Crochet", title: "Crochet Granny Square Wrap", slug: "crochet-granny-square-wrap", description: "A handmade crochet patchwork wrap featuring colorful granny square patterns stitched together in a cozy, timeless design. Soft, warm, and perfect for layering during cooler days.", price: 2299, images: ["/images/54.png","/images/54-1.png","/images/54-2.png"], popular: false, featured: false, inStock: true, tags: ["crochet wrap","crochet shawl","granny square wrap","patchwork crochet","boho wrap","handmade crochet","winter layer"], meta: { keywords: ["handmade crochet wrap","crochet patchwork shawl","granny square wrap","boho crochet shawl","colorful crochet wrap","winter crochet layer"] } },
+    { id: 112, categoryId: "Crochet", title: "Handcrafted Floral Bouquet", slug: "handcrafted-floral-bouquet", description: "A vibrant, handcrafted bouquet made entirely from soft pipe cleaners, designed to bring long-lasting charm to any space. Featuring a mix of delicately shaped lilies, roses, and whimsical floral accents in pastel and bold hues.
+
+Set in a sleek black base and finished with a subtle ribbon detail, it makes for a unique, maintenance-free alternative to real flowers. Perfect for gifting on birthdays, special occasions, or simply to brighten someone’s day.
+
+Each piece is carefully handmade, making every bouquet one-of-a-kind.", price: 600, images: ["/images/remove-the-background-make-it-transparent.jpeg"], popular: false, featured: false, inStock: true, tags: ["handmade", "bouquet", "floral", "gift", "home decor", "aesthetic", "long-lasting", "unique gift"], meta: { keywords: [] } },
+
   ],
   Candles: [
     { id: 2, categoryId: "Candles", title: "Strawberry Dessert Candle", slug: "strawberry-dessert-candle", description: "A dessert-style candle crafted to look like a strawberry parfait—complete with a creamy top layer and berry detailing. Perfect for gifting or home décor; looks delicious on a bedside table, desk, or vanity.", price: 569, images: ["/images/7.png"], popular: false, featured: false, inStock: true, tags: ["candle","strawberry","dessert","scented","gift"], meta: { keywords: ["dessert","strawberry","scented","gift","home decor"] } },
@@ -137,15 +143,15 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110],
-  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37],
-  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112],
+  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112],
+  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112],
   'for-your-dad':          [38, 59, 41, 40, 60],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28],
