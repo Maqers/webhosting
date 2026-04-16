@@ -124,6 +124,26 @@ const Products = () => {
     }
   }, [sortBy, selectedCategories.length, filteredProducts.length])
 
+  // Save scroll position as user scrolls
+useEffect(() => {
+  const handleScroll = () => {
+    sessionStorage.setItem('productsScrollY', window.scrollY)
+  }
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  return () => window.removeEventListener('scroll', handleScroll)
+}, [])
+
+// Restore scroll position when returning to this page
+useEffect(() => {
+  const saved = sessionStorage.getItem('productsScrollY')
+  if (saved) {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, parseInt(saved, 10))
+      sessionStorage.removeItem('productsScrollY')
+    })
+  }
+}, [])
+
   return (
     <div className="products-page">
       <div className="products-hero">
