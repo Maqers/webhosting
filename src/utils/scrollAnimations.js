@@ -54,6 +54,15 @@ export const initScrollAnimations = () => {
         const delay = parseInt(element.dataset.delay) || 0
         const duration = parseInt(element.dataset.duration) || 600
 
+        // Skip scale animations — causes zoom flash on page navigation
+        if (animationType === 'scale' || animationType === 'scale-up') {
+          element.classList.add('animate-in')
+          element.style.opacity = '1'
+          element.style.transform = 'none'
+          observer.unobserve(element)
+          return
+        }
+
         // Handle stagger animations (parent containers)
         if (animationType === ANIMATION_TYPES.STAGGER) {
           handleStaggerAnimation(element, delay, duration)
@@ -143,4 +152,3 @@ export const addAnimation = (element, type = 'fade-up', delay = 0, duration = 60
 
 // Export animation types for use in components
 export { ANIMATION_TYPES }
-

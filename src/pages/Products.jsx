@@ -53,35 +53,25 @@ const Products = () => {
   const filteredProducts = useMemo(() => {
     const hasSearch = searchQuery && searchQuery.trim().length >= 1
 
-    // Base product list
     let filtered = hasSearch
       ? (searchResultsData?.products ?? searchResults?.products ?? [])
       : (searchResultsData?.products ?? searchResults?.products ?? getAllProducts())
 
-    // ── KEY FIX ──────────────────────────────────────────────────
-    // Occasion categories (e.g. "for-your-best-friend") are resolved
-    // via occasionProductMap — not by matching product.categoryId.
-    // Source categories (e.g. "Crochet") match product.categoryId directly.
     if (selectedCategories.length > 0) {
-      // Separate selected into occasion vs source categories
       const occasionSelected = selectedCategories.filter(id => occasionProductMap[id])
       const sourceSelected   = selectedCategories.filter(id => !occasionProductMap[id])
 
-      // Collect product IDs from all selected occasion categories
       const occasionIds = new Set(
         occasionSelected.flatMap(id => occasionProductMap[id] || [])
       )
       const sourceSet = new Set(sourceSelected)
 
       filtered = filtered.filter(product => {
-        // Match via occasion map
         if (occasionSelected.length > 0 && occasionIds.has(product.id)) return true
-        // Match via source categoryId
         if (sourceSelected.length > 0 && sourceSet.has(product.categoryId)) return true
         return false
       })
     }
-    // ─────────────────────────────────────────────────────────────
 
     filtered = sortProducts(filtered, sortBy, {
       searchQuery: searchQuery || null,
@@ -124,25 +114,23 @@ const Products = () => {
     }
   }, [sortBy, selectedCategories.length, filteredProducts.length])
 
-  // Save scroll position as user scrolls
-useEffect(() => {
-  const handleScroll = () => {
-    sessionStorage.setItem('productsScrollY', window.scrollY)
-  }
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  return () => window.removeEventListener('scroll', handleScroll)
-}, [])
+  useEffect(() => {
+    const handleScroll = () => {
+      sessionStorage.setItem('productsScrollY', window.scrollY)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
-// Restore scroll position when returning to this page
-useEffect(() => {
-  const saved = sessionStorage.getItem('productsScrollY')
-  if (saved) {
-    requestAnimationFrame(() => {
-      window.scrollTo(0, parseInt(saved, 10))
-      sessionStorage.removeItem('productsScrollY')
-    })
-  }
-}, [])
+  useEffect(() => {
+    const saved = sessionStorage.getItem('productsScrollY')
+    if (saved) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+        sessionStorage.removeItem('productsScrollY')
+      })
+    }
+  }, [])
 
   return (
     <div className="products-page">
@@ -257,9 +245,7 @@ const ProductCard = memo(({ product, index, categoryMap, priority = false }) => 
     <Link
       to={`/product/${product.id}`}
       state={{ from: location.pathname + location.search }}
-      className="product-card hover-lift hover-zoom touch-feedback"
-      data-animate="scale"
-      data-delay={index * 50}
+      className="product-card hover-lift touch-feedback"
     >
       <div className="product-image-container">
         <ImageWithFallback
