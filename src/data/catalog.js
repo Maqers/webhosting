@@ -6,7 +6,7 @@
 const PLACEHOLDER = "/images/logo.png";
 
 export const categories = [
-  { id: "Crochet", name: "Handmade Crochet", slug: "Crochet", description: "Beautiful crochet handmade products", icon: "home", order: 1, featured: false, meta: { keywords: ["crochet","flowers","bouquets","handmade","anniversary","gift"] } },
+  { id: "Crochet", name: "Handmade Florals", slug: "Crochet", description: "Beautiful crochet handmade products", icon: "home", order: 1, featured: false, meta: { keywords: ["crochet","flowers","bouquets","handmade","anniversary","gift"] } },
   { id: "Candles", name: "Candles", slug: "Candles", description: "Beautiful fragnant candles, customisations available", icon: "gift", order: 2, featured: false, meta: { keywords: ["personalized","candles","gift","candle","birthday","anniversary"] } },
   { id: "Handbags", name: "Handbags", slug: "Handbags", description: "Elegant fashion items and bags", icon: "fashion", order: 3, featured: false, meta: { keywords: ["bags","handbags","prints","printed","bag"] } },
   { id: "Frames&Paintings", name: "Frames & Paintings", slug: "Frames&Paintings", description: "Handmade paintings in beautiful frames", icon: "jewelry", order: 10, featured: false, meta: { keywords: ["jewelry","accessories","traditional","handmade","ornaments"] } },
