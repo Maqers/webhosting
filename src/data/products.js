@@ -561,5 +561,4 @@ export const foodItems = products;
 export const getPopularItems = getPopularProducts;
 export const getItemsByCategory = getProductsByCategory;
 
-// Restaurants page (separate data; add entries with image, name, cuisine, etc.)
-export const restaurants = [];
+
