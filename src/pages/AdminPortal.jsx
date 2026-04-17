@@ -23,6 +23,7 @@ const OCCASION_CATEGORIES = [
   { id: "for-your-sibling", name: "For Your Sibling" },
   { id: "the-host-gift", name: "The Host Gift" },
   { id: "occasion-gifts", name: "Occasion Gifts" },
+  { id: "shaadi-fever", name: "Shaadi Fever"},
 ];
 
 const ICON_OPTIONS = ["home","gift","fashion","jewelry","kitchen","art","wedding","hampers","soaps","decor"];
