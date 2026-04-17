@@ -15,7 +15,7 @@ export const categories = [
   { id: "Handmade-Accessories", name: "Jewellery & Accessories", slug: "Handmade-Accessories", description: "Accessories for weddings and celebrations", icon: "wedding", order: 6, featured: false, meta: { keywords: ["wedding","occasion","celebration","gift","special"] } },
   { id: "Customised-Hampers", name: "Customised Hampers", slug: "Customised-Hampers", description: "Thoughtful gifts for hampers", icon: "hampers", order: 8, featured: false, meta: { keywords: ["gifts","hampers","rakhi","anniversary","birthday","gift"] } },
   { id: "Handmade-Soaps", name: "Handmade Soaps", slug: "Handmade-Soaps", description: "Handcrafted soaps in various fragnances", icon: "soaps", order: 9, featured: false, meta: { keywords: ["soaps","handwash","fragnance","soap","hanging"] } },
-  { id: "Wedding-Gifts", name: "Shaadi szn", slug: "Wedding-Gifts", description: "Beautiful gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
+  { id: "Wedding-Gifts", name: "Wedding Gifts", slug: "Wedding-Gifts", description: "Unique gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
 ];
 
 export const productsByCategory = {
