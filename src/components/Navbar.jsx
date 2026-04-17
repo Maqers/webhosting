@@ -5,8 +5,9 @@ import { getSortedCategories } from '../data/catalog'
 import './Navbar.css'
 
 const OCCASION_CATEGORIES = [
-  { id: 'for-your-best-friend',  name: 'For Your Best Friend',    slug: 'for-your-best-friend',  emoji: '🫂' },
-  { id: 'for-your-partner',      name: 'For Your Partner',         slug: 'for-your-partner',       emoji: '💕' },
+  { id: 'shaadi-fever',          name: 'Shaadi Fever',             slug: 'shaadi-fever',            emoji: '💍' },
+  { id: 'for-your-best-friend',  name: 'For Your Best Friend',     slug: 'for-your-best-friend',    emoji: '🫂' },
+  { id: 'for-your-partner',      name: 'For Your Partner',         slug: 'for-your-partner',        emoji: '💕' },
   { id: 'situationship',         name: 'For Your Situationship',   slug: 'situationship',           emoji: '🫠' },
   { id: 'self-love-kits',        name: 'Self-Love Kits',           slug: 'self-love-kits',          emoji: '🌸' },
   { id: 'breakup-hampers',       name: 'Breakup Hampers',          slug: 'breakup-hampers',         emoji: '🫶' },
@@ -30,6 +31,7 @@ const PRODUCT_CATEGORIES = [
   { id: 'Handmade-Accessories', name: 'Jewellery & Accessories', slug: 'Handmade-Accessories' },
   { id: 'Customised-Hampers',   name: 'Customised Hampers',   slug: 'Customised-Hampers'   },
   { id: 'Handmade-Soaps',       name: 'Handmade Soaps',       slug: 'Handmade-Soaps'       },
+  { id: 'Wedding-Gifts',        name: 'Wedding Gifts',        slug: 'Wedding-Gifts' },
 ]
 
 const Navbar = () => {

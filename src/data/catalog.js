@@ -6,7 +6,7 @@
 const PLACEHOLDER = "/images/logo.png";
 
 export const categories = [
-  { id: "Crochet", name: "Handmade Florals", slug: "Crochet", description: "Beautiful crochet handmade products", icon: "home", order: 1, featured: false, meta: { keywords: ["crochet","flowers","bouquets","handmade","anniversary","gift"] } },
+  { id: "Crochet", name: "Handmade Florals", slug: "Crochet", description: "Beautiful crochet handmade products", icon: "home", order: 4, featured: false, meta: { keywords: ["crochet","flowers","bouquets","handmade","anniversary","gift"] } },
   { id: "Candles", name: "Candles", slug: "Candles", description: "Beautiful fragnant candles, customisations available", icon: "gift", order: 2, featured: false, meta: { keywords: ["personalized","candles","gift","candle","birthday","anniversary"] } },
   { id: "Handbags", name: "Handbags", slug: "Handbags", description: "Elegant fashion items and bags", icon: "fashion", order: 3, featured: false, meta: { keywords: ["bags","handbags","prints","printed","bag"] } },
   { id: "Frames&Paintings", name: "Frames & Paintings", slug: "Frames&Paintings", description: "Handmade paintings in beautiful frames", icon: "jewelry", order: 10, featured: false, meta: { keywords: ["jewelry","accessories","traditional","handmade","ornaments"] } },
@@ -15,6 +15,7 @@ export const categories = [
   { id: "Handmade-Accessories", name: "Jewellery & Accessories", slug: "Handmade-Accessories", description: "Accessories for weddings and celebrations", icon: "wedding", order: 6, featured: false, meta: { keywords: ["wedding","occasion","celebration","gift","special"] } },
   { id: "Customised-Hampers", name: "Customised Hampers", slug: "Customised-Hampers", description: "Thoughtful gifts for hampers", icon: "hampers", order: 8, featured: false, meta: { keywords: ["gifts","hampers","rakhi","anniversary","birthday","gift"] } },
   { id: "Handmade-Soaps", name: "Handmade Soaps", slug: "Handmade-Soaps", description: "Handcrafted soaps in various fragnances", icon: "soaps", order: 9, featured: false, meta: { keywords: ["soaps","handwash","fragnance","soap","hanging"] } },
+  { id: "Wedding-Gifts", name: "Wedding Gifts", slug: "Wedding-Gifts", description: "Beautiful gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
 ];
 
 export const productsByCategory = {
