@@ -139,6 +139,8 @@ export const productsByCategory = {
   ],
   "Wedding-Gifts": [
     
+    { id: 115, categoryId: "Wedding-Gifts", title: "Printed Shreenathji Fabric Shagun Envelopes", slug: "printed-shreenathji-fabric-shagun-envelopes", description: "Vibrant fabric shagun envelopes crafted from rich textiles and intricate prints. A stylish upgrade from regular paper covers, they’re reusable, elegant, and perfect for weddings, festivals, and special occasions. Designed to make every gift feel a little more special.", price: 65, images: ["/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg", "/images/whatsapp-image-2026-04-17-at-15.22.22-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["shagun envelope", "fabric envelope", "wedding gifting", "festive gifting", "cash envelope", "money envelope", "indian wedding", "ethnic gift", "reusable envelope", "designer envelope", "handcrafted", "traditional gift", "gifting essentials", "premium envelopes"], meta: { keywords: ["shagun envelope", "fabric envelope", "wedding gifting", "festive gifting", "cash envelope", "money envelope", "indian wedding", "ethnic gift", "reusable envelope", "designer envelope", "handcrafted", "traditional gift", "gifting essentials", "premium envelopes"], colors: ["Red", "Rani", "Blue", "Grey"], moq: 13 } },
+
   ],
 };
 
