@@ -145,6 +145,8 @@ export const productsByCategory = {
     
     { id: 115, categoryId: "Wedding-Gifts", title: "Printed Shreenathji Fabric Shagun Envelopes", slug: "printed-shreenathji-fabric-shagun-envelopes", description: "Vibrant fabric shagun envelopes crafted from rich textiles and intricate prints. A stylish upgrade from regular paper covers, they’re reusable, elegant, and perfect for weddings, festivals, and special occasions. Designed to make every gift feel a little more special.", price: 65, images: ["/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg", "/images/whatsapp-image-2026-04-17-at-15.22.22-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["shagun envelope", "fabric envelope", "wedding gifting", "festive gifting", "cash envelope", "money envelope", "indian wedding", "ethnic gift", "reusable envelope", "designer envelope", "handcrafted", "traditional gift", "gifting essentials", "premium envelopes"], meta: { keywords: ["shagun envelope", "fabric envelope", "wedding gifting", "festive gifting", "cash envelope", "money envelope", "indian wedding", "ethnic gift", "reusable envelope", "designer envelope", "handcrafted", "traditional gift", "gifting essentials", "premium envelopes"], colors: ["Red", "Rani", "Blue", "Grey"], moq: 13 } },
 
+    { id: 118, categoryId: "Wedding-Gifts", title: "Evil Eye Box", slug: "evil-eye-box", description: "Handcrafted evil eye box designed to bring charm, protection, and a festive pop to your gifting. Finished with detailed beadwork and ghungroo accents, this decorative keepsake box is perfect for storing jewellery, coins, dry fruits, or small essentials. A stylish pick for shagun, return gifts, Rakhi, Diwali, weddings, and thoughtful festive gifting.", price: 85, images: ["/images/whatsapp-image-2026-04-17-at-15.36.56.jpeg"], popular: false, featured: false, inStock: true, tags: ["evil eye box", "gift box", "handmade decor", "festive gifting", "shagun box", "return gift", "trinket box", "jewellery box", "beaded box", "home decor"], meta: { keywords: ["evil eye box", "handmade evil eye box", "evil eye gift box", "decorative trinket box", "festive gift box", "shagun box", "return gift box", "jewellery storage box", "beaded evil eye decor", "wedding favor box", "rakhi gift box", "Diwali gift box", "handcrafted keepsake box", "small decorative box", "Indian festive decor"], colors: [], moq: 20, secondaryCategories: ["Handmade-Accessories", "Home-decor"] } },
+
   ],
 };
 
@@ -161,11 +163,11 @@ export const occasionProductMap = {
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
-  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114],
+  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
