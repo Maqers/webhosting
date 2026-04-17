@@ -137,6 +137,7 @@ export const productsByCategory = {
     { id: 69, categoryId: "Handmade-Soaps", title: "Glycerin Strawberry grape soap", slug: "glycerin-strawberry-grape-soap", description: "A playful strawberry-shaped soap designed to brighten up your kitchen or bathroom. Decorative yet functional, this hanging soap adds a sweet, aesthetic touch to any space.", price: 549, images: ["/images/extract-the-entire-bunch-of-strawberry-shaped-soap-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["strawberry soap", "fruit shaped soap", "aesthetic soap", "decorative soap", "hanging soap", "cute bathroom accessory", "gift soap"], meta: { keywords: ["strawberry shaped soap", "fruit soap bar", "aesthetic hanging soap", "cute decorative soap", "unique gift soap", "designer bathroom soap"] } },
     { id: 70, categoryId: "Handmade-Soaps", title: "Multicolor grape soap", slug: "Multicolor-grape-soap", description: "A vibrant multicolored grape-shaped soap designed to add a fun and aesthetic touch to your kitchen or bathroom. Functional and decorative, this soap makes for a unique gift or a playful home accessory.", price: 549, images: ["/images/58.png"], popular: false, featured: false, inStock: true, tags: ["crochet","bouquet","flowers","pink","gift"], meta: { keywords: ["everlasting","handmade","floral","keepsake","decor"] } },
   ],
+  "Wedding-Gifts": [],
 };
 
 
