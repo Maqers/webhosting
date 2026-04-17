@@ -168,14 +168,12 @@ export const getAllProducts = () => Object.values(productsByCategory).flat();
 
 export const getProductsByCategory = (categoryIdOrSlug) => {
   if (!categoryIdOrSlug || categoryIdOrSlug === "all") return getAllProducts();
-  // Merged: Jewellery & Accessories includes both bangles and oxidised jewellery
   if (categoryIdOrSlug === "Handmade-Accessories") {
     return [
       ...(productsByCategory["Handmade-Accessories"] || []),
       ...(productsByCategory["Oxidised-jewellery"] || []),
     ];
   }
-  // Legacy slug support for oxidised jewellery — redirect to merged
   if (categoryIdOrSlug === "Oxidised-jewellery" || categoryIdOrSlug === "oxidised-jewellery") {
     return [
       ...(productsByCategory["Handmade-Accessories"] || []),
@@ -184,7 +182,13 @@ export const getProductsByCategory = (categoryIdOrSlug) => {
   }
   const category = categories.find(cat => cat.id === categoryIdOrSlug || cat.slug === categoryIdOrSlug);
   if (!category) return [];
-  return productsByCategory[category.id] || [];
+  const primary = productsByCategory[category.id] || [];
+  // Also include products from other categories that list this as a secondary category
+  const secondary = getAllProducts().filter(p =>
+    p.categoryId !== category.id &&
+    p.meta?.secondaryCategories?.includes(category.id)
+  );
+  return [...primary, ...secondary];
 };
 
 export const getProductById = (id) => getAllProducts().find(product => product.id === parseInt(id));

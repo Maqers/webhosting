@@ -150,6 +150,17 @@ const ProductDetail = () => {
           {/* Right 50%: Content only, normal/responsive */}
           <div className="product-info-section">
             {categoryName && <span className="product-category-badge">{categoryName}</span>}
+            {product.meta?.secondaryCategories && product.meta.secondaryCategories.length > 0 && (
+              <p className="product-also-in">
+                Also in:{" "}
+                {product.meta.secondaryCategories.map((catId, i) => {
+                  const cat = getCategoryByIdOrSlug(catId);
+                  return cat ? (
+                    <span key={i} className="product-also-in-tag">{cat.name}</span>
+                  ) : null;
+                })}
+              </p>
+            )}
             {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-id">Product ID: {product.id}</p>

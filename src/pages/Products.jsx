@@ -59,7 +59,7 @@ const Products = () => {
 
     if (selectedCategories.length > 0) {
       const occasionSelected = selectedCategories.filter(id => occasionProductMap[id])
-      const sourceSelected   = selectedCategories.filter(id => !occasionProductMap[id])
+      const sourceSelected = selectedCategories.filter(id => !occasionProductMap[id])
 
       const occasionIds = new Set(
         occasionSelected.flatMap(id => occasionProductMap[id] || [])
@@ -67,10 +67,12 @@ const Products = () => {
       const sourceSet = new Set(sourceSelected)
 
       filtered = filtered.filter(product => {
-        if (occasionSelected.length > 0 && occasionIds.has(product.id)) return true
-        if (sourceSelected.length > 0 && sourceSet.has(product.categoryId)) return true
-        return false
-      })
+        if (occasionSelected.length > 0 && occasionIds.has(product.id)) return true;
+        if (sourceSelected.length > 0 && sourceSet.has(product.categoryId)) return true;
+        // Also match via secondaryCategories
+        if (sourceSelected.length > 0 && product.meta?.secondaryCategories?.some(c => sourceSet.has(c))) return true;
+        return false;
+      });
     }
 
     filtered = sortProducts(filtered, sortBy, {
@@ -178,7 +180,7 @@ const Products = () => {
                 )
               })}
             </div>
-            <ProductSort onSortChange={() => {}} />
+            <ProductSort onSortChange={() => { }} />
           </div>
         </div>
       </div>
@@ -214,10 +216,10 @@ const Products = () => {
             <div className="no-results">
               <div className="no-results-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="64" height="64">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="m21 21-4.35-4.35"/>
-                  <line x1="11" y1="8" x2="11" y2="14"/>
-                  <line x1="8" y1="11" x2="14" y2="11"/>
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                  <line x1="11" y1="8" x2="11" y2="14" />
+                  <line x1="8" y1="11" x2="14" y2="11" />
                 </svg>
               </div>
               <h3>No products found</h3>

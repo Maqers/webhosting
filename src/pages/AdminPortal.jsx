@@ -23,7 +23,6 @@ const OCCASION_CATEGORIES = [
   { id: "for-your-sibling", name: "For Your Sibling" },
   { id: "the-host-gift", name: "The Host Gift" },
   { id: "occasion-gifts", name: "Occasion Gifts" },
-  { id: "shaadi-fever", name: "Shaadi Fever"},
 ];
 
 const ICON_OPTIONS = ["home","gift","fashion","jewelry","kitchen","art","wedding","hampers","soaps","decor"];
@@ -134,6 +133,15 @@ function parseProducts(source) {
     const p = products.find(p => p.id === id);
     if (p) p.moq = parseInt(mq[2]) || 0;
   }
+  // Parse secondaryCategories
+  const scRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*secondaryCategories:\s*\[([^\]]*)\]/g;
+  let sc;
+  while ((sc = scRegex.exec(source)) !== null) {
+    const id = parseInt(sc[1]);
+    const cats = sc[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+    const p = products.find(p => p.id === id);
+    if (p) p.secondaryCategories = cats;
+  }
   return products;
 }
 
@@ -183,6 +191,8 @@ function updateProductInSource(source, product) {
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{\\s*keywords:\\s*\\[)[^\\]]*(\\])`), `$1${kwArr}$2`);
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*colors:\\s*\\[)[^\\]]*(\\])`), `$1${(product.colors||[]).map(c=>`"${sanitizeForJS(c)}"`).join(", ")}$2`);
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*moq:\\s*)\\d+`), `$1${product.moq ? Number(product.moq) : 0}`);
+  const secCatsArr2 = (product.secondaryCategories||[]).map(c=>`"${sanitizeForJS(c)}"`).join(", ");
+  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*secondaryCategories:\\s*\\[)[^\\]]*(\\])`), `$1${secCatsArr2}$2`);
   return u;
 }
 
@@ -195,7 +205,8 @@ function insertProductIntoSource(source, product, id) {
   const title = sanitizeForJS(product.title);
   const colorsArr = product.colors && product.colors.length > 0 ? product.colors.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
   const moqVal = product.moq ? Number(product.moq) : 0;
-  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], moq: ${moqVal} } },`;
+  const secCatsArr = product.secondaryCategories && product.secondaryCategories.length > 0 ? product.secondaryCategories.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
+  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}] } },`;
   const catKey = product.categoryId.match(/[&\-]/) ? `"${product.categoryId}"` : product.categoryId;
   const catPattern = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
   const match = source.match(catPattern);
@@ -273,7 +284,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "" });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "", secondaryCategories: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [imageFiles, setImageFiles] = useState([]);
   const [dragOver, setDragOver] = useState(false);
@@ -367,7 +378,7 @@ export default function AdminPortal() {
       await commitCatalog(updated, sha, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
       log(`Done! Product ID ${newId} live after Vercel redeploys (~45s).`);
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "" });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "", secondaryCategories: [] });
       setNewColorInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -605,6 +616,22 @@ export default function AdminPortal() {
                         <option value="">— Select —</option>
                         {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
+                      <label style={ts.label}>Also appears in <span style={ts.labelHint}>(optional — for Shop by Product)</span></label>
+                      <div style={ts.chipGrid}>
+                        {categories.filter(c => c.id !== newProduct.categoryId).map(c => {
+                          const active = (newProduct.secondaryCategories||[]).includes(c.id);
+                          return (
+                            <button type="button" key={c.id}
+                              onClick={() => setNewProduct(p => ({
+                                ...p,
+                                secondaryCategories: active
+                                  ? (p.secondaryCategories||[]).filter(x => x !== c.id)
+                                  : [...(p.secondaryCategories||[]), c.id]
+                              }))}
+                              style={active ? ts.chipActive : ts.chip}>{c.name}</button>
+                          );
+                        })}
+                      </div>
                       <label style={ts.label}>Price (Rs.) *</label>
                       <input style={ts.input} type="number" placeholder="499" value={newProduct.price}
                         onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))} />
@@ -716,6 +743,7 @@ export default function AdminPortal() {
                       ["Keywords", newProduct.keywords || "none"],
                       ["Colours", (newProduct.colors||[]).join(", ") || "none"],
                       ["MOQ", newProduct.moq || "none"],
+                      ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => OCCASION_CATEGORIES.find(oc => oc.id === o)?.name).join(", ") || "None"],
                       ["Images", imageFiles.map(f => f.name).join(", ")],
                     ].map(([label, val]) => (
@@ -781,6 +809,22 @@ export default function AdminPortal() {
                     <select style={ts.input} value={editingProduct.categoryId} onChange={e => setEditingProduct(p => ({ ...p, categoryId: e.target.value }))}>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
+                    <label style={ts.label}>Also appears in <span style={ts.labelHint}>(optional)</span></label>
+                    <div style={ts.chipGrid}>
+                      {categories.filter(c => c.id !== editingProduct.categoryId).map(c => {
+                        const active = (editingProduct.secondaryCategories||[]).includes(c.id);
+                        return (
+                          <button type="button" key={c.id}
+                            onClick={() => setEditingProduct(p => ({
+                              ...p,
+                              secondaryCategories: active
+                                ? (p.secondaryCategories||[]).filter(x => x !== c.id)
+                                : [...(p.secondaryCategories||[]), c.id]
+                            }))}
+                            style={active ? ts.chipActive : ts.chip}>{c.name}</button>
+                        );
+                      })}
+                    </div>
                     <label style={ts.label}>Price (Rs.)</label>
                     <input style={ts.input} type="number" value={editingProduct.price} onChange={e => setEditingProduct(p => ({ ...p, price: Number(e.target.value) }))} />
                     <label style={ts.label}>Description</label>
