@@ -116,6 +116,23 @@ function parseProducts(source) {
     const p = products.find(p => p.id === id);
     if (p) p.keywords = kws;
   }
+  // Parse colors
+  const colRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*colors:\s*\[([^\]]*)\]/g;
+  let cl;
+  while ((cl = colRegex.exec(source)) !== null) {
+    const id = parseInt(cl[1]);
+    const cols = cl[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+    const p = products.find(p => p.id === id);
+    if (p) p.colors = cols;
+  }
+  // Parse moq
+  const moqRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*moq:\s*(\d+)/g;
+  let mq;
+  while ((mq = moqRegex.exec(source)) !== null) {
+    const id = parseInt(mq[1]);
+    const p = products.find(p => p.id === id);
+    if (p) p.moq = parseInt(mq[2]) || 0;
+  }
   return products;
 }
 
@@ -163,6 +180,8 @@ function updateProductInSource(source, product) {
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?inStock:\\s*)(true|false)`), `$1${product.inStock}`);
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?tags:\\s*\\[)[^\\]]*(\\])`), `$1${tagsArr}$2`);
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{\\s*keywords:\\s*\\[)[^\\]]*(\\])`), `$1${kwArr}$2`);
+  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*colors:\\s*\\[)[^\\]]*(\\])`), `$1${(product.colors||[]).map(c=>`"${sanitizeForJS(c)}"`).join(", ")}$2`);
+  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*moq:\\s*)\\d+`), `$1${product.moq ? Number(product.moq) : 0}`);
   return u;
 }
 
@@ -173,7 +192,9 @@ function insertProductIntoSource(source, product, id) {
   const kwArr = product.keywords ? product.keywords.split(",").map(k => `"${sanitizeForJS(k.trim())}"`).join(", ") : "";
   const desc = sanitizeForJS(product.description);
   const title = sanitizeForJS(product.title);
-  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}] } },`;
+  const colorsArr = product.colors && product.colors.length > 0 ? product.colors.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
+  const moqVal = product.moq ? Number(product.moq) : 0;
+  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], moq: ${moqVal} } },`;
   const catKey = product.categoryId.match(/[&\-]/) ? `"${product.categoryId}"` : product.categoryId;
   const catPattern = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
   const match = source.match(catPattern);
@@ -251,7 +272,8 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "" });
+  const [newColorInput, setNewColorInput] = useState("");
   const [imageFiles, setImageFiles] = useState([]);
   const [dragOver, setDragOver] = useState(false);
   const [formError, setFormError] = useState("");
@@ -344,7 +366,8 @@ export default function AdminPortal() {
       await commitCatalog(updated, sha, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
       log(`Done! Product ID ${newId} live after Vercel redeploys (~45s).`);
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [] });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "" });
+      setNewColorInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
@@ -595,6 +618,27 @@ export default function AdminPortal() {
                       <label style={ts.label}>Keywords (comma-separated, for SEO)</label>
                       <input style={ts.input} placeholder="soy candle India, scented candle gift" value={newProduct.keywords}
                         onChange={e => setNewProduct(p => ({ ...p, keywords: e.target.value }))} />
+                      <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional — shown as dropdown on site)</span></label>
+                      <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                        <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. Red, Blue, Green"
+                          value={newColorInput} onChange={e => setNewColorInput(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); setNewColorInput(""); } } }} />
+                        <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                          onClick={() => { const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); setNewColorInput(""); } }}>+</button>
+                      </div>
+                      {(newProduct.colors||[]).length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                          {newProduct.colors.map((c, i) => (
+                            <span key={i} style={ts.colorChip}>
+                              {c}
+                              <button type="button" onClick={() => setNewProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
+                      <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
+                        onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
                     </div>
                     <div style={ts.card}>
                       <h2 style={ts.cardTitle}>Occasion Categories</h2>
@@ -669,6 +713,8 @@ export default function AdminPortal() {
                       ["Description", newProduct.description.replace(/\r?\n/g, " ")],
                       ["Tags", newProduct.tags || "none"],
                       ["Keywords", newProduct.keywords || "none"],
+                      ["Colours", (newProduct.colors||[]).join(", ") || "none"],
+                      ["MOQ", newProduct.moq || "none"],
                       ["Occasions", newProduct.occasions.map(o => OCCASION_CATEGORIES.find(oc => oc.id === o)?.name).join(", ") || "None"],
                       ["Images", imageFiles.map(f => f.name).join(", ")],
                     ].map(([label, val]) => (
@@ -746,6 +792,27 @@ export default function AdminPortal() {
                     <label style={ts.label}>Keywords (comma-separated)</label>
                     <input style={ts.input} value={(editingProduct.keywords || []).join(", ")}
                       onChange={e => setEditingProduct(p => ({ ...p, keywords: e.target.value.split(",").map(k => k.trim()).filter(Boolean) }))} />
+                    <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional)</span></label>
+                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                      <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add a colour"
+                        id="editColorInput"
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); e.target.value = ""; } } }} />
+                      <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                        onClick={() => { const inp = document.getElementById("editColorInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); inp.value = ""; } }}>+</button>
+                    </div>
+                    {(editingProduct.colors||[]).length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                        {editingProduct.colors.map((c, i) => (
+                          <span key={i} style={ts.colorChip}>
+                            {c}
+                            <button type="button" onClick={() => setEditingProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
+                    <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
+                      onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
                   </div>
                   <div>
                     <label style={ts.label}>Flags</label>
@@ -1086,4 +1153,7 @@ const ts = {
   occasionProductName: { fontSize: 9, color: "#555", margin: 0, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
   occasionProductId: { fontSize: 9, color: "#bbb", margin: "2px 0 0" },
   toast: { position: "fixed", top: 20, right: 20, color: "#fff", padding: "12px 20px", borderRadius: 8, fontSize: 13, fontFamily: "Georgia, serif", zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,0.2)", fontWeight: 600 },
+  colorChip: { display: "inline-flex", alignItems: "center", gap: 5, background: "#f0ede8", border: "1px solid #e0d8cc", borderRadius: 20, padding: "3px 10px", fontSize: 12, color: "#444" },
+  colorChipX: { background: "none", border: "none", cursor: "pointer", color: "#999", fontSize: 14, padding: 0, lineHeight: 1, fontFamily: "Georgia, serif" },
+  labelHint: { fontWeight: 400, color: "#aaa", textTransform: "none", letterSpacing: 0 },
 };
