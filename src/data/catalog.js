@@ -149,6 +149,8 @@ export const productsByCategory = {
 
     { id: 118, categoryId: "Wedding-Gifts", title: "Evil Eye Box", slug: "evil-eye-box", description: "Handcrafted evil eye box designed to bring charm, protection, and a festive pop to your gifting. Finished with detailed beadwork and ghungroo accents, this decorative keepsake box is perfect for storing jewellery, coins, dry fruits, or small essentials. A stylish pick for shagun, return gifts, Rakhi, Diwali, weddings, and thoughtful festive gifting.", price: 85, images: ["/images/whatsapp-image-2026-04-17-at-15.36.56.jpeg"], popular: false, featured: false, inStock: true, tags: ["evil eye box", "gift box", "handmade decor", "festive gifting", "shagun box", "return gift", "trinket box", "jewellery box", "beaded box", "home decor"], meta: { keywords: ["evil eye box", "handmade evil eye box", "evil eye gift box", "decorative trinket box", "festive gift box", "shagun box", "return gift box", "jewellery storage box", "beaded evil eye decor", "wedding favor box", "rakhi gift box", "Diwali gift box", "handcrafted keepsake box", "small decorative box", "Indian festive decor"], colors: [], moq: 20, secondaryCategories: ["Handmade-Accessories", "Home-decor"] } },
 
+    { id: 120, categoryId: "Wedding-Gifts", title: "Banarasi cash envelopes for sagun", slug: "banarasi-cash-envelopes-for-sagun", description: "Elegant fabric shagun lifafa crafted in rich brocade with delicate pearl lace detailing. Perfect for weddings, festive gifting & cash envelopes that look as special as the occasion.", price: 200, images: ["/images/whatsapp-image-2026-04-22-at-20.11.31-(1).jpeg", "/images/whatsapp-image-2026-04-22-at-20.11.31.jpeg"], popular: false, featured: false, inStock: true, tags: ["shagun lifafa", "fabric shagun envelope", "designer money envelope", "wedding cash envelope", "brocade lifafa", "ethnic gift envelope", "pearl lace envelope", "festive gifting envelope", "Indian wedding accessories", "return gift packaging", "premium shagun cover", "kapda lifafa"], meta: { keywords: ["shagun lifafa", "fabric shagun envelope", "designer money envelope", "wedding cash envelope", "brocade lifafa", "ethnic gift envelope", "pearl lace envelope", "festive gifting envelope", "Indian wedding accessories", "return gift packaging", "premium shagun cover", "kapda lifafa"], colors: ["Turquoise Blue", "Baby Pink", "Sky Blue", "Yellow"], moq: 20, secondaryCategories: ["Handbags"], sellerId: "", sellerCode: "" } },
+
   ],
 };
 
@@ -157,9 +159,9 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120],
   'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114],
-  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114],
+  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
@@ -168,9 +170,9 @@ export const occasionProductMap = {
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114],
   'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
-  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118],
-  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119],
+  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120],
+  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
