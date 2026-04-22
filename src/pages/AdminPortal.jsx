@@ -9,22 +9,8 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 
-const OCCASION_CATEGORIES = [
-  { id: "for-your-best-friend", name: "For Your Best Friend" },
-  { id: "for-your-partner", name: "For Your Partner" },
-  { id: "situationship", name: "Situationship" },
-  { id: "self-love-kits", name: "Self Love Kits" },
-  { id: "breakup-hampers", name: "Breakup Hampers" },
-  { id: "late-night-cravings", name: "Late Night Cravings" },
-  { id: "the-main-character", name: "The Main Character" },
-  { id: "for-your-work-friend", name: "For Your Work Friend" },
-  { id: "for-your-mom", name: "For Your Mom" },
-  { id: "for-your-dad", name: "For Your Dad" },
-  { id: "for-your-sibling", name: "For Your Sibling" },
-  { id: "the-host-gift", name: "The Host Gift" },
-  { id: "occasion-gifts", name: "Occasion Gifts" },
-  { id: 'shaadi-fever', name: 'Shaadi Fever'},
-];
+// Occasion categories are parsed dynamically from catalog.js occasionProductMap
+// — no hardcoded list needed anymore
 
 const ICON_OPTIONS = ["home","gift","fashion","jewelry","kitchen","art","wedding","hampers","soaps","decor"];
 
@@ -50,6 +36,81 @@ async function ghPut(path, content, message, sha, creds) {
   );
   if (!res.ok) throw new Error(`GitHub PUT failed (${res.status}): ${await res.text()}`);
   return res.json();
+}
+
+// ─── Supabase API ─────────────────────────────────────────────────────────────
+
+const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0";
+
+const sbHeaders = {
+  "Content-Type": "application/json",
+  "apikey": SUPABASE_KEY,
+  "Authorization": `Bearer ${SUPABASE_KEY}`,
+};
+
+async function sbGetSellers() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers?select=*&order=business_name.asc`, { headers: sbHeaders });
+  if (!res.ok) throw new Error(`Supabase GET failed: ${await res.text()}`);
+  return res.json();
+}
+
+async function sbCreateSeller(seller) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers`, {
+    method: "POST",
+    headers: { ...sbHeaders, "Prefer": "return=representation" },
+    body: JSON.stringify(seller),
+  });
+  if (!res.ok) throw new Error(`Supabase CREATE failed: ${await res.text()}`);
+  return res.json();
+}
+
+async function sbUpdateSeller(id, updates) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers?id=eq.${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { ...sbHeaders, "Prefer": "return=representation" },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error(`Supabase UPDATE failed: ${await res.text()}`);
+  return res.json();
+}
+
+async function sbDeleteSeller(id) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers?id=eq.${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: sbHeaders,
+  });
+  if (!res.ok) throw new Error(`Supabase DELETE failed: ${await res.text()}`);
+}
+
+async function sbUploadKYC(file, sellerId) {
+  const ext = file.name.split(".").pop();
+  const path = `${sellerId}/${Date.now()}.${ext}`;
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/seller-docs/${path}`, {
+    method: "POST",
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": file.type },
+    body: file,
+  });
+  if (!res.ok) throw new Error(`KYC upload failed: ${await res.text()}`);
+  return path;
+}
+
+async function sbGetKYCUrl(path) {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/seller-docs/${path}`, {
+    method: "POST",
+    headers: { ...sbHeaders },
+    body: JSON.stringify({ expiresIn: 3600 }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return `${SUPABASE_URL}/storage/v1${data.signedURL}`;
+}
+
+function generateSellerId(businessName, ownerName) {
+  const b = (businessName || "X").trim()[0].toUpperCase();
+  const o = (ownerName || "X").trim()[0].toUpperCase();
+  // Sequential number handled by caller passing in current count
+  return `${b}${o}`;
 }
 
 async function fetchCatalog(creds) {
@@ -158,15 +219,35 @@ function parseCategories(source) {
 
 function parseOccasionMap(source) {
   const map = {};
+  // Find the occasionProductMap block
+  const blockMatch = source.match(/export const occasionProductMap\s*=\s*\{([\s\S]*?)\};/m);
+  if (!blockMatch) return map;
+  const block = blockMatch[1];
   const regex = /'([^']+)':\s*\[([^\]]*)\]/g;
   let m;
-  while ((m = regex.exec(source)) !== null) {
-    if (OCCASION_CATEGORIES.find(o => o.id === m[1])) {
-      map[m[1]] = m[2].split(",").map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-    }
+  while ((m = regex.exec(block)) !== null) {
+    map[m[1]] = m[2].split(",").map(s => parseInt(s.trim())).filter(n => !isNaN(n));
   }
   return map;
 }
+
+// Derive occasion categories list from parsed map keys
+function parseOccasionCategories(source) {
+  const blockMatch = source.match(/export const occasionProductMap\s*=\s*\{([\s\S]*?)\};/m);
+  if (!blockMatch) return [];
+  const block = blockMatch[1];
+  const regex = /'([^']+)':/g;
+  const results = [];
+  let m;
+  while ((m = regex.exec(block)) !== null) {
+    const id = m[1];
+    // Convert slug to display name: "for-your-best-friend" -> "For Your Best Friend"
+    const name = id.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    results.push({ id, name });
+  }
+  return results;
+}
+
 
 // ─── Catalog Writers ──────────────────────────────────────────────────────────
 
@@ -194,6 +275,7 @@ function updateProductInSource(source, product) {
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*moq:\\s*)\\d+`), `$1${product.moq ? Number(product.moq) : 0}`);
   const secCatsArr2 = (product.secondaryCategories||[]).map(c=>`"${sanitizeForJS(c)}"`).join(", ");
   u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*secondaryCategories:\\s*\\[)[^\\]]*(\\])`), `$1${secCatsArr2}$2`);
+  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*sellerId:\\s*)"[^"]*"`), `$1"${sanitizeForJS(product.sellerId || "")}"`);
   return u;
 }
 
@@ -207,7 +289,10 @@ function insertProductIntoSource(source, product, id) {
   const colorsArr = product.colors && product.colors.length > 0 ? product.colors.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
   const moqVal = product.moq ? Number(product.moq) : 0;
   const secCatsArr = product.secondaryCategories && product.secondaryCategories.length > 0 ? product.secondaryCategories.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
-  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}] } },`;
+  const sellerIdVal = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
+  // Also store the human-readable seller_code for the public maker page
+  const sellerCodeVal = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
+  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}], sellerId: ${sellerIdVal}, sellerCode: ${sellerCodeVal} } },`;
   const catKey = product.categoryId.match(/[&\-]/) ? `"${product.categoryId}"` : product.categoryId;
   const catPattern = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
   const match = source.match(catPattern);
@@ -280,6 +365,7 @@ export default function AdminPortal() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [occasionMap, setOccasionMap] = useState({});
+  const [occasionCategories, setOccasionCategories] = useState([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [toast, setToast] = useState(null);
@@ -303,6 +389,17 @@ export default function AdminPortal() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [occasionEdits, setOccasionEdits] = useState({});
 
+  // ── Seller state ────────────────────────────────────────────────────────────
+  const [sellers, setSellers] = useState([]);
+  const [sellersLoading, setSellersLoading] = useState(false);
+  const [editingSeller, setEditingSeller] = useState(null);
+  const [showAddSeller, setShowAddSeller] = useState(false);
+  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", notes: "" });
+  const [newOwnerInput, setNewOwnerInput] = useState("");
+  const [kycFiles, setKycFiles] = useState([]);
+  const [kycUploading, setKycUploading] = useState(false);
+  const kycInputRef = useRef();
+
   const showToast = (message, type = "success") => setToast({ message, type });
 
   async function handleLogin(e) {
@@ -322,6 +419,7 @@ export default function AdminPortal() {
     setCategories(parseCategories(source));
     const oMap = parseOccasionMap(source);
     setOccasionMap(oMap);
+    setOccasionCategories(parseOccasionCategories(source));
     setOccasionEdits(JSON.parse(JSON.stringify(oMap)));
   }
 
@@ -378,6 +476,12 @@ export default function AdminPortal() {
       }
       await commitCatalog(updated, sha, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
       log(`Done! Product ID ${newId} live after Vercel redeploys (~45s).`);
+      // Link product to seller in Supabase and store seller_code
+      if (newProduct.sellerId) {
+        try {
+          await handleLinkProductToSeller(newProduct.sellerId, newId);
+        } catch {}
+      }
       loadCatalogData(updated, sha);
       setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "", secondaryCategories: [] });
       setNewColorInput("");
@@ -493,6 +597,98 @@ export default function AdminPortal() {
     return matchText && (productFilterCat === "all" || p.categoryId === productFilterCat);
   });
 
+  // ── Seller functions ─────────────────────────────────────────────────────────
+
+  async function loadSellers() {
+    setSellersLoading(true);
+    try { setSellers(await sbGetSellers()); }
+    catch (err) { showToast("Could not load sellers: " + err.message, "error"); }
+    finally { setSellersLoading(false); }
+  }
+
+  async function handleCreateSeller() {
+    if (!newSeller.business_name.trim()) return showToast("Business name required.", "error");
+    setPublishing(true);
+    try {
+      // Generate seller code: <B><O>100<N> e.g. AB1001
+      const existingSellers = sellers;
+      const b = newSeller.business_name.trim()[0].toUpperCase();
+      const o = (newSeller.owners[0] || "X").trim()[0].toUpperCase();
+      const prefix = `${b}${o}`;
+      const samePrefix = existingSellers.filter(s => s.seller_code && s.seller_code.startsWith(prefix));
+      const nextNum = 1001 + samePrefix.length;
+      const sellerCode = `${prefix}${nextNum}`;
+      const id = sellerCode.toLowerCase();
+
+      let kycPaths = [];
+      if (kycFiles.length > 0) {
+        setKycUploading(true);
+        for (const file of kycFiles) {
+          const path = await sbUploadKYC(file, id);
+          kycPaths.push(path);
+        }
+        setKycUploading(false);
+      }
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners, location: newSeller.location, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
+      await sbCreateSeller(seller);
+      await loadSellers();
+      setNewSeller({ business_name: "", owners: [], location: "", notes: "" });
+      setKycFiles([]); setNewOwnerInput(""); setShowAddSeller(false);
+      showToast(`Seller "${newSeller.business_name}" created! ID: ${sellerCode}`);
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); setKycUploading(false); }
+  }
+
+  async function handleUpdateSeller() {
+    setPublishing(true);
+    try {
+      let kycPaths = [...(editingSeller.kyc_documents || [])];
+      if (kycFiles.length > 0) {
+        setKycUploading(true);
+        for (const file of kycFiles) {
+          const path = await sbUploadKYC(file, editingSeller.id);
+          kycPaths.push(path);
+        }
+        setKycUploading(false);
+      }
+      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, notes: editingSeller.notes, kyc_documents: kycPaths });
+      await loadSellers();
+      setEditingSeller(null); setKycFiles([]);
+      showToast("Seller updated!");
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); setKycUploading(false); }
+  }
+
+  async function handleLinkProductToSeller(sellerId, productId) {
+    const seller = sellers.find(s => s.id === sellerId);
+    if (!seller) return;
+    const current = seller.product_ids || [];
+    const updated = current.includes(productId) ? current.filter(id => id !== productId) : [...current, productId];
+    try {
+      await sbUpdateSeller(sellerId, { product_ids: updated });
+      await loadSellers();
+      showToast("Seller products updated!");
+    } catch (err) { showToast(err.message, "error"); }
+  }
+
+  async function handleDeleteKYC(seller, path) {
+    try {
+      const updated = seller.kyc_documents.filter(p => p !== path);
+      await sbUpdateSeller(seller.id, { kyc_documents: updated });
+      setEditingSeller(s => ({ ...s, kyc_documents: updated }));
+      await loadSellers();
+      showToast("Document removed.");
+    } catch (err) { showToast(err.message, "error"); }
+  }
+
+  async function openKYCDoc(path) {
+    try {
+      const url = await sbGetKYCUrl(path);
+      if (url) window.open(url, "_blank");
+      else showToast("Could not generate link.", "error");
+    } catch (err) { showToast(err.message, "error"); }
+  }
+
   // ─── LOGIN ────────────────────────────────────────────────────────────────────
 
   if (step === "login") return (
@@ -529,7 +725,13 @@ export default function AdminPortal() {
     { id: "products", label: "Products", icon: "▤" },
     { id: "categories", label: "Categories", icon: "⊞" },
     { id: "occasions", label: "Occasions", icon: "♡" },
+    { id: "sellers", label: "Sellers", icon: "◎" },
   ];
+
+  function handleTabSwitch(tabId) {
+    setActiveTab(tabId);
+    if (tabId === "sellers" && sellers.length === 0) loadSellers();
+  }
 
   // ─── APP ──────────────────────────────────────────────────────────────────────
 
@@ -544,7 +746,7 @@ export default function AdminPortal() {
         </div>
         <nav style={ts.nav}>
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+            <button key={tab.id} onClick={() => handleTabSwitch(tab.id)}
               style={{ ...ts.navBtn, ...(activeTab === tab.id ? ts.navBtnActive : {}) }}>
               <span style={ts.navIcon}>{tab.icon}</span>{tab.label}
             </button>
@@ -668,11 +870,24 @@ export default function AdminPortal() {
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                       <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
                         onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
+                      <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
+                      <select style={ts.input} value={newProduct.sellerId || ""}
+                        onChange={e => {
+                          const sel = sellers.find(s => s.id === e.target.value);
+                          setNewProduct(p => ({ ...p, sellerId: e.target.value, sellerCode: sel?.seller_code || "" }));
+                        }}>
+                        <option value="">— Select seller —</option>
+                        {sellers.map(s => <option key={s.id} value={s.id}>{s.seller_code ? `${s.seller_code} — ` : ""}{s.business_name}</option>)}
+                      </select>
+                      <button type="button" style={{ ...ts.ghostBtn, padding: "6px 12px", fontSize: 11, marginTop: 4 }}
+                        onClick={() => { handleTabSwitch("sellers"); setShowAddSeller(true); }}>
+                        + Create new seller
+                      </button>
                     </div>
                     <div style={ts.card}>
                       <h2 style={ts.cardTitle}>Occasion Categories</h2>
                       <div style={ts.chipGrid}>
-                        {OCCASION_CATEGORIES.map(occ => (
+                        {occasionCategories.map(occ => (
                           <button type="button" key={occ.id}
                             onClick={() => setNewProduct(p => ({
                               ...p,
@@ -745,7 +960,7 @@ export default function AdminPortal() {
                       ["Colours", (newProduct.colors||[]).join(", ") || "none"],
                       ["MOQ", newProduct.moq || "none"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
-                      ["Occasions", newProduct.occasions.map(o => OCCASION_CATEGORIES.find(oc => oc.id === o)?.name).join(", ") || "None"],
+                      ["Occasions", newProduct.occasions.map(o => occasionCategories.find(oc => oc.id === o)?.name).filter(Boolean).join(", ") || "None"],
                       ["Images", imageFiles.map(f => f.name).join(", ")],
                     ].map(([label, val]) => (
                       <div key={label} style={{ marginBottom: 10 }}>
@@ -859,6 +1074,15 @@ export default function AdminPortal() {
                     <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                     <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
                       onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
+                    <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
+                    <select style={ts.input} value={editingProduct.sellerId || ""}
+                      onChange={e => {
+                        const sel = sellers.find(s => s.id === e.target.value);
+                        setEditingProduct(p => ({ ...p, sellerId: e.target.value, sellerCode: sel?.seller_code || "" }));
+                      }}>
+                      <option value="">— Select seller —</option>
+                      {sellers.map(s => <option key={s.id} value={s.id}>{s.seller_code ? `${s.seller_code} — ` : ""}{s.business_name}</option>)}
+                    </select>
                   </div>
                   <div>
                     <label style={ts.label}>Flags</label>
@@ -1072,7 +1296,7 @@ export default function AdminPortal() {
             <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
               Toggle which products appear in each occasion section. Hit Save All when done.
             </p>
-            {OCCASION_CATEGORIES.map(occ => {
+            {occasionCategories.map(occ => {
               const currentIds = occasionEdits[occ.id] || [];
               return (
                 <div key={occ.id} style={{ ...ts.card, marginBottom: 16 }}>
@@ -1098,6 +1322,221 @@ export default function AdminPortal() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* ── SELLERS ── */}
+        {activeTab === "sellers" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div>
+                <h1 style={ts.pageTitle}>Sellers / Makers</h1>
+                <p style={{ margin: 0, fontSize: 12, color: "#888" }}>Internal only — not shown on site</p>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button style={ts.ghostBtn} onClick={loadSellers} disabled={sellersLoading}>
+                  {sellersLoading ? "Loading..." : "↺ Refresh"}
+                </button>
+                <button style={ts.primaryBtn} onClick={() => setShowAddSeller(s => !s)}>+ Add Seller</button>
+              </div>
+            </div>
+
+            {/* Add Seller Form */}
+            {showAddSeller && (
+              <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
+                <h2 style={ts.cardTitle}>New Seller</h2>
+                <div style={ts.grid2}>
+                  <div>
+                    <label style={ts.label}>Business Name *</label>
+                    <input style={ts.input} placeholder="e.g. Bloom & Thread" value={newSeller.business_name}
+                      onChange={e => setNewSeller(s => ({ ...s, business_name: e.target.value }))} />
+                    <label style={ts.label}>Owner(s)</label>
+                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                      <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add owner name"
+                        value={newOwnerInput} onChange={e => setNewOwnerInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newOwnerInput.trim(); if (v) { setNewSeller(s => ({ ...s, owners: [...s.owners, v] })); setNewOwnerInput(""); } } }} />
+                      <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px" }}
+                        onClick={() => { const v = newOwnerInput.trim(); if (v) { setNewSeller(s => ({ ...s, owners: [...s.owners, v] })); setNewOwnerInput(""); } }}>+</button>
+                    </div>
+                    {newSeller.owners.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                        {newSeller.owners.map((o, i) => (
+                          <span key={i} style={ts.colorChip}>{o}
+                            <button type="button" onClick={() => setNewSeller(s => ({ ...s, owners: s.owners.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <label style={ts.label}>Location (HQ)</label>
+                    <input style={ts.input} placeholder="e.g. Mumbai, Maharashtra" value={newSeller.location}
+                      onChange={e => setNewSeller(s => ({ ...s, location: e.target.value }))} />
+                    <label style={ts.label}>Internal Notes</label>
+                    <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} placeholder="Any notes..."
+                      value={newSeller.notes} onChange={e => setNewSeller(s => ({ ...s, notes: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={ts.label}>KYC Documents</label>
+                    <div style={ts.editDropzone} onClick={() => kycInputRef.current?.click()}>
+                      <input ref={kycInputRef} type="file" accept="image/*,.pdf" multiple style={{ display: "none" }}
+                        onChange={e => setKycFiles(prev => [...prev, ...Array.from(e.target.files)])} />
+                      <span style={{ fontSize: 12, color: "#aaa" }}>+ Upload ID / KYC documents</span>
+                    </div>
+                    <p style={ts.fieldHint}>Stored privately in Supabase — not publicly accessible.</p>
+                    {kycFiles.length > 0 && (
+                      <div style={{ marginTop: 8 }}>
+                        {kycFiles.map((f, i) => (
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 8px", background: "#f9f7f4", borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
+                            <span style={{ color: "#555" }}>📄 {f.name}</span>
+                            <button type="button" onClick={() => setKycFiles(prev => prev.filter((_,j)=>j!==i))} style={ts.colorChipX}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                  <button style={ts.ghostBtn} onClick={() => { setShowAddSeller(false); setNewSeller({ business_name: "", owners: [], location: "", notes: "" }); setKycFiles([]); }}>Cancel</button>
+                  <button style={ts.primaryBtn} onClick={handleCreateSeller} disabled={publishing || kycUploading}>
+                    {kycUploading ? "Uploading docs..." : publishing ? "Creating..." : "Create Seller"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Edit Seller Form */}
+            {editingSeller && (
+              <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
+                <h2 style={ts.cardTitle}>Edit: {editingSeller.business_name}</h2>
+                <div style={ts.grid2}>
+                  <div>
+                    <label style={ts.label}>Business Name</label>
+                    <input style={ts.input} value={editingSeller.business_name}
+                      onChange={e => setEditingSeller(s => ({ ...s, business_name: e.target.value }))} />
+                    <label style={ts.label}>Owner(s)</label>
+                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                      <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add owner"
+                        id="editOwnerInput"
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingSeller(s => ({ ...s, owners: [...(s.owners||[]), v] })); e.target.value = ""; } } }} />
+                      <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px" }}
+                        onClick={() => { const inp = document.getElementById("editOwnerInput"); const v = inp.value.trim(); if (v) { setEditingSeller(s => ({ ...s, owners: [...(s.owners||[]), v] })); inp.value = ""; } }}>+</button>
+                    </div>
+                    {(editingSeller.owners||[]).length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                        {editingSeller.owners.map((o, i) => (
+                          <span key={i} style={ts.colorChip}>{o}
+                            <button type="button" onClick={() => setEditingSeller(s => ({ ...s, owners: s.owners.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <label style={ts.label}>Location</label>
+                    <input style={ts.input} value={editingSeller.location || ""}
+                      onChange={e => setEditingSeller(s => ({ ...s, location: e.target.value }))} />
+                    <label style={ts.label}>Internal Notes</label>
+                    <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} value={editingSeller.notes || ""}
+                      onChange={e => setEditingSeller(s => ({ ...s, notes: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={ts.label}>KYC Documents</label>
+                    {(editingSeller.kyc_documents||[]).length > 0 ? (
+                      <div style={{ marginBottom: 10 }}>
+                        {editingSeller.kyc_documents.map((path, i) => (
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", background: "#f9f7f4", borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
+                            <button type="button" onClick={() => openKYCDoc(path)} style={{ background: "none", border: "none", color: "#c8a96e", cursor: "pointer", fontSize: 12, padding: 0, fontFamily: "Georgia, serif" }}>
+                              📄 View document {i + 1}
+                            </button>
+                            <button type="button" onClick={() => handleDeleteKYC(editingSeller, path)} style={ts.colorChipX}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : <p style={{ fontSize: 12, color: "#bbb", marginTop: 4 }}>No documents uploaded.</p>}
+                    <div style={ts.editDropzone} onClick={() => kycInputRef.current?.click()}>
+                      <input ref={kycInputRef} type="file" accept="image/*,.pdf" multiple style={{ display: "none" }}
+                        onChange={e => setKycFiles(prev => [...prev, ...Array.from(e.target.files)])} />
+                      <span style={{ fontSize: 12, color: "#aaa" }}>+ Upload more documents</span>
+                    </div>
+                    {kycFiles.length > 0 && (
+                      <div style={{ marginTop: 8 }}>
+                        {kycFiles.map((f, i) => (
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 8px", background: "#f9f7f4", borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
+                            <span style={{ color: "#555" }}>📄 {f.name}</span>
+                            <button type="button" onClick={() => setKycFiles(prev => prev.filter((_,j)=>j!==i))} style={ts.colorChipX}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Linked Products */}
+                <div style={{ marginTop: 20, borderTop: "1px solid #eee", paddingTop: 16 }}>
+                  <h3 style={{ ...ts.cardTitle, marginBottom: 12 }}>Linked Products ({(editingSeller.product_ids||[]).length})</h3>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxHeight: 200, overflowY: "auto" }}>
+                    {products.map(p => {
+                      const linked = (editingSeller.product_ids||[]).includes(p.id);
+                      return (
+                        <button key={p.id} type="button"
+                          onClick={() => handleLinkProductToSeller(editingSeller.id, p.id).then(() => setEditingSeller(s => ({ ...s, product_ids: linked ? s.product_ids.filter(id=>id!==p.id) : [...(s.product_ids||[]), p.id] })))}
+                          style={{ ...linked ? ts.chipActive : ts.chip, fontSize: 11 }}>
+                          {linked ? "✓ " : ""}{p.title} (ID {p.id})
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                  <button style={ts.ghostBtn} onClick={() => { setEditingSeller(null); setKycFiles([]); }}>Cancel</button>
+                  <button style={ts.primaryBtn} onClick={handleUpdateSeller} disabled={publishing || kycUploading}>
+                    {kycUploading ? "Uploading..." : publishing ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Sellers List */}
+            {sellersLoading ? (
+              <div style={{ textAlign: "center", color: "#aaa", padding: 40 }}>Loading sellers...</div>
+            ) : sellers.length === 0 ? (
+              <div style={{ textAlign: "center", color: "#aaa", padding: 40 }}>No sellers yet. Add your first one above.</div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+                {sellers.map(seller => {
+                  const sellerProducts = products.filter(p => (seller.product_ids||[]).includes(p.id));
+                  return (
+                    <div key={seller.id} style={ts.catCard}>
+                      <div style={ts.catCardTop}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#c8a96e", fontFamily: "monospace" }}>{seller.seller_code || seller.id}</span>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <a href={`/maker/${seller.seller_code || seller.id}`} target="_blank" rel="noreferrer" style={{ ...ts.editBtn, textDecoration: "none" }}>↗ View</a>
+                          <button style={ts.editBtn} onClick={() => { setEditingSeller({ ...seller }); setKycFiles([]); }}>Edit</button>
+                        </div>
+                      </div>
+                      <div style={ts.catCardName}>{seller.business_name}</div>
+                      {seller.location && <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>📍 {seller.location}</div>}
+                      {(seller.owners||[]).length > 0 && (
+                        <div style={{ fontSize: 12, color: "#888", marginBottom: 8 }}>
+                          👤 {seller.owners.join(", ")}
+                        </div>
+                      )}
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        <span style={ts.flag}>{(seller.product_ids||[]).length} products</span>
+                        <span style={{ ...ts.flag, background: "#f0f0f0", color: "#888" }}>
+                          {(seller.kyc_documents||[]).length} doc(s)
+                        </span>
+                      </div>
+                      {sellerProducts.length > 0 && (
+                        <div style={{ marginTop: 8, fontSize: 11, color: "#999", lineHeight: 1.5 }}>
+                          {sellerProducts.slice(0, 3).map(p => p.title).join(" · ")}
+                          {sellerProducts.length > 3 && ` +${sellerProducts.length - 3} more`}
+                        </div>
+                      )}
+                      {seller.notes && <div style={{ marginTop: 8, fontSize: 11, color: "#bbb", fontStyle: "italic" }}>{seller.notes}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

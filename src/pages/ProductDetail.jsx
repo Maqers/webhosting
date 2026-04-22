@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
-import { getProductById, getCategoryByIdOrSlug } from '../data/catalog'
+import { getProductById, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
 import { getWhatsAppNumber } from '../data/contactInfo'
 import ImageWithFallback from '../components/ImageWithFallback'
 import './ProductDetail.css'
@@ -31,7 +31,6 @@ const ProductDetail = () => {
   const handleContactUs = () => {
     const message = `Hello! I want to buy Product ID: ${id} - ${product.title}.`
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    //const url = `https://wa.me/${contactInfo.whatsapp.number}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank')
   }
 
@@ -76,18 +75,28 @@ const ProductDetail = () => {
     )
   }
 
-
   const currentImage = images[selectedImage]
   const categoryName = product.category || (product.categoryId ? getCategoryByIdOrSlug(product.categoryId)?.name : '') || ''
+
+  // ── More from this maker logic ─────────────────────────────────────────────
+  const getMoreFromMaker = () => {
+    const allProds = getAllProducts().filter(p => p.id !== product.id && p.inStock)
+    const sellerCode = product.meta?.sellerCode
+    if (sellerCode) {
+      const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode).slice(0, 3)
+      if (fromSeller.length > 0) return { products: fromSeller, sellerCode }
+    }
+    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 3), sellerCode: null }
+  }
+  const { products: moreProducts, sellerCode: makerCode } = getMoreFromMaker()
 
   return (
     <div className="product-detail">
       <div className="container">
-        {/* <Link to="/products" className="back-button">← Back to Products</Link> */}
-        <button onClick={handleBack} className="back-button">← Back </button>
+        <button onClick={handleBack} className="back-button">← Back</button>
 
         <div className="product-detail-content">
-          {/* Left 50%: Sliding image + zoom lens only */}
+          {/* Left: Image slider */}
           <div className="product-images-section">
             <div
               ref={imageWrapRef}
@@ -107,15 +116,10 @@ const ProductDetail = () => {
               </div>
               {hasMultiple && (
                 <>
-                  <button type="button" className="slider-btn slider-prev" onClick={goPrev} aria-label="Previous image">
-                    ‹
-                  </button>
-                  <button type="button" className="slider-btn slider-next" onClick={goNext} aria-label="Next image">
-                    ›
-                  </button>
+                  <button type="button" className="slider-btn slider-prev" onClick={goPrev} aria-label="Previous image">‹</button>
+                  <button type="button" className="slider-btn slider-next" onClick={goNext} aria-label="Next image">›</button>
                 </>
               )}
-              {/* Zoom lens: visible on hover (desktop), shows 2x magnified area */}
               {lensVisible && currentImage && lensPos.w != null && (
                 <div
                   className="zoom-lens"
@@ -147,20 +151,21 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Right 50%: Content only, normal/responsive */}
+          {/* Right: Product info */}
           <div className="product-info-section">
             {categoryName && <span className="product-category-badge">{categoryName}</span>}
+
+            {/* Also in */}
             {product.meta?.secondaryCategories && product.meta.secondaryCategories.length > 0 && (
               <p className="product-also-in">
                 Also in:{" "}
                 {product.meta.secondaryCategories.map((catId, i) => {
-                  const cat = getCategoryByIdOrSlug(catId);
-                  return cat ? (
-                    <span key={i} className="product-also-in-tag">{cat.name}</span>
-                  ) : null;
+                  const cat = getCategoryByIdOrSlug(catId)
+                  return cat ? <span key={i} className="product-also-in-tag">{cat.name}</span> : null
                 })}
               </p>
             )}
+
             {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-id">Product ID: {product.id}</p>
@@ -172,9 +177,26 @@ const ProductDetail = () => {
               <p className="delivery-info">Delivery: 7-14 business days</p>
             </div>
 
+            {/* MOQ */}
+            {product.meta?.moq > 0 && (
+              <p className="product-moq">Minimum Order Quantity: <strong>{product.meta.moq} units</strong></p>
+            )}
+
+            {/* Colour dropdown */}
+            {product.meta?.colors && product.meta.colors.length > 0 && (
+              <div className="product-colors">
+                <label className="colors-label" htmlFor="color-select">Select Colour:</label>
+                <select id="color-select" className="colors-select">
+                  <option value="">— Choose a colour —</option>
+                  {product.meta.colors.map((c, i) => (
+                    <option key={i} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="product-actions">
               <button type="button" onClick={handleContactUs} className="contact-us-button">
-                {/* Contact Us via WhatsApp */}
                 Place an order via WhatsApp
               </button>
               <p className="inquiry-text">Click to inquire about this product.</p>
@@ -191,6 +213,30 @@ const ProductDetail = () => {
               </ul>
             </div>
           </div>
+
+          {/* More from this maker — spans full width */}
+          {moreProducts.length > 0 && (
+            <div className="more-from-maker">
+              <h3 className="more-from-maker-title">
+                {makerCode ? (
+                  <a href={`/maker/${makerCode}`} className="more-from-maker-link">
+                    More from {makerCode} →
+                  </a>
+                ) : "More from this maker →"}
+              </h3>
+              <div className="more-from-maker-grid">
+                {moreProducts.map(p => (
+                  <a key={p.id} href={`/product/${p.id}`} className="more-from-maker-card">
+                    <div className="more-from-maker-img">
+                      {p.images[0] && <img src={p.images[0]} alt={p.title} loading="lazy" />}
+                    </div>
+                    <p className="more-from-maker-name">{p.title}</p>
+                    <p className="more-from-maker-price">₹{p.price}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
