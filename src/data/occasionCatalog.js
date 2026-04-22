@@ -6,8 +6,9 @@
  */
 
 export const occasionCategories = [
-  { id: "for-your-best-friend",  name: "For Your Best Friend",    slug: "for-your-best-friend",  emoji: "🫂", order: 1  },
-  { id: "for-your-partner",      name: "For Your Partner",         slug: "for-your-partner",       emoji: "💕", order: 2  },
+  { id: "shaadi-fever",          name: "Shaadi Fever",             slug: "shaadi-fever",            emoji: "💍", order: 0  },
+  { id: "for-your-best-friend",  name: "For Your Best Friend",     slug: "for-your-best-friend",    emoji: "🫂", order: 1  },
+  { id: "for-your-partner",      name: "For Your Partner",         slug: "for-your-partner",        emoji: "💕", order: 2  },
   { id: "situationship",         name: "For Your Situationship",   slug: "situationship",           emoji: "🫠", order: 3  },
   { id: "self-love-kits",        name: "Self-Love Kits",           slug: "self-love-kits",          emoji: "🌸", order: 4  },
   { id: "breakup-hampers",       name: "Breakup Hampers",          slug: "breakup-hampers",         emoji: "🫶", order: 5  },
@@ -22,19 +23,20 @@ export const occasionCategories = [
 ]
 
 export const occasionProductMap = {
-  "for-your-best-friend":  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110],
-  "for-your-partner":      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37],
-  "situationship":         [10, 12, 1, 4, 39, 109, 110, 2, 63],
-  "self-love-kits":        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71],
-  "breakup-hampers":       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110],
-  "late-night-cravings":   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110],
-  "the-main-character":    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67],
-  "for-your-work-friend":  [38, 39, 40, 41, 59, 60, 10, 12],
-  "for-your-mom":          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65],
-  "for-your-dad":          [38, 59, 41, 40, 60],
-  "for-your-sibling":      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67],
-  "the-host-gift":         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28],
-  "occasion-gifts":        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8],
+  "shaadi-fever":          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37],
+  "for-your-best-friend":  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114],
+  "for-your-partner":      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114],
+  "situationship":         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114],
+  "self-love-kits":        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
+  "breakup-hampers":       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
+  "late-night-cravings":   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
+  "the-main-character":    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114],
+  "for-your-work-friend":  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114],
+  "for-your-mom":          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118],
+  "for-your-dad":          [38, 59, 41, 40, 60, 113, 114],
+  "for-your-sibling":      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118],
+  "the-host-gift":         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114],
+  "occasion-gifts":        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119],
 }
 
 /**
