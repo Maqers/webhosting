@@ -183,6 +183,8 @@ export const productsByCategory = {
 
     { id: 136, categoryId: "Wedding-Gifts", title: "Rawsilk Coin Pouches", slug: "rawsilk-coin-pouches", description: "Designed with stylish tassel detailing, each pouch reflects traditional charm with a modern finish. The soft sponge padding and smooth satin inner lining ensure durability while keeping your items safe. Finished with a secure press button closure, these pouches are perfect for gifting, festive occasions, weddings, or everyday luxury storage.", price: 80, images: ["/images/whatsapp-image-2026-04-22-at-6.48.34-pm-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["raw silk pouch", "mirror work pouch", "pearl work pouch", "ethnic pouch bag", "designer pouch", "wedding return gift pouch", "festive pouch india", "traditional pouch", "handcrafted pouch", "tassel pouch", "ladies pouch bag", "indian ethnic accessories"], meta: { keywords: ["raw silk pouch with mirror work", "pearl work pouch india", "designer ethnic pouch online", "wedding return gift pouches india", "festive gift pouch for women", "traditional indian pouches", "handcrafted mirror work pouch", "tassel pouch bag india", "luxury ethnic pouch for gifting", "satin lined pouch with button closure", "indian wedding accessories pouch"], colors: [], moq: 16, secondaryCategories: [], sellerId: "", sellerCode: "" } },
 
+    { id: 137, categoryId: "Wedding-Gifts", title: "Banarasi Gift Envelopes", slug: "banarasi-gift-envelopes", description: "Add a royal touch to your gifting with these beautifully crafted Banarasi fabric envelopes, designed with intricate detailing and elegant brooch work. Perfectly blending tradition with sophistication, these envelopes elevate the charm of cash gifting and special occasions. Ideal for weddings, shagun, return favors, and festive hampers, they come in stunning colors to suit every celebration. Price Options: • ₹110 each – MOQ 30 pcs • ₹120 each – MOQ 15 pcs", price: 120, images: ["/images/whatsapp-image-2026-04-22-at-6.48.35-pm.jpeg", "/images/whatsapp-image-2026-04-22-at-6.48.36-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["banarasi envelopes", "shagun envelopes", "wedding envelopes india", "cash gifting envelopes", "designer envelopes", "ethnic gifting envelopes", "brooch envelopes", "festive envelopes", "return gift envelopes", "indian wedding accessories"], meta: { keywords: ["banarasi shagun envelopes online", "wedding cash envelopes india", "designer gifting envelopes with brooch", "ethnic envelopes for weddings", "festive cash gifting envelopes india", "return favor envelopes wedding", "traditional indian envelopes", "premium shagun envelopes india", "banarasi fabric envelopes bulk", "wedding accessories envelopes india"], colors: [], moq: 15, secondaryCategories: [], sellerId: "", sellerCode: "" } },
+
   ],
 };
 
@@ -191,7 +193,7 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125, 131, 132, 133, 134, 135, 136],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125, 131, 132, 133, 134, 135, 136, 137],
   'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129, 130, 134],
   'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129, 130],
@@ -203,8 +205,8 @@ export const occasionProductMap = {
   'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128, 131, 134, 135],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127, 129],
-  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126, 132, 133],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131, 132, 133, 134, 135, 136],
+  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126, 132, 133, 137],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131, 132, 133, 134, 135, 136, 137],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
