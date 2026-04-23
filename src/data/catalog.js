@@ -126,6 +126,8 @@ export const productsByCategory = {
 
     { id: 127, categoryId: "Handmade-Accessories", title: "Anti-tarnish Golden snakewatch", slug: "anti-tarnish-golden-snakewatch", description: "Not just a watch. A whole moment. This gold serpentine wrap watch coils around your wrist like jewellery that also tells time — a crystal-rimmed oval dial, Roman numeral face, and a ridged double-wrap band that sits somewhere between statement bracelet and heirloom piece. Wear it with a white tee and it's the only thing anyone notices. Wear it with a lehenga and watch it hold its own.For the woman who doesn't do subtle.", price: 799, images: ["/images/whatsapp-image-2026-04-22-at-20.43.34.jpeg", "/images/whatsapp-image-2026-04-22-at-20.43.34-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["snake watch", "wrap watch", "bracelet watch", "gold watch", "statement watch", "crystal watch", "serpentine watch", "women's watch", "gift for her", "bold jewellery", "wrist candy", "Indo-western accessories", "fashion watch"], meta: { keywords: ["snake wrap watch", "serpentine watch women", "gold coil watch", "bracelet watch India", "crystal dial watch", "statement watch women", "wrap around watch", "Roman numeral watch gold", "luxury style watch India", "bold wrist watch", "Indo-western jewellery watch", "gift for her watch"], colors: [], moq: 2, secondaryCategories: [], sellerId: "", sellerCode: "" } },
 
+    { id: 128, categoryId: "Handmade-Accessories", title: "Anti-tarnish Bracelet Watch", slug: "anti-tarnish-bracelet-watch", description: "Clean lines. Gold finish. The kind of watch that looks like it costs three times what it does. This minimal square-dial bangle watch by Zido sits flat on the wrist with an octagonal frame and open bangle band — understated enough for the office, polished enough for a dinner date. No fuss, no clutter. Just good taste on your wrist. The everyday watch you'll reach for every day.", price: 769, images: ["/images/whatsapp-image-2026-04-22-at-19.33.29.jpeg", "/images/whatsapp-image-2026-04-22-at-19.33.29-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["square dial watch women", "gold bangle watch", "minimal bracelet watch India", "Zido watch", "octagonal watch", "open bangle watch", "slim gold watch", "elegant everyday watch", "gift watch for women", "dainty gold watch", "office watch women", "classic wrist watch"], meta: { keywords: ["bangle watch", "square watch", "gold watch", "minimal watch", "bracelet watch", "Zido", "women's watch", "everyday watch", "dainty watch", "gift for her", "office accessories", "wrist candy", "slim watch", "elegant watch"], colors: [], moq: 0, secondaryCategories: ["Handmade-Accessories"], sellerId: "", sellerCode: "" } },
+
   ],
   "Oxidised-jewellery": [
     { id: 72, categoryId: "Oxidised-jewellery", title: "Shabnam Chaandbaali Earrings", slug: "shabnam-chaandbaali-earrings", description: "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.", price: 599, images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], popular: true, featured: false, inStock: true, tags: ["chaandbaali", "kundan earrings", "antique gold", "statement earrings", "wedding jewellery", "festive jewellery"], meta: { keywords: ["chaandbaali earrings","kundan chandbali earrings","antique gold earrings","statement ethnic earrings","wedding chandbali earrings","festive indian earrings"] } },
@@ -174,15 +176,15 @@ export const productsByCategory = {
 // ============================================================================
 export const occasionProductMap = {
   'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125],
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127],
-  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123],
-  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128],
+  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128],
+  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126],
