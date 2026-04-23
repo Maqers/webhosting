@@ -66,6 +66,8 @@ export const productsByCategory = {
 
     { id: 124, categoryId: "Handbags", title: "Kundan Elephant Motif Suede Clutch", slug: "kundan-elephant-motif-suede-clutch", description: "Every wedding season needs a clutch this good. Crafted in plush suede and adorned with hand-embellished gold motifs — kundan florals, royal elephants, lotus blooms, and dangling ghungroo bells — this is the kind of bag that becomes the conversation at the shaadi. The pearl-cluster top handle on the ivory version makes it a bridal dream; the bold emerald and blush pink options are built for the baraati who dresses to be remembered. Handcrafted. Wedding-ready. Rs 30 extra for sling", price: 1250, images: ["/images/whatsapp-image-2026-04-22-at-18.09.48.jpeg", "/images/whatsapp-image-2026-04-22-at-18.09.49.jpeg", "/images/whatsapp-image-2026-04-22-at-18.09.50.jpeg"], popular: true, featured: true, inStock: true, tags: ["bridal clutch", "wedding bag", "kundan bag", "elephant motif", "suede clutch", "pearl handle", "Indian wedding accessories", "ethnic clutch", "shaadi accessories", "handcrafted bag", "ghungroo bag", "festive bag", "gift for bride", "bridesmaid gift"], meta: { keywords: ["bridal clutch India", "kundan clutch bag", "wedding clutch purse", "Indian bridal accessories", "elephant motif bag", "suede clutch bag", "pearl handle clutch", "shaadi clutch", "ghungroo clutch", "embellished Indian clutch", "ethnic evening bag", "lehenga clutch", "sangeet bag"], colors: ["Red", "Blue", "Emerald Green", "Dark Green", "Baby Pink", "Ivory"], moq: 0, secondaryCategories: ["Wedding-Gifts"], sellerId: "", sellerCode: "" } },
 
+    { id: 131, categoryId: "Handbags", title: "Gulshan Potli's", slug: "gulshan-potli-s", description: "Our best-selling Gulshan Potli is back in all colors, bringing timeless elegance to your festive and wedding looks. This potli features intricate hand embroidery with delicate floral motifs and shimmering embellishments. The beautifully embroidered handle adds both style and comfort, while the tassel details enhance its traditional charm. Designed with small finishing dots at the back for a refined touch, this potli is perfect for carrying your essentials in style. Ideal for weddings, festive occasions, and gifting. Size: 10 x 8 inches", price: 1449, images: ["/images/whatsapp-image-2026-04-22-at-6.47.46-pm.jpeg", "/images/whatsapp-image-2026-04-22-at-6.47.46-pm-(1).jpeg", "/images/whatsapp-image-2026-04-22-at-6.47.47-pm.jpeg", "/images/whatsapp-image-2026-04-22-at-6.47.47-pm-(2).jpeg"], popular: false, featured: false, inStock: true, tags: ["potli bag", "embroidered potli", "bridal potli bag", "ethnic handbag", "traditional clutch", "wedding accessories", "festive bag", "indian potli", "designer potli", "green potli bag", "handcrafted bag", "ladies ethnic purse"], meta: { keywords: ["gulshan potli bag", "embroidered potli bag india", "bridal potli bag online", "ethnic potli for weddings", "designer potli handbags", "festive clutch india", "traditional indian handbags", "handmade embroidered bags", "wedding return gift potli", "premium potli bag", "indian ethnic accessories", "potli bag for lehenga", "saree accessories bag"], colors: ["Green", "Red", "Pink", "Yellow", "Olive", "White", "Brown"], moq: 0, secondaryCategories: ["Wedding-Gifts"], sellerId: "", sellerCode: "" } },
+
   ],
   "Frames&Paintings": [
     { id: 27, categoryId: "Frames&Paintings", title: "Pressed Flower Memory Frame", slug: "pressed-flower-memory-frame", description: "Preserve your special moments with real pressed flowers, arranged into an elegant keepsake frame. Perfect for gifting or home décor—ideal for wedding flowers, anniversaries, or meaningful memories you want to keep forever.", price: 1859, images: ["/images/17.png","/images/17-1.png"], popular: false, featured: false, inStock: true, tags: ["flowers","memory","frame","keepsake","wedding"], meta: { keywords: ["pressed flower frame","memory keepsake","wedding flowers","home decor","gift"] } },
@@ -179,7 +181,7 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125, 131],
   'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129, 130],
   'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129, 130],
@@ -188,11 +190,11 @@ export const occasionProductMap = {
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124, 130],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128, 131],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127, 129],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
