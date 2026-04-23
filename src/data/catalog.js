@@ -130,6 +130,8 @@ export const productsByCategory = {
 
     { id: 129, categoryId: "Handmade-Accessories", title: "Pearl Centre Flower Stud Earrings", slug: "pearl-centre-flower-stud-earrings", description: "Some earrings you wear. These you notice. White enamel petals edged in gold, with a single pearl at the centre — delicate enough for brunch, polished enough for a wedding. The kind of piece that goes with everything and still feels intentional. Lightweight, stud-back, effortlessly pretty. Quiet luxury, at an honest price.", price: 269, images: ["/images/whatsapp-image-2026-04-22-at-20.44.59.jpeg"], popular: false, featured: false, inStock: true, tags: ["flower studs", "pearl earrings", "white enamel earrings", "gold earrings", "stud earrings", "bridal earrings", "everyday jewellery", "gift for her", "floral jewellery", "lightweight earrings", "wedding accessories", "elegant studs"], meta: { keywords: ["white flower stud earrings", "pearl centre earrings", "gold enamel flower earrings", "bridal stud earrings India", "floral stud earrings", "pearl stud earrings", "elegant everyday earrings", "gift earrings for women", "Korean style earrings India", "wedding earrings", "Indo-western jewellery"], colors: [], moq: 0, secondaryCategories: ["Handmade-Accessories"], sellerId: "", sellerCode: "" } },
 
+    { id: 130, categoryId: "Handmade-Accessories", title: "Drop earrings", slug: "drop-earrings", description: "Gold up top. Silver below. Because why choose? These chunky two-tone anti-tarnish teardrop earrings pull off the mixed metal trend without trying - a polished gold stud drop paired with a mirror-finish silver teardrop that catches light every time you move. Bold enough to be the focal point, minimal enough to wear on a Tuesday. The earring for people who own things in both gold and silver and refuse to compromise.", price: 299, images: ["/images/whatsapp-image-2026-04-22-at-20.40.07-(1).jpeg", "/images/whatsapp-image-2026-04-22-at-20.40.07.jpeg"], popular: false, featured: false, inStock: true, tags: ["two tone earrings", "gold silver teardrop earrings", "chunky drop earrings India", "mixed metal earrings", "statement drop earrings", "bold teardrop earrings", "contemporary jewellery India", "minimalist statement earrings", "gift earrings women", "oversized drop earrings", "everyday bold earrings"], meta: { keywords: ["teardrop earrings", "two tone jewellery", "gold silver earrings", "chunky earrings", "drop earrings", "statement earrings", "mixed metal", "dangle earrings", "bold jewellery", "gift for her", "contemporary jewellery", "everyday earrings", "party earrings"], colors: [], moq: 0, secondaryCategories: ["Handmade-Accessories"], sellerId: "", sellerCode: "" } },
+
   ],
   "Oxidised-jewellery": [
     { id: 72, categoryId: "Oxidised-jewellery", title: "Shabnam Chaandbaali Earrings", slug: "shabnam-chaandbaali-earrings", description: "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.", price: 599, images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], popular: true, featured: false, inStock: true, tags: ["chaandbaali", "kundan earrings", "antique gold", "statement earrings", "wedding jewellery", "festive jewellery"], meta: { keywords: ["chaandbaali earrings","kundan chandbali earrings","antique gold earrings","statement ethnic earrings","wedding chandbali earrings","festive indian earrings"] } },
@@ -178,14 +180,14 @@ export const productsByCategory = {
 // ============================================================================
 export const occasionProductMap = {
   'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125],
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129, 130],
   'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128],
-  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129],
+  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129, 130],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125],
-  'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124],
+  'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124, 130],
   'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127, 129],
