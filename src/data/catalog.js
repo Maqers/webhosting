@@ -151,6 +151,8 @@ export const productsByCategory = {
 
     { id: 120, categoryId: "Wedding-Gifts", title: "Banarasi cash envelopes for sagun", slug: "banarasi-cash-envelopes-for-sagun", description: "Elegant fabric shagun lifafa crafted in rich brocade with delicate pearl lace detailing. Perfect for weddings, festive gifting & cash envelopes that look as special as the occasion.", price: 200, images: ["/images/whatsapp-image-2026-04-22-at-20.11.31-(1).jpeg", "/images/whatsapp-image-2026-04-22-at-20.11.31.jpeg"], popular: false, featured: false, inStock: true, tags: ["shagun lifafa", "fabric shagun envelope", "designer money envelope", "wedding cash envelope", "brocade lifafa", "ethnic gift envelope", "pearl lace envelope", "festive gifting envelope", "Indian wedding accessories", "return gift packaging", "premium shagun cover", "kapda lifafa"], meta: { keywords: ["shagun lifafa", "fabric shagun envelope", "designer money envelope", "wedding cash envelope", "brocade lifafa", "ethnic gift envelope", "pearl lace envelope", "festive gifting envelope", "Indian wedding accessories", "return gift packaging", "premium shagun cover", "kapda lifafa"], colors: ["Turquoise Blue", "Baby Pink", "Sky Blue", "Yellow"], moq: 20, secondaryCategories: ["Handbags"], sellerId: "", sellerCode: "" } },
 
+    { id: 121, categoryId: "Wedding-Gifts", title: "Sparkling Zari Bags", slug: "sparkling-zari-bags", description: "Statement zari fringe bags that bring instant glam ✨ Crafted with layered shimmering tassels for a rich, luxe look, these bags feature a structured design that easily fits your essentials (and your phone). Perfect for weddings, festive nights & party-ready outfits, they come with a sleek sling chain for effortless styling.", price: 1250, images: ["/images/whatsapp-image-2026-04-22-at-18.12.02.jpeg", "/images/whatsapp-image-2026-04-22-at-18.12.03.jpeg", "/images/whatsapp-image-2026-04-22-at-18.12.00.jpeg"], popular: false, featured: false, inStock: true, tags: ["zari fringe bag", "designer potli bag", "festive clutch bag", "Indian wedding purse", "tassel handbag", "ethnic party bag", "bridal clutch", "shimmer fringe bag", "occasion wear handbag", "wedding accessories India", "statement clutch", "festive sling bag"], meta: { keywords: ["zari fringe bag", "designer potli bag", "festive clutch bag", "Indian wedding purse", "tassel handbag", "ethnic party bag", "bridal clutch", "shimmer fringe bag", "occasion wear handbag", "wedding accessories India", "statement clutch", "festive sling bag"], colors: [], moq: 0, secondaryCategories: ["Handbags"], sellerId: "", sellerCode: "" } },
+
   ],
 };
 
@@ -159,16 +161,16 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120],
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121],
   'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120],
-  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114],
+  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114],
-  'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118],
+  'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120],
