@@ -60,6 +60,8 @@ export const productsByCategory = {
     { id: 67, categoryId: "Handbags", title: "Sunflower Crochet Tote Bag", slug: "sunflower-crochet-tote-bag", description: "A handmade crochet tote featuring vibrant sunflower granny squares on a soft blue base. Lightweight yet sturdy, it's perfect for picnics, market runs, and sunny day outings.", price: 999, images: ["/images/55.png","/images/55-1.png","/images/55-2.png"], popular: false, featured: false, inStock: true, tags: ["crochet tote","sunflower bag","granny square bag","picnic tote","handmade crochet bag","boho tote","summer bag"], meta: { keywords: ["sunflower crochet tote","granny square tote bag","handmade crochet picnic bag","boho sunflower bag","summer crochet tote","aesthetic handmade bag"] } },
     { id: 119, categoryId: "Handbags", title: "Banarasi Potlis", slug: "banarasi-potlis", description: "Elegant and festive, this pink brocade potli bag is designed to add a rich ethnic touch to any look. Featuring intricate gold weaving, a statement pearl handle, detailed lace borders, and cascading pearl tassels, it blends classic charm with standout styling. Perfect for weddings, festive occasions, mehendi, sangeet, bridal wear, and gifting, this potli bag is both eye-catching and timeless. Bulk price for these will be 400each Minimum order quantity for bulk price: 585 pcs", price: 585, images: ["/images/whatsapp-image-2026-04-17-at-15.36.12-(3).jpeg", "/images/whatsapp-image-2026-04-17-at-15.36.13.jpeg", "/images/whatsapp-image-2026-04-17-at-15.36.12-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["pink potli bag", "brocade potli bag", "pearl handle potli bag", "bridal potli bag", "wedding potli bag", "festive potli bag", "ethnic potli bag", "zari potli bag", "embroidered potli bag", "traditional potli purse", "women’s ethnic bag", "Indian wedding bag", "return gift potli", "designer potli bag", "pink ethnic clutch"], meta: { keywords: ["pink potli bag", "brocade potli bag", "pearl handle potli bag", "bridal potli bag", "wedding potli bag", "festive potli bag", "ethnic potli bag", "zari potli bag", "embroidered potli bag", "traditional potli purse", "women’s ethnic bag", "Indian wedding bag", "return gift potli", "designer potli bag", "pink ethnic clutch"], colors: [], moq: 0, secondaryCategories: ["Wedding-Gifts"] } },
 
+    { id: 123, categoryId: "Handbags", title: "Textured weave clutch with a chic gold clasp", slug: "textured-weave-clutch-with-a-chic-gold-clasp", description: "Meet your next going-out essential. This hand-woven leather clutch features a rich intrecciato-style weave and a polished gold kiss-lock clasp — the kind of piece that looks expensive without trying. Structured enough to hold its shape, soft enough to gather beautifully in your hands. Available in warm cognac brown and deep wine, it pairs just as effortlessly with a saree as it does with a little black dress. Handcrafted. Limited pieces. Made to be noticed.", price: 1100, images: ["/images/whatsapp-image-2026-04-22-at-18.10.03.jpeg", "/images/whatsapp-image-2026-04-22-at-18.10.04.jpeg", "/images/whatsapp-image-2026-04-22-at-18.10.04-(2).jpeg"], popular: false, featured: false, inStock: true, tags: ["woven leather clutch", "intrecciato clutch bag", "gold clasp purse", "kiss lock clutch", "handcrafted clutch India", "evening clutch bag", "wedding clutch bag", "bridal purse", "artisan leather bag", "boho clutch", "Indo-western clutch"], meta: { keywords: ["clutch bag", "woven faux leather", "gold clasp", "handcrafted bag", "evening bag", "bridal clutch", "wedding accessories", "gift for her", "Indian artisan", "small batch fashion", "cognac bag", "wine bag", "frame bag"], colors: ["Brown", "Wine", "Beige", "Black"], moq: 0, secondaryCategories: [], sellerId: "", sellerCode: "" } },
+
   ],
   "Frames&Paintings": [
     { id: 27, categoryId: "Frames&Paintings", title: "Pressed Flower Memory Frame", slug: "pressed-flower-memory-frame", description: "Preserve your special moments with real pressed flowers, arranged into an elegant keepsake frame. Perfect for gifting or home décor—ideal for wedding flowers, anniversaries, or meaningful memories you want to keep forever.", price: 1859, images: ["/images/17.png","/images/17-1.png"], popular: false, featured: false, inStock: true, tags: ["flowers","memory","frame","keepsake","wedding"], meta: { keywords: ["pressed flower frame","memory keepsake","wedding flowers","home decor","gift"] } },
@@ -164,19 +166,19 @@ export const productsByCategory = {
 // ============================================================================
 export const occasionProductMap = {
   'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122],
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121],
-  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123],
+  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
-  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120],
+  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
