@@ -72,6 +72,8 @@ export const productsByCategory = {
 
     { id: 134, categoryId: "Handbags", title: "Noor -E -Zari Potli", slug: "noor-e-zari-potli", description: "Add a touch of royal elegance to your ensemble with this stunning Mustard Banarasi Potli. Crafted from luxurious Banarasi fabric, it features intricate lacework on the front, beautifully complemented by classy golden tassels for a rich, festive appeal. The potli comes with a delicate lace handle, making it easy to carry while enhancing its graceful look. Designed with proper inner lining and adequate thickness, it ensures durability along with style. Perfect for weddings, festive occasions, family functions, or as a thoughtful gift, this potli is a timeless addition to your ethnic collection. Product Dimensions: 9 x 9 inches", price: 749, images: ["/images/whatsapp-image-2026-04-22-at-6.48.33-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["banarasi potli bag", "mustard potli bag", "bridal potli bag", "lace work potli", "ethnic handbag", "wedding potli bag", "festive clutch india", "traditional handbag", "designer potli", "indian potli purse", "handcrafted potli", "gift for her", "ladies ethnic bag"], meta: { keywords: ["mustard banarasi potli bag", "bridal potli bag india", "lace work potli bag online", "designer potli for weddings", "ethnic potli for festivals", "traditional indian handbags", "banarasi silk potli purse", "festive clutch for women india", "handmade potli bag for gifting", "wedding accessories potli bag", "indian ethnic purse for lehenga saree", "premium potli bags india"], colors: ["Mustard"], moq: 0, secondaryCategories: ["Wedding-Gifts"], sellerId: "", sellerCode: "" } },
 
+    { id: 135, categoryId: "Handbags", title: "Noor Pearl Potli", slug: "noor-pearl-potli", description: "Introducing the elegant Noor Pearl Potli Bag ✨ — a perfect blend of grace and tradition. Crafted from pure Banarasi fabric, this potli features a timeless design with a luxurious finish, making it ideal for weddings and festive occasions. Designed with identical detailing on both sides, it offers a complete 360° premium look. Compact yet spacious, it’s perfect for carrying your essentials while elevating your ethnic outfit. Fabric: Pure Banarasi Size: 9 x 9 inches", price: 849, images: ["/images/whatsapp-image-2026-04-22-at-6.48.34-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["noor pearl potli", "banarasi potli bag", "bridal potli bag", "ethnic handbag", "wedding potli", "festive clutch india", "traditional handbag", "designer potli bag", "indian potli purse", "handcrafted potli", "gift for her", "ladies ethnic bag"], meta: { keywords: ["noor pearl potli bag", "banarasi potli bag india", "bridal potli bag online", "designer potli for weddings", "ethnic potli for festivals", "traditional indian handbags", "festive clutch for women india", "handmade potli bag for gifting", "wedding accessories potli bag", "indian ethnic purse for lehenga saree", "premium potli bags india"], colors: ["Pink"], moq: 0, secondaryCategories: ["Wedding-Gifts"], sellerId: "", sellerCode: "" } },
+
   ],
   "Frames&Paintings": [
     { id: 27, categoryId: "Frames&Paintings", title: "Pressed Flower Memory Frame", slug: "pressed-flower-memory-frame", description: "Preserve your special moments with real pressed flowers, arranged into an elegant keepsake frame. Perfect for gifting or home décor—ideal for wedding flowers, anniversaries, or meaningful memories you want to keep forever.", price: 1859, images: ["/images/17.png","/images/17-1.png"], popular: false, featured: false, inStock: true, tags: ["flowers","memory","frame","keepsake","wedding"], meta: { keywords: ["pressed flower frame","memory keepsake","wedding flowers","home decor","gift"] } },
@@ -187,20 +189,20 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125, 131, 132, 133, 134],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125, 131, 132, 133, 134, 135],
   'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129, 130, 134],
   'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129, 130],
-  'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114, 133, 134],
+  'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114, 133, 134, 135],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
-  'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125, 133, 134],
+  'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125, 133, 134, 135],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124, 130, 134],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128, 131, 134],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128, 131, 134, 135],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127, 129],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126, 132, 133],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131, 132, 133, 134],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131, 132, 133, 134, 135],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
