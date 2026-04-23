@@ -124,6 +124,8 @@ export const productsByCategory = {
     { id: 104, categoryId: "Handmade-Accessories", title: "Emerald Coin Charm Silk Thread Bangles Set", slug: "emerald-coin-charm-silk-thread-bangles-set", description: "Emerald silk-thread bangles stacked with coin charms and tiny gold motifs for a rich, traditional look. Pair with sarees, kurtas, or lehengas—especially in gold, maroon, or green.", price: 249, images: ["/images/91.png","/images/91-1.png"], popular: false, featured: false, inStock: true, tags: ["green silk thread bangles","coin charm bangles","emerald bangles set","traditional bangles","gold tone bangles","ethnic jewellery"], meta: { keywords: ["emerald coin charm silk thread bangles","green coin bangles set","silk thread bangles with coin charms","traditional green bangles for women","green bangles for saree","gold coin charm bangles set","ethnic silk thread bangles green"] } },
     { id: 116, categoryId: "Wedding-Gifts", title: "Lace Potli Bag", slug: "lace-potli-bag", description: "Make your festive look stand out with the bestselling Lace Potli Bag, crafted with rich lace detailing and bold eye-catching tassels. Designed with the same elegant finish on both front and back, this potli bag blends traditional charm with statement styling. Sized at 10 x 8 inches and finished with foam support and inner lining, it offers both structure and convenience for weddings, festive occasions, mehendi, sangeet, and gifting.", price: 1400, images: ["/images/whatsapp-image-2026-04-17-at-15.38.23.jpeg"], popular: true, featured: true, inStock: true, tags: ["potli bag", "lace potli", "ethnic bag", "festive bag", "wedding accessory", "bridal bag", "tassel bag", "embroidered bag", "traditional purse", "handmade look"], meta: { keywords: ["potli bag", "lace potli", "ethnic bag", "festive bag", "wedding accessory", "bridal bag", "tassel bag", "embroidered bag", "traditional purse", "handmade look"], colors: [], moq: 0, secondaryCategories: [] } },
 
+    { id: 127, categoryId: "Handmade-Accessories", title: "Anti-tarnish Golden snakewatch", slug: "anti-tarnish-golden-snakewatch", description: "Not just a watch. A whole moment. This gold serpentine wrap watch coils around your wrist like jewellery that also tells time — a crystal-rimmed oval dial, Roman numeral face, and a ridged double-wrap band that sits somewhere between statement bracelet and heirloom piece. Wear it with a white tee and it's the only thing anyone notices. Wear it with a lehenga and watch it hold its own.For the woman who doesn't do subtle.", price: 799, images: ["/images/whatsapp-image-2026-04-22-at-20.43.34.jpeg", "/images/whatsapp-image-2026-04-22-at-20.43.34-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["snake watch", "wrap watch", "bracelet watch", "gold watch", "statement watch", "crystal watch", "serpentine watch", "women's watch", "gift for her", "bold jewellery", "wrist candy", "Indo-western accessories", "fashion watch"], meta: { keywords: ["snake wrap watch", "serpentine watch women", "gold coil watch", "bracelet watch India", "crystal dial watch", "statement watch women", "wrap around watch", "Roman numeral watch gold", "luxury style watch India", "bold wrist watch", "Indo-western jewellery watch", "gift for her watch"], colors: [], moq: 2, secondaryCategories: [], sellerId: "", sellerCode: "" } },
+
   ],
   "Oxidised-jewellery": [
     { id: 72, categoryId: "Oxidised-jewellery", title: "Shabnam Chaandbaali Earrings", slug: "shabnam-chaandbaali-earrings", description: "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.", price: 599, images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], popular: true, featured: false, inStock: true, tags: ["chaandbaali", "kundan earrings", "antique gold", "statement earrings", "wedding jewellery", "festive jewellery"], meta: { keywords: ["chaandbaali earrings","kundan chandbali earrings","antique gold earrings","statement ethnic earrings","wedding chandbali earrings","festive indian earrings"] } },
@@ -172,7 +174,7 @@ export const productsByCategory = {
 // ============================================================================
 export const occasionProductMap = {
   'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125],
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127],
   'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114],
@@ -180,11 +182,11 @@ export const occasionProductMap = {
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
-  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124],
+  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
