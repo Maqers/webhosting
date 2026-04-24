@@ -50,13 +50,13 @@ const sbHeaders = {
 };
 
 async function sbGetSellers() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers?select=*&order=business_name.asc`, { headers: sbHeaders });
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?select=*&order=business_name.asc`, { headers: sbHeaders });
   if (!res.ok) throw new Error(`Supabase GET failed: ${await res.text()}`);
   return res.json();
 }
 
 async function sbCreateSeller(seller) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db`, {
     method: "POST",
     headers: { ...sbHeaders, "Prefer": "return=representation" },
     body: JSON.stringify(seller),
@@ -66,7 +66,7 @@ async function sbCreateSeller(seller) {
 }
 
 async function sbUpdateSeller(id, updates) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers?id=eq.${encodeURIComponent(id)}`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?id=eq.${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { ...sbHeaders, "Prefer": "return=representation" },
     body: JSON.stringify(updates),
@@ -76,7 +76,7 @@ async function sbUpdateSeller(id, updates) {
 }
 
 async function sbDeleteSeller(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers?id=eq.${encodeURIComponent(id)}`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?id=eq.${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: sbHeaders,
   });

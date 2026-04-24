@@ -19,7 +19,7 @@ export default function SellerPage() {
       try {
         // Fetch seller by seller_code
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/sellers?seller_code=eq.${encodeURIComponent(sellerCode)}&select=product_ids`,
+          `${SUPABASE_URL}/rest/v1/sellers_db?seller_code=eq.${encodeURIComponent(sellerCode)}&select=product_ids`,
           { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } }
         )
         const data = await res.json()
