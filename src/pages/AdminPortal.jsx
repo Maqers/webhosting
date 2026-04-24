@@ -684,12 +684,15 @@ export default function AdminPortal() {
     if (!newSeller.business_name.trim()) return showToast("Business name required.", "error");
     setPublishing(true);
     try {
-      // Generate seller code: <B><O>100<N> e.g. AB1001
-      const existingSellers = sellers;
       const b = newSeller.business_name.trim()[0].toUpperCase();
-      const o = (newSeller.owners[0] || "X").trim()[0].toUpperCase();
+      // Use first owner from list, or from the input field if not yet added
+      const ownerName = newSeller.owners[0] || newOwnerInput || "X";
+      const o = ownerName.trim()[0].toUpperCase();
       const prefix = `${b}${o}`;
-      const samePrefix = existingSellers.filter(s => s.seller_code && s.seller_code.startsWith(prefix));
+
+      // Load latest sellers to get correct count
+      const latestSellers = await sbGetSellers();
+      const samePrefix = latestSellers.filter(s => s.seller_code && s.seller_code.startsWith(prefix));
       const nextNum = 1001 + samePrefix.length;
       const sellerCode = `${prefix}${nextNum}`;
       const id = sellerCode.toLowerCase();
@@ -703,7 +706,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners, location: newSeller.location, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
       await sbCreateSeller(seller);
       await loadSellers();
       setNewSeller({ business_name: "", owners: [], location: "", notes: "" });
