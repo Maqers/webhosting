@@ -86,7 +86,7 @@ async function sbDeleteSeller(id) {
 async function sbUploadKYC(file, sellerId) {
   const ext = file.name.split(".").pop();
   const path = `${sellerId}/${Date.now()}.${ext}`;
-  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/seller-docs/${path}`, {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/seller_docs/${path}`, {
     method: "POST",
     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": file.type },
     body: file,
@@ -96,7 +96,7 @@ async function sbUploadKYC(file, sellerId) {
 }
 
 async function sbGetKYCUrl(path) {
-  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/seller-docs/${path}`, {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/seller_docs/${path}`, {
     method: "POST",
     headers: { ...sbHeaders },
     body: JSON.stringify({ expiresIn: 3600 }),
