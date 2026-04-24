@@ -30,9 +30,7 @@
   }
   
   /* Ensure all padding uses rem, not vw */
-  * {
-    /* Override any vw-based padding */
-  }
+ 
   
   /* Fix font sizes - remove vw from clamp */
   h1, .hero-title {

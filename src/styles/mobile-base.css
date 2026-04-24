@@ -52,16 +52,16 @@ button,
     -webkit-overflow-scrolling: touch;
   }
   
-  /* Android needs explicit touch-action for scrolling */
+  /* Allow vertical scrolling AND pinch-zoom on html/body */
   html,
   body {
-    touch-action: pan-y;
-    -ms-touch-action: pan-y;
+    touch-action: pan-x pan-y pinch-zoom;
+    -ms-touch-action: pan-x pan-y pinch-zoom;
   }
   
   body {
     overflow-x: hidden;
-    overflow-y: auto; /* Ensure vertical scrolling is enabled */
+    overflow-y: auto;
     -webkit-text-size-adjust: 100%;
   }
 }
@@ -69,7 +69,7 @@ button,
 /* Mobile Typography Adjustments */
 @media (max-width: 480px) {
   html {
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
   }
   
   h1 {
@@ -88,12 +88,12 @@ button,
   }
   
   p {
-    font-size: 0.9375rem; /* 15px - better readability */
+    font-size: 0.9375rem;
     line-height: 1.6;
   }
 }
 
-/* Prevent horizontal scroll - Enhanced for zoom safety */
+/* Prevent horizontal scroll */
 @media (max-width: 768px) {
   * {
     max-width: 100%;
@@ -106,7 +106,6 @@ button,
     height: auto;
   }
   
-  /* Ensure all containers use full width on mobile */
   .container,
   .section,
   .card,
@@ -123,12 +122,10 @@ button,
     box-sizing: border-box;
   }
   
-  /* Prevent fixed-width elements from causing overflow */
   [style*="width"] {
     max-width: 100% !important;
   }
   
-  /* Ensure padding doesn't cause overflow */
   .container,
   .section {
     padding-left: clamp(var(--spacing-xs), 4vw, var(--spacing-md)) !important;
@@ -136,22 +133,13 @@ button,
   }
 }
 
-/* Zoom-safe breakpoints - Ensure elements scale properly */
-@media (min-width: 125%) {
-  /* When browser zoom is 125%+ */
-  * {
-    font-size: inherit;
-  }
-}
-
-/* Touch target safety - Ensure minimum sizes at all zoom levels */
+/* Touch target safety */
 @media (pointer: coarse) {
   button,
   a,
   input[type="button"],
   input[type="submit"],
   .clickable {
-    /* Zoom-safe: Fixed rem values instead of vw */
     min-height: 2.75rem;
     min-width: 2.75rem;
   }
@@ -159,7 +147,6 @@ button,
 
 /* CRITICAL FIX: Prevent viewport units from breaking on zoom */
 @media (max-width: 768px) {
-  /* Force all containers to use percentage widths, not viewport units */
   .container,
   .navbar-container,
   .sub-navbar-container,
@@ -173,13 +160,11 @@ button,
     margin-right: 0 !important;
   }
   
-  /* Fix padding to use rem, not vw */
   .container {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
   
-  /* Ensure grids don't use vw in minmax */
   .products-grid,
   .featured-grid,
   .food-grid {
@@ -187,7 +172,6 @@ button,
     gap: 1rem !important;
   }
   
-  /* Fix hero heights - use percentage, not vh clamp */
   .hero {
     min-height: 50vh !important;
     max-height: 100vh !important;
@@ -214,4 +198,3 @@ button,
     }
   }
 }
-
