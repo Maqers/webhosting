@@ -15,6 +15,7 @@ const AboutUs = lazy(() => import('./pages/AboutUs'))
 const FAQs = lazy(() => import('./pages/FAQs'))
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
+const SellerPage = lazy(() => import('./pages/SellerPage'))
 
 const RouteLoadingFallback = () => (
   <div style={{ 
@@ -55,6 +56,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/admin" element={<AdminPortal />} />
+          <Route path="/maker/:sellerCode" element={<SellerPage />} />
         </Routes>
       </Suspense>
       <Footer />
