@@ -248,9 +248,9 @@ const ProductDetail = () => {
               <h3 className="more-from-maker-title">
                 {makerCode ? (
                   <a href={`/maker/${makerCode}`} className="more-from-maker-link">
-                    More from {makerCode} →
+                    More from this maker →
                   </a>
-                ) : "More from this maker →"}
+                ) : "You'd also love →"}
               </h3>
               <div className="more-from-maker-grid">
                 {moreProducts.map(p => (
