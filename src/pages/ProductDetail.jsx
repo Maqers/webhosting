@@ -22,6 +22,8 @@ const ProductDetail = () => {
 
   const product = getProductById(id)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [selectedColor, setSelectedColor] = useState("")
+  const [selectedSize, setSelectedSize] = useState("")
   const [lensVisible, setLensVisible] = useState(false)
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   const imageWrapRef = useRef(null)
@@ -29,7 +31,9 @@ const ProductDetail = () => {
 
   const whatsappNumber = getWhatsAppNumber()
   const handleContactUs = () => {
-    const message = `Hello! I want to buy Product ID: ${id} - ${product.title}.`
+    let message = `Hello! I want to buy Product ID: ${id} - ${product.title}.`
+    if (selectedColor) message += ` Colour: ${selectedColor}.`
+    if (selectedSize) message += ` Size: ${selectedSize}.`
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank')
   }
@@ -182,14 +186,38 @@ const ProductDetail = () => {
               <p className="product-moq">Minimum Order Quantity: <strong>{product.meta.moq} units</strong></p>
             )}
 
-            {/* Colour dropdown */}
+            {/* Colour dropdown — switches image */}
             {product.meta?.colors && product.meta.colors.length > 0 && (
               <div className="product-colors">
                 <label className="colors-label" htmlFor="color-select">Select Colour:</label>
-                <select id="color-select" className="colors-select">
+                <select id="color-select" className="colors-select" value={selectedColor}
+                  onChange={e => {
+                    setSelectedColor(e.target.value);
+                    const found = product.meta.colors.find(c =>
+                      (typeof c === "object" ? c.name : c) === e.target.value
+                    );
+                    if (found && typeof found === "object" && found.imageIndex != null) {
+                      setSelectedImage(found.imageIndex);
+                    }
+                  }}>
                   <option value="">— Choose a colour —</option>
-                  {product.meta.colors.map((c, i) => (
-                    <option key={i} value={c}>{c}</option>
+                  {product.meta.colors.map((c, i) => {
+                    const name = typeof c === "object" ? c.name : c;
+                    return <option key={i} value={name}>{name}</option>;
+                  })}
+                </select>
+              </div>
+            )}
+
+            {/* Size dropdown */}
+            {product.meta?.sizes && product.meta.sizes.length > 0 && (
+              <div className="product-colors">
+                <label className="colors-label" htmlFor="size-select">Select Size:</label>
+                <select id="size-select" className="colors-select" value={selectedSize}
+                  onChange={e => setSelectedSize(e.target.value)}>
+                  <option value="">— Choose a size —</option>
+                  {product.meta.sizes.map((s, i) => (
+                    <option key={i} value={s}>{s}</option>
                   ))}
                 </select>
               </div>

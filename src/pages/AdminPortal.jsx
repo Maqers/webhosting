@@ -178,14 +178,37 @@ function parseProducts(source) {
     const p = products.find(p => p.id === id);
     if (p) p.keywords = kws;
   }
-  // Parse colors
+  // Parse colors (new format: [{name, imageIndex}])
   const colRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*colors:\s*\[([^\]]*)\]/g;
   let cl;
   while ((cl = colRegex.exec(source)) !== null) {
     const id = parseInt(cl[1]);
-    const cols = cl[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
     const p = products.find(p => p.id === id);
-    if (p) p.colors = cols;
+    if (!p) continue;
+    const raw = cl[2].trim();
+    if (!raw) { p.colors = []; continue; }
+    // Try object format first: { name: "Red", imageIndex: 0 }
+    if (raw.includes("name:")) {
+      const objRegex = /\{\s*name:\s*"([^"]+)",\s*imageIndex:\s*(\d+)\s*\}/g;
+      const cols = [];
+      let om;
+      while ((om = objRegex.exec(raw)) !== null) {
+        cols.push({ name: om[1], imageIndex: parseInt(om[2]) });
+      }
+      p.colors = cols;
+    } else {
+      // Legacy string format
+      p.colors = raw.split(",").map(s => ({ name: s.trim().replace(/^"|"$/g, ""), imageIndex: 0 })).filter(c => c.name);
+    }
+  }
+  // Parse sizes
+  const szRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*sizes:\s*\[([^\]]*)\]/g;
+  let sz;
+  while ((sz = szRegex.exec(source)) !== null) {
+    const id = parseInt(sz[1]);
+    const sizes = sz[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+    const p = products.find(p => p.id === id);
+    if (p) p.sizes = sizes;
   }
   // Parse moq
   const moqRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*moq:\s*(\d+)/g;
@@ -286,13 +309,21 @@ function insertProductIntoSource(source, product, id) {
   const kwArr = product.keywords ? product.keywords.split(",").map(k => `"${sanitizeForJS(k.trim())}"`).join(", ") : "";
   const desc = sanitizeForJS(product.description);
   const title = sanitizeForJS(product.title);
-  const colorsArr = product.colors && product.colors.length > 0 ? product.colors.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
+  const colorsArr = product.colors && product.colors.length > 0
+    ? product.colors.map(c => typeof c === "object"
+        ? `{ name: "${sanitizeForJS(c.name)}", imageIndex: ${c.imageIndex ?? 0} }`
+        : `{ name: "${sanitizeForJS(c)}", imageIndex: 0 }`)
+      .join(", ")
+    : "";
+  const sizesArr = product.sizes && product.sizes.length > 0
+    ? product.sizes.map(s => `"${sanitizeForJS(s)}"`).join(", ")
+    : "";
   const moqVal = product.moq ? Number(product.moq) : 0;
   const secCatsArr = product.secondaryCategories && product.secondaryCategories.length > 0 ? product.secondaryCategories.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
   const sellerIdVal = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   // Also store the human-readable seller_code for the public maker page
   const sellerCodeVal = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
-  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}], sellerId: ${sellerIdVal}, sellerCode: ${sellerCodeVal} } },`;
+  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], sizes: [${sizesArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}], sellerId: ${sellerIdVal}, sellerCode: ${sellerCodeVal} } },`;
   const catKey = product.categoryId.match(/[&\-]/) ? `"${product.categoryId}"` : product.categoryId;
   const catPattern = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
   const match = source.match(catPattern);
@@ -371,8 +402,12 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "", secondaryCategories: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
   const [newColorInput, setNewColorInput] = useState("");
+  const [newColorImageIdx, setNewColorImageIdx] = useState(0);
+  const [newSizeInput, setNewSizeInput] = useState("");
+  const [productQueue, setProductQueue] = useState([]); // batch add queue
+  const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
   const [dragOver, setDragOver] = useState(false);
   const [formError, setFormError] = useState("");
@@ -483,10 +518,49 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], moq: "", secondaryCategories: [] });
-      setNewColorInput("");
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
+      setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
+    } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  async function handlePublishQueue() {
+    if (!productQueue.length) return;
+    setPublishing(true); setPublishLog([]);
+    const log = msg => setPublishLog(prev => [...prev, msg]);
+    try {
+      let { source, sha } = await fetchCatalog(creds);
+      let currentId = getNextId(source);
+      for (const qp of productQueue) {
+        log(`Uploading images for "${qp.title}"...`);
+        const imagePaths = [];
+        for (const img of qp._imageFiles) {
+          let imgSha; try { const ex = await ghGet(`public/images/${img.name}`, creds); imgSha = ex.sha; } catch {}
+          await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, imgSha, creds);
+          imagePaths.push(`/images/${img.name}`);
+        }
+        const fullProduct = { ...qp, price: Number(qp.price), images: imagePaths };
+        source = insertProductIntoSource(source, fullProduct, currentId);
+        for (const occ of (qp.occasions || [])) {
+          source = source.replace(
+            new RegExp(`('${occ}'\\s*:\\s*\\[)([^\\]]*)(\\])`, "m"),
+            (_, open, content, close) => { const t = content.trimEnd(); return `${open}${t}${t.endsWith(",") ? " " : ", "}${currentId}${close}`; }
+          );
+        }
+        if (qp.sellerId) { try { await handleLinkProductToSeller(qp.sellerId, currentId); } catch {} }
+        log(`Queued "${qp.title}" as ID ${currentId}`);
+        currentId++;
+      }
+      log("Committing all products...");
+      const result = await commitCatalog(source, sha, `Batch add ${productQueue.length} products`, creds);
+      sha = result.content?.sha || sha;
+      log(`Done! ${productQueue.length} products published in one deploy.`);
+      loadCatalogData(source, sha);
+      setProductQueue([]);
+      showToast(`${productQueue.length} products published!`);
+      setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
@@ -849,20 +923,45 @@ export default function AdminPortal() {
                       <label style={ts.label}>Keywords (comma-separated, for SEO)</label>
                       <input style={ts.input} placeholder="soy candle India, scented candle gift" value={newProduct.keywords}
                         onChange={e => setNewProduct(p => ({ ...p, keywords: e.target.value }))} />
-                      <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional — shown as dropdown on site)</span></label>
+                      <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional — links to product image)</span></label>
                       <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                        <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. Red, Blue, Green"
+                        <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. Red"
                           value={newColorInput} onChange={e => setNewColorInput(e.target.value)}
-                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); setNewColorInput(""); } } }} />
+                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: newColorImageIdx }] })); setNewColorInput(""); setNewColorImageIdx(0); } } }} />
+                        <select style={{ ...ts.input, width: 100, marginTop: 0 }} value={newColorImageIdx}
+                          onChange={e => setNewColorImageIdx(Number(e.target.value))}>
+                          {imageFiles.length === 0
+                            ? <option value={0}>Image 1</option>
+                            : imageFiles.map((_, i) => <option key={i} value={i}>Image {i + 1}</option>)}
+                        </select>
                         <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                          onClick={() => { const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); setNewColorInput(""); } }}>+</button>
+                          onClick={() => { const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: newColorImageIdx }] })); setNewColorInput(""); setNewColorImageIdx(0); } }}>+</button>
                       </div>
+                      <p style={ts.fieldHint}>Select which image number this colour corresponds to.</p>
                       {(newProduct.colors||[]).length > 0 && (
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
                           {newProduct.colors.map((c, i) => (
                             <span key={i} style={ts.colorChip}>
-                              {c}
+                              {c.name} → Img {(c.imageIndex ?? 0) + 1}
                               <button type="button" onClick={() => setNewProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
+                      <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                        <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L or 6, 8, 10"
+                          value={newSizeInput} onChange={e => setNewSizeInput(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newSizeInput.trim(); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } } }} />
+                        <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                          onClick={() => { const v = newSizeInput.trim(); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } }}>+</button>
+                      </div>
+                      {(newProduct.sizes||[]).length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                          {newProduct.sizes.map((s, i) => (
+                            <span key={i} style={ts.colorChip}>
+                              {s}
+                              <button type="button" onClick={() => setNewProduct(p => ({ ...p, sizes: p.sizes.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
                             </span>
                           ))}
                         </div>
@@ -934,9 +1033,36 @@ export default function AdminPortal() {
                   </div>
                 </div>
                 {formError && <p style={ts.errorText}>{formError}</p>}
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                  <button type="submit" style={ts.primaryBtn}>Preview and Publish</button>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
+                  <button type="button" style={ts.ghostBtn} onClick={() => {
+                    setFormError("");
+                    if (!newProduct.title.trim()) return setFormError("Title required.");
+                    if (!newProduct.categoryId) return setFormError("Select a category.");
+                    if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
+                    if (imageFiles.length === 0) return setFormError("Upload at least one image.");
+                    setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
+                    setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
+                    showToast("Added to queue!", "info");
+                  }}>+ Add to Queue</button>
+                  <button type="submit" style={ts.primaryBtn}>Preview & Publish This →</button>
                 </div>
+                {productQueue.length > 0 && (
+                  <div style={{ ...ts.card, marginTop: 16, background: "#fffbf3", border: "1px solid #e8d9b8" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <h3 style={{ ...ts.cardTitle, margin: 0 }}>Queue ({productQueue.length} product{productQueue.length > 1 ? "s" : ""})</h3>
+                      <button style={ts.primaryBtn} disabled={publishing} onClick={handlePublishQueue}>
+                        {publishing ? "Publishing..." : `Publish All (${productQueue.length}) →`}
+                      </button>
+                    </div>
+                    {productQueue.map((qp, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderTop: "1px solid #f0ede8" }}>
+                        <span style={{ fontSize: 13, color: "#555" }}>{qp.title} — ₹{qp.price} — {qp._imageFiles.length} image(s)</span>
+                        <button type="button" onClick={() => setProductQueue(q => q.filter((_, j) => j !== i))} style={ts.colorChipX}>× Remove</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </form>
             )}
             {productStep === "preview" && (
