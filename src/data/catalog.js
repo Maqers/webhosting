@@ -156,6 +156,8 @@ export const productsByCategory = {
 
     { id: 145, categoryId: "Handmade-Accessories", title: "Kashmiri Watch", slug: "kashmiri-watch", description: "Our best-selling Kashmiri Watch is a timeless blend of heritage and elegance, featuring premium kundan detailing in a rich emerald hue. Designed to reflect royal charm and intricate craftsmanship, this statement piece effortlessly enhances your ethnic and festive looks. Perfect for weddings, celebrations, and special occasions, it adds a luxurious touch to every outfit.", price: 925, images: ["/images/remove-the-white-text-box-with-kl-52-from-the-imag.jpeg"], popular: false, featured: false, inStock: true, tags: ["kashmiri watch", "emerald kundan watch", "kundan watch", "ethnic watch", "traditional watch", "designer watch", "bridal accessories", "festive accessories", "heritage jewellery watch", "indian accessories"], meta: { keywords: ["best selling kashmiri kundan watch", "emerald green ethnic watch india", "kundan jewellery watch for women", "traditional indian watches online", "bridal accessories kundan watch", "festive wear watches india", "heritage style watches india", "designer ethnic watches india", "premium kundan watches for women"], colors: [], sizes: [], moq: 0, secondaryCategories: [], sellerId: "", sellerCode: "" } },
 
+    { id: 148, categoryId: "Handmade-Accessories", title: "Crystal Set Gold Bangle Bracelet", slug: "crystal-set-gold-bangle-bracelet", description: "The one bracelet you don't take off. This slim gold bangle is set with a continuous row of round crystals - structured, refined, and quietly luxurious in a way that works from morning coffee to evening plans. No clasp, no fuss. Just slides on and sits perfectly. The kind of wrist piece that makes everything else look more expensive. Stack it. Solo it. Either way, it works.", price: 420, images: ["/images/5ed90421-e9bf-4832-b83b-3007f6bce037.jpg", "/images/82f8b377-45c7-4e9c-be1a-09125676fc7c.jpg", "/images/ad2b0154-0db7-4754-a4a8-00d307f9c29f.jpg"], popular: false, featured: false, inStock: true, tags: ["crystal bangle bracelet", "gold bangle women India", "diamond style bangle", "slim gold bracelet", "luxury bangle gift", "everyday bracelet women", "rhinestone bangle gold", "stacking bracelet India", "minimalist gold bangle", "wrist candy women", "gift bracelet for her", "elegant bangle India"], meta: { keywords: ["crystal bangle bracelet", "gold bangle women India", "diamond style bangle", "slim gold bracelet", "luxury bangle gift", "everyday bracelet women", "rhinestone bangle gold", "stacking bracelet India", "minimalist gold bangle", "wrist candy women", "gift bracelet for her", "elegant bangle India"], colors: [], sizes: [], moq: 0, secondaryCategories: [], sellerId: "", sellerCode: "" } },
+
   ],
   "Oxidised-jewellery": [
     { id: 72, categoryId: "Oxidised-jewellery", title: "Shabnam Chaandbaali Earrings", slug: "shabnam-chaandbaali-earrings", description: "Shabnam Chaandbaalis in an antique-gold crescent design with kundan-style stones and a red center accent, finished with a ghungroo fringe for movement. Wear them to weddings (mehendi/sangeet/reception), festivals, family functions, or to elevate a simple kurta, saree, or lehenga look. Ideal for bridesmaids, wedding guests, and anyone who loves bold traditional jewellery.", price: 599, images: ["/images/59.png", "/images/59-1.png", "/images/59-2.png"], popular: true, featured: false, inStock: true, tags: ["chaandbaali", "kundan earrings", "antique gold", "statement earrings", "wedding jewellery", "festive jewellery"], meta: { keywords: ["chaandbaali earrings","kundan chandbali earrings","antique gold earrings","statement ethnic earrings","wedding chandbali earrings","festive indian earrings"] } },
@@ -214,19 +216,19 @@ export const productsByCategory = {
 // ============================================================================
 export const occasionProductMap = {
   'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 120, 121, 122, 124, 125, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 143, 144, 145, 146],
-  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129, 130, 134, 141, 142, 143, 144, 145, 146],
-  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128, 141, 142, 143, 144, 145, 146],
-  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129, 130, 145],
+  'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114, 121, 123, 124, 127, 128, 129, 130, 134, 141, 142, 143, 144, 145, 146, 148],
+  'for-your-partner':      [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 120, 122, 123, 128, 141, 142, 143, 144, 145, 146, 148],
+  'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 112, 113, 114, 121, 124, 128, 129, 130, 145, 148],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114, 133, 134, 135, 141, 142, 143, 145, 146],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113],
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113, 142],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 122, 124, 125, 133, 134, 135, 141, 142, 143, 144, 146],
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114, 121, 122, 124, 130, 134, 142, 143, 144, 145],
-  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128, 131, 134, 135, 141, 142, 143, 144, 145, 146],
+  'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118, 121, 122, 123, 124, 125, 127, 128, 131, 134, 135, 141, 142, 143, 144, 145, 146, 148],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
-  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127, 129, 142, 143, 144, 145],
+  'for-your-sibling':      [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 120, 123, 124, 127, 129, 142, 143, 144, 145, 148],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 120, 124, 126, 132, 133, 137, 138, 139, 140, 141, 143, 144, 145, 146],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 120, 122, 123, 125, 126, 127, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 148],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
