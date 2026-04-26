@@ -7,31 +7,37 @@ import './Navbar.css'
 const OCCASION_CATEGORIES = [
   { id: 'shaadi-fever',          name: 'Shaadi Fever',             slug: 'shaadi-fever',            emoji: '💍' },
   { id: 'for-your-best-friend',  name: 'For Your Best Friend',     slug: 'for-your-best-friend',    emoji: '🫂' },
-  { id: 'for-your-partner',      name: 'For Your Partner',         slug: 'for-your-partner',        emoji: '💕' },
+  { id: 'for-your-girlfriend',   name: 'For Your Girlfriend',      slug: 'for-your-girlfriend',     emoji: '💕' },
+  { id: 'for-your-boyfriend',    name: 'For Your Boyfriend',       slug: 'for-your-boyfriend',      emoji: '🫶' },
   { id: 'situationship',         name: 'For Your Situationship',   slug: 'situationship',           emoji: '🫠' },
   { id: 'self-love-kits',        name: 'Self-Love Kits',           slug: 'self-love-kits',          emoji: '🌸' },
-  { id: 'breakup-hampers',       name: 'Breakup Hampers',          slug: 'breakup-hampers',         emoji: '🫶' },
+  { id: 'breakup-hampers',       name: 'Breakup Hampers',          slug: 'breakup-hampers',         emoji: '💔' },
+  { id: 'birthday',              name: 'Birthday Gifts',           slug: 'birthday',                emoji: '🎂' },
   { id: 'late-night-cravings',   name: 'Midnight Crisis Gifts',    slug: 'late-night-cravings',     emoji: '🌙' },
   { id: 'the-main-character',    name: 'Main Character Energy',    slug: 'the-main-character',      emoji: '✨' },
   { id: 'for-your-work-friend',  name: 'For Your Work Friend',     slug: 'for-your-work-friend',    emoji: '☕' },
   { id: 'for-your-mom',          name: 'For Your Mom',             slug: 'for-your-mom',            emoji: '🌷' },
   { id: 'for-your-dad',          name: 'For Your Dad',             slug: 'for-your-dad',            emoji: '🫡' },
-  { id: 'for-your-sibling',      name: 'For Your Sibling',         slug: 'for-your-sibling',        emoji: '👀' },
+  { id: 'for-your-sister',       name: 'For Your Sister',          slug: 'for-your-sister',         emoji: '👯' },
+  { id: 'for-your-brother',      name: 'For Your Brother',         slug: 'for-your-brother',        emoji: '🤜' },
   { id: 'the-host-gift',         name: 'The Host Gift',            slug: 'the-host-gift',           emoji: '🥂' },
-  { id: 'occasion-gifts',        name: 'Occasion Gifts',           slug: 'occasion-gifts',          emoji: '🎉' },
+  { id: 'housewarming',          name: 'Housewarming',             slug: 'housewarming',            emoji: '🏡' },
+  { id: 'bachelor-party',        name: 'Bachelor Party',           slug: 'bachelor-party',          emoji: '🎉' },
+  { id: 'godh-bharai',           name: 'Godh Bharai / Baby Shower',slug: 'godh-bharai',             emoji: '🍼' },
+  { id: 'occasion-gifts',        name: 'Occasion Gifts',           slug: 'occasion-gifts',          emoji: '🎁' },
 ]
 
 const PRODUCT_CATEGORIES = [
-  { id: 'Crochet',              name: 'Handmade Crochet',     slug: 'Crochet'              },
-  { id: 'Candles',              name: 'Candles & Diffusers',  slug: 'Candles'              },
-  { id: 'Handbags',             name: 'Handbags & Totes',     slug: 'Handbags'             },
-  { id: 'Frames&Paintings',     name: 'Frames & Paintings',   slug: 'Frames&Paintings'     },
-  { id: 'Home-decor',           name: 'Home Decor',           slug: 'Home-decor'           },
-  { id: 'resin-products',       name: 'Resin Products',       slug: 'resin-products'       },
-  { id: 'Handmade-Accessories', name: 'Jewellery & Accessories', slug: 'Handmade-Accessories' },
-  { id: 'Customised-Hampers',   name: 'Customised Hampers',   slug: 'Customised-Hampers'   },
-  { id: 'Handmade-Soaps',       name: 'Handmade Soaps',       slug: 'Handmade-Soaps'       },
-  { id: 'Wedding-Gifts',        name: 'Wedding Gifts',        slug: 'Wedding-Gifts' },
+  { id: 'Crochet',              name: 'Handmade Crochet',        slug: 'Crochet'              },
+  { id: 'Candles',              name: 'Candles & Diffusers',     slug: 'Candles'              },
+  { id: 'Handbags',             name: 'Handbags & Totes',        slug: 'Handbags'             },
+  { id: 'Frames&Paintings',     name: 'Frames & Paintings',      slug: 'Frames&Paintings'     },
+  { id: 'Home-decor',           name: 'Home Decor',              slug: 'Home-decor'           },
+  { id: 'resin-products',       name: 'Resin Products',          slug: 'resin-products'       },
+  { id: 'Handmade-Accessories', name: 'Jewellery & Accessories',  slug: 'Handmade-Accessories' },
+  { id: 'Customised-Hampers',   name: 'Customised Hampers',      slug: 'Customised-Hampers'   },
+  { id: 'Handmade-Soaps',       name: 'Handmade Soaps',          slug: 'Handmade-Soaps'       },
+  { id: 'Wedding-Gifts',        name: 'Wedding Gifts',           slug: 'Wedding-Gifts'        },
 ]
 
 const Navbar = () => {
@@ -142,13 +148,11 @@ const Navbar = () => {
         <div className="navbar-container">
           <div className="navbar-top-row">
 
-            {/* LEFT: Logo + desktop categories */}
             <div className="navbar-left-section">
               <Link to="/" className="navbar-logo" onClick={closeMenu} aria-label="Home">
                 <span className="logo-text">maqers.in</span>
               </Link>
 
-              {/* Desktop dropdown — hidden on mobile via CSS */}
               <div className="navbar-products-categories" ref={catRef}>
                 <Link to="/products" className={`navbar-dropdown-trigger ${isProductsActive() ? 'active' : ''}`} onMouseEnter={() => setCategoriesOpen(false)}>
                   All Products
@@ -200,17 +204,14 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* CENTER: Desktop search */}
             <div className="navbar-center-section navbar-search-desktop">
               <EnhancedSearchBar onSearch={handleSearch} />
             </div>
 
-            {/* MOBILE: inline search — sits between logo and hamburger */}
             <div className="navbar-mobile-search-inline">
               <EnhancedSearchBar onSearch={handleSearch} />
             </div>
 
-            {/* RIGHT: Desktop nav links + hamburger */}
             <div className="navbar-right-section">
               <div className="navbar-menu-desktop">
                 {menuItems.map((item) => (
@@ -222,13 +223,11 @@ const Navbar = () => {
               </button>
             </div>
           </div>
-          {/* No second row — search is inline on mobile now */}
         </div>
       </nav>
 
       <div className={`navbar-menu-backdrop ${isOpen ? 'active' : ''}`} onClick={closeMenu} aria-hidden="true" />
 
-      {/* Mobile drawer */}
       <div id="mobile-menu" ref={menuRef} className={`navbar-menu-mobile ${isOpen ? 'active' : ''}`} aria-hidden={!isOpen} role="dialog" aria-modal={isOpen} style={{ display: isOpen ? 'flex' : 'none' }}>
         <div className="mobile-menu-header">
           <div className="mobile-menu-header-content">
@@ -246,7 +245,6 @@ const Navbar = () => {
             <Link ref={firstItemRef} to="/" className={`mobile-menu-link ${isActive('/') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>Home</Link>
             <Link to="/products" className={`mobile-menu-link ${isProductsActive() ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>All Products</Link>
 
-            {/* Accordion: Shop by Occasion */}
             <button type="button" className="mobile-accordion-trigger" onClick={() => setMobileOccasionOpen(o => !o)} aria-expanded={mobileOccasionOpen}>
               <span>Shop by Occasion</span>
               <svg className={`mobile-accordion-arrow ${mobileOccasionOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 14 14" fill="none">
@@ -263,7 +261,6 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* Accordion: Shop by Product */}
             <button type="button" className="mobile-accordion-trigger" onClick={() => setMobileProductOpen(o => !o)} aria-expanded={mobileProductOpen}>
               <span>Shop by Product</span>
               <svg className={`mobile-accordion-arrow ${mobileProductOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 14 14" fill="none">

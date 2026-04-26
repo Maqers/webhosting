@@ -56,10 +56,9 @@ const Home = () => {
             Custom Gifts from Indian Home Businesses
           </h1>
           <p className="hero-banner-subtitle">
-            Handcrafted with love, delivered with care
+            Gifts for every occasion, every person — handpicked from India's best home businesses.
           </p>
 
-          {/* Wrapper — only visible on mobile */}
           <div className="hero-category-links" ref={scrollRef}>
             <Link to="/products" className="hero-category-chip all">
               All Products
@@ -154,7 +153,7 @@ const Home = () => {
 const ProductCard = ({ product, index }) => (
   <Link
     to={`/product/${product.id}`}
-    className="product-card hover-lift hover-zoom touch-feedback"
+    className="product-card hover-lift touch-feedback"
     style={{ "--i": index }}
   >
     <div className="product-image-container">

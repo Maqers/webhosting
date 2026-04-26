@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation } from 'react-router-dom'
-import { getAllProducts, getSortedCategories, getProductsByCategory, getCategoryProductCount } from '../data/catalog'
-import { occasionCategories, occasionProductMap, getOccasionProducts } from '../data/occasionCatalog'
+import { getAllProducts, getSortedCategories, getProductsByCategory, getCategoryProductCount, occasionProductMap } from '../data/catalog'
+import { occasionCategories, getOccasionProducts } from '../data/occasionCatalog'
 import ImageWithFallback from '../components/ImageWithFallback'
 import './Categories.css'
 
@@ -31,10 +31,11 @@ const Categories = () => {
     : allCats.find(c => c.slug === selectedCategory || c.id === selectedCategory)
       || { name: selectedCategory, slug: selectedCategory, id: selectedCategory, emoji: '🎁' }
 
+  // KEY FIX: pass occasionProductMap from catalog.js so it's always in sync
   const categoryProducts = selectedCategory === 'All'
     ? getAllProducts()
     : occasionProductMap[selectedCategory]
-      ? getOccasionProducts(getAllProducts, selectedCategory)
+      ? getOccasionProducts(getAllProducts, occasionProductMap, selectedCategory)
       : getProductsByCategory(selectedCategory)
 
   return (
@@ -61,6 +62,9 @@ const Categories = () => {
                   <Link key={cat.id} to={`/category/${cat.slug}`} className="category-card-large scroll-animate">
                     <div className="category-card-emoji">{cat.emoji}</div>
                     <h3 className="category-name">{cat.name}</h3>
+                    {cat.description && (
+                      <p className="category-description">{cat.description}</p>
+                    )}
                     <p className="category-count">{(occasionProductMap[cat.id] || []).length} products</p>
                   </Link>
                 ))}
@@ -88,6 +92,9 @@ const Categories = () => {
                   {selectedCategoryObj?.emoji && <span className="category-page-emoji">{selectedCategoryObj.emoji} </span>}
                   {selectedCategoryObj?.name || selectedCategory}
                 </h1>
+                {selectedCategoryObj?.description && (
+                  <p className="category-page-description">{selectedCategoryObj.description}</p>
+                )}
                 <p className="category-page-subtitle">
                   {categoryProducts.length} {categoryProducts.length === 1 ? 'product' : 'products'} available
                 </p>
@@ -116,7 +123,7 @@ const Categories = () => {
 const ProductCard = ({ product, index }) => {
   const location = useLocation()
   return (
-    <Link to={`/product/${product.id}`} state={{ from: location.pathname }} className="product-card hover-lift hover-zoom touch-feedback" style={{ '--i': index }}>
+    <Link to={`/product/${product.id}`} state={{ from: location.pathname }} className="product-card hover-lift touch-feedback" style={{ '--i': index }}>
       <div className="product-image-container">
         <ImageWithFallback src={product.images[0]} alt={product.title} className="product-image" loading={index < 8 ? 'eager' : 'lazy'} />
         {product.popular && <div className="popular-badge">Popular</div>}

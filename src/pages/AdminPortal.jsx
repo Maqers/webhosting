@@ -166,7 +166,7 @@ function parseProducts(source) {
       images: m[7].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean),
       popular: m[8] === "true", featured: m[9] === "true", inStock: m[10] === "true",
       tags: m[11].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean),
-      keywords: [],
+      keywords: [], colors: [], sizes: [],
     });
   }
   // Parse keywords separately
@@ -456,6 +456,8 @@ export default function AdminPortal() {
     setOccasionMap(oMap);
     setOccasionCategories(parseOccasionCategories(source));
     setOccasionEdits(JSON.parse(JSON.stringify(oMap)));
+    // Load sellers so they're available everywhere
+    loadSellers();
   }
 
   async function refreshCatalog() {
@@ -562,6 +564,37 @@ export default function AdminPortal() {
       showToast(`${productQueue.length} products published!`);
       setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  async function handleReorderProduct(productId, direction) {
+    // Get all products in the same category
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    const sameCat = filteredProducts.filter(p => p.categoryId === product.categoryId);
+    const idx = sameCat.findIndex(p => p.id === productId);
+    const swapIdx = idx + direction;
+    if (swapIdx < 0 || swapIdx >= sameCat.length) return;
+    const swapProduct = sameCat[swapIdx];
+
+    setPublishing(true);
+    try {
+      let { source, sha } = await fetchCatalog(creds);
+      // Swap the two product entries in the source
+      const entryRegex = id => new RegExp(`(    \\{ id: ${id},[\\s\\S]*?\\},)`, "m");
+      const matchA = source.match(entryRegex(productId));
+      const matchB = source.match(entryRegex(swapProduct.id));
+      if (!matchA || !matchB) { showToast("Could not find entries to swap.", "error"); return; }
+      const entryA = matchA[1];
+      const entryB = matchB[1];
+      // Replace A with a placeholder, B with A, placeholder with B
+      source = source.replace(entryA, "%%SWAP_PLACEHOLDER%%");
+      source = source.replace(entryB, entryA);
+      source = source.replace("%%SWAP_PLACEHOLDER%%", entryB);
+      await commitCatalog(source, sha, `Reorder products ${productId} ↔ ${swapProduct.id}`, creds);
+      loadCatalogData(source, sha);
+      showToast("Order updated!");
+    } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
 
@@ -1186,16 +1219,37 @@ export default function AdminPortal() {
                     <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
                       <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add a colour"
                         id="editColorInput"
-                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); e.target.value = ""; } } }} />
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); e.target.value = ""; } } }} />
                       <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                        onClick={() => { const inp = document.getElementById("editColorInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), v] })); inp.value = ""; } }}>+</button>
+                        onClick={() => { const inp = document.getElementById("editColorInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); inp.value = ""; } }}>+</button>
                     </div>
                     {(editingProduct.colors||[]).length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-                        {editingProduct.colors.map((c, i) => (
+                        {editingProduct.colors.map((c, i) => {
+                          const name = typeof c === "object" ? c.name : c;
+                          return (
+                            <span key={i} style={ts.colorChip}>
+                              {name}
+                              <button type="button" onClick={() => setEditingProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
+                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                      <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L or 6, 8, 10"
+                        id="editSizeInput"
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); e.target.value = ""; } } }} />
+                      <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                        onClick={() => { const inp = document.getElementById("editSizeInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); inp.value = ""; } }}>+</button>
+                    </div>
+                    {(editingProduct.sizes||[]).length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                        {editingProduct.sizes.map((s, i) => (
                           <span key={i} style={ts.colorChip}>
-                            {c}
-                            <button type="button" onClick={() => setEditingProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                            {s}
+                            <button type="button" onClick={() => setEditingProduct(p => ({ ...p, sizes: p.sizes.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
                           </span>
                         ))}
                       </div>
@@ -1312,8 +1366,12 @@ export default function AdminPortal() {
                         {p.featured ? "Yes" : "No"}
                       </button>
                     </span>
-                    <span style={{ flex: 1 }}>
+                    <span style={{ flex: 1, display: "flex", gap: 4, alignItems: "center" }}>
                       <button style={ts.editBtn} onClick={() => { setEditingProduct({ ...p }); window.scrollTo({ top: 0, behavior: "smooth" }); }}>Edit</button>
+                      <button style={{ ...ts.editBtn, padding: "3px 7px" }} title="Move up"
+                        onClick={() => handleReorderProduct(product.id, -1)}>↑</button>
+                      <button style={{ ...ts.editBtn, padding: "3px 7px" }} title="Move down"
+                        onClick={() => handleReorderProduct(product.id, 1)}>↓</button>
                     </span>
                   </div>
                 );
