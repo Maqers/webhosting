@@ -1481,31 +1481,74 @@ export default function AdminPortal() {
               </button>
             </div>
             <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
-              Toggle which products appear in each occasion section. Hit Save All when done.
+              Toggle products in each occasion. Use ↑↓ to reorder. Hit Save All when done.
             </p>
             {occasionCategories.map(occ => {
               const currentIds = occasionEdits[occ.id] || [];
+              const selectedProducts = currentIds.map(id => products.find(p => p.id === id)).filter(Boolean);
               return (
                 <div key={occ.id} style={{ ...ts.card, marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <h2 style={{ ...ts.cardTitle, margin: 0 }}>{occ.name}</h2>
                     <span style={ts.flag}>{currentIds.length} products</span>
                   </div>
-                  <div style={ts.occasionProductGrid}>
-                    {products.map(p => {
-                      const active = currentIds.includes(p.id);
-                      return (
-                        <button key={p.id} type="button" onClick={() => toggleOccasionProduct(occ.id, p.id)}
-                          style={{ ...ts.occasionProductBtn, ...(active ? ts.occasionProductBtnActive : {}) }}>
-                          <div style={ts.occasionProductImg}>
-                            {p.images[0] && <img src={p.images[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
+
+                  {/* Ordered list with ↑↓ reorder */}
+                  {selectedProducts.length > 0 && (
+                    <div style={{ marginBottom: 16, border: "1px solid #f0ede8", borderRadius: 8, overflow: "hidden" }}>
+                      <div style={{ padding: "8px 12px", background: "#faf8f5", fontSize: 11, color: "#999", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                        Display order (drag ↑↓ to reorder)
+                      </div>
+                      {selectedProducts.map((p, idx) => (
+                        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: "#fff" }}>
+                          <span style={{ fontSize: 11, color: "#ccc", width: 20, textAlign: "center", flexShrink: 0 }}>{idx + 1}</span>
+                          <img src={p.images[0]} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
+                          <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{p.title} <span style={{ color: "#bbb" }}>ID {p.id}</span></span>
+                          <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                            <button type="button" disabled={idx === 0}
+                              onClick={() => {
+                                const newIds = [...currentIds];
+                                [newIds[idx - 1], newIds[idx]] = [newIds[idx], newIds[idx - 1]];
+                                setOccasionEdits(e => ({ ...e, [occ.id]: newIds }));
+                              }}
+                              style={{ ...ts.editBtn, padding: "3px 8px", opacity: idx === 0 ? 0.3 : 1 }}>↑</button>
+                            <button type="button" disabled={idx === selectedProducts.length - 1}
+                              onClick={() => {
+                                const newIds = [...currentIds];
+                                [newIds[idx + 1], newIds[idx]] = [newIds[idx], newIds[idx + 1]];
+                                setOccasionEdits(e => ({ ...e, [occ.id]: newIds }));
+                              }}
+                              style={{ ...ts.editBtn, padding: "3px 8px", opacity: idx === selectedProducts.length - 1 ? 0.3 : 1 }}>↓</button>
+                            <button type="button"
+                              onClick={() => toggleOccasionProduct(occ.id, p.id)}
+                              style={{ ...ts.editBtn, padding: "3px 8px", color: "#c00" }}>×</button>
                           </div>
-                          <p style={ts.occasionProductName}>{p.title}</p>
-                          <p style={ts.occasionProductId}>ID {p.id}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Toggle grid to add more products */}
+                  <details>
+                    <summary style={{ cursor: "pointer", fontSize: 12, color: "#c8a96e", fontWeight: 600, marginBottom: 10, userSelect: "none" }}>
+                      + Add / remove products ({products.length} total)
+                    </summary>
+                    <div style={{ ...ts.occasionProductGrid, marginTop: 10 }}>
+                      {products.map(p => {
+                        const active = currentIds.includes(p.id);
+                        return (
+                          <button key={p.id} type="button" onClick={() => toggleOccasionProduct(occ.id, p.id)}
+                            style={{ ...ts.occasionProductBtn, ...(active ? ts.occasionProductBtnActive : {}) }}>
+                            <div style={ts.occasionProductImg}>
+                              {p.images[0] && <img src={p.images[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
+                            </div>
+                            <p style={ts.occasionProductName}>{p.title}</p>
+                            <p style={ts.occasionProductId}>ID {p.id}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </details>
                 </div>
               );
             })}
