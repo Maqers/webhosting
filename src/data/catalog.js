@@ -215,7 +215,7 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 124, 131, 133, 134, 135, 130, 129, 128, 127, 121, 122, 125, 136, 137, 138, 139, 140, 94, 95, 96, 84, 104, 92, 85],
   'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114],
   'for-your-girlfriend':   [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114],
   'for-your-boyfriend':    [5, 9, 38, 59, 60, 41, 40, 3, 7, 67, 113, 114],
