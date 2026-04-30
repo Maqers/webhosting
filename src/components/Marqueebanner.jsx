@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import './MarqueeBanner.css';
+import './Marqueebanner.css';
 
 const Diamond = () => (
   <svg width="8" height="8" viewBox="0 0 10 10" fill="#1a1714" style={{ flexShrink: 0, opacity: 0.5 }}>
