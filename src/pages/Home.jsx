@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import ImageWithFallback from "../components/ImageWithFallback";
+import MarqueeBanner from '../components/Marqueebanner';
 import "./Home.css";
 
 import heroBg from "../assets/images/hero/slide1.png";
@@ -93,6 +94,8 @@ const Home = () => {
         </div>
       </section>
 
+      <MarqueeBanner />
+
       <section className="trust-bar">
         <div className="container trust-bar-inner">
           <div className="trust-item">
@@ -116,6 +119,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      
 
       <section className="popular-section">
         <div className="container">
