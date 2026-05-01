@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import EnhancedSearchBar from './EnhancedSearchBar'
 import { getSortedCategories } from '../data/catalog'
+import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import './Navbar.css'
 
 const OCCASION_CATEGORIES = [
@@ -20,6 +22,7 @@ const OCCASION_CATEGORIES = [
   { id: 'for-your-dad',          name: 'For Your Dad',             slug: 'for-your-dad',            emoji: '🫡' },
   { id: 'for-your-sister',       name: 'For Your Sister',          slug: 'for-your-sister',         emoji: '👯' },
   { id: 'for-your-brother',      name: 'For Your Brother',         slug: 'for-your-brother',        emoji: '🤜' },
+  { id: 'for-children',          name: 'For Children',             slug: 'for-children',            emoji: '🧸' },
   { id: 'the-host-gift',         name: 'The Host Gift',            slug: 'the-host-gift',           emoji: '🥂' },
   { id: 'housewarming',          name: 'Housewarming',             slug: 'housewarming',            emoji: '🏡' },
   { id: 'bachelor-party',        name: 'Bachelor Party',           slug: 'bachelor-party',          emoji: '🎉' },
@@ -38,6 +41,7 @@ const PRODUCT_CATEGORIES = [
   { id: 'Customised-Hampers',   name: 'Customised Hampers',      slug: 'Customised-Hampers'   },
   { id: 'Handmade-Soaps',       name: 'Handmade Soaps',          slug: 'Handmade-Soaps'       },
   { id: 'Wedding-Gifts',        name: 'Wedding Gifts',           slug: 'Wedding-Gifts'        },
+  { id: 'Brooches-Clips',      name: 'Brooches & Clips',        slug: 'Brooches-Clips'       },
 ]
 
 const Navbar = () => {
@@ -135,8 +139,10 @@ const Navbar = () => {
 
   useEffect(() => () => { if (catTimerRef.current) clearTimeout(catTimerRef.current) }, [])
 
-  const menuItems = [
-    { path: '/',        label: 'Home'       },
+  const { count, setIsOpen: setCartOpen } = useCart()
+  const { count: wishlistCount, setIsOpen: setWishlistOpen } = useWishlist()
+
+  const menuItems = [    { path: '/',        label: 'Home'       },
     { path: '/about',   label: 'About'      },
     { path: '/faqs',    label: 'FAQs'       },
     { path: '/contact', label: 'Contact Us' },
@@ -208,15 +214,35 @@ const Navbar = () => {
               <EnhancedSearchBar onSearch={handleSearch} />
             </div>
 
-            <div className="navbar-mobile-search-inline">
-              <EnhancedSearchBar onSearch={handleSearch} />
-            </div>
+            <div className="navbar-mobile-search-inline" style={{display:'none'}} />
 
             <div className="navbar-right-section">
               <div className="navbar-menu-desktop">
                 {menuItems.map((item) => (
                   <Link key={item.path} to={item.path} className={`navbar-link ${isActive(item.path) ? 'active' : ''}`}>{item.label}</Link>
                 ))}
+              </div>
+              <div className="navbar-icons">
+                <button className="navbar-icon-btn" onClick={() => setWishlistOpen(true)} aria-label="Open wishlist" type="button">
+                  <div className="navbar-cart-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                    </svg>
+                    {wishlistCount > 0 && <span className="navbar-cart-count">{wishlistCount}</span>}
+                  </div>
+                  <span className="navbar-icon-label">Wishlist</span>
+                </button>
+                <button className="navbar-icon-btn navbar-icon-btn--cart" onClick={() => setCartOpen(true)} aria-label="Open cart" type="button">
+                  <div className="navbar-cart-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                      <line x1="3" y1="6" x2="21" y2="6"/>
+                      <path d="M16 10a4 4 0 01-8 0"/>
+                    </svg>
+                    {count > 0 && <span className="navbar-cart-count">{count}</span>}
+                  </div>
+                  <span className="navbar-icon-label">Cart</span>
+                </button>
               </div>
               <button className={`navbar-toggle ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? 'Close menu' : 'Open menu'} aria-expanded={isOpen} type="button">
                 <span className="hamburger-line"/><span className="hamburger-line"/><span className="hamburger-line"/>
@@ -225,6 +251,11 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+
+      {/* Mobile search row — below navbar, hidden on desktop */}
+      <div className="navbar-mobile-search-row">
+        <EnhancedSearchBar onSearch={handleSearch} />
+      </div>
 
       <div className={`navbar-menu-backdrop ${isOpen ? 'active' : ''}`} onClick={closeMenu} aria-hidden="true" />
 

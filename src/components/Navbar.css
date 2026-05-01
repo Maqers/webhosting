@@ -41,7 +41,7 @@
   max-width: 100%;
   width: 100%;
   margin: 0;
-  padding: 0 12px 0 0;
+  padding: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -50,7 +50,6 @@
   overflow: visible;
 }
 
-/* Single row on all screen sizes */
 .navbar-top-row {
   display: flex;
   align-items: center;
@@ -69,7 +68,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  padding: 0 12px;
+  padding: 0 8px 0 12px;
   height: 100%;
   outline: none;
 }
@@ -82,7 +81,7 @@
 }
 
 .logo-text {
-  font-size: clamp(1.25rem, 4vw, 2rem);
+  font-size: clamp(1.1rem, 3.5vw, 2rem);
   font-weight: 700;
   color: #fff;
   letter-spacing: .05em;
@@ -91,7 +90,7 @@
 }
 
 /* ============================================================================
-   LEFT SECTION (Logo + desktop category dropdowns)
+   LEFT SECTION
    ============================================================================ */
 
 .navbar-left-section {
@@ -100,7 +99,6 @@
   flex-shrink: 0;
 }
 
-/* Desktop: show All Products + Categories triggers */
 .navbar-products-categories {
   display: none;
   align-items: center;
@@ -123,61 +121,44 @@
 }
 
 /* ============================================================================
-   MOBILE INLINE SEARCH — sits between logo and hamburger
+   MOBILE SEARCH ROW — below navbar
    ============================================================================ */
 
-.navbar-mobile-search-inline {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  margin: 0 8px;
+.navbar-mobile-search-inline { display: none !important; }
+
+.navbar-mobile-search-row {
+  display: block;
+  background: #760909;
+  padding: 0 12px 8px;
+  position: sticky;
+  top: var(--navbar-height-mobile);
+  z-index: calc(var(--navbar-z-index) - 1);
 }
 
-.navbar-mobile-search-inline .search-bar-container {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
+.navbar-mobile-search-row .search-form {
+  background: rgba(255,255,255,0.95) !important;
+  border-radius: 6px !important;
+  padding: 2px 4px !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
-.navbar-mobile-search-inline .search-form,
-.navbar-mobile-search-inline .search-input-wrapper {
-  height: auto !important;
-  min-height: unset !important;
-}
-
-.navbar-mobile-search-inline .search-input-wrapper {
-  border-radius: 8px !important;
-  padding: 0 !important;
-}
-
-.navbar-mobile-search-inline .search-input {
+.navbar-mobile-search-row .search-input {
+  font-size: 0.85rem !important;
   padding-top: 6px !important;
   padding-bottom: 6px !important;
-  font-size: 0.85rem !important;
-  min-height: unset !important;
-  height: auto !important;
-  line-height: 1.3 !important;
 }
 
-.navbar-mobile-search-inline .search-icon {
-  width: 14px !important;
-  height: 14px !important;
+@media (min-width: 969px) {
+  .navbar-mobile-search-row { display: none !important; }
 }
 
-/* Kill the old second-row search section everywhere */
 .navbar-mobile-search-section {
   display: none !important;
-  max-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  overflow: hidden !important;
-  visibility: hidden !important;
 }
 
 /* ============================================================================
-   RIGHT SECTION (desktop nav links + hamburger)
+   RIGHT SECTION
    ============================================================================ */
 
 .navbar-right-section {
@@ -185,6 +166,88 @@
   align-items: center;
   flex-shrink: 0;
   gap: 0;
+  margin-left: auto;
+  padding-right: 4px;
+}
+
+/* ============================================================================
+   CART + WISHLIST ICONS — always visible
+   ============================================================================ */
+
+.navbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.navbar-icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  padding: 4px 5px;
+  min-height: unset;
+  min-width: unset;
+  border-radius: 6px;
+  transition: opacity 0.2s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.navbar-icon-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.navbar-icon-btn:hover { opacity: 0.75; }
+
+.navbar-icon-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: white;
+  line-height: 1;
+}
+
+@media (max-width: 968px) {
+  .navbar-icon-label { display: none; }
+  .navbar-icon-btn { padding: 4px 4px; }
+  .navbar-icon-btn svg { width: 17px; height: 17px; }
+}
+
+@media (min-width: 969px) {
+  .navbar-icon-btn { padding: 6px 8px; }
+}
+
+.navbar-cart-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-cart-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: #c8a96e;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 700;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* ============================================================================
@@ -259,7 +322,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* 2-column wide dropdown */
 .navbar-dropdown-menu--wide {
   min-width: 560px !important;
   width: 560px !important;
@@ -347,8 +409,8 @@
 
 .navbar-toggle {
   display: flex; flex-direction: column; background: transparent; border: none;
-  cursor: pointer; padding: 10px; gap: 5px; z-index: 1001;
-  min-width: 44px; min-height: 44px; align-items: center; justify-content: center;
+  cursor: pointer; padding: 8px; gap: 5px; z-index: 1001;
+  min-width: 40px; min-height: 40px; align-items: center; justify-content: center;
   -webkit-tap-highlight-color: transparent; flex-shrink: 0; outline: none;
   border-radius: 6px; transition: background .2s;
 }
@@ -356,7 +418,7 @@
 .navbar-toggle:focus-visible { outline: 2px solid rgba(255,255,255,.8); outline-offset: 2px; }
 
 .hamburger-line {
-  width: 22px; height: 2px; background: #fff;
+  width: 20px; height: 2px; background: #fff;
   border-radius: 2px; transition: all .3s cubic-bezier(.4,0,.2,1);
   display: block;
 }
@@ -402,7 +464,6 @@
   to   { transform: translateX(0);    opacity: 1; }
 }
 
-/* Mobile menu header */
 .mobile-menu-header {
   flex-shrink: 0; background: #760909;
   border-bottom: 1px solid rgba(255,255,255,.1);
@@ -430,7 +491,6 @@
 .mobile-menu-close:hover { background: rgba(255,255,255,.25); }
 .mobile-menu-close svg { width: 20px; height: 20px; }
 
-/* Mobile nav list */
 .mobile-menu-nav {
   display: flex; flex-direction: column; flex: 1;
   padding: 12px; gap: 4px; overflow-y: auto; overflow-x: hidden;
@@ -452,7 +512,6 @@
 .mobile-menu-link:hover { background: rgba(118,9,9,.08); color: var(--primary-color); }
 .mobile-menu-link.active { background: rgba(118,9,9,.12); color: var(--primary-color); font-weight: 600; }
 
-/* Mobile accordion for categories */
 .mobile-accordion-trigger {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px; background: transparent; border: none; cursor: pointer;
@@ -489,7 +548,7 @@
 }
 
 /* ============================================================================
-   TABLET (768–968px) — inline search still visible, show hamburger
+   TABLET
    ============================================================================ */
 
 @media (min-width: 768px) and (max-width: 968px) {
@@ -498,7 +557,7 @@
 }
 
 /* ============================================================================
-   DESKTOP (> 968px) — hide inline search, show desktop search + nav links
+   DESKTOP
    ============================================================================ */
 
 @media (min-width: 969px) {
@@ -508,10 +567,8 @@
     gap: 8px;
   }
 
-  /* Hide mobile inline search */
   .navbar-mobile-search-inline { display: none !important; }
 
-  /* Show desktop search center */
   .navbar-center-section {
     display: flex !important;
     flex: 1;
@@ -519,20 +576,15 @@
     margin: 0 12px;
   }
 
-  /* Show All Products + Categories */
   .navbar-products-categories { display: flex; gap: 4px; }
-
-  /* Show desktop nav links */
   .navbar-menu-desktop { display: flex; }
-
-  /* Hide hamburger + mobile menu + backdrop */
   .navbar-toggle      { display: none; }
   .navbar-menu-mobile { display: none !important; }
   .navbar-menu-backdrop { display: none !important; }
 }
 
 /* ============================================================================
-   BODY LOCK + BLUR WHEN MENU OPEN
+   BODY LOCK
    ============================================================================ */
 
 body.menu-open {
@@ -564,18 +616,11 @@ body.menu-open .navbar-logo {
 }
 
 /* ============================================================================
-   GLOBAL: hide via WhatsApp hint on product cards
+   MISC
    ============================================================================ */
+
 .product-wa-hint { display: none !important; }
-
-/* ============================================================================
-   SEARCH: no submit button
-   ============================================================================ */
 .search-form--no-btn .search-submit-btn { display: none !important; }
-
-/* ============================================================================
-   REDUCED MOTION
-   ============================================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   .navbar-menu-mobile,

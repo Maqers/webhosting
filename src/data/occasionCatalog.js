@@ -126,6 +126,14 @@ export const occasionCategories = [
     description: "He'll say he doesn't want anything. Get him something anyway. Watch him pretend not to love it."
   },
   {
+    id: "for-children",
+    name: "For children",
+    slug: "for-children",
+    emoji: "🧸",
+    order: 13,
+    description: "Because tiny humans deserve the most thoughtful gifts. And because you want to be the favourite aunt/uncle."
+  },
+  {
     id: "the-host-gift",
     name: "The Host Gift",
     slug: "the-host-gift",

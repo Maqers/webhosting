@@ -63,7 +63,7 @@ const Categories = () => {
                     <div className="category-card-emoji">{cat.emoji}</div>
                     <h3 className="category-name">{cat.name}</h3>
                     {cat.description && (
-                      <p className="category-description">{cat.description}</p>
+                      <p className="category-description category-description--desktop">{cat.description}</p>
                     )}
                     <p className="category-count">{(occasionProductMap[cat.id] || []).length} products</p>
                   </Link>

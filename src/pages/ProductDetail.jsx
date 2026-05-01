@@ -2,6 +2,8 @@ import { useState, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getProductById, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
 import { getWhatsAppNumber } from '../data/contactInfo'
+import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import ImageWithFallback from '../components/ImageWithFallback'
 import './ProductDetail.css'
 
@@ -30,6 +32,13 @@ const ProductDetail = () => {
   const imgRef = useRef(null)
 
   const whatsappNumber = getWhatsAppNumber()
+  const { addItem } = useCart()
+  const { toggleItem, isWishlisted } = useWishlist()
+  const wishlisted = isWishlisted(product?.id)
+
+  const handleAddToCart = () => {
+    addItem(product, selectedColor, selectedSize)
+  }
   const handleContactUs = () => {
     let message = `Hello! I want to buy Product ID: ${id} - ${product.title}.`
     if (selectedColor) message += ` Colour: ${selectedColor}.`
@@ -224,10 +233,14 @@ const ProductDetail = () => {
             )}
 
             <div className="product-actions">
-              <button type="button" onClick={handleContactUs} className="contact-us-button">
-                Place an order via WhatsApp
-              </button>
-              <p className="inquiry-text">Click to inquire about this product.</p>
+              <div className="product-action-buttons">
+                <button type="button" onClick={handleAddToCart} className="add-to-cart-button">
+                  Add to Cart
+                </button>
+                <button type="button" onClick={() => toggleItem(product)} className={`add-to-wishlist-button ${wishlisted ? 'wishlisted' : ''}`}>
+                  {wishlisted ? '♥ Wishlisted' : '♡ Wishlist'}
+                </button>
+              </div>
             </div>
 
             <div className="product-features">

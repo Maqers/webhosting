@@ -4,6 +4,11 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
 import PageLoader from './components/PageLoader'
+import CartDrawer from './components/CartDrawer'
+import WishlistDrawer from './components/WishlistDrawer'
+import BottomNav from './components/BottomNav'
+import { CartProvider } from './context/CartContext'
+import { WishlistProvider } from './context/WishlistContext'
 import { initScrollAnimations, cleanupScrollAnimations } from './utils/scrollAnimations'
 import './App.css'
 
@@ -16,12 +21,13 @@ const FAQs = lazy(() => import('./pages/FAQs'))
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 const SellerPage = lazy(() => import('./pages/SellerPage'))
+const Checkout = lazy(() => import('./pages/Checkout'))
 
 const RouteLoadingFallback = () => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     minHeight: '50vh',
     fontSize: '1.125rem',
     color: '#666'
@@ -45,6 +51,8 @@ function AppContent() {
     <>
       <PageLoader />
       <Navbar />
+      <CartDrawer />
+      <WishlistDrawer />
       <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -57,10 +65,12 @@ function AppContent() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="/maker/:sellerCode" element={<SellerPage />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </Suspense>
       <Footer />
       <WhatsAppButton />
+      <BottomNav />
     </>
   )
 }
@@ -73,9 +83,13 @@ function App() {
         v7_relativeSplatPath: true
       }}
     >
-      <div className="App">
-        <AppContent />
-      </div>
+      <CartProvider>
+        <WishlistProvider>
+          <div className="App">
+            <AppContent />
+          </div>
+        </WishlistProvider>
+      </CartProvider>
     </Router>
   )
 }

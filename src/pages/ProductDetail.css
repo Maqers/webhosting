@@ -512,3 +512,85 @@
   transition: color 0.15s;
 }
 .more-from-maker-link:hover { color: var(--primary-color); }
+
+/* Add to Cart button */
+.add-to-cart-button {
+  display: block;
+  width: 100%;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.75rem;
+}
+
+.add-to-cart-button:hover { background: #5a0707; transform: translateY(-1px); }
+.add-to-cart-button:active { transform: translateY(0); }
+
+/* Wishlist button */
+.add-to-wishlist-button {
+  display: block;
+  width: 100%;
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+}
+
+.add-to-wishlist-button:hover {
+  background: rgba(118, 9, 9, 0.06);
+}
+
+.add-to-wishlist-button.wishlisted {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Action buttons row */
+.product-action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.product-action-buttons .add-to-cart-button {
+  flex: 2;
+  margin-bottom: 0;
+}
+
+.product-action-buttons .add-to-wishlist-button {
+  flex: 1;
+  background: var(--primary-color);
+  color: white;
+  border: 2px solid var(--primary-color);
+  font-weight: 700;
+}
+
+.product-action-buttons .add-to-wishlist-button:hover {
+  background: #5a0707;
+  border-color: #5a0707;
+}
+
+.product-action-buttons .add-to-wishlist-button.wishlisted {
+  background: #5a0707;
+  border-color: #5a0707;
+}
+
+/* Fix wishlisted button text wrapping */
+.product-action-buttons .add-to-wishlist-button {
+  white-space: nowrap;
+  min-width: 120px;
+}
