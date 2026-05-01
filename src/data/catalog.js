@@ -16,9 +16,11 @@ export const categories = [
   { id: "Customised-Hampers", name: "Customised Hampers", slug: "Customised-Hampers", description: "Thoughtful gifts for hampers", icon: "hampers", order: 8, featured: false, meta: { keywords: ["gifts","hampers","rakhi","anniversary","birthday","gift"] } },
   { id: "Handmade-Soaps", name: "Handmade Soaps", slug: "Handmade-Soaps", description: "Handcrafted soaps in various fragnances", icon: "soaps", order: 9, featured: false, meta: { keywords: ["soaps","handwash","fragnance","soap","hanging"] } },
   { id: "Wedding-Gifts", name: "Wedding Gifts", slug: "Wedding-Gifts", description: "Unique gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
+  { id: "cosmetics", name: "Cosmetics", slug: "cosmetics", description: "Discover our beautifully curated cosmetic collection, designed to combine elegance with functionality.", icon: "fashion", order: 11, featured: false, meta: { keywords: [] } },
 ];
 
 export const productsByCategory = {
+  "cosmetics": [],
   Crochet: [
     { id: 1, categoryId: "Crochet", title: "Handcrafted Yarn Tulip", slug: "handcrafted-yarn-tulip", description: "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won't wilt, won't fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..", price: 219, images: ["/images/1.png"], popular: false, featured: false, inStock: true, tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"], meta: { keywords: ["tulip","crochet flower","forever","gift","handcrafted"] } },
     { id: 4, categoryId: "Crochet", title: "Crochet Flower Bouquet", slug: "handmade-crochet-flower-bouquet", description: "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a \"just because\" gift.", price: 269, images: ["/images/2.png"], popular: false, featured: false, inStock: true, tags: ["bouquet","crochet","yarn","birthday","gift"], meta: { keywords: ["bouquet","yarn flowers","gift","birthday","anniversary","flowers"] } },
