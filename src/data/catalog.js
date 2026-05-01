@@ -21,6 +21,7 @@ export const categories = [
 
 export const productsByCategory = {
   "cosmetics": [
+    
   ],
   Crochet: [
     { id: 1, categoryId: "Crochet", title: "Handcrafted Yarn Tulip", slug: "handcrafted-yarn-tulip", description: "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won't wilt, won't fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..", price: 219, images: ["/images/1.png"], popular: false, featured: false, inStock: true, tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"], meta: { keywords: ["tulip","crochet flower","forever","gift","handcrafted"] } },
