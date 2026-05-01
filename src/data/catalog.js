@@ -209,6 +209,10 @@ export const productsByCategory = {
 
     { id: 140, categoryId: "Wedding-Gifts", title: "Organza Scrunch Potli", slug: "organza-scrunch-potli", description: "Perfect for dry fruit, mithai gifting, and wedding favors, these beautifully crafted pieces combine functionality with festive elegance. Designed to hold approximately 400–500 grams, they are spacious enough for thoughtful gifting while maintaining a premium look. With a generous diameter of around 16 inches, they make an eye-catching addition to any celebration, from weddings to festive occasions.", price: 115, images: ["/images/whatsapp-image-2026-04-22-at-6.48.42-pm-(1).jpeg", "/images/whatsapp-image-2026-04-22-at-6.48.42-pm-(2).jpeg", "/images/whatsapp-image-2026-04-22-at-6.48.42-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["dry fruit packing", "mithai packaging", "wedding favor packing", "festive gifting trays", "return gift packaging", "indian wedding favors", "gift packing baskets", "ethnic gifting", "wedding hampers india", "festive packaging ideas"], meta: { keywords: ["dry fruit gift packaging india", "mithai gifting trays online", "wedding favor packing ideas india", "festive gift packaging trays", "return gift packing for weddings", "indian wedding hamper packaging", "large gift tray for dry fruits", "ethnic gifting solutions india", "reusable gift packaging trays", "wedding favor trays india"], colors: ["Blue", "Purple", "Orange", "Pink", "Green", "Yellow", "Red", "Baby Pink", "Dark Green"], moq: 12, secondaryCategories: [], sellerId: "", sellerCode: "" } },
 
+    { id: 149, categoryId: "Wedding-Gifts", title: "Trousseau Handle basket", slug: "trousseau-handle-basket", description: "Elegant trousseau handle baskets designed for grand wedding presentations and premium gifting. Crafted in a spacious size, these baskets are perfect for beautifully packing sarees, outfits, cosmetics, accessories, purses, and even footwear. Available in both round and rectangular shapes, they offer versatility along with a luxurious look. The sturdy handle adds ease of carrying, while optional light detailing can elevate the overall presentation. Customisation in colours and sizes makes them ideal for curated wedding trousseau setups. Available Sizes & Shapes: • 18\" Round • 15\" × 21\" Rectangle", price: 2300, images: ["/images/whatsapp-image-2026-05-01-at-2.15.59-pm-(1).jpeg", "/images/whatsapp-image-2026-05-01-at-2.15.59-pm.jpeg", "/images/whatsapp-image-2026-05-01-at-2.15.57-pm.jpeg", "/images/whatsapp-image-2026-05-01-at-2.16.01-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["trousseau basket", "wedding packing basket", "bridal trousseau packing", "handle basket", "wedding hamper basket", "saree packing basket", "bridal packaging", "gift basket india", "wedding accessories packing", "decorative baskets"], meta: { keywords: ["trousseau packing basket india", "wedding saree packing basket", "bridal trousseau basket with handle", "large gift basket for weddings india", "wedding hamper basket online", "decorative baskets for trousseau packing", "indian wedding packaging ideas", "bridal gift packing baskets india", "custom wedding baskets india", "premium trousseau baskets"], colors: [{ name: "Yellow", imageIndex: 0 }, { name: "Orange", imageIndex: 1 }, { name: "Pink", imageIndex: 2 }, { name: "Blue/Purple", imageIndex: 3 }], sizes: ["18\" Round", "15\" × 21\" Rectangle"], moq: 0, secondaryCategories: ["Customised-Hampers"], sellerId: "px1001", sellerCode: "PX1001" } },
+
+    { id: 150, categoryId: "Wedding-Gifts", title: "Satin Potli", slug: "satin-potli", description: "Elegant satin potlis designed specially for packaging and gifting. Made from thick, sturdy satin fabric, these potlis offer a rich look without the need for inner lining. Spacious enough to hold 400–450 grams with ease, they are perfect for packing dry fruits, sweets, small gifts, coconut, gur, and more. A versatile and classy choice for weddings, festive gifting, and return favors. Size can also be customised to suit your needs. Size: 8 × 7 inches (customisable)", price: 100, images: ["/images/whatsapp-image-2026-05-01-at-2.16.11-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["satin potli", "packaging potli", "gifting potli", "wedding return gift potli", "dry fruit pouch", "mithai packing pouch", "ethnic pouch", "festive packaging", "gift pouch india", "potli for favors"], meta: { keywords: ["satin potli for packaging india", "dry fruit packing potli bag", "mithai pouch for gifting", "wedding return gift potli india", "thick satin potli bag online", "festive gift packaging pouches", "potli for coconut and gur packing", "custom size potli bags india", "reusable gift pouches india", "traditional packaging potli"], colors: [], sizes: [], moq: 0, secondaryCategories: [], sellerId: "px1001", sellerCode: "PX1001" } },
+
   ],
 };
 
@@ -217,7 +221,7 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37],
+  'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 149, 150],
   'for-your-best-friend':  [4, 8, 10, 12, 56, 57, 62, 64, 65, 71, 9, 110, 112, 113, 114],
   'for-your-girlfriend':   [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114],
   'for-your-boyfriend':    [5, 9, 38, 59, 60, 41, 40, 3, 7, 67, 113, 114],
@@ -230,14 +234,14 @@ export const occasionProductMap = {
   'for-your-work-friend':  [38, 39, 40, 41, 59, 60, 10, 12, 113, 114],
   'for-your-mom':          [27, 28, 73, 77, 80, 81, 83, 29, 64, 65, 112, 113, 114, 118],
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
-  'for-your-sister':       [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118],
+  'for-your-sister':       [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 149],
   'for-your-brother':      [10, 12, 24, 25, 26, 3, 7, 67, 114],
   'for-children':          [10, 12, 39, 63, 1, 4, 68, 69, 70],
-  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114],
-  'housewarming':          [32, 33, 34, 35, 36, 37, 27, 28, 38, 59, 60, 106, 107, 117],
-  'bachelor-party':        [109, 110, 111, 113, 32, 33, 34, 35, 36, 37],
-  'godh-bharai':           [64, 65, 27, 28, 29, 68, 69, 70, 113, 114],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119],
+  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 149, 150],
+  'housewarming':          [32, 33, 34, 35, 36, 37, 27, 28, 38, 59, 60, 106, 107, 117, 149, 150],
+  'bachelor-party':        [109, 110, 111, 113, 32, 33, 34, 35, 36, 37, 149, 150],
+  'godh-bharai':           [64, 65, 27, 28, 29, 68, 69, 70, 113, 114, 149, 150],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 149, 150],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
