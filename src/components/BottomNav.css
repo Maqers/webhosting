@@ -54,3 +54,9 @@
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 }
+
+  /* Push WhatsApp button above bottom nav */
+  .whatsapp-button,
+  .whatsapp-container {
+    bottom: calc(64px + env(safe-area-inset-bottom)) !important;
+  }

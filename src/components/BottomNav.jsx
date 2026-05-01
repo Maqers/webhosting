@@ -22,14 +22,14 @@ export default function BottomNav() {
         <span>All Products</span>
       </Link>
 
-      <Link to="/categories" className={`bottom-nav-item ${location.pathname === '/categories' && !location.search ? 'active' : ''}`}>
+      <Link to="/by-product" className={`bottom-nav-item ${location.pathname === '/by-product' ? 'active' : ''}`}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M4 6h16M4 12h10M4 18h7"/>
         </svg>
         <span>By Product</span>
       </Link>
 
-      <Link to="/categories" className={`bottom-nav-item ${location.pathname.startsWith('/category/') ? 'active' : ''}`}>
+      <Link to="/by-occasion" className={`bottom-nav-item ${location.pathname === '/by-occasion' || location.pathname.startsWith('/category/') ? 'active' : ''}`}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
         </svg>

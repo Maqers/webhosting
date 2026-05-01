@@ -1,0 +1,74 @@
+.by-page {
+  min-height: 100vh;
+  background: var(--bg-secondary, #f8f8f8);
+  padding-bottom: 80px;
+}
+
+.by-page-header {
+  background: var(--primary-color, #760909);
+  color: white;
+  padding: 1.5rem 1.25rem 1.25rem;
+}
+
+.by-page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: white;
+}
+
+.by-page-header p {
+  font-size: 0.875rem;
+  margin: 0;
+  opacity: 0.85;
+  color: white;
+}
+
+.by-page-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.by-page-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: var(--text-primary, #1a1a1a);
+  background: white;
+  border-bottom: 1px solid #f0ede8;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.by-page-item:active {
+  background: #faf8f5;
+}
+
+.by-page-emoji {
+  font-size: 1.25rem;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+}
+
+.by-page-name {
+  flex: 1;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.by-page-count {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary, #999);
+  flex-shrink: 0;
+}
+
+.by-page-arrow {
+  font-size: 1.25rem;
+  color: #ccc;
+  flex-shrink: 0;
+  line-height: 1;
+}
