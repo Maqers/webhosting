@@ -204,15 +204,10 @@ export default function Checkout() {
                 <div className="checkout-upi-box">
                   <p className="checkout-upi-label">Scan to pay</p>
                   <div className="checkout-qr-placeholder">
-                    <div className="checkout-qr-inner">
-                      <p style={{ fontSize: 13, color: '#888', textAlign: 'center', margin: 0 }}>
-                        UPI ID<br />
-                        <strong style={{ fontSize: 15, color: '#333' }}>{UPI_ID}</strong>
-                      </p>
-                    </div>
+                    <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
                   </div>
                   <p className="checkout-upi-note">
-                    After placing your order, pay ₹{grandTotal.toLocaleString('en-IN')} to the UPI ID above. We'll confirm your order via email soon.
+                    Scan the QR code with GPay, PhonePe, or Paytm to pay ₹{grandTotal.toLocaleString('en-IN')}. We'll confirm your order via email soon.
                   </p>
                 </div>
               )}
