@@ -20,7 +20,8 @@ export const categories = [
 ];
 
 export const productsByCategory = {
-  "cosmetics": [],
+  "cosmetics": [
+  ],
   Crochet: [
     { id: 1, categoryId: "Crochet", title: "Handcrafted Yarn Tulip", slug: "handcrafted-yarn-tulip", description: "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won't wilt, won't fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..", price: 219, images: ["/images/1.png"], popular: false, featured: false, inStock: true, tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"], meta: { keywords: ["tulip","crochet flower","forever","gift","handcrafted"] } },
     { id: 4, categoryId: "Crochet", title: "Crochet Flower Bouquet", slug: "handmade-crochet-flower-bouquet", description: "A cute, forever-flower bouquet handcrafted with soft yarn and wrapped in aesthetic pastel packaging. Choose from multiple flower styles and colors—perfect for birthdays, anniversaries, or a \"just because\" gift.", price: 269, images: ["/images/2.png"], popular: false, featured: false, inStock: true, tags: ["bouquet","crochet","yarn","birthday","gift"], meta: { keywords: ["bouquet","yarn flowers","gift","birthday","anniversary","flowers"] } },
