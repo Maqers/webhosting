@@ -17,9 +17,11 @@ export const categories = [
   { id: "Handmade-Soaps", name: "Handmade Soaps", slug: "Handmade-Soaps", description: "Handcrafted soaps in various fragnances", icon: "soaps", order: 9, featured: false, meta: { keywords: ["soaps","handwash","fragnance","soap","hanging"] } },
   { id: "Wedding-Gifts", name: "Wedding Gifts", slug: "Wedding-Gifts", description: "Unique gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
   { id: "cosmetics", name: "Cosmetics", slug: "cosmetics", description: "Discover our beautifully curated cosmetic collection, designed to combine elegance with functionality.", icon: "fashion", order: 11, featured: false, meta: { keywords: [] } },
+  { id: "brooches-and-clips", name: "Brooches and Clips", slug: "brooches-and-clips", description: "", icon: "fashion", order: 12, featured: false, meta: { keywords: [] } },
 ];
 
 export const productsByCategory = {
+  "brooches-and-clips": [],
   "cosmetics": [
     
   ],
