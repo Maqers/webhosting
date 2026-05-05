@@ -31,10 +31,39 @@
   border-bottom: 1px solid rgba(255,255,255,.1);
   width: 100%;
   isolation: isolate;
+  transition: box-shadow 0.3s;
 }
 
 .navbar.scrolled {
   box-shadow: 0 4px 12px rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.15);
+}
+
+/* Mobile: shrink navbar height when scrolled */
+@media (max-width: 968px) {
+  .navbar.scrolled .navbar-container {
+    height: 48px;
+  }
+  .navbar.scrolled .logo-text {
+    font-size: 1rem;
+  }
+  .navbar.scrolled .navbar-icon-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Mobile search row hides when scrolled */
+@media (max-width: 968px) {
+  .navbar.scrolled + .navbar-mobile-search-row {
+    max-height: 0;
+    padding: 0 12px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  .navbar-mobile-search-row {
+    max-height: 60px;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
 }
 
 .navbar-container {

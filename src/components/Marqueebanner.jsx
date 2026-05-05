@@ -7,7 +7,7 @@ const Diamond = () => (
   </svg>
 );
 
-const items = [
+const desktopItems = [
   "Handcrafted with love",
   "Straight from artisan hands",
   "Find your class",
@@ -18,10 +18,23 @@ const items = [
   "Ethnic elegance, modern edge",
 ];
 
+const mobileItems = [
+  "🔍 Hand-picked sellers",
+  "🎁 Genuinely handmade",
+  "💬 Order via cart",
+  "🇮🇳 Support Indian home biz",
+  "✨ One-of-a-kind pieces",
+  "🚚 Ships across India",
+  "Handcrafted with love",
+  "Curated from Instagram's best",
+];
+
 export default function MarqueeBanner() {
   const trackRef = useRef(null);
   const posRef = useRef(0);
   const rafRef = useRef(null);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 968;
+  const items = isMobile ? mobileItems : desktopItems;
 
   useEffect(() => {
     const track = trackRef.current;

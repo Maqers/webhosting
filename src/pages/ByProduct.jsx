@@ -3,7 +3,7 @@ import { getSortedCategories, getCategoryProductCount } from '../data/catalog'
 import './ByOccasion.css'
 
 export default function ByProduct() {
-  const categories = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
+  const categories = getSortedCategories().filter(c => !['Oxidised-jewellery', 'cosmetics'].includes(c.id))
 
   return (
     <div className="by-page">

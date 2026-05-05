@@ -35,28 +35,19 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .bottom-nav-item svg {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
+  .bottom-nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .bottom-nav-item.active { color: #760909; }
+  .bottom-nav-item:hover  { color: #760909; }
+
+  /* Push WhatsApp button above bottom nav */
+  .whatsapp-button,
+  .whatsapp-container,
+  .whatsapp-fab {
+    bottom: calc(68px + env(safe-area-inset-bottom)) !important;
   }
 
-  .bottom-nav-item.active {
-    color: #760909;
-  }
-
-  .bottom-nav-item:hover {
-    color: #760909;
-  }
-
-  /* Add padding to page content so it doesn't hide behind bottom nav */
+  /* Page padding so nothing hides behind bottom nav */
   body {
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 }
-
-  /* Push WhatsApp button above bottom nav */
-  .whatsapp-button,
-  .whatsapp-container {
-    bottom: calc(64px + env(safe-area-inset-bottom)) !important;
-  }

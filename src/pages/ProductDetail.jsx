@@ -96,10 +96,10 @@ const ProductDetail = () => {
     const allProds = getAllProducts().filter(p => p.id !== product.id && p.inStock)
     const sellerCode = product.meta?.sellerCode
     if (sellerCode) {
-      const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode).slice(0, 3)
+      const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode)
       if (fromSeller.length > 0) return { products: fromSeller, sellerCode }
     }
-    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 3), sellerCode: null }
+    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6), sellerCode: null }
   }
   const { products: moreProducts, sellerCode: makerCode } = getMoreFromMaker()
 

@@ -37,28 +37,14 @@
 }
 
 /* ── CHIP WRAPPER + CHIPS ──────────────────────────────────────── */
-
-/* Desktop: wrapper is transparent, arrows hidden */
 .hero-category-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  gap: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; max-width: 720px; margin: 0 auto; gap: 0;
 }
-
-/* Desktop: chips wrap normally */
 .hero-category-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  justify-content: center;
-  flex: 1;
-  min-width: 0;
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  justify-content: center; flex: 1; min-width: 0;
 }
-
 .hero-category-chip {
   display: inline-flex; align-items: center; justify-content: center;
   padding: .55rem 1.3rem; border-radius: 9999px;
@@ -72,93 +58,39 @@
 .hero-category-chip:hover { background: var(--secondary-color); color: var(--primary-color); border-color: var(--secondary-color); transform: translateY(-1px); }
 .hero-category-chip.all:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
 
-/* Scroll arrows — desktop handled via @media(min-width:769px) below */
-
-/* ── MOBILE ONLY ───────────────────────────────────────────────── */
-/* Extra insurance: hide on tablet/desktop */
-@media (min-width: 769px) {
-  .scroll-btn { display: none !important; }
-}
+@media (min-width: 769px) { .scroll-btn { display: none !important; } }
 
 @media (max-width: 768px) {
   .hero-banner { padding: 2rem 0 1.75rem; }
   .hero-banner-content { padding: 1.25rem 1rem 1.5rem; }
   .hero-banner-title { font-size: clamp(1.4rem, 6vw, 1.9rem); }
   .hero-banner-subtitle { font-size: clamp(.95rem, 3vw, 1.1rem); margin-bottom: var(--spacing-md); }
-
-  /* Wrapper: row with arrows on each side */
-  .hero-category-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    max-width: 100%;
-    padding: 0;
-  }
-
-  /* Chips: single scrollable row */
+  .hero-category-wrapper { display: flex; align-items: center; gap: 6px; max-width: 100%; padding: 0; }
   .hero-category-links {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    justify-content: flex-start;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    /* no scrollbar — arrows do the job */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding: 4px 0;
+    flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+    justify-content: flex-start; scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    -ms-overflow-style: none; padding: 4px 0;
   }
   .hero-category-links::-webkit-scrollbar { display: none; }
-
-  .hero-category-chip {
-    padding: .42rem .95rem;
-    font-size: .83rem;
-  }
-
-  /* Arrow buttons row — sits BELOW the chips, centered */
+  .hero-category-chip { padding: .42rem .95rem; font-size: .83rem; }
   .scroll-arrows {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-top: 8px;
-    padding: 0 4px;
-    box-sizing: border-box;
+    display: flex; justify-content: space-between; align-items: center;
+    width: 100%; margin-top: 8px; padding: 0 4px; box-sizing: border-box;
   }
-
   .scroll-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,.5);
-    background: rgba(0,0,0,.4);
-    color: white;
-    font-size: 1.2rem;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0;
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .2s;
+    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,.5); background: rgba(0,0,0,.4);
+    color: white; font-size: 1.2rem; line-height: 1; cursor: pointer;
+    padding: 0; outline: none; -webkit-tap-highlight-color: transparent;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
   }
-
-  .scroll-btn.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .scroll-btn:active {
-    background: rgba(255,255,255,.25);
-    transform: scale(.92);
-  }
+  .scroll-btn.visible { opacity: 1; pointer-events: auto; }
+  .scroll-btn:active { background: rgba(255,255,255,.25); transform: scale(.92); }
 }
 
-/* ── TRUST BAR ─────────────────────────────────────────────────── */
+/* ── TRUST BAR — desktop only ──────────────────────────────────── */
 .trust-bar { background: #1a1714; padding: 1.4rem 0; }
 .trust-bar-inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
 .trust-item { display: flex; align-items: center; gap: 13px; padding: .6rem 2rem; flex: 1; min-width: 180px; }
@@ -177,26 +109,9 @@
 }
 .trust-divider { width: 1px; height: 38px; background: rgba(255,255,255,.08); flex-shrink: 0; }
 @media (max-width: 900px) { .trust-item { padding: .6rem 1.25rem; } }
-@media (max-width: 768px) {
-  .hero-category-links {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    justify-content: flex-start;
-    padding-bottom: 6px;
 
-    /* smooth scroll */
-    -webkit-overflow-scrolling: touch;
-
-    /* optional: smooth programmatic scroll */
-    scroll-behavior: smooth;
-  }
-
-  .hero-category-chip {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-}
+/* Hide on mobile — content moves to marquee */
+@media (max-width: 968px) { .trust-bar { display: none !important; } }
 
 /* ── SHARED UTILITIES ──────────────────────────────────────────── */
 .section-eyebrow { font-family: var(--font-family-primary); font-size: .82rem; font-weight: var(--font-weight-semibold); letter-spacing: .12em; text-transform: uppercase; color: var(--primary-color); margin: 0 0 .4rem; }

@@ -6,6 +6,10 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import './Navbar.css'
 
+// Product categories are derived directly from catalog.js — no manual sync needed.
+// getSortedCategories() is the single source of truth.
+// Occasion categories remain here since they are managed via occasionCatalog.js
+
 const OCCASION_CATEGORIES = [
   { id: 'shaadi-fever',          name: 'Shaadi Fever',             slug: 'shaadi-fever',            emoji: '💍' },
   { id: 'for-your-best-friend',  name: 'For Your Best Friend',     slug: 'for-your-best-friend',    emoji: '🫂' },
@@ -30,19 +34,8 @@ const OCCASION_CATEGORIES = [
   { id: 'occasion-gifts',        name: 'Occasion Gifts',           slug: 'occasion-gifts',          emoji: '🎁' },
 ]
 
-const PRODUCT_CATEGORIES = [
-  { id: 'Crochet',              name: 'Handmade Crochet',        slug: 'Crochet'              },
-  { id: 'Candles',              name: 'Candles & Diffusers',     slug: 'Candles'              },
-  { id: 'Handbags',             name: 'Handbags & Totes',        slug: 'Handbags'             },
-  { id: 'Frames&Paintings',     name: 'Frames & Paintings',      slug: 'Frames&Paintings'     },
-  { id: 'Home-decor',           name: 'Home Decor',              slug: 'Home-decor'           },
-  { id: 'resin-products',       name: 'Resin Products',          slug: 'resin-products'       },
-  { id: 'Handmade-Accessories', name: 'Jewellery & Accessories',  slug: 'Handmade-Accessories' },
-  { id: 'Customised-Hampers',   name: 'Customised Hampers',      slug: 'Customised-Hampers'   },
-  { id: 'Handmade-Soaps',       name: 'Handmade Soaps',          slug: 'Handmade-Soaps'       },
-  { id: 'Wedding-Gifts',        name: 'Wedding Gifts',           slug: 'Wedding-Gifts'        },
-  { id: 'Brooches-Clips',      name: 'Brooches & Clips',        slug: 'Brooches-Clips'       },
-]
+// IDs to exclude from the navbar product dropdown (internal/legacy categories)
+const EXCLUDED_CATEGORY_IDS = ['Oxidised-jewellery', 'cosmetics']
 
 const Navbar = () => {
   const [isOpen, setIsOpen]           = useState(false)
@@ -50,6 +43,11 @@ const Navbar = () => {
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [mobileOccasionOpen, setMobileOccasionOpen] = useState(false)
   const [mobileProductOpen, setMobileProductOpen]   = useState(false)
+
+  // Derived from catalog.js — always in sync, no manual maintenance
+  const PRODUCT_CATEGORIES = getSortedCategories()
+    .filter(c => !EXCLUDED_CATEGORY_IDS.includes(c.id))
+    .map(c => ({ id: c.id, name: c.name, slug: c.slug || c.id }))
 
   const location  = useLocation()
   const navigate  = useNavigate()
