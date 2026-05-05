@@ -24,6 +24,8 @@ export const productsByCategory = {
   "brooches-and-clips": [],
   "cosmetics": [
     
+    { id: 151, categoryId: "brooches-and-clips", title: "Captain America Brooch", slug: "captain-america-brooch", description: "This meticulously designed Captain America brooch exemplifies superior craftsmanship through thoughtfully selected materials that deliver both resilience and wearability. Its feather light design allows effortless attachment to outerwear, accessories, or bags without compromising comfort or aesthetics. The iconic superhero motif seamlessly transitions across diverse styling contexts, from everyday wear to more polished ensembles. Perfect for collectors and enthusiasts who value artisan excellence and meaningful accessories with enduring appeal. This versatile piece merges pop culture appreciation with refined design sensibilities, transcending fleeting fashion cycles.", price: 749, images: ["/images/dsc_8211.jpg", "/images/screenshot-2026-05-05-at-11.53.15-pm.png"], popular: false, featured: false, inStock: true, tags: ["bead brooch", "handmade brooch", "star pin", "lapel pin", "jacket accessory", "bag pin", "statement brooch", "seed bead jewellery", "handcrafted pin", "colourful brooch"], meta: { keywords: ["handmade bead brooch", "seed bead pin", "red white blue brooch", "star brooch", "circular brooch", "handcrafted brooch India", "beaded lapel pin", "jacket pin", "bag charm brooch", "pop culture brooch", "statement pin"], colors: [], sizes: [], moq: 0, secondaryCategories: ["brooches-and-clips"], sellerId: "li1001", sellerCode: "LI1001" } },
+
   ],
   Crochet: [
     { id: 1, categoryId: "Crochet", title: "Handcrafted Yarn Tulip", slug: "handcrafted-yarn-tulip", description: "A cute, forever-flower tulip made with soft yarn and a sturdy stem—won't wilt, won't fade. Perfect for gifting as a mini bouquet/add-on gift; available in multiple colors (mix & match)..", price: 219, images: ["/images/1.png"], popular: false, featured: false, inStock: true, tags: ["yarn", "tulip", "crochet", "forever-flower", "gift"], meta: { keywords: ["tulip","crochet flower","forever","gift","handcrafted"] } },
@@ -240,7 +242,7 @@ export const occasionProductMap = {
   'for-your-dad':          [38, 59, 41, 40, 60, 113, 114],
   'for-your-sister':       [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 149],
   'for-your-brother':      [10, 12, 24, 25, 26, 3, 7, 67, 114],
-  'for-children':          [10, 12, 39, 63, 1, 4, 68, 69, 70],
+  'for-children':          [10, 12, 39, 63, 1, 4, 68, 69, 70, 151],
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 107, 27, 28, 113, 114, 149, 150],
   'housewarming':          [32, 33, 34, 35, 36, 37, 27, 28, 38, 59, 60, 106, 107, 117, 149, 150],
   'bachelor-party':        [109, 110, 111, 113, 32, 33, 34, 35, 36, 37, 149, 150],
