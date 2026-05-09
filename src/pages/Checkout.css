@@ -486,3 +486,23 @@
   margin: 0;
   width: 100%;
 }
+
+.checkout-fill-info {
+  font-size: 0.875rem;
+  color: var(--primary-color, #760909);
+  font-weight: 600;
+  text-align: center;
+  margin: 0.75rem 0 1rem;
+  padding: 0.625rem 1rem;
+  background: rgba(118, 9, 9, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(118, 9, 9, 0.15);
+}
+
+.checkout-upi-inline-note {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #666);
+  text-align: center;
+  margin-top: 0.75rem;
+  font-style: italic;
+}

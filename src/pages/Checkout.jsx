@@ -201,16 +201,16 @@ export default function Checkout() {
               </div>
 
               {paymentMethod === 'upi' && (
-                <div className="checkout-upi-box">
-                  <p className="checkout-upi-label">Scan to pay</p>
-                  <div className="checkout-qr-placeholder">
-                    <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
-                  </div>
-                  <p className="checkout-upi-note">
-                    Scan the QR code with GPay, PhonePe, or Paytm to pay ₹{grandTotal.toLocaleString('en-IN')}. We'll confirm your order via email soon.
-                  </p>
-                </div>
+                <p className="checkout-upi-inline-note">You'll see the QR code to scan in the order summary →</p>
               )}
+            </div>
+
+            {/* Place Order — at bottom of left column after all info is filled */}
+            <div className="checkout-section checkout-place-section">
+              <button className="checkout-place-btn" onClick={handlePlaceOrder} disabled={submitting}>
+                {submitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
+              </button>
+              <p className="checkout-terms">By placing your order you agree to our terms</p>
             </div>
           </div>
 
@@ -253,10 +253,24 @@ export default function Checkout() {
                   <span className="checkout-total-val">₹{grandTotal.toLocaleString('en-IN')}</span>
                 </div>
               </div>
-              <button className="checkout-place-btn" onClick={handlePlaceOrder} disabled={submitting}>
-                {submitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
-              </button>
-              <p className="checkout-terms">By placing your order you agree to our terms</p>
+
+              {paymentMethod === 'upi' && (
+                <div className="checkout-upi-box">
+                  <p className="checkout-upi-label">Step 1 — Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</p>
+                  <div className="checkout-qr-placeholder">
+                    <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
+                  </div>
+                  <p className="checkout-upi-note">
+                    Scan with GPay, PhonePe, or Paytm and complete your payment first.
+                  </p>
+                </div>
+              )}
+
+              <p className="checkout-fill-info">
+                {paymentMethod === 'upi'
+                  ? 'Step 2 — Fill in your details below, then click Place Order.'
+                  : 'Please fill in your details below and click Place Order.'}
+              </p>
             </div>
           </div>
         </div>

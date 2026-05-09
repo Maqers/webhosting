@@ -15,7 +15,6 @@ export default function ByOccasion() {
           <Link key={cat.id} to={`/category/${cat.slug}`} className="by-page-item">
             <span className="by-page-emoji">{cat.emoji}</span>
             <span className="by-page-name">{cat.name}</span>
-            <span className="by-page-count">{(occasionProductMap[cat.id] || []).length}</span>
             <span className="by-page-arrow">›</span>
           </Link>
         ))}

@@ -253,7 +253,7 @@
   display: block;
   width: 100%;
   background: var(--primary-color, #760909);
-  color: white;
+  color: white !important;
   text-align: center;
   padding: 1rem;
   border-radius: 6px;

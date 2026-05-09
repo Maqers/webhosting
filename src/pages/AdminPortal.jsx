@@ -138,7 +138,10 @@ function slugify(text) {
  * and cause Vercel build to fail with "Unterminated string constant".
  */
 function sanitizeForJS(str) {
-  return (str || "")
+  if (str === null || str === undefined) return ""
+  if (Array.isArray(str)) return str.map(s => sanitizeForJS(s)).join(", ")
+  if (typeof str !== "string") str = String(str)
+  return str
     .replace(/\r?\n|\r/g, " ")
     .replace(/\t/g, " ")
     .replace(/\\/g, "\\\\")
@@ -325,9 +328,17 @@ function insertProductIntoSource(source, product, id) {
   const sellerCodeVal = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
   const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], sizes: [${sizesArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}], sellerId: ${sellerIdVal}, sellerCode: ${sellerCodeVal} } },`;
   const catKey = product.categoryId.match(/[&\-]/) ? `"${product.categoryId}"` : product.categoryId;
+  // Try multi-line block first, then single-line empty block
   const catPattern = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
-  const match = source.match(catPattern);
-  if (!match) throw new Error(`Category block "${product.categoryId}" not found in catalog.js`);
+  const catPatternEmpty = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*)(\\[\\s*\\],?)`, "m");
+  let match = source.match(catPattern);
+  if (!match) {
+    // Empty single-line block — expand it first
+    const emptyMatch = source.match(catPatternEmpty);
+    if (!emptyMatch) throw new Error(`Category block "${product.categoryId}" not found in catalog.js`);
+    const expanded = source.replace(catPatternEmpty, `$1[\n${entry}\n  ],`);
+    return expanded;
+  }
   const insertPos = match.index + match[0].lastIndexOf(match[3]);
   return source.slice(0, insertPos) + "\n" + entry + "\n" + source.slice(insertPos);
 }
@@ -338,7 +349,7 @@ function insertCategoryIntoSource(source, cat, order) {
 }
 
 function addCategoryProductBlock(source, categoryId) {
-  return source.replace(/(export const productsByCategory = \{)/, `$1\n  "${categoryId}": [],`);
+  return source.replace(/(export const productsByCategory = \{)/, `$1\n  "${categoryId}": [\n  ],`);
 }
 
 function updateCategoryInSource(source, original, updated) {
@@ -429,7 +440,7 @@ export default function AdminPortal() {
   const [sellersLoading, setSellersLoading] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [showAddSeller, setShowAddSeller] = useState(false);
-  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", notes: "" });
+  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", pincode: "", notes: "" });
   const [newOwnerInput, setNewOwnerInput] = useState("");
   const [kycFiles, setKycFiles] = useState([]);
   const [kycUploading, setKycUploading] = useState(false);
@@ -739,10 +750,10 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, pincode: newSeller.pincode, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
       await sbCreateSeller(seller);
       await loadSellers();
-      setNewSeller({ business_name: "", owners: [], location: "", notes: "" });
+      setNewSeller({ business_name: "", owners: [], location: "", pincode: "", notes: "" });
       setKycFiles([]); setNewOwnerInput(""); setShowAddSeller(false);
       showToast(`Seller "${newSeller.business_name}" created! ID: ${sellerCode}`);
     } catch (err) { showToast(err.message, "error"); }
@@ -761,7 +772,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, notes: editingSeller.notes, kyc_documents: kycPaths });
+      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, pincode: editingSeller.pincode || "", notes: editingSeller.notes, kyc_documents: kycPaths });
       await loadSellers();
       setEditingSeller(null); setKycFiles([]);
       showToast("Seller updated!");
@@ -1600,6 +1611,9 @@ export default function AdminPortal() {
                     <label style={ts.label}>Location (HQ)</label>
                     <input style={ts.input} placeholder="e.g. Mumbai, Maharashtra" value={newSeller.location}
                       onChange={e => setNewSeller(s => ({ ...s, location: e.target.value }))} />
+                    <label style={ts.label}>Pincode <span style={ts.labelHint}>(for delivery estimation)</span></label>
+                    <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
+                      value={newSeller.pincode} onChange={e => setNewSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
                     <label style={ts.label}>Internal Notes</label>
                     <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} placeholder="Any notes..."
                       value={newSeller.notes} onChange={e => setNewSeller(s => ({ ...s, notes: e.target.value }))} />
@@ -1662,6 +1676,10 @@ export default function AdminPortal() {
                     <label style={ts.label}>Location</label>
                     <input style={ts.input} value={editingSeller.location || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, location: e.target.value }))} />
+                    <label style={ts.label}>Pincode <span style={ts.labelHint}>(for delivery estimation)</span></label>
+                    <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
+                      value={editingSeller.pincode || ""}
+                      onChange={e => setEditingSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
                     <label style={ts.label}>Internal Notes</label>
                     <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} value={editingSeller.notes || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, notes: e.target.value }))} />
