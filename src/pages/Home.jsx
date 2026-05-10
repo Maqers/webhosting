@@ -1,96 +1,32 @@
-import { useMemo, useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getPopularProducts, getSortedCategories } from "../data/catalog";
+import { useMemo, useState, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { getPopularProducts } from "../data/catalog";
 import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 import "./Home.css";
-
-import heroBg from "../assets/images/hero/slide1.png";
 
 const Home = () => {
   const popularProducts = useMemo(() => getPopularProducts(), []);
-  const categories = useMemo(() => getSortedCategories(), []);
-  const scrollRef = useRef(null);
-  const [canLeft, setCanLeft]   = useState(false);
-  const [canRight, setCanRight] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  const checkEdges = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanLeft(el.scrollLeft > 2);
-    setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
-  };
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const checkAll = () => {
-      setIsMobile(window.innerWidth <= 768);
-      checkEdges();
-    };
-    checkAll();
-    el.addEventListener("scroll", checkEdges, { passive: true });
-    window.addEventListener("resize", checkAll);
-    return () => {
-      el.removeEventListener("scroll", checkEdges);
-      window.removeEventListener("resize", checkAll);
-    };
-  }, []);
-
-  const scroll = (dir) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    const next = Math.max(0, Math.min(el.scrollLeft + dir * 160, max));
-    el.scrollTo({ left: next, behavior: "smooth" });
-  };
 
   return (
     <div className="home">
-      <section
-        className="hero-banner"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      >
-        <div className="hero-banner-content">
-          <h1 className="hero-banner-title">
-            Custom Gifts from Indian Home Businesses
+
+      <section className="hero-bright">
+        <div className="container hero-bright-inner">
+          <span className="hero-eyebrow-pill">✦ India's Finest Artisan Gifts</span>
+          <h1 className="hero-bright-title">
+            Gifts That Actually<br /><em>Mean Something</em>
           </h1>
-          <p className="hero-banner-subtitle">
-            Gifts for every occasion, every person — handpicked from India's best home businesses.
+          <p className="hero-bright-subtitle">
+            Handpicked from India's best home businesses — for every occasion, every person.
           </p>
-
-          <div className="hero-category-links" ref={scrollRef}>
-            <Link to="/products" className="hero-category-chip all">
-              All Products
-            </Link>
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                to={`/category/${category.slug || category.name}`}
-                className="hero-category-chip"
-              >
-                {category.name}
-              </Link>
-            ))}
+          <div className="hero-bright-actions">
+            <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
+            <Link to="/by-occasion" className="hero-bright-btn-primary">Shop by Occasion</Link>
+            <Link to="/by-product" className="hero-bright-btn-primary">Shop by Category</Link>
           </div>
-
-          {isMobile && (
-            <div className="scroll-arrows">
-              <button
-                className={`scroll-btn left${canLeft ? " visible" : ""}`}
-                onClick={() => scroll(-1)}
-                aria-label="Scroll left"
-                type="button"
-              >‹</button>
-              <button
-                className={`scroll-btn right${canRight ? " visible" : ""}`}
-                onClick={() => scroll(1)}
-                aria-label="Scroll right"
-                type="button"
-              >›</button>
-            </div>
-          )}
         </div>
       </section>
 
@@ -120,20 +56,18 @@ const Home = () => {
         </div>
       </section>
 
-      
-
-      <section className="popular-section">
+      <section className="featured-section">
         <div className="container">
-          <div className="section-header">
-            <div>
-              <p className="section-eyebrow">Crowd favourites</p>
-              <h2 className="section-title">Most loved right now</h2>
+          <div className="featured-header">
+            <div className="featured-header-left">
+              <span className="featured-eyebrow">✦ Crowd Favourites</span>
+              <h2 className="featured-title">Most Loved Right Now</h2>
             </div>
-            <Link to="/products" className="view-all-link">View all →</Link>
+            <Link to="/products" className="featured-view-all">View all →</Link>
           </div>
-          <div className="products-grid">
-            {popularProducts.slice(0, 6).map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
+          <div className="featured-grid">
+            {popularProducts.slice(0, 8).map((product, index) => (
+              <FeaturedCard key={product.id} product={product} index={index} />
             ))}
           </div>
         </div>
@@ -155,29 +89,70 @@ const Home = () => {
   );
 };
 
-const ProductCard = ({ product, index }) => (
-  <Link
-    to={`/product/${product.id}`}
-    className="product-card hover-lift touch-feedback"
-    style={{ "--i": index }}
-  >
-    <div className="product-image-container">
-      <ImageWithFallback
-        src={product.images[0]}
-        alt={product.title}
-        className="product-image"
-        loading="lazy"
-      />
-      {product.popular && <div className="popular-badge">Popular</div>}
-    </div>
-    <div className="product-info">
-      <h3 className="product-title">{product.title}</h3>
-      <p className="product-category">{product.category}</p>
-      <div className="product-meta">
-        <span className="product-price">₹{product.price}</span>
+export const FeaturedCard = ({ product, index }) => {
+  const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
+  const navigate = useNavigate();
+  const wishlisted = isWishlisted(product.id);
+  const [addedFeedback, setAddedFeedback] = useState(false);
+
+  const handleAddToCart = useCallback((e) => {
+    e.preventDefault(); e.stopPropagation();
+    addItem(product);
+    setAddedFeedback(true);
+    setTimeout(() => setAddedFeedback(false), 1400);
+  }, [product, addItem]);
+
+  const handleWishlist = useCallback((e) => {
+    e.preventDefault(); e.stopPropagation();
+    toggleItem(product);
+  }, [product, toggleItem]);
+
+  const handleCardClick = useCallback(() => {
+    navigate(`/product/${product.id}`);
+  }, [product.id, navigate]);
+
+  return (
+    <article
+      className="feat-card"
+      style={{ "--i": index % 12 }}
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
+      aria-label={product.title}
+    >
+      <div className="feat-img-zone">
+        <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading="lazy" />
+        {product.popular && <span className="feat-badge-popular">Popular</span>}
+        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
+          <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
       </div>
-    </div>
-  </Link>
-);
+      <div className="feat-info-zone">
+        <p className="feat-category">{product.category}</p>
+        <h3 className="feat-title">{product.title}</h3>
+        <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
+        <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
+          <button className={`feat-add-btn${addedFeedback ? " added" : ""}`} onClick={handleAddToCart} type="button" aria-label="Add to cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {addedFeedback ? "Added!" : "Add to Cart"}
+          </button>
+          <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button" aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}>
+            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {wishlisted ? "Saved" : "Wishlist"}
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+};
 
 export default Home;

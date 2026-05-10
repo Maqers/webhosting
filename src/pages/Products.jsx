@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect, memo, useCallback } from 'react'
-import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
 import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
+import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import './Products.css'
 
 let cachedCategories = null
@@ -69,7 +71,6 @@ const Products = () => {
       filtered = filtered.filter(product => {
         if (occasionSelected.length > 0 && occasionIds.has(product.id)) return true;
         if (sourceSelected.length > 0 && sourceSet.has(product.categoryId)) return true;
-        // Also match via secondaryCategories
         if (sourceSelected.length > 0 && product.meta?.secondaryCategories?.some(c => sourceSet.has(c))) return true;
         return false;
       });
@@ -108,7 +109,7 @@ const Products = () => {
       requestAnimationFrame(() => {
         const productsGrid = document.querySelector('.products-grid')
         if (productsGrid) void productsGrid.offsetHeight
-        document.querySelectorAll('.product-card').forEach(card => {
+        document.querySelectorAll('.feat-card').forEach(card => {
           card.style.visibility = 'visible'
           card.style.opacity = '1'
         })
@@ -232,8 +233,14 @@ const Products = () => {
   )
 }
 
-const ProductCard = memo(({ product, index, categoryMap, priority = false }) => {
+const ProductCard = ({ product, index, categoryMap, priority = false }) => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { addItem } = useCart()
+  const { toggleItem, isWishlisted } = useWishlist()
+  const wishlisted = isWishlisted(product.id)
+  const [addedFeedback, setAddedFeedback] = useState(false)
+
   const categoryName = useMemo(() => {
     if (product.categoryId) {
       const category = categoryMap.get(product.categoryId)
@@ -243,44 +250,89 @@ const ProductCard = memo(({ product, index, categoryMap, priority = false }) => 
     return category ? category.name : (product.category || 'Handmade Gift')
   }, [product.categoryId, product.category, categoryMap])
 
+  const handleAddToCart = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addItem(product)
+    setAddedFeedback(true)
+    setTimeout(() => setAddedFeedback(false), 1400)
+  }, [product, addItem])
+
+  const handleWishlist = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleItem(product)
+  }, [product, toggleItem])
+
+  const handleCardClick = useCallback(() => {
+    navigate(`/product/${product.id}`, { state: { from: location.pathname + location.search } })
+  }, [product.id, navigate, location])
+
   return (
-    <Link
-      to={`/product/${product.id}`}
-      state={{ from: location.pathname + location.search }}
-      className="product-card hover-lift touch-feedback"
+    <article
+      className="feat-card"
+      style={{ "--i": index % 12 }}
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
+      aria-label={product.title}
     >
-      <div className="product-image-container">
+      <div className="feat-img-zone">
         <ImageWithFallback
           src={product.images[0]}
           alt={product.title}
-          className="product-image"
+          className="feat-img"
           loading={priority ? "eager" : "lazy"}
           priority={priority}
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
-        {product.popular && <div className="popular-badge">Popular</div>}
+        {product.popular && <span className="feat-badge-popular">Popular</span>}
+        <button
+          className={`feat-wishlist-btn${wishlisted ? " active" : ""}`}
+          onClick={handleWishlist}
+          aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          type="button"
+        >
+          <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
       </div>
-      <div className="product-info">
-        <h3 className="product-title">{product.title}</h3>
-        <p className="product-id">Product ID: {product.id}</p>
-        <p className="product-category">{categoryName}</p>
-        <div className="product-footer">
-          <span className="product-price">₹{product.price}</span>
+
+      <div className="feat-info-zone">
+        <p className="feat-category">{categoryName}</p>
+        <h3 className="feat-title">{product.title}</h3>
+        <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
+
+        <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
+          <button
+            className={`feat-add-btn${addedFeedback ? " added" : ""}`}
+            onClick={handleAddToCart}
+            type="button"
+            aria-label="Add to cart"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {addedFeedback ? "Added!" : "Add to Cart"}
+          </button>
+          <button
+            className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`}
+            onClick={handleWishlist}
+            type="button"
+            aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}
+          >
+            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {wishlisted ? "Saved" : "Wishlist"}
+          </button>
         </div>
       </div>
-    </Link>
+    </article>
   )
-}, (prevProps, nextProps) => (
-  prevProps.product.id === nextProps.product.id &&
-  prevProps.product.title === nextProps.product.title &&
-  prevProps.product.price === nextProps.product.price &&
-  prevProps.product.images[0] === nextProps.product.images[0] &&
-  prevProps.product.popular === nextProps.product.popular &&
-  prevProps.product.categoryId === nextProps.product.categoryId &&
-  prevProps.index === nextProps.index &&
-  prevProps.priority === nextProps.priority
-))
-
-ProductCard.displayName = 'ProductCard'
+}
 
 export default Products

@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
-import { Link, useParams, useLocation } from 'react-router-dom'
-import { getAllProducts, getSortedCategories, getProductsByCategory, getCategoryProductCount, occasionProductMap } from '../data/catalog'
+import { useState, useEffect, useCallback } from 'react'
+import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
+import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { occasionCategories, getOccasionProducts } from '../data/occasionCatalog'
 import ImageWithFallback from '../components/ImageWithFallback'
+import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import './Categories.css'
 
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
@@ -31,7 +33,6 @@ const Categories = () => {
     : allCats.find(c => c.slug === selectedCategory || c.id === selectedCategory)
       || { name: selectedCategory, slug: selectedCategory, id: selectedCategory, emoji: '🎁' }
 
-  // KEY FIX: pass occasionProductMap from catalog.js so it's always in sync
   const categoryProducts = selectedCategory === 'All'
     ? getAllProducts()
     : occasionProductMap[selectedCategory]
@@ -65,7 +66,6 @@ const Categories = () => {
                     {cat.description && (
                       <p className="category-description category-description--desktop">{cat.description}</p>
                     )}
-                    <p className="category-count">{(occasionProductMap[cat.id] || []).length} products</p>
                   </Link>
                 ))}
               </div>
@@ -77,7 +77,6 @@ const Categories = () => {
                 {SOURCE_CATS.map((cat) => (
                   <Link key={cat.id} to={`/category/${cat.slug}`} className="category-card-large scroll-animate">
                     <h3 className="category-name">{cat.name}</h3>
-                    <p className="category-count">{getCategoryProductCount(cat.id)} products</p>
                   </Link>
                 ))}
               </div>
@@ -95,9 +94,6 @@ const Categories = () => {
                 {selectedCategoryObj?.description && (
                   <p className="category-page-description">{selectedCategoryObj.description}</p>
                 )}
-                <p className="category-page-subtitle">
-                  {categoryProducts.length} {categoryProducts.length === 1 ? 'product' : 'products'} available
-                </p>
               </div>
 
               {categoryProducts.length > 0 ? (
@@ -122,19 +118,68 @@ const Categories = () => {
 
 const ProductCard = ({ product, index }) => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { addItem } = useCart()
+  const { toggleItem, isWishlisted } = useWishlist()
+  const wishlisted = isWishlisted(product.id)
+  const [addedFeedback, setAddedFeedback] = useState(false)
+
+  const handleAddToCart = useCallback((e) => {
+    e.preventDefault(); e.stopPropagation()
+    addItem(product)
+    setAddedFeedback(true)
+    setTimeout(() => setAddedFeedback(false), 1400)
+  }, [product, addItem])
+
+  const handleWishlist = useCallback((e) => {
+    e.preventDefault(); e.stopPropagation()
+    toggleItem(product)
+  }, [product, toggleItem])
+
+  const handleCardClick = useCallback(() => {
+    navigate(`/product/${product.id}`, { state: { from: location.pathname } })
+  }, [product.id, navigate, location])
+
   return (
-    <Link to={`/product/${product.id}`} state={{ from: location.pathname }} className="product-card hover-lift touch-feedback" style={{ '--i': index }}>
-      <div className="product-image-container">
-        <ImageWithFallback src={product.images[0]} alt={product.title} className="product-image" loading={index < 8 ? 'eager' : 'lazy'} />
-        {product.popular && <div className="popular-badge">Popular</div>}
+    <article
+      className="feat-card"
+      style={{ "--i": index % 12 }}
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
+      aria-label={product.title}
+    >
+      <div className="feat-img-zone">
+        <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading={index < 8 ? 'eager' : 'lazy'} />
+        {product.popular && <span className="feat-badge-popular">Popular</span>}
+        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
+          <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
       </div>
-      <div className="product-info">
-        <h3 className="product-title">{product.title}</h3>
-        <p className="product-id">Product ID: {product.id}</p>
-        <p className="product-category">{product.category || product.categoryId}</p>
-        <div className="product-footer"><span className="product-price">₹{product.price}</span></div>
+      <div className="feat-info-zone">
+        <p className="feat-category">{product.category || product.categoryId}</p>
+        <h3 className="feat-title">{product.title}</h3>
+        <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
+        <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
+          <button className={`feat-add-btn${addedFeedback ? " added" : ""}`} onClick={handleAddToCart} type="button" aria-label="Add to cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {addedFeedback ? "Added!" : "Add to Cart"}
+          </button>
+          <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button">
+            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {wishlisted ? "Saved" : "Wishlist"}
+          </button>
+        </div>
       </div>
-    </Link>
+    </article>
   )
 }
 

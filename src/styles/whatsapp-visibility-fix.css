@@ -73,7 +73,7 @@ body > .whatsapp-container {
 @media (max-width: 768px) {
   .whatsapp-container {
     z-index: 99999 !important;
-    bottom: max(var(--spacing-md), env(safe-area-inset-bottom)) !important;
+    bottom: calc(64px + env(safe-area-inset-bottom)) !important;
     right: max(var(--spacing-md), env(safe-area-inset-right)) !important;
   }
   
@@ -85,7 +85,7 @@ body > .whatsapp-container {
 @media (max-width: 480px) {
   .whatsapp-container {
     z-index: 99999 !important;
-    bottom: max(var(--spacing-sm), env(safe-area-inset-bottom)) !important;
+    bottom: calc(64px + env(safe-area-inset-bottom)) !important;
     right: max(var(--spacing-sm), env(safe-area-inset-right)) !important;
   }
 }
@@ -117,4 +117,3 @@ body:has(.product-detail) .whatsapp-container {
   position: fixed !important;
   isolation: auto !important;
 }
-
