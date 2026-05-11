@@ -311,3 +311,16 @@
   .feat-price { font-size: 0.95rem; }
   .feat-info-zone { padding: 0.75rem 0.875rem 0.875rem; }
 }
+
+@media (max-width: 968px) {
+  .feat-img-zone {
+    aspect-ratio: unset !important;
+    height: auto !important;
+  }
+  .feat-img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}

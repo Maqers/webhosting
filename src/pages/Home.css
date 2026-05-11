@@ -301,3 +301,16 @@
 }
 
 .product-id { display: none !important; }
+
+@media (max-width: 968px) {
+  .feat-img-zone {
+    aspect-ratio: unset !important;
+    height: auto !important;
+  }
+  .feat-img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}

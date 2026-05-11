@@ -197,20 +197,7 @@ img {
   object-position: center;
 }
 
-/* Mobile: let image show at natural size — no cropping, no forced ratio */
-@media (max-width: 767px) {
-  .product-image,
-  .product-image-container img {
-    width: 100%;
-    height: auto !important;
-    object-fit: unset !important;
-  }
-
-  .product-image-container {
-    aspect-ratio: unset !important;
-    height: auto !important;
-  }
-}
+/* Mobile: images keep their square ratio — no cropping override */
 
 .hero-image,
 .hero-slide-image {
