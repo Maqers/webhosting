@@ -9,6 +9,7 @@ const WHATSAPP_NUMBER = '919289955099'
 const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
+const EMAILJS_TEMPLATE_CONFIRMED = 'template_cp8gsrc'
 
 function getDeliveryFee(subtotal) {
   if (subtotal >= 4000) return 0
