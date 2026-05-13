@@ -4,7 +4,7 @@ import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
 import './Checkout.css'
 
-const UPI_ID = 'PASTE_YOUR_UPI_ID_HERE' // e.g. maqers@okaxis
+const UPI_ID = '9650800399@pthdfc' // e.g. maqers@okaxis
 const WHATSAPP_NUMBER = '919289955099'
 const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
