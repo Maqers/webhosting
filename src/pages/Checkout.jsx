@@ -4,7 +4,7 @@ import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
 import './Checkout.css'
 
-const UPI_ID = '9650800399@pthdfc' // e.g. maqers@okaxis
+const UPI_ID = 'PASTE_YOUR_UPI_ID_HERE' // e.g. maqers@okaxis
 const WHATSAPP_NUMBER = '919289955099'
 const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
@@ -36,6 +36,10 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderId, setOrderId] = useState('')
+  const [showUPIChooser, setShowUPIChooser] = useState(false)
+  const [pendingOrderId, setPendingOrderId] = useState('')
+  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false)
+  const [appNotFound, setAppNotFound] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -73,7 +77,7 @@ export default function Checkout() {
     const address = `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`
 
     try {
-      // Send email via EmailJS
+      // Email 1: always fires — even if user never comes back, you know an order was attempted
       await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
@@ -86,23 +90,98 @@ export default function Checkout() {
           items: itemsText,
           total: totalText,
           sellers: sellersText,
-          payment_method: paymentMethod === 'upi' ? 'UPI Direct' : 'Pay via WhatsApp',
+          payment_method: paymentMethod === 'upi'
+            ? `UPI — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING`
+            : 'WhatsApp',
         },
         EMAILJS_PUBLIC_KEY
       )
     } catch (err) {
-      console.error('Email failed:', err)
+      console.error('Email 1 failed:', err)
     }
 
     if (paymentMethod === 'upi') {
-      const note = encodeURIComponent(`Maqers Order ${oid}`)
-      const upiLink = `upi://pay?pa=${UPI_ID}&pn=Maqers&am=${grandTotal}&cu=INR&tn=${note}`
-      window.location.href = upiLink
+      setPendingOrderId(oid)
+      setSubmitting(false)
+      setShowUPIChooser(true)
+      return
     }
 
     clearCart()
     setOrderPlaced(true)
     setSubmitting(false)
+  }
+
+  const openUPIApp = (app) => {
+    const note = encodeURIComponent(`Maqers Order ${pendingOrderId}`)
+    const params = `pa=${UPI_ID}&pn=Maqers&am=${grandTotal}&cu=INR&tn=${note}`
+    const links = {
+      gpay: `tez://upi/pay?${params}`,
+      phonepe: `phonepe://pay?${params}`,
+      paytm: `paytmmp://pay?${params}`,
+    }
+
+    setShowUPIChooser(false)
+
+    // Detect if the UPI app actually opened (page went to background)
+    let appOpened = false
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') appOpened = true
+    }
+    const onReturn = () => {
+      if (document.visibilityState === 'visible') {
+        document.removeEventListener('visibilitychange', onHide)
+        document.removeEventListener('visibilitychange', onReturn)
+        setShowPaymentConfirm(true)
+      }
+    }
+
+    document.addEventListener('visibilitychange', onHide)
+    document.addEventListener('visibilitychange', onReturn)
+
+    // Fallback: if page never went hidden after 3s, app probably not installed
+    setTimeout(() => {
+      if (!appOpened) {
+        document.removeEventListener('visibilitychange', onHide)
+        document.removeEventListener('visibilitychange', onReturn)
+        setShowUPIChooser(true) // bring chooser back with error
+        setAppNotFound(true)
+      }
+    }, 3000)
+
+    window.location.href = links[app]
+  }
+
+  const confirmPaymentDone = async () => {
+    // Email 2: customer self-confirmed — your cue to verify in UPI app and dispatch
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE,
+        {
+          order_id: pendingOrderId,
+          customer_name: form.name,
+          customer_email: form.email || 'Not provided',
+          customer_phone: form.phone,
+          shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+          items: buildItemsText(),
+          total: `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery)`,
+          sellers: buildSellersText(),
+          payment_method: `UPI — CUSTOMER CONFIRMED PAYMENT. Verify ₹${grandTotal} received before dispatching.`,
+        },
+        EMAILJS_PUBLIC_KEY
+      )
+    } catch (err) {
+      console.error('Email 2 failed:', err)
+    }
+    clearCart()
+    setShowPaymentConfirm(false)
+    setOrderPlaced(true)
+  }
+
+  const retryPayment = () => {
+    setShowPaymentConfirm(false)
+    setShowUPIChooser(true)
   }
 
   if (orderPlaced) return (
@@ -281,6 +360,56 @@ export default function Checkout() {
           </div>
         </div>
       </div>
+
+      {showUPIChooser && (
+        <div className="upi-chooser-overlay">
+          <div className="upi-chooser-modal">
+            <h2>Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
+            <p>Choose your UPI app to pay</p>
+            {appNotFound && (
+              <div className="upi-app-error">
+                ⚠️ That app doesn't seem to be installed. Try another one or scan the QR code above.
+              </div>
+            )}
+            <div className="upi-redirect-notice">
+              📲 You'll be redirected to your payment app. After paying, <strong>come back to this page</strong> to confirm your order and receive a confirmation email.
+            </div>
+            <div className="upi-chooser-buttons">
+              <button onClick={() => openUPIApp('gpay')} className="upi-app-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay" />
+                <span>Google Pay</span>
+              </button>
+              <button onClick={() => openUPIApp('phonepe')} className="upi-app-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe" />
+                <span>PhonePe</span>
+              </button>
+              <button onClick={() => openUPIApp('paytm')} className="upi-app-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" />
+                <span>Paytm</span>
+              </button>
+            </div>
+            <button className="upi-chooser-cancel" onClick={() => setShowUPIChooser(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {showPaymentConfirm && (
+        <div className="upi-chooser-overlay">
+          <div className="upi-chooser-modal">
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>💳</div>
+            <h2>Payment Complete?</h2>
+            <p>Did you successfully pay ₹{grandTotal.toLocaleString('en-IN')} via UPI?</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem' }}>
+              <button onClick={confirmPaymentDone} className="checkout-place-btn" style={{ margin: 0 }}>
+                ✓ Yes, I've paid
+              </button>
+              <button onClick={retryPayment} className="upi-app-btn" style={{ flexDirection: 'row', gap: '0.5rem', justifyContent: 'center' }}>
+                ↩ No, try again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

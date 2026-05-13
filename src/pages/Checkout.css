@@ -506,3 +506,110 @@
   margin-top: 0.75rem;
   font-style: italic;
 }
+/* UPI App Chooser Modal */
+.upi-chooser-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.upi-chooser-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.upi-chooser-modal h2 {
+  font-family: var(--font-family-heading);
+  font-size: 1.5rem;
+  color: #1a1714;
+  margin: 0 0 0.25rem;
+}
+
+.upi-chooser-modal p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+.upi-chooser-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.upi-app-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8f5f2;
+  border: 1.5px solid #e8e0d8;
+  border-radius: 12px;
+  padding: 1rem 0.75rem;
+  cursor: pointer;
+  flex: 1;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.upi-app-btn:hover {
+  border-color: #760909;
+  background: #fdf6f0;
+}
+
+.upi-app-btn img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.upi-app-btn span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1a1714;
+}
+
+.upi-chooser-cancel {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.upi-redirect-notice {
+  background: #fdf6f0;
+  border: 1.5px solid #e8d5c4;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8375rem;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.upi-redirect-notice strong {
+  color: #760909;
+}
+
+.upi-app-error {
+  background: #fff4f4;
+  border: 1.5px solid #f5c6c6;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.8rem;
+  color: #a00;
+  margin-bottom: 1rem;
+  text-align: left;
+}
