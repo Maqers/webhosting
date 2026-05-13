@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
@@ -21,11 +21,36 @@ function generateOrderId() {
   return 'MQ' + Date.now().toString(36).toUpperCase()
 }
 
+function AppIcon({ app }) {
+  const styles = {
+    gpay:    { bg: '#1a73e8', label: 'G Pay' },
+    phonepe: { bg: '#5f259f', label: 'Pe' },
+    paytm:   { bg: '#002970', label: 'Pt' },
+  }
+  const s = styles[app]
+  return (
+    <div style={{
+      width: 48, height: 48, borderRadius: 12,
+      background: s.bg, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', color: '#fff',
+      fontWeight: 700, fontSize: app === 'gpay' ? '0.7rem' : '0.85rem',
+      letterSpacing: '-0.5px', flexShrink: 0,
+    }}>{s.label}</div>
+  )
+}
+
 export default function Checkout() {
   const { items, total, clearCart } = useCart()
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
   const grandTotal = total + deliveryFee
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
 
   const [form, setForm] = useState({
     name: '', email: '', phone: '',
@@ -33,11 +58,14 @@ export default function Checkout() {
   })
   const [paymentMethod, setPaymentMethod] = useState('upi')
   const [errors, setErrors] = useState({})
+  const [submitAttempted, setSubmitAttempted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderId, setOrderId] = useState('')
-  const [showUPIChooser, setShowUPIChooser] = useState(false)
   const [pendingOrderId, setPendingOrderId] = useState('')
+
+  // Mobile UPI modal: null | 'choose' | 'qr' | 'apps'
+  const [mobileUPIStep, setMobileUPIStep] = useState(null)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState(false)
   const [appNotFound, setAppNotFound] = useState(false)
 
@@ -63,47 +91,54 @@ export default function Checkout() {
     return sellers.length > 0 ? sellers.join(', ') : 'Not assigned'
   }
 
+  const sendEmail = async (oid, paymentNote) => {
+    await emailjs.send(
+      EMAILJS_SERVICE,
+      EMAILJS_TEMPLATE,
+      {
+        order_id: oid,
+        customer_name: form.name,
+        customer_email: form.email || 'Not provided',
+        customer_phone: form.phone,
+        shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+        items: buildItemsText(),
+        total: `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery)`,
+        sellers: buildSellersText(),
+        payment_method: paymentNote,
+      },
+      EMAILJS_PUBLIC_KEY
+    )
+  }
+
   const handlePlaceOrder = async () => {
+    setSubmitAttempted(true)
     if (!validate()) return
     if (items.length === 0) return
 
     setSubmitting(true)
     const oid = generateOrderId()
     setOrderId(oid)
-
-    const itemsText = buildItemsText()
-    const sellersText = buildSellersText()
-    const totalText = `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery)`
-    const address = `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`
+    setPendingOrderId(oid)
 
     try {
-      // Email 1: always fires — even if user never comes back, you know an order was attempted
-      await emailjs.send(
-        EMAILJS_SERVICE,
-        EMAILJS_TEMPLATE,
-        {
-          order_id: oid,
-          customer_name: form.name,
-          customer_email: form.email || 'Not provided',
-          customer_phone: form.phone,
-          shipping_address: address,
-          items: itemsText,
-          total: totalText,
-          sellers: sellersText,
-          payment_method: paymentMethod === 'upi'
-            ? `UPI — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING`
-            : 'WhatsApp',
-        },
-        EMAILJS_PUBLIC_KEY
+      await sendEmail(oid,
+        paymentMethod === 'upi'
+          ? 'UPI — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING'
+          : 'WhatsApp'
       )
     } catch (err) {
       console.error('Email 1 failed:', err)
     }
 
     if (paymentMethod === 'upi') {
-      setPendingOrderId(oid)
       setSubmitting(false)
-      setShowUPIChooser(true)
+      if (isMobile) {
+        setMobileUPIStep('choose')
+      } else {
+        // Desktop: QR already visible in sidebar, just confirm order
+        clearCart()
+        setOrderPlaced(true)
+      }
       return
     }
 
@@ -116,18 +151,16 @@ export default function Checkout() {
     const note = encodeURIComponent(`Maqers Order ${pendingOrderId}`)
     const params = `pa=${UPI_ID}&pn=Maqers&am=${grandTotal}&cu=INR&tn=${note}`
     const links = {
-      gpay: `tez://upi/pay?${params}`,
+      gpay:    `tez://upi/pay?${params}`,
       phonepe: `phonepe://pay?${params}`,
-      paytm: `paytmmp://pay?${params}`,
+      paytm:   `paytmmp://pay?${params}`,
     }
 
-    setShowUPIChooser(false)
+    setMobileUPIStep(null)
+    setAppNotFound(false)
 
-    // Detect if the UPI app actually opened (page went to background)
     let appOpened = false
-    const onHide = () => {
-      if (document.visibilityState === 'hidden') appOpened = true
-    }
+    const onHide = () => { if (document.visibilityState === 'hidden') appOpened = true }
     const onReturn = () => {
       if (document.visibilityState === 'visible') {
         document.removeEventListener('visibilitychange', onHide)
@@ -135,17 +168,15 @@ export default function Checkout() {
         setShowPaymentConfirm(true)
       }
     }
-
     document.addEventListener('visibilitychange', onHide)
     document.addEventListener('visibilitychange', onReturn)
 
-    // Fallback: if page never went hidden after 3s, app probably not installed
     setTimeout(() => {
       if (!appOpened) {
         document.removeEventListener('visibilitychange', onHide)
         document.removeEventListener('visibilitychange', onReturn)
-        setShowUPIChooser(true) // bring chooser back with error
         setAppNotFound(true)
+        setMobileUPIStep('apps')
       }
     }, 3000)
 
@@ -153,43 +184,25 @@ export default function Checkout() {
   }
 
   const confirmPaymentDone = async () => {
-    // Email 2: customer self-confirmed — your cue to verify in UPI app and dispatch
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE,
-        EMAILJS_TEMPLATE,
-        {
-          order_id: pendingOrderId,
-          customer_name: form.name,
-          customer_email: form.email || 'Not provided',
-          customer_phone: form.phone,
-          shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
-          items: buildItemsText(),
-          total: `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery)`,
-          sellers: buildSellersText(),
-          payment_method: `UPI — CUSTOMER CONFIRMED PAYMENT. Verify ₹${grandTotal} received before dispatching.`,
-        },
-        EMAILJS_PUBLIC_KEY
-      )
+      await sendEmail(pendingOrderId, `UPI — CUSTOMER CONFIRMED PAYMENT. Verify ₹${grandTotal} received before dispatching.`)
     } catch (err) {
       console.error('Email 2 failed:', err)
     }
     clearCart()
     setShowPaymentConfirm(false)
+    setMobileUPIStep(null)
     setOrderPlaced(true)
   }
 
-  const retryPayment = () => {
-    setShowPaymentConfirm(false)
-    setShowUPIChooser(true)
-  }
+  // ── Screens ───────────────────────────────────────────────────────────────
 
   if (orderPlaced) return (
     <div className="checkout-success">
       <div className="checkout-success-inner">
         <div className="checkout-success-icon">✓</div>
         <h1>Order Received!</h1>
-        <p className="checkout-success-id">Order ID: <strong>{orderId}</strong></p>
+        <p className="checkout-success-id">Order ID: <strong>{orderId || pendingOrderId}</strong></p>
         <p>Thank you, {form.name}. We've received your order and will confirm it shortly via email or WhatsApp.</p>
         <p className="checkout-success-note">Our team will reach out to you at <strong>{form.phone}</strong> to confirm payment and delivery details.</p>
         <button className="checkout-success-btn" onClick={() => navigate('/products')}>Continue Shopping</button>
@@ -204,6 +217,8 @@ export default function Checkout() {
     </div>
   )
 
+  const hasErrors = submitAttempted && Object.keys(errors).length > 0
+
   return (
     <div className="checkout-page">
       <div className="checkout-container">
@@ -213,9 +228,8 @@ export default function Checkout() {
         </div>
 
         <div className="checkout-grid">
-          {/* Left: Form */}
           <div className="checkout-left">
-            {/* Contact */}
+
             <div className="checkout-section">
               <h2 className="checkout-section-title">CONTACT INFORMATION</h2>
               <div className="checkout-row-2">
@@ -236,7 +250,6 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* Shipping */}
             <div className="checkout-section">
               <h2 className="checkout-section-title">SHIPPING ADDRESS</h2>
               <div className="checkout-field">
@@ -263,7 +276,6 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* Payment */}
             <div className="checkout-section">
               <h2 className="checkout-section-title">PAYMENT METHOD</h2>
               <div className="checkout-payment-options">
@@ -271,7 +283,7 @@ export default function Checkout() {
                   <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
                   <div className="checkout-payment-icon">📱</div>
                   <div>
-                    <strong>UPI Direct</strong>
+                    <strong>UPI</strong>
                     <span>GPay · PhonePe · Paytm</span>
                   </div>
                 </label>
@@ -284,17 +296,17 @@ export default function Checkout() {
                   </div>
                 </label>
               </div>
-
-              {paymentMethod === 'upi' && (
-                <p className="checkout-upi-inline-note">You'll see the QR code to scan in the order summary →</p>
-              )}
             </div>
 
-            {/* Place Order — at bottom of left column after all info is filled */}
             <div className="checkout-section checkout-place-section">
               <button className="checkout-place-btn" onClick={handlePlaceOrder} disabled={submitting}>
                 {submitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
               </button>
+              {hasErrors && (
+                <p className="checkout-form-error-summary">
+                  ⚠️ Please fill in all required fields marked above before placing your order.
+                </p>
+              )}
               <p className="checkout-terms">By placing your order you agree to our terms</p>
             </div>
           </div>
@@ -339,60 +351,116 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {paymentMethod === 'upi' && (
+              {/* Desktop only: QR in sidebar */}
+              {paymentMethod === 'upi' && !isMobile && (
                 <div className="checkout-upi-box">
-                  <p className="checkout-upi-label">Step 1 — Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</p>
+                  <p className="checkout-upi-label">Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</p>
                   <div className="checkout-qr-placeholder">
                     <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
                   </div>
                   <p className="checkout-upi-note">
-                    Scan with GPay, PhonePe, or Paytm and complete your payment first.
+                    Scan with any UPI app, fill in your details below, then click Place Order.
                   </p>
                 </div>
               )}
 
-              <p className="checkout-fill-info">
-                {paymentMethod === 'upi'
-                  ? 'Step 2 — Fill in your details below, then click Place Order.'
-                  : 'Please fill in your details below and click Place Order.'}
-              </p>
+              {paymentMethod === 'upi' && isMobile && (
+                <p className="checkout-fill-info">
+                  After clicking Place Order, you'll be prompted to pay via your UPI app.
+                </p>
+              )}
+
+              {paymentMethod === 'whatsapp' && (
+                <p className="checkout-fill-info">
+                  Fill in your details and click Place Order. We'll confirm via WhatsApp.
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {showUPIChooser && (
+      {/* ── Mobile: How to pay chooser ─────────────────────────────────── */}
+      {mobileUPIStep === 'choose' && (
         <div className="upi-chooser-overlay">
           <div className="upi-chooser-modal">
             <h2>Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
-            <p>Choose your UPI app to pay</p>
-            {appNotFound && (
-              <div className="upi-app-error">
-                ⚠️ That app doesn't seem to be installed. Try another one or scan the QR code above.
-              </div>
-            )}
-            <div className="upi-redirect-notice">
-              📲 You'll be redirected to your payment app. After paying, <strong>come back to this page</strong> to confirm your order and receive a confirmation email.
-            </div>
-            <div className="upi-chooser-buttons">
-              <button onClick={() => openUPIApp('gpay')} className="upi-app-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay" />
-                <span>Google Pay</span>
+            <p>How would you like to pay?</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', margin: '1rem 0' }}>
+              <button className="upi-method-btn" onClick={() => setMobileUPIStep('qr')}>
+                <span className="upi-method-icon">📷</span>
+                <div>
+                  <strong>Scan QR Code</strong>
+                  <span>Open any UPI app and scan</span>
+                </div>
               </button>
-              <button onClick={() => openUPIApp('phonepe')} className="upi-app-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe" />
-                <span>PhonePe</span>
-              </button>
-              <button onClick={() => openUPIApp('paytm')} className="upi-app-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" />
-                <span>Paytm</span>
+              <button className="upi-method-btn" onClick={() => setMobileUPIStep('apps')}>
+                <span className="upi-method-icon">📲</span>
+                <div>
+                  <strong>Open UPI App</strong>
+                  <span>GPay, PhonePe, or Paytm</span>
+                </div>
               </button>
             </div>
-            <button className="upi-chooser-cancel" onClick={() => setShowUPIChooser(false)}>Cancel</button>
+            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep(null)}>Cancel</button>
           </div>
         </div>
       )}
 
+      {/* ── Mobile: QR code ───────────────────────────────────────────── */}
+      {mobileUPIStep === 'qr' && (
+        <div className="upi-chooser-overlay">
+          <div className="upi-chooser-modal">
+            <h2>Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
+            <p>Open any UPI app and scan this code</p>
+            <div className="checkout-qr-placeholder" style={{ margin: '1rem auto', width: 180, height: 180 }}>
+              <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
+            </div>
+            <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1rem' }}>
+              After paying, tap below to confirm your order.
+            </p>
+            <button onClick={confirmPaymentDone} className="checkout-place-btn" style={{ margin: '0 0 0.75rem' }}>
+              ✓ I've paid — Confirm Order
+            </button>
+            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep('choose')}>← Back</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Mobile: UPI App chooser ───────────────────────────────────── */}
+      {mobileUPIStep === 'apps' && (
+        <div className="upi-chooser-overlay">
+          <div className="upi-chooser-modal">
+            <h2>Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
+            <p>Choose your UPI app</p>
+            {appNotFound && (
+              <div className="upi-app-error">
+                ⚠️ That app doesn't seem to be installed. Try another or scan the QR code instead.
+              </div>
+            )}
+            <div className="upi-redirect-notice">
+              📲 You'll be redirected to your payment app. After paying, <strong>come back here</strong> to confirm your order.
+            </div>
+            <div className="upi-chooser-buttons">
+              <button onClick={() => openUPIApp('gpay')} className="upi-app-btn">
+                <AppIcon app="gpay" />
+                <span>Google Pay</span>
+              </button>
+              <button onClick={() => openUPIApp('phonepe')} className="upi-app-btn">
+                <AppIcon app="phonepe" />
+                <span>PhonePe</span>
+              </button>
+              <button onClick={() => openUPIApp('paytm')} className="upi-app-btn">
+                <AppIcon app="paytm" />
+                <span>Paytm</span>
+              </button>
+            </div>
+            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep('choose')}>← Back</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Payment confirmation (after returning from UPI app) ───────── */}
       {showPaymentConfirm && (
         <div className="upi-chooser-overlay">
           <div className="upi-chooser-modal">
@@ -403,7 +471,11 @@ export default function Checkout() {
               <button onClick={confirmPaymentDone} className="checkout-place-btn" style={{ margin: 0 }}>
                 ✓ Yes, I've paid
               </button>
-              <button onClick={retryPayment} className="upi-app-btn" style={{ flexDirection: 'row', gap: '0.5rem', justifyContent: 'center' }}>
+              <button
+                onClick={() => { setShowPaymentConfirm(false); setMobileUPIStep('apps') }}
+                className="upi-app-btn"
+                style={{ flexDirection: 'row', gap: '0.5rem', justifyContent: 'center' }}
+              >
                 ↩ No, try again
               </button>
             </div>

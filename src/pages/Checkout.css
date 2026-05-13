@@ -613,3 +613,50 @@
   margin-bottom: 1rem;
   text-align: left;
 }
+
+.checkout-form-error-summary {
+  color: #a00;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  background: #fff4f4;
+  border: 1.5px solid #f5c6c6;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.upi-method-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f8f5f2;
+  border: 1.5px solid #e8e0d8;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.upi-method-btn:hover {
+  border-color: #760909;
+  background: #fdf6f0;
+}
+
+.upi-method-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.upi-method-btn strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #1a1714;
+  margin-bottom: 0.1rem;
+}
+
+.upi-method-btn span {
+  font-size: 0.8rem;
+  color: #888;
+}
