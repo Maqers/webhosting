@@ -52,3 +52,34 @@
     padding-bottom: calc(54px + env(safe-area-inset-bottom));
   }
 }
+  .bottom-nav-cart {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .bottom-nav-cart-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-nav-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #760909;
+    color: #fff;
+    font-size: 0.5rem;
+    font-weight: 700;
+    min-width: 15px;
+    height: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+  }

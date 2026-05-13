@@ -4,12 +4,11 @@ import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
 import './Checkout.css'
 
-const UPI_ID = '9650800399@pthdfc' // e.g. maqers@okaxis
+const UPI_ID = 'PASTE_YOUR_UPI_ID_HERE' // e.g. maqers@okaxis
 const WHATSAPP_NUMBER = '919289955099'
 const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
-const EMAILJS_TEMPLATE_CONFIRMED = 'template_cp8gsrc'
 
 function getDeliveryFee(subtotal) {
   if (subtotal >= 4000) return 0
@@ -124,8 +123,8 @@ export default function Checkout() {
     try {
       await sendEmail(oid,
         paymentMethod === 'upi'
-          ? 'UPI — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING'
-          : 'WhatsApp'
+          ? 'UPI App — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING'
+          : 'QR Code — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING'
       )
     } catch (err) {
       console.error('Email 1 failed:', err)
@@ -134,9 +133,19 @@ export default function Checkout() {
     if (paymentMethod === 'upi') {
       setSubmitting(false)
       if (isMobile) {
-        setMobileUPIStep('choose')
+        setMobileUPIStep('apps') // go straight to app chooser
       } else {
-        // Desktop: QR already visible in sidebar, just confirm order
+        clearCart()
+        setOrderPlaced(true)
+      }
+      return
+    }
+
+    if (paymentMethod === 'qr') {
+      setSubmitting(false)
+      if (isMobile) {
+        setMobileUPIStep('qr') // go straight to QR modal
+      } else {
         clearCart()
         setOrderPlaced(true)
       }
@@ -282,18 +291,18 @@ export default function Checkout() {
               <div className="checkout-payment-options">
                 <label className={`checkout-payment-option ${paymentMethod === 'upi' ? 'selected' : ''}`}>
                   <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
-                  <div className="checkout-payment-icon">📱</div>
+                  <div className="checkout-payment-icon">📲</div>
                   <div>
-                    <strong>UPI</strong>
+                    <strong>Pay via UPI App</strong>
                     <span>GPay · PhonePe · Paytm</span>
                   </div>
                 </label>
-                <label className={`checkout-payment-option ${paymentMethod === 'whatsapp' ? 'selected' : ''}`}>
-                  <input type="radio" name="payment" value="whatsapp" checked={paymentMethod === 'whatsapp'} onChange={() => setPaymentMethod('whatsapp')} />
-                  <div className="checkout-payment-icon">💬</div>
+                <label className={`checkout-payment-option ${paymentMethod === 'qr' ? 'selected' : ''}`}>
+                  <input type="radio" name="payment" value="qr" checked={paymentMethod === 'qr'} onChange={() => setPaymentMethod('qr')} />
+                  <div className="checkout-payment-icon">📷</div>
                   <div>
-                    <strong>Pay via WhatsApp</strong>
-                    <span>We'll confirm your order on WhatsApp</span>
+                    <strong>Scan QR Code</strong>
+                    <span>Open any UPI app and scan</span>
                   </div>
                 </label>
               </div>
@@ -352,10 +361,12 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {/* Desktop only: QR in sidebar */}
-              {paymentMethod === 'upi' && !isMobile && (
+              {/* Desktop only: QR in sidebar for both options */}
+              {(paymentMethod === 'upi' || paymentMethod === 'qr') && !isMobile && (
                 <div className="checkout-upi-box">
-                  <p className="checkout-upi-label">Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</p>
+                  <p className="checkout-upi-label">
+                    {paymentMethod === 'qr' ? 'Scan & Pay' : 'Or scan to pay'} ₹{grandTotal.toLocaleString('en-IN')}
+                  </p>
                   <div className="checkout-qr-placeholder">
                     <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
                   </div>
@@ -367,46 +378,19 @@ export default function Checkout() {
 
               {paymentMethod === 'upi' && isMobile && (
                 <p className="checkout-fill-info">
-                  After clicking Place Order, you'll be prompted to pay via your UPI app.
+                  After clicking Place Order, your UPI app will open with the amount prefilled.
                 </p>
               )}
 
-              {paymentMethod === 'whatsapp' && (
+              {paymentMethod === 'qr' && isMobile && (
                 <p className="checkout-fill-info">
-                  Fill in your details and click Place Order. We'll confirm via WhatsApp.
+                  After clicking Place Order, a QR code will appear for you to scan.
                 </p>
               )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* ── Mobile: How to pay chooser ─────────────────────────────────── */}
-      {mobileUPIStep === 'choose' && (
-        <div className="upi-chooser-overlay">
-          <div className="upi-chooser-modal">
-            <h2>Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
-            <p>How would you like to pay?</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', margin: '1rem 0' }}>
-              <button className="upi-method-btn" onClick={() => setMobileUPIStep('qr')}>
-                <span className="upi-method-icon">📷</span>
-                <div>
-                  <strong>Scan QR Code</strong>
-                  <span>Open any UPI app and scan</span>
-                </div>
-              </button>
-              <button className="upi-method-btn" onClick={() => setMobileUPIStep('apps')}>
-                <span className="upi-method-icon">📲</span>
-                <div>
-                  <strong>Open UPI App</strong>
-                  <span>GPay, PhonePe, or Paytm</span>
-                </div>
-              </button>
-            </div>
-            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep(null)}>Cancel</button>
-          </div>
-        </div>
-      )}
 
       {/* ── Mobile: QR code ───────────────────────────────────────────── */}
       {mobileUPIStep === 'qr' && (
@@ -423,7 +407,7 @@ export default function Checkout() {
             <button onClick={confirmPaymentDone} className="checkout-place-btn" style={{ margin: '0 0 0.75rem' }}>
               ✓ I've paid — Confirm Order
             </button>
-            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep('choose')}>← Back</button>
+            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep(null)}>Cancel</button>
           </div>
         </div>
       )}
@@ -456,7 +440,7 @@ export default function Checkout() {
                 <span>Paytm</span>
               </button>
             </div>
-            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep('choose')}>← Back</button>
+            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep(null)}>Cancel</button>
           </div>
         </div>
       )}
