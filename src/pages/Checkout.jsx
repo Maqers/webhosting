@@ -94,6 +94,12 @@ export default function Checkout() {
       console.error('Email failed:', err)
     }
 
+    if (paymentMethod === 'upi') {
+      const note = encodeURIComponent(`Maqers Order ${oid}`)
+      const upiLink = `upi://pay?pa=${UPI_ID}&pn=Maqers&am=${grandTotal}&cu=INR&tn=${note}`
+      window.location.href = upiLink
+    }
+
     clearCart()
     setOrderPlaced(true)
     setSubmitting(false)
