@@ -65,8 +65,8 @@ async function sbCreateSeller(seller) {
   return res.json();
 }
 
-async function sbUpdateSeller(id, updates) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?id=eq.${encodeURIComponent(id)}`, {
+async function sbUpdateSeller(sellerCode, updates) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?seller_code=eq.${encodeURIComponent(sellerCode)}`, {
     method: "PATCH",
     headers: { ...sbHeaders, "Prefer": "return=representation" },
     body: JSON.stringify(updates),
@@ -75,8 +75,8 @@ async function sbUpdateSeller(id, updates) {
   return res.json();
 }
 
-async function sbDeleteSeller(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?id=eq.${encodeURIComponent(id)}`, {
+async function sbDeleteSeller(sellerCode) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?seller_code=eq.${encodeURIComponent(sellerCode)}`, {
     method: "DELETE",
     headers: sbHeaders,
   });
@@ -772,7 +772,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, kyc_documents: kycPaths });
+      await sbUpdateSeller(editingSeller.seller_code, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, kyc_documents: kycPaths });
       await loadSellers();
       setEditingSeller(null); setKycFiles([]);
       showToast("Seller updated!");
@@ -780,13 +780,13 @@ export default function AdminPortal() {
     finally { setPublishing(false); setKycUploading(false); }
   }
 
-  async function handleLinkProductToSeller(sellerId, productId) {
-    const seller = sellers.find(s => s.id === sellerId);
+  async function handleLinkProductToSeller(sellerCode, productId) {
+    const seller = sellers.find(s => s.seller_code === sellerCode);
     if (!seller) return;
     const current = seller.product_ids || [];
     const updated = current.includes(productId) ? current.filter(id => id !== productId) : [...current, productId];
     try {
-      await sbUpdateSeller(sellerId, { product_ids: updated });
+      await sbUpdateSeller(sellerCode, { product_ids: updated });
       await loadSellers();
       showToast("Seller products updated!");
     } catch (err) { showToast(err.message, "error"); }
@@ -795,7 +795,7 @@ export default function AdminPortal() {
   async function handleDeleteKYC(seller, path) {
     try {
       const updated = seller.kyc_documents.filter(p => p !== path);
-      await sbUpdateSeller(seller.id, { kyc_documents: updated });
+      await sbUpdateSeller(seller.seller_code, { kyc_documents: updated });
       setEditingSeller(s => ({ ...s, kyc_documents: updated }));
       await loadSellers();
       showToast("Document removed.");
@@ -1731,7 +1731,7 @@ export default function AdminPortal() {
                       const linked = (editingSeller.product_ids||[]).includes(p.id);
                       return (
                         <button key={p.id} type="button"
-                          onClick={() => handleLinkProductToSeller(editingSeller.id, p.id).then(() => setEditingSeller(s => ({ ...s, product_ids: linked ? s.product_ids.filter(id=>id!==p.id) : [...(s.product_ids||[]), p.id] })))}
+                          onClick={() => handleLinkProductToSeller(editingSeller.seller_code, p.id).then(() => setEditingSeller(s => ({ ...s, product_ids: linked ? s.product_ids.filter(id=>id!==p.id) : [...(s.product_ids||[]), p.id] })))}
                           style={{ ...linked ? ts.chipActive : ts.chip, fontSize: 11 }}>
                           {linked ? "✓ " : ""}{p.title} (ID {p.id})
                         </button>
