@@ -440,7 +440,7 @@ export default function AdminPortal() {
   const [sellersLoading, setSellersLoading] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [showAddSeller, setShowAddSeller] = useState(false);
-  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", pincode: "", notes: "" });
+  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
   const [newOwnerInput, setNewOwnerInput] = useState("");
   const [kycFiles, setKycFiles] = useState([]);
   const [kycUploading, setKycUploading] = useState(false);
@@ -750,10 +750,10 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, pincode: newSeller.pincode, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, address: newSeller.address || "", pincode: newSeller.pincode, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
       await sbCreateSeller(seller);
       await loadSellers();
-      setNewSeller({ business_name: "", owners: [], location: "", pincode: "", notes: "" });
+      setNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
       setKycFiles([]); setNewOwnerInput(""); setShowAddSeller(false);
       showToast(`Seller "${newSeller.business_name}" created! ID: ${sellerCode}`);
     } catch (err) { showToast(err.message, "error"); }
@@ -772,7 +772,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, pincode: editingSeller.pincode || "", notes: editingSeller.notes, kyc_documents: kycPaths });
+      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, kyc_documents: kycPaths });
       await loadSellers();
       setEditingSeller(null); setKycFiles([]);
       showToast("Seller updated!");
@@ -1608,9 +1608,12 @@ export default function AdminPortal() {
                         ))}
                       </div>
                     )}
-                    <label style={ts.label}>Location (HQ)</label>
+                    <label style={ts.label}>Location (City)</label>
                     <input style={ts.input} placeholder="e.g. Mumbai, Maharashtra" value={newSeller.location}
                       onChange={e => setNewSeller(s => ({ ...s, location: e.target.value }))} />
+                    <label style={ts.label}>Full Address</label>
+                    <textarea style={{ ...ts.input, height: 60, resize: "vertical" }} placeholder="Street, Area, City"
+                      value={newSeller.address || ''} onChange={e => setNewSeller(s => ({ ...s, address: e.target.value }))} />
                     <label style={ts.label}>Pincode <span style={ts.labelHint}>(for delivery estimation)</span></label>
                     <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
                       value={newSeller.pincode} onChange={e => setNewSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
@@ -1673,9 +1676,13 @@ export default function AdminPortal() {
                         ))}
                       </div>
                     )}
-                    <label style={ts.label}>Location</label>
+                    <label style={ts.label}>Location (City)</label>
                     <input style={ts.input} value={editingSeller.location || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, location: e.target.value }))} />
+                    <label style={ts.label}>Full Address</label>
+                    <textarea style={{ ...ts.input, height: 60, resize: "vertical" }} placeholder="Street, Area, City"
+                      value={editingSeller.address || ""}
+                      onChange={e => setEditingSeller(s => ({ ...s, address: e.target.value }))} />
                     <label style={ts.label}>Pincode <span style={ts.labelHint}>(for delivery estimation)</span></label>
                     <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
                       value={editingSeller.pincode || ""}

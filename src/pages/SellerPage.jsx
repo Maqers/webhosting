@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getAllProducts } from '../data/catalog'
 import ImageWithFallback from '../components/ImageWithFallback'
-import { useCart } from '../context/CartContext'
-import { useWishlist } from '../context/WishlistContext'
 import './SellerPage.css'
 
-const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0";
+const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co"
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0"
+const SB_HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
 
 export default function SellerPage() {
-  const { sellerCode } = useParams()
+  const sellerCode = window.location.pathname.split('/maker/')[1]
+  const [seller, setSeller] = useState(null)
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -20,23 +20,21 @@ export default function SellerPage() {
       setLoading(true)
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/sellers_db?seller_code=eq.${encodeURIComponent(sellerCode)}&select=product_ids`,
-          { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } }
+          `${SUPABASE_URL}/rest/v1/sellers_db?seller_code=eq.${encodeURIComponent(sellerCode)}&select=*`,
+          { headers: SB_HEADERS }
         )
         const data = await res.json()
-        if (!data || data.length === 0) { setNotFound(true); return; }
+        if (!data || data.length === 0) { setNotFound(true); return }
 
-        const productIds = data[0].product_ids || []
-        if (productIds.length === 0) { setProducts([]); return; }
+        const s = data[0]
+        setSeller(s)
 
-        const allProds = getAllProducts()
-        const sellerProds = productIds
-          .map(id => allProds.find(p => p.id === id))
-          .filter(Boolean)
-          .filter(p => p.inStock)
-
-        setProducts(sellerProds)
-      } catch (err) {
+        const productIds = s.product_ids || []
+        if (productIds.length > 0) {
+          const allProds = getAllProducts()
+          setProducts(productIds.map(id => allProds.find(p => p.id === id)).filter(Boolean))
+        }
+      } catch {
         setNotFound(true)
       } finally {
         setLoading(false)
@@ -45,101 +43,94 @@ export default function SellerPage() {
     load()
   }, [sellerCode])
 
-  if (loading) return (
-    <div className="seller-page"><div className="container"><div className="seller-loading">Loading...</div></div></div>
-  )
-
+  if (loading) return <div className="seller-page"><div className="seller-loading">Loading...</div></div>
   if (notFound) return (
-    <div className="seller-page"><div className="container"><div className="seller-not-found">
+    <div className="seller-page"><div className="seller-not-found">
       <h2>Maker not found</h2>
-      <Link to="/products" className="seller-back-link">Browse all products</Link>
-    </div></div></div>
+      <Link to="/products">Browse all products</Link>
+    </div></div>
   )
 
   return (
     <div className="seller-page">
-      <div className="container">
+      <div className="seller-inner">
         <Link to="/products" className="seller-back">← Back to products</Link>
-        <div className="seller-header">
-          <h1 className="seller-code">{sellerCode}</h1>
-          <p className="seller-count">{products.length} product{products.length !== 1 ? "s" : ""}</p>
-        </div>
-        {products.length === 0 ? (
-          <p className="seller-empty">No products available from this maker right now.</p>
-        ) : (
-          <div className="products-grid">
-            {products.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
+
+        {/* Seller profile card */}
+        <div className="seller-profile-card">
+          <div className="seller-profile-header">
+            <div className="seller-profile-avatar">{(seller.business_name || 'M')[0].toUpperCase()}</div>
+            <div>
+              <h1 className="seller-profile-name">{seller.business_name}</h1>
+              <span className="seller-profile-code">{seller.seller_code}</span>
+            </div>
           </div>
-        )}
+
+          <div className="seller-profile-grid">
+            {(seller.owners || []).length > 0 && (
+              <div className="seller-profile-field">
+                <span className="seller-profile-label">Owner</span>
+                <span className="seller-profile-value">{seller.owners.join(', ')}</span>
+              </div>
+            )}
+            {seller.location && (
+              <div className="seller-profile-field">
+                <span className="seller-profile-label">City</span>
+                <span className="seller-profile-value">{seller.location}</span>
+              </div>
+            )}
+            {seller.address && (
+              <div className="seller-profile-field">
+                <span className="seller-profile-label">Address</span>
+                <span className="seller-profile-value">{seller.address}</span>
+              </div>
+            )}
+            {seller.pincode && (
+              <div className="seller-profile-field">
+                <span className="seller-profile-label">Pincode</span>
+                <span className="seller-profile-value">{seller.pincode}</span>
+              </div>
+            )}
+            {seller.notes && (
+              <div className="seller-profile-field seller-profile-field--full">
+                <span className="seller-profile-label">Notes</span>
+                <span className="seller-profile-value">{seller.notes}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Products */}
+        <div className="seller-products-section">
+          <h2 className="seller-products-title">
+            Products <span className="seller-products-count">{products.length}</span>
+          </h2>
+
+          {products.length === 0 ? (
+            <p className="seller-empty">No products listed yet.</p>
+          ) : (
+            <div className="seller-products-grid">
+              {products.map(product => (
+                <div key={product.id} className="seller-product-card">
+                  <div className="seller-product-img">
+                    <ImageWithFallback
+                      src={product.images?.[0]}
+                      alt={product.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div className="seller-product-info">
+                    <p className="seller-product-category">{product.category || product.categoryId}</p>
+                    <p className="seller-product-title">{product.title}</p>
+                    <p className="seller-product-price">₹{product.price?.toLocaleString('en-IN')}</p>
+                    <p className="seller-product-id">ID {product.id}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  )
-}
-
-const ProductCard = ({ product, index }) => {
-  const navigate = useNavigate()
-  const { addItem } = useCart()
-  const { toggleItem, isWishlisted } = useWishlist()
-  const wishlisted = isWishlisted(product.id)
-  const [addedFeedback, setAddedFeedback] = useState(false)
-
-  const handleAddToCart = useCallback((e) => {
-    e.preventDefault(); e.stopPropagation()
-    addItem(product)
-    setAddedFeedback(true)
-    setTimeout(() => setAddedFeedback(false), 1400)
-  }, [product, addItem])
-
-  const handleWishlist = useCallback((e) => {
-    e.preventDefault(); e.stopPropagation()
-    toggleItem(product)
-  }, [product, toggleItem])
-
-  const handleCardClick = useCallback(() => {
-    navigate(`/product/${product.id}`)
-  }, [product.id, navigate])
-
-  return (
-    <article
-      className="feat-card"
-      style={{ "--i": index % 12 }}
-      onClick={handleCardClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
-      aria-label={product.title}
-    >
-      <div className="feat-img-zone">
-        <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading="lazy" />
-        {product.popular && <span className="feat-badge-popular">Popular</span>}
-        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
-          <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-      </div>
-      <div className="feat-info-zone">
-        <p className="feat-category">{product.category || product.categoryId}</p>
-        <h3 className="feat-title">{product.title}</h3>
-        <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
-        <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
-          <button className={`feat-add-btn${addedFeedback ? " added" : ""}`} onClick={handleAddToCart} type="button" aria-label="Add to cart">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-            {addedFeedback ? "Added!" : "Add to Cart"}
-          </button>
-          <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button">
-            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            {wishlisted ? "Saved" : "Wishlist"}
-          </button>
-        </div>
-      </div>
-    </article>
   )
 }
