@@ -67,36 +67,28 @@ export default function SellerPage() {
           </div>
 
           <div className="seller-profile-grid">
-            {(seller.owners || []).length > 0 && (
-              <div className="seller-profile-field">
-                <span className="seller-profile-label">Owner</span>
-                <span className="seller-profile-value">{seller.owners.join(', ')}</span>
-              </div>
-            )}
-            {seller.location && (
-              <div className="seller-profile-field">
-                <span className="seller-profile-label">City</span>
-                <span className="seller-profile-value">{seller.location}</span>
-              </div>
-            )}
-            {seller.address && (
-              <div className="seller-profile-field">
-                <span className="seller-profile-label">Address</span>
-                <span className="seller-profile-value">{seller.address}</span>
-              </div>
-            )}
-            {seller.pincode && (
-              <div className="seller-profile-field">
-                <span className="seller-profile-label">Pincode</span>
-                <span className="seller-profile-value">{seller.pincode}</span>
-              </div>
-            )}
-            {seller.notes && (
-              <div className="seller-profile-field seller-profile-field--full">
-                <span className="seller-profile-label">Notes</span>
-                <span className="seller-profile-value">{seller.notes}</span>
-              </div>
-            )}
+            <div className="seller-profile-field">
+              <span className="seller-profile-label">Owner</span>
+              <span className="seller-profile-value">
+                {(seller.owners || []).length > 0 ? seller.owners.join(', ') : '—'}
+              </span>
+            </div>
+            <div className="seller-profile-field">
+              <span className="seller-profile-label">City</span>
+              <span className="seller-profile-value">{seller.location || '—'}</span>
+            </div>
+            <div className="seller-profile-field seller-profile-field--full">
+              <span className="seller-profile-label">Address</span>
+              <span className="seller-profile-value">{seller.address || '—'}</span>
+            </div>
+            <div className="seller-profile-field">
+              <span className="seller-profile-label">Pincode</span>
+              <span className="seller-profile-value">{seller.pincode || '—'}</span>
+            </div>
+            <div className="seller-profile-field">
+              <span className="seller-profile-label">Notes</span>
+              <span className="seller-profile-value">{seller.notes || seller.internal_notes || '—'}</span>
+            </div>
           </div>
         </div>
 
