@@ -50,8 +50,8 @@ const sbHeaders = {
 };
 
 async function sbGetSellers() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?select=*&order=business_name.asc&t=${Date.now()}`, {
-    headers: { ...sbHeaders, "Cache-Control": "no-cache" }
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?select=*&order=business_name.asc`, {
+    headers: { ...sbHeaders, "Cache-Control": "no-cache", "Pragma": "no-cache" }
   });
   if (!res.ok) throw new Error(`Supabase GET failed: ${await res.text()}`);
   return res.json();
