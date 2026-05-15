@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, memo, useCallback } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalogIndex'
+import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'

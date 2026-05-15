@@ -127,14 +127,14 @@ async function commitCatalog(source, sha, message, creds) {
 }
 
 async function fetchCatalog2(creds) {
-  const file = await ghGet("src/data/catalog2.js", creds);
+  const file = await ghGet("src/data/catalog.js", creds);
   const source = decodeURIComponent(escape(atob(file.content.replace(/\n/g, ""))));
   return { source, sha: file.sha };
 }
 
 async function commitCatalog2(source, sha, message, creds) {
   const encoded = btoa(unescape(encodeURIComponent(source)));
-  return ghPut("src/data/catalog2.js", encoded, message, sha, creds);
+  return ghPut("src/data/catalog.js", encoded, message, sha, creds);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -524,39 +524,18 @@ export default function AdminPortal() {
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         imagePaths.push(`/images/${img.name}`);
       }
-      log("Updating catalog2.js...");
-      const { source: source2, sha: sha2 } = await fetchCatalog2(creds);
-      // Get next ID from catalog.js (to avoid ID conflicts)
-      const { source: source1 } = await fetchCatalog(creds);
-      const newId = getNextId(source1 + source2);
+      log("Updating catalog.js...");
+      const { source, sha } = await fetchCatalog(creds);
+      const newId = getNextId(source);
       const fullProduct = { ...newProduct, price: Number(newProduct.price), images: imagePaths };
-
-      // Insert into catalog2.js — ensure category block exists
-      let updated2 = source2;
-      const catKey = fullProduct.categoryId.match(/[&\-]/) ? `"${fullProduct.categoryId}"` : fullProduct.categoryId;
-      const hasCatBlock = new RegExp(`${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:`).test(updated2);
-      if (!hasCatBlock) {
-        // Add new category block to productsByCategory2
-        updated2 = updated2.replace(
-          /(export const productsByCategory2 = \{)/,
-          `$1\n  "${fullProduct.categoryId}": [\n  ],`
+      let updated = insertProductIntoSource(source, fullProduct, newId);
+      for (const occ of (newProduct.occasions || [])) {
+        updated = updated.replace(
+          new RegExp(`('${occ}'\\s*:\\s*\\[)([^\\]]*)(\\])`, "m"),
+          (_, open, content, close) => { const t = content.trimEnd(); return `${open}${t}${t.endsWith(",") ? " " : ", "}${newId}${close}`; }
         );
       }
-      updated2 = insertProductIntoSource(updated2, fullProduct, newId);
-
-      // Also add to occasionProductMap in catalog.js if occasions selected
-      if (newProduct.occasions && newProduct.occasions.length > 0) {
-        let { source: cat1src, sha: cat1sha } = await fetchCatalog(creds);
-        for (const occ of newProduct.occasions) {
-          cat1src = cat1src.replace(
-            new RegExp(`('${occ}'\\s*:\\s*\\[)([^\\]]*)(\\])`, "m"),
-            (_, open, content, close) => { const t = content.trimEnd(); return `${open}${t}${t.endsWith(",") ? " " : ", "}${newId}${close}`; }
-          );
-        }
-        await commitCatalog(cat1src, cat1sha, `Add product ${newId} to occasions`, creds);
-      }
-
-      await commitCatalog2(updated2, sha2, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
+      await commitCatalog(updated, sha, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
       log(`Done! Product ID ${newId} live after Vercel redeploys (~45s).`);
       // Link product to seller in Supabase and store seller_code
       if (newProduct.sellerId) {

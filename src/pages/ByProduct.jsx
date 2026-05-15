@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { getSortedCategories, getCategoryProductCount } from '../data/catalog'
 import './ByOccasion.css'
 
 export default function ByProduct() {

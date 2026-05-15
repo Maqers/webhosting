@@ -288,4 +288,3 @@ const DynamicSubNavbar = () => {
 }
 
 export default DynamicSubNavbar
-
