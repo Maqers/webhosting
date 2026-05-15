@@ -72,3 +72,9 @@
   flex-shrink: 0;
   line-height: 1;
 }
+.by-page-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-right: 0.5rem;
+}

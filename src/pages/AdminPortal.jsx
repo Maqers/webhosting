@@ -126,6 +126,17 @@ async function commitCatalog(source, sha, message, creds) {
   return ghPut("src/data/catalog.js", encoded, message, sha, creds);
 }
 
+async function fetchCatalog2(creds) {
+  const file = await ghGet("src/data/catalog2.js", creds);
+  const source = decodeURIComponent(escape(atob(file.content.replace(/\n/g, ""))));
+  return { source, sha: file.sha };
+}
+
+async function commitCatalog2(source, sha, message, creds) {
+  const encoded = btoa(unescape(encodeURIComponent(source)));
+  return ghPut("src/data/catalog2.js", encoded, message, sha, creds);
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function slugify(text) {
@@ -337,7 +348,7 @@ function insertProductIntoSource(source, product, id) {
   if (!match) {
     // Empty single-line block — expand it first
     const emptyMatch = source.match(catPatternEmpty);
-    if (!emptyMatch) throw new Error(`Category block "${product.categoryId}" not found in catalog.js`);
+    if (!emptyMatch) throw new Error(`Category block "${product.categoryId}" not found in catalog`);
     const expanded = source.replace(catPatternEmpty, `$1[\n${entry}\n  ],`);
     return expanded;
   }
@@ -442,7 +453,7 @@ export default function AdminPortal() {
   const [sellersLoading, setSellersLoading] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [showAddSeller, setShowAddSeller] = useState(false);
-  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
+  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [] });
   const [newOwnerInput, setNewOwnerInput] = useState("");
   const [kycFiles, setKycFiles] = useState([]);
   const [kycUploading, setKycUploading] = useState(false);
@@ -513,18 +524,39 @@ export default function AdminPortal() {
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         imagePaths.push(`/images/${img.name}`);
       }
-      log("Updating catalog.js...");
-      const { source, sha } = await fetchCatalog(creds);
-      const newId = getNextId(source);
+      log("Updating catalog2.js...");
+      const { source: source2, sha: sha2 } = await fetchCatalog2(creds);
+      // Get next ID from catalog.js (to avoid ID conflicts)
+      const { source: source1 } = await fetchCatalog(creds);
+      const newId = getNextId(source1 + source2);
       const fullProduct = { ...newProduct, price: Number(newProduct.price), images: imagePaths };
-      let updated = insertProductIntoSource(source, fullProduct, newId);
-      for (const occ of newProduct.occasions) {
-        updated = updated.replace(
-          new RegExp(`('${occ}'\\s*:\\s*\\[)([^\\]]*)(\\])`, "m"),
-          (_, open, content, close) => { const t = content.trimEnd(); return `${open}${t}${t.endsWith(",") ? " " : ", "}${newId}${close}`; }
+
+      // Insert into catalog2.js — ensure category block exists
+      let updated2 = source2;
+      const catKey = fullProduct.categoryId.match(/[&\-]/) ? `"${fullProduct.categoryId}"` : fullProduct.categoryId;
+      const hasCatBlock = new RegExp(`${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:`).test(updated2);
+      if (!hasCatBlock) {
+        // Add new category block to productsByCategory2
+        updated2 = updated2.replace(
+          /(export const productsByCategory2 = \{)/,
+          `$1\n  "${fullProduct.categoryId}": [\n  ],`
         );
       }
-      await commitCatalog(updated, sha, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
+      updated2 = insertProductIntoSource(updated2, fullProduct, newId);
+
+      // Also add to occasionProductMap in catalog.js if occasions selected
+      if (newProduct.occasions && newProduct.occasions.length > 0) {
+        let { source: cat1src, sha: cat1sha } = await fetchCatalog(creds);
+        for (const occ of newProduct.occasions) {
+          cat1src = cat1src.replace(
+            new RegExp(`('${occ}'\\s*:\\s*\\[)([^\\]]*)(\\])`, "m"),
+            (_, open, content, close) => { const t = content.trimEnd(); return `${open}${t}${t.endsWith(",") ? " " : ", "}${newId}${close}`; }
+          );
+        }
+        await commitCatalog(cat1src, cat1sha, `Add product ${newId} to occasions`, creds);
+      }
+
+      await commitCatalog2(updated2, sha2, `Add product: ${sanitizeForJS(newProduct.title)} (ID ${newId})`, creds);
       log(`Done! Product ID ${newId} live after Vercel redeploys (~45s).`);
       // Link product to seller in Supabase and store seller_code
       if (newProduct.sellerId) {
@@ -577,6 +609,30 @@ export default function AdminPortal() {
       showToast(`${productQueue.length} products published!`);
       setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  async function handleDeleteProduct(product) {
+    if (!window.confirm(`Delete "${product.title}" (ID ${product.id})? This cannot be undone.`)) return;
+    setPublishing(true);
+    try {
+      let { source, sha } = await fetchCatalog(creds);
+      // Remove the product entry from catalog.js
+      const entryRegex = new RegExp(`\\n?\\s*\\{ id: ${product.id},[\\s\\S]*?\\},\\n?`, "m");
+      if (!entryRegex.test(source)) {
+        showToast(`Product ID ${product.id} not found in catalog.js`, "error");
+        return;
+      }
+      source = source.replace(entryRegex, "\n");
+      // Also remove from all occasion maps
+      source = source.replace(new RegExp(`,?\\s*\\b${product.id}\\b\\s*,?`, "g"), (match) => {
+        // Keep surrounding commas clean
+        return match.startsWith(", ") ? "" : match.endsWith(", ") ? "" : "";
+      });
+      await commitCatalog(source, sha, `Delete product: ${product.title} (ID ${product.id})`, creds);
+      loadCatalogData(source, sha);
+      showToast(`"${product.title}" deleted.`);
+    } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
 
@@ -752,10 +808,10 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, pincode: newSeller.pincode, notes: newSeller.notes, product_ids: [], kyc_documents: kycPaths };
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, address: newSeller.address || "", pincode: newSeller.pincode, notes: newSeller.notes, gst_registered: newSeller.gst_registered || false, gst_number: newSeller.gst_number || "", hsn_codes: newSeller.hsn_codes || [], product_ids: [], kyc_documents: kycPaths };
       await sbCreateSeller(seller);
       await loadSellers();
-      setNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
+      setNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [] });
       setKycFiles([]); setNewOwnerInput(""); setShowAddSeller(false);
       showToast(`Seller "${newSeller.business_name}" created! ID: ${sellerCode}`);
     } catch (err) { showToast(err.message, "error"); }
@@ -774,7 +830,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, pincode: editingSeller.pincode || "", notes: editingSeller.notes, kyc_documents: kycPaths });
+      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, gst_registered: editingSeller.gst_registered || false, gst_number: editingSeller.gst_number || "", hsn_codes: editingSeller.hsn_codes || [], kyc_documents: kycPaths });
       await loadSellers();
       setEditingSeller(null); setKycFiles([]);
       showToast("Seller updated!");
@@ -1385,6 +1441,8 @@ export default function AdminPortal() {
                         onClick={() => handleReorderProduct(product.id, -1)}>↑</button>
                       <button style={{ ...ts.editBtn, padding: "3px 7px" }} title="Move down"
                         onClick={() => handleReorderProduct(product.id, 1)}>↓</button>
+                      <button style={{ ...ts.editBtn, padding: "3px 7px", background: "#feeeed", color: "#c00", border: "1px solid #f5c6c6" }} title="Delete product"
+                        onClick={() => handleDeleteProduct(product)}>✕</button>
                     </span>
                   </div>
                 );
@@ -1619,6 +1677,27 @@ export default function AdminPortal() {
                     <label style={ts.label}>Pincode <span style={ts.labelHint}>(for delivery estimation)</span></label>
                     <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
                       value={newSeller.pincode} onChange={e => setNewSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
+                    <label style={ts.label}>GST Registered?</label>
+                    <div style={{ display: "flex", gap: 12, margin: "4px 0 8px" }}>
+                      {["Yes", "No"].map(opt => (
+                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 13 }}>
+                          <input type="radio" name="new_gst" value={opt} checked={newSeller.gst_registered === (opt === "Yes")}
+                            onChange={() => setNewSeller(s => ({ ...s, gst_registered: opt === "Yes", gst_number: opt === "No" ? "" : s.gst_number }))} />
+                          {opt}
+                        </label>
+                      ))}
+                    </div>
+                    {newSeller.gst_registered && (
+                      <>
+                        <label style={ts.label}>GST Number</label>
+                        <input style={ts.input} placeholder="e.g. 27AAAAA0000A1Z5" value={newSeller.gst_number}
+                          onChange={e => setNewSeller(s => ({ ...s, gst_number: e.target.value.toUpperCase() }))} />
+                      </>
+                    )}
+                    <label style={ts.label}>HSN Codes <span style={ts.labelHint}>(comma-separated)</span></label>
+                    <input style={ts.input} placeholder="e.g. 6702, 9405"
+                      value={(newSeller.hsn_codes || []).join(", ")}
+                      onChange={e => setNewSeller(s => ({ ...s, hsn_codes: e.target.value.split(",").map(h => h.trim()).filter(Boolean) }))} />
                     <label style={ts.label}>Internal Notes</label>
                     <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} placeholder="Any notes..."
                       value={newSeller.notes} onChange={e => setNewSeller(s => ({ ...s, notes: e.target.value }))} />
@@ -1689,6 +1768,27 @@ export default function AdminPortal() {
                     <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
                       value={editingSeller.pincode || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
+                    <label style={ts.label}>GST Registered?</label>
+                    <div style={{ display: "flex", gap: 12, margin: "4px 0 8px" }}>
+                      {["Yes", "No"].map(opt => (
+                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 13 }}>
+                          <input type="radio" name="edit_gst" value={opt} checked={(editingSeller.gst_registered === true ? "Yes" : "No") === opt}
+                            onChange={() => setEditingSeller(s => ({ ...s, gst_registered: opt === "Yes", gst_number: opt === "No" ? "" : s.gst_number }))} />
+                          {opt}
+                        </label>
+                      ))}
+                    </div>
+                    {editingSeller.gst_registered && (
+                      <>
+                        <label style={ts.label}>GST Number</label>
+                        <input style={ts.input} placeholder="e.g. 27AAAAA0000A1Z5" value={editingSeller.gst_number || ""}
+                          onChange={e => setEditingSeller(s => ({ ...s, gst_number: e.target.value.toUpperCase() }))} />
+                      </>
+                    )}
+                    <label style={ts.label}>HSN Codes <span style={ts.labelHint}>(comma-separated)</span></label>
+                    <input style={ts.input} placeholder="e.g. 6702, 9405"
+                      value={(editingSeller.hsn_codes || []).join(", ")}
+                      onChange={e => setEditingSeller(s => ({ ...s, hsn_codes: e.target.value.split(",").map(h => h.trim()).filter(Boolean) }))} />
                     <label style={ts.label}>Internal Notes</label>
                     <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} value={editingSeller.notes || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, notes: e.target.value }))} />
@@ -1781,7 +1881,13 @@ export default function AdminPortal() {
                         <span style={{ ...ts.flag, background: "#f0f0f0", color: "#888" }}>
                           {(seller.kyc_documents||[]).length} doc(s)
                         </span>
+                        {seller.gst_registered
+                          ? <span style={{ ...ts.flag, background: "#e8f5e8", color: "#2a7a2a" }}>GST ✓</span>
+                          : <span style={{ ...ts.flag, background: "#feeeed", color: "#c00" }}>No GST</span>
+                        }
                       </div>
+                      {seller.gst_number && <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>GST: {seller.gst_number}</div>}
+                      {(seller.hsn_codes||[]).length > 0 && <div style={{ fontSize: 11, color: "#888" }}>HSN: {seller.hsn_codes.join(", ")}</div>}
                       {sellerProducts.length > 0 && (
                         <div style={{ marginTop: 8, fontSize: 11, color: "#999", lineHeight: 1.5 }}>
                           {sellerProducts.slice(0, 3).map(p => p.title).join(" · ")}

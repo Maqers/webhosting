@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, memo, useCallback } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
+import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalogIndex'
 import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
@@ -288,6 +288,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false }) => {
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         {product.popular && <span className="feat-badge-popular">Popular</span>}
+        {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button
           className={`feat-wishlist-btn${wishlisted ? " active" : ""}`}
           onClick={handleWishlist}
@@ -307,16 +308,17 @@ const ProductCard = ({ product, index, categoryMap, priority = false }) => {
 
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button
-            className={`feat-add-btn${addedFeedback ? " added" : ""}`}
-            onClick={handleAddToCart}
+            className={`feat-add-btn${addedFeedback ? " added" : ""}${product.inStock === false ? " disabled" : ""}`}
+            onClick={product.inStock === false ? undefined : handleAddToCart}
             type="button"
             aria-label="Add to cart"
+            disabled={product.inStock === false}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            {addedFeedback ? "Added!" : "Add to Cart"}
+            {product.inStock === false ? "Out of Stock" : addedFeedback ? "Added!" : "Add to Cart"}
           </button>
           <button
             className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`}
