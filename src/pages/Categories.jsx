@@ -86,7 +86,7 @@ const Categories = () => {
           {selectedCategory !== 'All' && (
             <div className="category-products-section">
               <div className="category-header">
-                <Link to="/categories" className="back-to-categories">← All Categories</Link>
+                <Link to="/products" className="back-to-categories">← All Products</Link>
                 <h1 className="category-page-title">
                   {selectedCategoryObj?.emoji && <span className="category-page-emoji">{selectedCategoryObj.emoji} </span>}
                   {selectedCategoryObj?.name || selectedCategory}
