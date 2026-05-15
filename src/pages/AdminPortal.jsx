@@ -155,7 +155,7 @@ function sanitizeForJS(str) {
   if (Array.isArray(str)) return str.map(s => sanitizeForJS(s)).join(", ")
   if (typeof str !== "string") str = String(str)
   return str
-    .replace(/\r?\n|\r/g, " ")
+    .replace(/\r?\n|\r/g, "\\n")
     .replace(/\t/g, " ")
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
