@@ -41,7 +41,7 @@ async function ghPut(path, content, message, sha, creds) {
 // ─── Supabase API ─────────────────────────────────────────────────────────────
 
 const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_PIA3JYE-MMnNEjG_LeLOqw_sdhTy7Go";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0";
 
 const sbHeaders = {
   "Content-Type": "application/json",
