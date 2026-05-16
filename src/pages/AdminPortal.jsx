@@ -155,11 +155,11 @@ function sanitizeForJS(str) {
   if (Array.isArray(str)) return str.map(s => sanitizeForJS(s)).join(", ")
   if (typeof str !== "string") str = String(str)
   return str
-    .replace(/\r?\n|\r/g, "\\n")
-    .replace(/\t/g, " ")
-    .replace(/\\/g, "\\\\")
-    .replace(/"/g, '\\"')
-    .replace(/\s{2,}/g, " ")
+    .replace(/\\/g, "\\\\")        // escape backslashes FIRST
+    .replace(/"/g, '\\"')           // escape double quotes
+    .replace(/\r?\n|\r/g, "\\n")   // convert newlines to \n literal
+    .replace(/\t/g, " ")            // tabs to spaces
+    .replace(/\s{2,}/g, " ")       // collapse multiple spaces
     .trim();
 }
 
@@ -291,69 +291,95 @@ function parseOccasionCategories(source) {
 // ─── Catalog Writers ──────────────────────────────────────────────────────────
 
 function updateProductInSource(source, product) {
+  const range = getEntryRange(source, product.id);
+  if (!range) throw new Error(`Product ID ${product.id} not found in catalog`);
+  const newEntry = buildEntry(product.id, product);
+  return source.slice(0, range.start) + newEntry + source.slice(range.end);
+}
+
+// Find the exact character range of a product entry using brace-counting
+// This is safe against regex cross-matching between products
+function getEntryRange(source, id) {
+  const pattern = new RegExp(`    \\{ id: ${id},`);
+  const m = source.match(pattern);
+  if (!m) return null;
+  let depth = 0;
+  let i = m.index;
+  while (i < source.length) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        let end = i + 1;
+        if (source[end] === ',') end++;
+        return { start: m.index, end };
+      }
+    }
+    i++;
+  }
+  return null;
+}
+
+function serializeColors(colors) {
+  if (!colors || !Array.isArray(colors) || colors.length === 0) return "";
+  return colors
+    .filter(c => c && (typeof c === "object" ? c.name && c.name !== "[object Object]" : typeof c === "string" && c !== "[object Object]"))
+    .map(c => {
+      if (typeof c === "object" && c.name) {
+        return `{ name: "${sanitizeForJS(c.name)}", imageIndex: ${Number(c.imageIndex) || 0} }`;
+      }
+      return `{ name: "${sanitizeForJS(String(c))}", imageIndex: 0 }`;
+    })
+    .join(", ");
+}
+
+function serializeSizes(sizes) {
+  if (!sizes || !Array.isArray(sizes) || sizes.length === 0) return "";
+  return sizes.map(s => `"${sanitizeForJS(String(s))}"`).join(", ");
+}
+
+function buildEntry(id, product) {
   const slug = slugify(product.title);
-  const imagesArr = product.images.map(img => `"${img}"`).join(", ");
-  const tagsArr = product.tags.map(t => `"${sanitizeForJS(t)}"`).join(", ");
-  const kwArr = (product.keywords || []).map(k => `"${sanitizeForJS(k)}"`).join(", ");
   const desc = sanitizeForJS(product.description);
   const title = sanitizeForJS(product.title);
-  const id = product.id;
-  let u = source;
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?categoryId:\\s*)"[^"]*"`), `$1"${product.categoryId}"`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?title:\\s*)"[^"]*"`), `$1"${title}"`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?slug:\\s*)"[^"]*"`), `$1"${slug}"`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?description:\\s*)"(?:[^"\\\\]|\\\\.)*"`), `$1"${desc}"`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?price:\\s*)\\d+`), `$1${product.price}`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?images:\\s*\\[)[^\\]]*(\\])`), `$1${imagesArr}$2`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?popular:\\s*)(true|false)`), `$1${product.popular}`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?featured:\\s*)(true|false)`), `$1${product.featured}`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?inStock:\\s*)(true|false)`), `$1${product.inStock}`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?tags:\\s*\\[)[^\\]]*(\\])`), `$1${tagsArr}$2`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{\\s*keywords:\\s*\\[)[^\\]]*(\\])`), `$1${kwArr}$2`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*colors:\\s*\\[)[^\\]]*(\\])`), `$1${(product.colors||[]).map(c=>`"${sanitizeForJS(c)}"`).join(", ")}$2`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*moq:\\s*)\\d+`), `$1${product.moq ? Number(product.moq) : 0}`);
-  const secCatsArr2 = (product.secondaryCategories||[]).map(c=>`"${sanitizeForJS(c)}"`).join(", ");
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*secondaryCategories:\\s*\\[)[^\\]]*(\\])`), `$1${secCatsArr2}$2`);
-  u = u.replace(new RegExp(`(id:\\s*${id},[\\s\\S]*?meta:\\s*\\{[^}]*sellerId:\\s*)"[^"]*"`), `$1"${sanitizeForJS(product.sellerId || "")}"`);
-  return u;
+  const images = (product.images || []).map(img => `"${img}"`).join(", ");
+  const tags = Array.isArray(product.tags)
+    ? product.tags.map(t => `"${sanitizeForJS(t)}"`).join(", ")
+    : (product.tags || "").split(",").map(t => `"${sanitizeForJS(t.trim())}"`).filter(t => t !== '""').join(", ");
+  const keywords = Array.isArray(product.keywords)
+    ? product.keywords.map(k => `"${sanitizeForJS(k)}"`).join(", ")
+    : (product.keywords || "").split(",").map(k => `"${sanitizeForJS(k.trim())}"`).filter(k => k !== '""').join(", ");
+  const colors = serializeColors(product.colors);
+  const sizes = serializeSizes(product.sizes);
+  const moq = Number(product.moq) || 0;
+  const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
+  const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
+  const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${product.inStock !== false}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
-  const slug = slugify(product.title);
-  const imagesArr = product.images.map(img => `"${img}"`).join(", ");
-  const tagsArr = product.tags ? product.tags.split(",").map(t => `"${sanitizeForJS(t.trim())}"`).join(", ") : "";
-  const kwArr = product.keywords ? product.keywords.split(",").map(k => `"${sanitizeForJS(k.trim())}"`).join(", ") : "";
-  const desc = sanitizeForJS(product.description);
-  const title = sanitizeForJS(product.title);
-  const colorsArr = product.colors && product.colors.length > 0
-    ? product.colors.map(c => typeof c === "object"
-        ? `{ name: "${sanitizeForJS(c.name)}", imageIndex: ${c.imageIndex ?? 0} }`
-        : `{ name: "${sanitizeForJS(c)}", imageIndex: 0 }`)
-      .join(", ")
-    : "";
-  const sizesArr = product.sizes && product.sizes.length > 0
-    ? product.sizes.map(s => `"${sanitizeForJS(s)}"`).join(", ")
-    : "";
-  const moqVal = product.moq ? Number(product.moq) : 0;
-  const secCatsArr = product.secondaryCategories && product.secondaryCategories.length > 0 ? product.secondaryCategories.map(c => `"${sanitizeForJS(c)}"`).join(", ") : "";
-  const sellerIdVal = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
-  // Also store the human-readable seller_code for the public maker page
-  const sellerCodeVal = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
-  const entry = `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${product.price}, images: [${imagesArr}], popular: false, featured: false, inStock: true, tags: [${tagsArr}], meta: { keywords: [${kwArr}], colors: [${colorsArr}], sizes: [${sizesArr}], moq: ${moqVal}, secondaryCategories: [${secCatsArr}], sellerId: ${sellerIdVal}, sellerCode: ${sellerCodeVal} } },`;
-  const catKey = product.categoryId.match(/[&\-]/) ? `"${product.categoryId}"` : product.categoryId;
-  // Try multi-line block first, then single-line empty block
-  const catPattern = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
-  const catPatternEmpty = new RegExp(`(${catKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*)(\\[\\s*\\],?)`, "m");
-  let match = source.match(catPattern);
-  if (!match) {
-    // Empty single-line block — expand it first
-    const emptyMatch = source.match(catPatternEmpty);
-    if (!emptyMatch) throw new Error(`Category block "${product.categoryId}" not found in catalog`);
-    const expanded = source.replace(catPatternEmpty, `$1[\n${entry}\n  ],`);
-    return expanded;
+  const entry = buildEntry(id, product);
+  const catId = product.categoryId;
+  const catEscaped = catId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const catKeyPattern = `(?:"${catEscaped}"|${catEscaped})`;
+
+  // Non-empty category block — insert before closing ],
+  const blockPattern = new RegExp(`(${catKeyPattern}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
+  const match = source.match(blockPattern);
+  if (match) {
+    const insertPos = match.index + match[1].length + match[2].length;
+    return source.slice(0, insertPos) + "\n" + entry + source.slice(insertPos);
   }
-  const insertPos = match.index + match[0].lastIndexOf(match[3]);
-  return source.slice(0, insertPos) + "\n" + entry + "\n" + source.slice(insertPos);
+
+  // Empty category block
+  const emptyPattern = new RegExp(`(${catKeyPattern}\\s*:\\s*)(\\[\\s*\\],?)`, "m");
+  const emptyMatch = source.match(emptyPattern);
+  if (emptyMatch) {
+    return source.replace(emptyPattern, `$1[\n${entry}\n  ],`);
+  }
+
+  throw new Error(`Category block "${catId}" not found in catalog`);
 }
 
 function insertCategoryIntoSource(source, cat, order) {
