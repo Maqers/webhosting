@@ -3,9 +3,9 @@
  * Caches static assets and API responses for faster loading
  */
 
-const CACHE_NAME = 'premium-catalogue-v1'
-const STATIC_CACHE_NAME = 'premium-catalogue-static-v1'
-const IMAGE_CACHE_NAME = 'premium-catalogue-images-v1'
+const CACHE_NAME = 'premium-catalogue-v2'
+const STATIC_CACHE_NAME = 'premium-catalogue-static-v2'
+const IMAGE_CACHE_NAME = 'premium-catalogue-images-v2'
 
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
@@ -53,9 +53,13 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url)
 
   // Skip non-GET requests
-  if (request.method !== 'GET') {
-    return
-  }
+  if (request.method !== 'GET') return
+
+  // Skip non-http(s) requests — chrome-extension://, data: etc. can't be cached
+  if (!url.protocol.startsWith('http')) return
+
+  // Skip Supabase and external API requests — always fetch fresh
+  if (url.hostname.includes('supabase.co') || url.hostname.includes('api.github.com')) return
 
   // Handle different types of requests
   if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.html')) {
@@ -121,4 +125,3 @@ self.addEventListener('fetch', (event) => {
     )
   }
 })
-
