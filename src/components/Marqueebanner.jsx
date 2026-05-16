@@ -10,9 +10,9 @@ const Diamond = () => (
 const desktopItems = [
   "Handcrafted with love",
   "Straight from artisan hands",
-  "Find your class",
+  "Prepaid orders only",
   "Ships across India",
-  "Curated from Instagram's best",
+  "Curated from Instagram's best finds",
   "One-of-a-kind pieces",
   "Support local artisans",
   "Ethnic elegance, modern edge",
