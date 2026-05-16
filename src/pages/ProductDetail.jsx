@@ -182,7 +182,7 @@ const ProductDetail = () => {
             {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-id">Product ID: {product.id}</p>
-            <p className="product-detail-description">{product.description}</p>
+            <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: product.description.split('\\n').join('<br/>') }} />
 
             <div className="price-section">
               <span className="price-label">Price:</span>
