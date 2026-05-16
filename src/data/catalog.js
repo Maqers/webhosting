@@ -18,12 +18,9 @@ export const categories = [
   { id: "Wedding-Gifts", name: "Wedding Gifts", slug: "Wedding-Gifts", description: "Unique gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
   { id: "cosmetics", name: "Cosmetics", slug: "cosmetics", description: "Discover our beautifully curated cosmetic collection, designed to combine elegance with functionality.", icon: "fashion", order: 11, featured: false, meta: { keywords: [] } },
   { id: "Kids-Accessories", name: "Kids Accessories", slug: "Kids-Accessories", description: "", icon: "fashion", order: 12, featured: false, meta: { keywords: [] } },
-  { id: "crockery", name: "Crockery", slug: "crockery", description: "Beautiful crockery products", icon: "gift", order: 13, featured: false, meta: { keywords: [] } },
 ];
 
 export const productsByCategory = {
-  "crockery": [
-  ],
   "Kids-Accessories": [
     
     { id: 151, categoryId: "Kids-Accessories", title: "Captain America Brooch", slug: "captain-america-brooch", description: "This meticulously designed Captain America brooch exemplifies superior craftsmanship through thoughtfully selected materials that deliver both resilience and wearability. Its feather light design allows effortless attachment to outerwear, accessories, or bags without compromising comfort or aesthetics. The iconic superhero motif seamlessly transitions across diverse styling contexts, from everyday wear to more polished ensembles. Perfect for collectors and enthusiasts who value artisan excellence and meaningful accessories with enduring appeal. This versatile piece merges pop culture appreciation with refined design sensibilities, transcending fleeting fashion cycles.", price: 749, images: ["/images/dsc_8211.jpg", "/images/screenshot-2026-05-05-at-11.53.15-pm.png"], popular: false, featured: false, inStock: true, tags: ["bead brooch", "handmade brooch", "star pin", "lapel pin", "jacket accessory", "bag pin", "statement brooch", "seed bead jewellery", "handcrafted pin", "colourful brooch"], meta: { keywords: ["handmade bead brooch", "seed bead pin", "red white blue brooch", "star brooch", "circular brooch", "handcrafted brooch India", "beaded lapel pin", "jacket pin", "bag charm brooch", "pop culture brooch", "statement pin"], colors: [], sizes: [], moq: 0, secondaryCategories: ["Kids-Accessories"], sellerId: "li1001", sellerCode: "LI1001" } },
