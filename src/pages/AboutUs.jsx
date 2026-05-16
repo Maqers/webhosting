@@ -40,7 +40,7 @@ const AboutUs = () => {
               <div className="about-stat-card">
                 <div className="about-stat-num about-stat-emoji" role="img" aria-label="handshake">🤝</div>
                 <div className="about-stat-label">WhatsApp ordering</div>
-                <div className="about-stat-sub">Talk to us directly — no confusing checkout flows</div>
+                <div className="about-stat-sub">Talk to us directly. No confusing checkout flows.</div>
               </div>
               <div className="about-stat-card">
                 <div className="about-stat-num about-stat-emoji" role="img" aria-label="India">🇮🇳</div>
@@ -95,8 +95,8 @@ const AboutUs = () => {
                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                   </svg>
                 </div>
-                <h3>Verified via Video KYC</h3>
-                <p>Every seller verified face-to-face before listing. Not a form — a real check.</p>
+                <h3>Personally Vetted Sellers</h3>
+                <p>Every seller reviewed and verified by us before listing. Not a form, a real check.</p>
               </div>
               <div className="feature-card scroll-animate">
                 <div className="feature-icon-wrapper">
@@ -126,8 +126,8 @@ const AboutUs = () => {
                     <polyline points="22 4 12 14.01 9 11.01"/>
                   </svg>
                 </div>
-                <h3>We've Test-Ordered Everything</h3>
-                <p>Real orders placed, quality checked, delivery tested — before any seller goes live.</p>
+                <h3>Curated, Not Random</h3>
+                <p>Every product on Maqers is handpicked. We review what sellers make before anything goes live.</p>
               </div>
             </div>
           </div>

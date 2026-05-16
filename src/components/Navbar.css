@@ -169,6 +169,13 @@
   position: sticky;
   top: var(--navbar-height-mobile);
   z-index: calc(var(--navbar-z-index) - 1);
+  transition: top 0.2s ease;
+}
+
+/* When navbar shrinks on scroll, move search row up too */
+.navbar.scrolled ~ .navbar-mobile-search-row,
+.navbar.scrolled + .navbar-mobile-search-row {
+  top: 48px;
 }
 
 .navbar-mobile-search-row .search-form {

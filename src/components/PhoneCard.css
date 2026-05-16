@@ -136,7 +136,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 640px) {
+@media (max-width: 968px) {
   .phone-card-link {
     padding: var(--spacing-sm) var(--spacing-md);
   }
@@ -150,4 +150,3 @@
     transform: translateY(0);
   }
 }
-

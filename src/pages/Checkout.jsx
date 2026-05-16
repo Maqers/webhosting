@@ -313,11 +313,29 @@ export default function Checkout() {
                       <img
                         src="/images/upi-qr.png"
                         alt="UPI QR Code"
+                        id="upi-qr-img"
                         style={{ width: 180, height: 180, objectFit: 'contain', borderRadius: 8, border: '1px solid #eee' }}
                       />
                       <p style={{ fontSize: '0.78rem', color: '#888', marginTop: '0.5rem' }}>
                         Scan with any UPI app · UPI ID: <strong style={{ color: '#1a1714' }}>{UPI_ID}</strong>
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const a = document.createElement('a');
+                          a.href = '/images/upi-qr.png';
+                          a.download = 'maqers-upi-qr.png';
+                          a.click();
+                        }}
+                        style={{
+                          marginTop: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                          padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #d0c9bf',
+                          background: 'transparent', color: '#666', fontSize: '0.78rem',
+                          fontFamily: 'var(--font-primary)', cursor: 'pointer'
+                        }}
+                      >
+                        ⬇ Download QR
+                      </button>
                     </div>
                   )}
                 </div>

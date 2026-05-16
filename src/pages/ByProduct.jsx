@@ -15,7 +15,6 @@ export default function ByProduct() {
         {categories.map(cat => (
           <Link key={cat.id} to={`/products?category=${cat.id}`} className="by-page-item">
             <span className="by-page-name">{cat.name}</span>
-            <span className="by-page-count">{getCategoryProductCount(cat.id)} products</span>
             <span className="by-page-arrow">›</span>
           </Link>
         ))}

@@ -7,44 +7,44 @@ const FAQs = () => {
 
   const faqs = [
     {
-      question: "How do I inquire about a product?",
-      answer: "Simply click on the WhatsApp button located at the bottom right of any page. You can specify the product ID you're interested in, and our team will assist you with all your questions. We're available 24/7 to help you find the perfect custom gift."
+      question: "How do I place an order?",
+      answer: "Browse our catalogue, find a product you love, and click 'Add to Cart'. Once you're ready, go to checkout, fill in your details, and place your order. We'll confirm via email and follow up on WhatsApp."
     },
     {
-      question: "Do you ship internationally?",
-      answer: "No, we don't offer international shipping to customers worldwide as of now. We currently ship only within India. However, we are working on expanding our shipping options in the future. Stay tuned for updates!"
+      question: "How do I pay?",
+      answer: "We accept UPI payments (GPay, PhonePe, Paytm, any UPI app). You can copy our UPI ID or scan the QR code on the checkout page. Once you place your order, we'll verify payment before dispatching."
     },
     {
-      question: "What payment methods do you accept?",
-      answer: "We accept various payment methods including bank transfers, credit cards, debit cards, and digital payment platforms like UPI. Payment details will be discussed when you place an order through our WhatsApp chat. We ensure secure and hassle-free transactions."
+      question: "Do you ship across India?",
+      answer: "Yes, we ship anywhere in India. Delivery is free on orders above Rs. 1,500. For orders below that, a flat delivery fee of Rs. 60 applies."
     },
     {
       question: "How long does delivery take?",
-      answer: "Delivery times vary depending on your location and the product customization requirements. Typically, domestic orders take 5-7 business days. We'll provide specific timelines when you place your order, and you'll receive tracking information once your order ships."
+      answer: "Typically 7 to 14 business days, depending on the seller's location and product type. Some items, especially customised ones, may take a little longer. We'll keep you posted."
     },
     {
-      question: "Can I return or exchange a product?",
-      answer: "No, we don't offer returns and exchanges for now."
+      question: "Can I customise a product?",
+      answer: "Many of our sellers offer customisation, such as personalised names, colours, or messages. Reach out to us on WhatsApp after placing your order and we'll coordinate with the seller."
     },
     {
-      question: "Are the products authentic?",
-      answer: "Absolutely! We guarantee the authenticity of all our products. We work directly with trusted manufacturers, skilled artisans, and verified suppliers across India to ensure you receive genuine, high-quality items. Every product is carefully inspected before shipping."
+      question: "What is your return policy?",
+      answer: "We do not offer returns or exchanges at this time. If your product arrives damaged or significantly different from what was shown, please contact us on WhatsApp within 48 hours with photos and we will do our best to help."
     },
     {
-      question: "Do you offer gift wrapping?",
-      answer: "No, we don't offer separate gift wrapping services. Packaging depends on artisans, if something specific is required please mention this when placing your order through WhatsApp, and we'll try arranging it for you after coordinating with the sellers, if possible additional costs may apply"
+      question: "Are the sellers on Maqers verified?",
+      answer: "Yes. Every seller on Maqers has been personally vetted by us before listing. We've reviewed their work, checked their credibility, and ensured they're genuine Indian home businesses."
     },
     {
       question: "How can I track my order?",
-      answer: "Once your order is shipped, we'll provide you with a tracking number via WhatsApp. You can use this to track your package's journey to your doorstep in real-time. We'll also send you updates at each stage of the shipping process so you're always informed."
+      answer: "Once your order is shipped, we will share tracking details via WhatsApp. You can use the tracking link to follow your package in real time."
     },
     {
-      question: "Can I customize products with personal messages?",
-      answer: "Yes! Many of our products can be personalized with names, dates, special messages, or custom designs. When you contact us via WhatsApp, let us know what customization you'd like, and we'll work with you to create a truly unique gift that's perfect for your recipient."
+      question: "Can I buy in bulk for events or corporate gifting?",
+      answer: "Absolutely. We cater to bulk orders for weddings, corporate gifting, and events. WhatsApp us with your requirements and we will put together a custom quote."
     },
     {
-      question: "What if I'm not satisfied with my order?",
-      answer: "Your satisfaction is our priority! If you're not completely happy with your order, please contact us immediately via WhatsApp. We'll work with you to resolve any issues. We stand behind the quality of every product we sell."
+      question: "How do I contact you?",
+      answer: "The easiest way is WhatsApp. You can also reach us by email or Instagram. All contact details are on our Contact page."
     }
   ]
 
@@ -53,53 +53,20 @@ const FAQs = () => {
   }
 
   useEffect(() => {
-    // Immediately show elements that are already in viewport
     const checkVisibility = () => {
-      const elements = document.querySelectorAll('.scroll-animate')
-      elements.forEach((el) => {
+      document.querySelectorAll('.scroll-animate').forEach((el) => {
         const rect = el.getBoundingClientRect()
-        const isVisible = rect.top < window.innerHeight && rect.bottom > 0
-        if (isVisible) {
-          el.classList.add('animate-in')
-        }
+        if (rect.top < window.innerHeight && rect.bottom > 0) el.classList.add('animate-in')
       })
     }
-
-    // Check immediately on mount
     checkVisibility()
-
-    // Also use IntersectionObserver for elements entering viewport
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
+      (entries) => { entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('animate-in'); observer.unobserve(e.target) } }) },
       { threshold: 0.1, rootMargin: '50px' }
     )
-
-    // Observe all scroll-animate elements
-    document.querySelectorAll('.scroll-animate').forEach((el) => {
-      // Only observe if not already visible
-      if (!el.classList.contains('animate-in')) {
-        observer.observe(el)
-      }
-    })
-
-    // Fallback: Make all elements visible after a short delay
-    const fallbackTimeout = setTimeout(() => {
-      document.querySelectorAll('.scroll-animate:not(.animate-in)').forEach((el) => {
-        el.classList.add('animate-in')
-      })
-    }, 500)
-
-    return () => {
-      observer.disconnect()
-      clearTimeout(fallbackTimeout)
-    }
+    document.querySelectorAll('.scroll-animate:not(.animate-in)').forEach((el) => observer.observe(el))
+    const t = setTimeout(() => { document.querySelectorAll('.scroll-animate:not(.animate-in)').forEach((el) => el.classList.add('animate-in')) }, 500)
+    return () => { observer.disconnect(); clearTimeout(t) }
   }, [])
 
   return (
@@ -108,7 +75,7 @@ const FAQs = () => {
         <div className="hero-overlay"></div>
         <div className="container">
           <h1 className="faqs-title scroll-animate">Frequently Asked Questions</h1>
-          <p className="faqs-subtitle scroll-animate">Everything you need to know about our custom gifts</p>
+          <p className="faqs-subtitle scroll-animate">Everything you need to know about ordering on Maqers</p>
         </div>
       </div>
 
@@ -116,12 +83,12 @@ const FAQs = () => {
         <section className="faqs-content">
           <div className="faqs-list">
             {faqs.map((faq, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`faq-item scroll-animate ${openIndex === index ? 'open' : ''}`}
                 style={{ '--i': index }}
               >
-                <button 
+                <button
                   className="faq-question"
                   onClick={() => toggleFAQ(index)}
                   aria-expanded={openIndex === index}
@@ -154,10 +121,8 @@ const FAQs = () => {
               </svg>
             </div>
             <h2>Still have questions?</h2>
-            <p>Don't hesitate to reach out to us. Our friendly team is always ready to assist you with any queries or help you find the perfect gift!</p>
-            <Link to="/contact" className="contact-link">
-              Contact Us
-            </Link>
+            <p>We're real people. Reach out anytime.</p>
+            <Link to="/contact" className="contact-link">Contact Us</Link>
           </div>
         </section>
       </div>

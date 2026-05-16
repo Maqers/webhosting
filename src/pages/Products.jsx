@@ -104,17 +104,25 @@ const Products = () => {
     setSearchParams(newParams, { replace: true })
   }, [searchParams, setSearchParams])
 
+  // Restore category filter from URL param (e.g. when navigating back from product detail)
   useEffect(() => {
-    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      requestAnimationFrame(() => {
-        const productsGrid = document.querySelector('.products-grid')
-        if (productsGrid) void productsGrid.offsetHeight
-        document.querySelectorAll('.feat-card').forEach(card => {
-          card.style.visibility = 'visible'
-          card.style.opacity = '1'
-        })
-      })
+    const cat = searchParams.get('category')
+    if (cat) {
+      setSelectedCategories([cat])
+      // Remove from URL so filter chip shows correctly
+      setSearchParams(prev => { const next = new URLSearchParams(prev); next.delete('category'); return next }, { replace: true })
     }
+  }, []) // eslint-disable-line
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const productsGrid = document.querySelector('.products-grid')
+      if (productsGrid) void productsGrid.offsetHeight
+      document.querySelectorAll('.feat-card').forEach(card => {
+        card.style.visibility = 'visible'
+        card.style.opacity = '1'
+      })
+    })
   }, [sortBy, selectedCategories.length, filteredProducts.length])
 
   useEffect(() => {
@@ -210,6 +218,7 @@ const Products = () => {
                   index={index}
                   categoryMap={categoryMap}
                   priority={index < 12}
+                  selectedCategories={selectedCategories}
                 />
               ))}
             </div>
@@ -233,7 +242,7 @@ const Products = () => {
   )
 }
 
-const ProductCard = ({ product, index, categoryMap, priority = false }) => {
+const ProductCard = ({ product, index, categoryMap, priority = false, selectedCategories = [] }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const { addItem } = useCart()
@@ -265,8 +274,12 @@ const ProductCard = ({ product, index, categoryMap, priority = false }) => {
   }, [product, toggleItem])
 
   const handleCardClick = useCallback(() => {
-    navigate(`/product/${product.id}`, { state: { from: location.pathname + location.search } })
-  }, [product.id, navigate, location])
+    // Build the return URL including any active category filter
+    const params = selectedCategories.length > 0
+      ? `?category=${selectedCategories[0]}`
+      : location.search
+    navigate(`/product/${product.id}`, { state: { from: location.pathname + params } })
+  }, [product.id, navigate, location, selectedCategories])
 
   return (
     <article
