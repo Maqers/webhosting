@@ -24,23 +24,14 @@
 .navbar {
   background: #760909;
   padding: 0;
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: var(--navbar-z-index);
   box-shadow: 0 2px 8px rgba(0,0,0,.15), 0 1px 4px rgba(0,0,0,.1);
   border-bottom: 1px solid rgba(255,255,255,.1);
   width: 100%;
   isolation: isolate;
   transition: box-shadow 0.3s;
-}
-
-/* Desktop: push content below fixed navbar */
-@media (min-width: 969px) {
-  body {
-    padding-top: var(--navbar-height-desktop);
-  }
 }
 
 /* Mobile: revert to sticky so it doesn't interfere with mobile layout */
