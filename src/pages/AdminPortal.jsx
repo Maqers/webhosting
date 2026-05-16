@@ -157,10 +157,19 @@ function sanitizeForJS(str) {
   return str
     .replace(/\\/g, "\\\\")        // escape backslashes FIRST
     .replace(/"/g, '\\"')           // escape double quotes
-    .replace(/\r?\n|\r/g, "\\n")   // convert newlines to \n literal
-    .replace(/\t/g, " ")            // tabs to spaces
-    .replace(/\s{2,}/g, " ")       // collapse multiple spaces
+    .replace(/\r?\n|\r/g, "\\\\n") // actual newlines -> \\n (two backslashes+n at runtime -> writes \\n to file)
+    .replace(/\t/g, " ")
+    .replace(/\s{2,}/g, " ")
     .trim();
+}
+
+// Normalize raw captured description from catalog source text
+// parseProducts regex captures raw escape sequences; we unescape them to real chars
+function normalizeDescription(raw) {
+  return raw
+    .replace(/\\"/g, '"')       // \" -> "
+    .replace(/\\\\n/g, '\n')    // \\n (two backslashes+n in source) -> actual newline
+    .replace(/\\\\/g, '\\');    // \\\\ -> single backslash
 }
 
 function getNextId(source) {
@@ -177,7 +186,7 @@ function parseProducts(source) {
   while ((m = regex.exec(source)) !== null) {
     products.push({
       id: parseInt(m[1]), categoryId: m[2], title: m[3], slug: m[4],
-      description: m[5].replace(/\\"/g, '"'),
+      description: normalizeDescription(m[5]),
       price: parseInt(m[6]),
       images: m[7].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean),
       popular: m[8] === "true", featured: m[9] === "true", inStock: m[10] === "true",
@@ -242,6 +251,21 @@ function parseProducts(source) {
     const cats = sc[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
     const p = products.find(p => p.id === id);
     if (p) p.secondaryCategories = cats;
+  }
+  // Parse sellerId and sellerCode
+  const sellerIdRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*sellerId:\s*"([^"]*)"/g;
+  let si;
+  while ((si = sellerIdRegex.exec(source)) !== null) {
+    const id = parseInt(si[1]);
+    const p = products.find(p => p.id === id);
+    if (p) p.sellerId = si[2];
+  }
+  const sellerCodeRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*sellerCode:\s*"([^"]*)"/g;
+  let sco;
+  while ((sco = sellerCodeRegex.exec(source)) !== null) {
+    const id = parseInt(sco[1]);
+    const p = products.find(p => p.id === id);
+    if (p) p.sellerCode = sco[2];
   }
   return products;
 }

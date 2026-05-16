@@ -63,9 +63,6 @@ const Categories = () => {
                   <Link key={cat.id} to={`/category/${cat.slug}`} className="category-card-large scroll-animate">
                     <div className="category-card-emoji">{cat.emoji}</div>
                     <h3 className="category-name">{cat.name}</h3>
-                    {cat.description && (
-                      <p className="category-description category-description--desktop">{cat.description}</p>
-                    )}
                   </Link>
                 ))}
               </div>
@@ -86,14 +83,11 @@ const Categories = () => {
           {selectedCategory !== 'All' && (
             <div className="category-products-section">
               <div className="category-header">
-                <Link to="/products" className="back-to-categories">← All Products</Link>
+                <Link to="/categories" className="back-to-categories">← All Categories</Link>
                 <h1 className="category-page-title">
                   {selectedCategoryObj?.emoji && <span className="category-page-emoji">{selectedCategoryObj.emoji} </span>}
                   {selectedCategoryObj?.name || selectedCategory}
                 </h1>
-                {selectedCategoryObj?.description && (
-                  <p className="category-page-description">{selectedCategoryObj.description}</p>
-                )}
               </div>
 
               {categoryProducts.length > 0 ? (

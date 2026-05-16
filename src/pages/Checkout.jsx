@@ -62,12 +62,8 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderId, setOrderId] = useState('')
-  const [pendingOrderId, setPendingOrderId] = useState('')
-
-  // Mobile UPI modal: null | 'choose' | 'qr' | 'apps'
-  const [mobileUPIStep, setMobileUPIStep] = useState(null)
-  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false)
-  const [appNotFound, setAppNotFound] = useState(false)
+  const [upiCopied, setUpiCopied] = useState(false)
+  const [showQR, setShowQR] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -118,43 +114,29 @@ export default function Checkout() {
     setSubmitting(true)
     const oid = generateOrderId()
     setOrderId(oid)
-    setPendingOrderId(oid)
 
     try {
-      await sendEmail(oid,
-        paymentMethod === 'upi'
-          ? 'UPI App — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING'
-          : 'QR Code — VERIFY PAYMENT IN YOUR UPI APP BEFORE DISPATCHING'
-      )
+      await sendEmail(oid, 'UPI — Customer will pay via UPI ID or QR scan. Verify before dispatching.')
     } catch (err) {
-      console.error('Email 1 failed:', err)
-    }
-
-    if (paymentMethod === 'upi') {
-      setSubmitting(false)
-      if (isMobile) {
-        setMobileUPIStep('apps') // go straight to app chooser
-      } else {
-        clearCart()
-        setOrderPlaced(true)
-      }
-      return
-    }
-
-    if (paymentMethod === 'qr') {
-      setSubmitting(false)
-      if (isMobile) {
-        setMobileUPIStep('qr') // go straight to QR modal
-      } else {
-        clearCart()
-        setOrderPlaced(true)
-      }
-      return
+      console.error('Email failed:', err)
     }
 
     clearCart()
     setOrderPlaced(true)
     setSubmitting(false)
+  }
+
+  const handleCopyUPI = () => {
+    navigator.clipboard.writeText(UPI_ID)
+      .then(() => {
+        setUpiCopied(true)
+        setTimeout(() => setUpiCopied(false), 4000)
+      })
+      .catch(() => {
+        // Fallback for browsers that block clipboard
+        setUpiCopied(true)
+        setTimeout(() => setUpiCopied(false), 4000)
+      })
   }
 
   const openUPIApp = (app) => {
@@ -288,23 +270,59 @@ export default function Checkout() {
 
             <div className="checkout-section">
               <h2 className="checkout-section-title">PAYMENT METHOD</h2>
-              <div className="checkout-payment-options">
-                <label className={`checkout-payment-option ${paymentMethod === 'upi' ? 'selected' : ''}`}>
-                  <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
-                  <div className="checkout-payment-icon">📲</div>
-                  <div>
-                    <strong>Pay via UPI App</strong>
-                    <span>GPay · PhonePe · Paytm</span>
+              <p style={{ fontSize: '0.82rem', color: '#888', marginBottom: '1rem' }}>
+                Pay via UPI before or after placing your order.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {/* Copy UPI ID */}
+                <button
+                  type="button"
+                  onClick={handleCopyUPI}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                    padding: '0.85rem 1.25rem', borderRadius: 10, cursor: 'pointer',
+                    background: upiCopied ? '#2a7a2a' : '#1a1714', color: '#c8a96e',
+                    border: 'none', fontSize: '0.9rem', fontFamily: 'var(--font-primary)', fontWeight: 600,
+                    transition: 'background 0.2s'
+                  }}
+                >
+                  {upiCopied ? '✓ Copied!' : '📋 Copy UPI ID'}
+                </button>
+                {upiCopied && (
+                  <div style={{
+                    background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8,
+                    padding: '0.65rem 1rem', fontSize: '0.82rem', color: '#166534', textAlign: 'center'
+                  }}>
+                    UPI ID copied! Paste it in your UPI app to pay ₹{grandTotal.toLocaleString('en-IN')}
                   </div>
-                </label>
-                <label className={`checkout-payment-option ${paymentMethod === 'qr' ? 'selected' : ''}`}>
-                  <input type="radio" name="payment" value="qr" checked={paymentMethod === 'qr'} onChange={() => setPaymentMethod('qr')} />
-                  <div className="checkout-payment-icon">📷</div>
-                  <div>
-                    <strong>Scan QR Code</strong>
-                    <span>Open any UPI app and scan</span>
+                )}
+
+                {/* Scan QR */}
+                <button
+                  type="button"
+                  onClick={() => setShowQR(q => !q)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                    padding: '0.85rem 1.25rem', borderRadius: 10, cursor: 'pointer',
+                    background: 'transparent', color: '#1a1714',
+                    border: '1.5px solid #d0c9bf', fontSize: '0.9rem',
+                    fontFamily: 'var(--font-primary)', fontWeight: 600
+                  }}
+                >
+                  📷 {showQR ? 'Hide QR Code' : 'Scan QR Code'}
+                </button>
+                {showQR && (
+                  <div style={{ textAlign: 'center', padding: '0.75rem 0' }}>
+                    <img
+                      src="/images/upi-qr.png"
+                      alt="UPI QR Code"
+                      style={{ width: 180, height: 180, objectFit: 'contain', borderRadius: 8, border: '1px solid #eee' }}
+                    />
+                    <p style={{ fontSize: '0.78rem', color: '#888', marginTop: '0.5rem' }}>
+                      Scan with any UPI app · UPI ID: <strong style={{ color: '#1a1714' }}>{UPI_ID}</strong>
+                    </p>
                   </div>
-                </label>
+                )}
               </div>
             </div>
 
@@ -361,30 +379,11 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {/* Desktop only: QR in sidebar for both options */}
-              {(paymentMethod === 'upi' || paymentMethod === 'qr') && !isMobile && (
-                <div className="checkout-upi-box">
-                  <p className="checkout-upi-label">
-                    {paymentMethod === 'qr' ? 'Scan & Pay' : 'Or scan to pay'} ₹{grandTotal.toLocaleString('en-IN')}
-                  </p>
-                  <div className="checkout-qr-placeholder">
-                    <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
-                  </div>
-                  <p className="checkout-upi-note">
-                    Scan with any UPI app, fill in your details below, then click Place Order.
-                  </p>
-                </div>
-              )}
 
-              {paymentMethod === 'upi' && isMobile && (
-                <p className="checkout-fill-info">
-                  After clicking Place Order, your UPI app will open with the amount prefilled.
-                </p>
-              )}
 
-              {paymentMethod === 'qr' && isMobile && (
+              {isMobile && (
                 <p className="checkout-fill-info">
-                  After clicking Place Order, a QR code will appear for you to scan.
+                  Use the buttons above to pay before placing your order.
                 </p>
               )}
             </div>
@@ -392,81 +391,6 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* ── Mobile: QR code ───────────────────────────────────────────── */}
-      {mobileUPIStep === 'qr' && (
-        <div className="upi-chooser-overlay">
-          <div className="upi-chooser-modal">
-            <h2>Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
-            <p>Open any UPI app and scan this code</p>
-            <div className="checkout-qr-placeholder" style={{ margin: '1rem auto', width: 180, height: 180 }}>
-              <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
-            </div>
-            <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1rem' }}>
-              After paying, tap below to confirm your order.
-            </p>
-            <button onClick={confirmPaymentDone} className="checkout-place-btn" style={{ margin: '0 0 0.75rem' }}>
-              ✓ I've paid — Confirm Order
-            </button>
-            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep(null)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Mobile: UPI App chooser ───────────────────────────────────── */}
-      {mobileUPIStep === 'apps' && (
-        <div className="upi-chooser-overlay">
-          <div className="upi-chooser-modal">
-            <h2>Pay ₹{grandTotal.toLocaleString('en-IN')}</h2>
-            <p>Choose your UPI app</p>
-            {appNotFound && (
-              <div className="upi-app-error">
-                ⚠️ That app doesn't seem to be installed. Try another or scan the QR code instead.
-              </div>
-            )}
-            <div className="upi-redirect-notice">
-              📲 You'll be redirected to your payment app. After paying, <strong>come back here</strong> to confirm your order.
-            </div>
-            <div className="upi-chooser-buttons">
-              <button onClick={() => openUPIApp('gpay')} className="upi-app-btn">
-                <AppIcon app="gpay" />
-                <span>Google Pay</span>
-              </button>
-              <button onClick={() => openUPIApp('phonepe')} className="upi-app-btn">
-                <AppIcon app="phonepe" />
-                <span>PhonePe</span>
-              </button>
-              <button onClick={() => openUPIApp('paytm')} className="upi-app-btn">
-                <AppIcon app="paytm" />
-                <span>Paytm</span>
-              </button>
-            </div>
-            <button className="upi-chooser-cancel" onClick={() => setMobileUPIStep(null)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Payment confirmation (after returning from UPI app) ───────── */}
-      {showPaymentConfirm && (
-        <div className="upi-chooser-overlay">
-          <div className="upi-chooser-modal">
-            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>💳</div>
-            <h2>Payment Complete?</h2>
-            <p>Did you successfully pay ₹{grandTotal.toLocaleString('en-IN')} via UPI?</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem' }}>
-              <button onClick={confirmPaymentDone} className="checkout-place-btn" style={{ margin: 0 }}>
-                ✓ Yes, I've paid
-              </button>
-              <button
-                onClick={() => { setShowPaymentConfirm(false); setMobileUPIStep('apps') }}
-                className="upi-app-btn"
-                style={{ flexDirection: 'row', gap: '0.5rem', justifyContent: 'center' }}
-              >
-                ↩ No, try again
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
