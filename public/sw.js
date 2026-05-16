@@ -3,9 +3,9 @@
  * Caches static assets and API responses for faster loading
  */
 
-const CACHE_NAME = 'premium-catalogue-v2'
-const STATIC_CACHE_NAME = 'premium-catalogue-static-v2'
-const IMAGE_CACHE_NAME = 'premium-catalogue-images-v2'
+const CACHE_NAME = 'premium-catalogue-v3'
+const STATIC_CACHE_NAME = 'premium-catalogue-static-v3'
+const IMAGE_CACHE_NAME = 'premium-catalogue-images-v3'
 
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
@@ -61,25 +61,21 @@ self.addEventListener('fetch', (event) => {
   // Skip Supabase and external API requests — always fetch fresh
   if (url.hostname.includes('supabase.co') || url.hostname.includes('api.github.com')) return
 
-  // Handle different types of requests
+  // JS/CSS/HTML — network first, cache fallback
+  // This ensures fresh deploys always take effect immediately
   if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.html')) {
-    // Static assets - cache first, then network
     event.respondWith(
-      caches.match(request).then((response) => {
-        return (
-          response ||
-          fetch(request).then((fetchResponse) => {
-            // Cache successful responses
-            if (fetchResponse && fetchResponse.status === 200) {
-              const responseToCache = fetchResponse.clone()
-              caches.open(STATIC_CACHE_NAME).then((cache) => {
-                cache.put(request, responseToCache)
-              })
-            }
-            return fetchResponse
-          })
-        )
-      })
+      fetch(request)
+        .then((fetchResponse) => {
+          if (fetchResponse && fetchResponse.status === 200) {
+            const responseToCache = fetchResponse.clone()
+            caches.open(STATIC_CACHE_NAME).then((cache) => {
+              cache.put(request, responseToCache)
+            })
+          }
+          return fetchResponse
+        })
+        .catch(() => caches.match(request))
     )
   } else if (
     url.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ||
