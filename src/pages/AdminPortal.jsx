@@ -7,7 +7,7 @@
  * Drop into src/pages/AdminPortal.jsx
  */
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -498,6 +498,16 @@ export default function AdminPortal() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [occasionEdits, setOccasionEdits] = useState({});
 
+  // ── Drag-and-drop reorder state ──────────────────────────────────────────────
+  const [draggingId, setDraggingId] = useState(null);
+  const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
+  const editFormRef = useRef(null);
+
+  // ── Inline seller creation (used inside add-product & edit forms) ────────────
+  const [showInlineAddSeller, setShowInlineAddSeller] = useState(false);
+  const [inlineNewSeller, setInlineNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
+  const [inlineOwnerInput, setInlineOwnerInput] = useState("");
+
   // ── Seller state ────────────────────────────────────────────────────────────
   const [sellers, setSellers] = useState([]);
   const [sellersLoading, setSellersLoading] = useState(false);
@@ -646,18 +656,24 @@ export default function AdminPortal() {
     setPublishing(true);
     try {
       let { source, sha } = await fetchCatalog(creds);
-      // Remove the product entry from catalog.js
-      const entryRegex = new RegExp(`\\n?\\s*\\{ id: ${product.id},[\\s\\S]*?\\},\\n?`, "m");
-      if (!entryRegex.test(source)) {
+      // Use brace-counting range finder — works correctly with nested meta objects
+      const range = getEntryRange(source, product.id);
+      if (!range) {
         showToast(`Product ID ${product.id} not found in catalog.js`, "error");
         return;
       }
-      source = source.replace(entryRegex, "\n");
-      // Also remove from all occasion maps
-      source = source.replace(new RegExp(`,?\\s*\\b${product.id}\\b\\s*,?`, "g"), (match) => {
-        // Keep surrounding commas clean
-        return match.startsWith(", ") ? "" : match.endsWith(", ") ? "" : "";
-      });
+      let before = source.slice(0, range.start);
+      let after = source.slice(range.end);
+      // Clean up extra blank line left behind
+      if (before.endsWith("\n") && after.startsWith("\n")) after = after.slice(1);
+      source = before + after;
+      // Remove product id from occasion maps only — use placeholder to avoid partial matches
+      const pid = String(product.id);
+      source = source.replace(new RegExp(`,\\s*\\b${pid}\\b`, "g"), "");  // trailing: ", 42"
+      source = source.replace(new RegExp(`\\b${pid}\\b\\s*,\\s*`, "g"), ""); // leading: "42, "
+      source = source.replace(new RegExp(`\\b${pid}\\b`, "g"), "");          // standalone
+      // Tidy up any resulting empty arrays or double-commas in occasion maps
+      source = source.replace(/,\s*,/g, ",").replace(/\[\s*,/g, "[").replace(/,\s*\]/g, "]");
       await commitCatalog(source, sha, `Delete product: ${product.title} (ID ${product.id})`, creds);
       loadCatalogData(source, sha);
       showToast(`"${product.title}" deleted.`);
@@ -665,33 +681,56 @@ export default function AdminPortal() {
     finally { setPublishing(false); }
   }
 
-  async function handleReorderProduct(productId, direction) {
-    // Get all products in the same category
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    const sameCat = filteredProducts.filter(p => p.categoryId === product.categoryId);
-    const idx = sameCat.findIndex(p => p.id === productId);
-    const swapIdx = idx + direction;
-    if (swapIdx < 0 || swapIdx >= sameCat.length) return;
-    const swapProduct = sameCat[swapIdx];
+  function handleDragStart(e, productId) {
+    if (productFilterCat === "all") return;
+    setDraggingId(productId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(productId));
+  }
 
+  function handleDragOver(e, targetId) {
+    e.preventDefault();
+    if (!draggingId || draggingId === targetId || productFilterCat === "all") return;
+    const catId = productFilterCat;
+    const base = products.filter(p => p.categoryId === catId).map(p => p.id);
+    const currentOrder = localOrderByCat[catId] || base;
+    const fromIdx = currentOrder.indexOf(draggingId);
+    const toIdx = currentOrder.indexOf(targetId);
+    if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
+    const newOrder = [...currentOrder];
+    newOrder.splice(fromIdx, 1);
+    newOrder.splice(toIdx, 0, draggingId);
+    setLocalOrderByCat(prev => ({ ...prev, [catId]: newOrder }));
+  }
+
+  function handleDragEnd() { setDraggingId(null); }
+
+  async function handlePublishOrder() {
+    const changedCats = Object.keys(localOrderByCat);
+    if (!changedCats.length) return;
     setPublishing(true);
     try {
       let { source, sha } = await fetchCatalog(creds);
-      // Swap the two product entries in the source
-      const entryRegex = id => new RegExp(`(    \\{ id: ${id},[\\s\\S]*?\\},)`, "m");
-      const matchA = source.match(entryRegex(productId));
-      const matchB = source.match(entryRegex(swapProduct.id));
-      if (!matchA || !matchB) { showToast("Could not find entries to swap.", "error"); return; }
-      const entryA = matchA[1];
-      const entryB = matchB[1];
-      // Replace A with a placeholder, B with A, placeholder with B
-      source = source.replace(entryA, "%%SWAP_PLACEHOLDER%%");
-      source = source.replace(entryB, entryA);
-      source = source.replace("%%SWAP_PLACEHOLDER%%", entryB);
-      await commitCatalog(source, sha, `Reorder products ${productId} ↔ ${swapProduct.id}`, creds);
+      for (const catId of changedCats) {
+        const newOrder = localOrderByCat[catId];
+        const catProds = products.filter(p => p.categoryId === catId);
+        // Get entry ranges sorted by position in source
+        const entries = catProds
+          .map(p => { const r = getEntryRange(source, p.id); return r ? { id: p.id, range: r } : null; })
+          .filter(Boolean)
+          .sort((a, b) => a.range.start - b.range.start);
+        if (!entries.length) continue;
+        const entryTexts = {};
+        for (const e of entries) entryTexts[e.id] = source.slice(e.range.start, e.range.end);
+        const blockStart = entries[0].range.start;
+        const blockEnd = entries[entries.length - 1].range.end;
+        const orderedTexts = newOrder.map(id => entryTexts[id]).filter(Boolean).join("\n");
+        source = source.slice(0, blockStart) + orderedTexts + source.slice(blockEnd);
+      }
+      await commitCatalog(source, sha, `Reorder products (${changedCats.join(", ")})`, creds);
       loadCatalogData(source, sha);
-      showToast("Order updated!");
+      setLocalOrderByCat({});
+      showToast("Order published!");
     } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
@@ -798,9 +837,15 @@ export default function AdminPortal() {
   }
 
   const filteredProducts = products.filter(p => {
-    const matchText = p.title.toLowerCase().includes(productFilter.toLowerCase()) || p.description.toLowerCase().includes(productFilter.toLowerCase());
+    const matchText = !productFilter || p.title.toLowerCase().includes(productFilter.toLowerCase()) || p.description.toLowerCase().includes(productFilter.toLowerCase());
     return matchText && (productFilterCat === "all" || p.categoryId === productFilterCat);
   });
+
+  function getDisplayedProducts() {
+    if (productFilterCat === "all" || !localOrderByCat[productFilterCat]) return filteredProducts;
+    const orderMap = Object.fromEntries((localOrderByCat[productFilterCat] || []).map((id, i) => [id, i]));
+    return [...filteredProducts].sort((a, b) => (orderMap[a.id] ?? 999) - (orderMap[b.id] ?? 999));
+  }
 
   // ── Seller functions ─────────────────────────────────────────────────────────
 
@@ -809,6 +854,31 @@ export default function AdminPortal() {
     try { setSellers(await sbGetSellers()); }
     catch (err) { showToast("Could not load sellers: " + err.message, "error"); }
     finally { setSellersLoading(false); }
+  }
+
+  async function handleInlineCreateSeller(onCreated) {
+    if (!inlineNewSeller.business_name.trim()) return showToast("Business name required.", "error");
+    setPublishing(true);
+    try {
+      const b = inlineNewSeller.business_name.trim()[0].toUpperCase();
+      const ownerName = inlineNewSeller.owners[0] || inlineOwnerInput || "X";
+      const o = ownerName.trim()[0].toUpperCase();
+      const prefix = `${b}${o}`;
+      const latestSellers = await sbGetSellers();
+      const samePrefix = latestSellers.filter(s => s.seller_code && s.seller_code.startsWith(prefix));
+      const nextNum = 1001 + samePrefix.length;
+      const sellerCode = `${prefix}${nextNum}`;
+      const id = sellerCode.toLowerCase();
+      const seller = { id, seller_code: sellerCode, business_name: inlineNewSeller.business_name, owners: inlineNewSeller.owners.length > 0 ? inlineNewSeller.owners : (inlineOwnerInput ? [inlineOwnerInput] : []), location: inlineNewSeller.location, address: inlineNewSeller.address || "", pincode: inlineNewSeller.pincode || "", notes: inlineNewSeller.notes || "", gst_registered: false, gst_number: "", hsn_codes: [], product_ids: [], kyc_documents: [] };
+      await sbCreateSeller(seller);
+      const updated = await sbGetSellers();
+      setSellers(updated);
+      setInlineNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
+      setInlineOwnerInput(""); setShowInlineAddSeller(false);
+      showToast(`Seller "${inlineNewSeller.business_name}" created!`);
+      if (onCreated) onCreated(id, sellerCode);
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
   }
 
   async function handleCreateSeller() {
@@ -1113,9 +1183,26 @@ export default function AdminPortal() {
                         {sellers.map(s => <option key={s.id} value={s.id}>{s.seller_code ? `${s.seller_code} — ` : ""}{s.business_name}</option>)}
                       </select>
                       <button type="button" style={{ ...ts.ghostBtn, padding: "6px 12px", fontSize: 11, marginTop: 4 }}
-                        onClick={() => { handleTabSwitch("sellers"); setShowAddSeller(true); }}>
-                        + Create new seller
+                        onClick={() => setShowInlineAddSeller(s => !s)}>
+                        {showInlineAddSeller ? "Cancel" : "+ Create new seller"}
                       </button>
+                      {showInlineAddSeller && (
+                        <div style={{ background: "#fffbf3", border: "1px solid #e8d9b8", borderRadius: 8, padding: 14, marginTop: 8 }}>
+                          <p style={{ ...ts.label, marginTop: 0 }}>New Seller (quick add)</p>
+                          <input style={ts.input} placeholder="Business name *" value={inlineNewSeller.business_name}
+                            onChange={e => setInlineNewSeller(s => ({ ...s, business_name: e.target.value }))} />
+                          <input style={{ ...ts.input, marginTop: 6 }} placeholder="Owner name" value={inlineOwnerInput}
+                            onChange={e => setInlineOwnerInput(e.target.value)} />
+                          <input style={{ ...ts.input, marginTop: 6 }} placeholder="Location (city)" value={inlineNewSeller.location}
+                            onChange={e => setInlineNewSeller(s => ({ ...s, location: e.target.value }))} />
+                          <button type="button" style={{ ...ts.primaryBtn, marginTop: 8, padding: "8px 16px" }}
+                            onClick={() => handleInlineCreateSeller((id, code) => {
+                              setNewProduct(p => ({ ...p, sellerId: id, sellerCode: code }));
+                            })} disabled={publishing}>
+                            {publishing ? "Creating..." : "Create & Select"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div style={ts.card}>
                       <h2 style={ts.cardTitle}>Occasion Categories</h2>
@@ -1255,6 +1342,11 @@ export default function AdminPortal() {
                 )}
               </div>
               <div style={{ display: "flex", gap: 10 }}>
+                {Object.keys(localOrderByCat).length > 0 && (
+                  <button style={{ ...ts.ghostBtn, color: "#2a7a2a", borderColor: "#b8ddb8" }} onClick={handlePublishOrder} disabled={publishing}>
+                    {publishing ? "Publishing..." : `Publish Order ↕`}
+                  </button>
+                )}
                 {Object.keys(pendingChanges).length > 0 && (
                   <button style={ts.ghostBtn} onClick={() => setPendingChanges({})}>Discard All</button>
                 )}
@@ -1274,167 +1366,31 @@ export default function AdminPortal() {
               </select>
             </div>
 
-            {editingProduct && (
-              <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
-                <h2 style={ts.cardTitle}>Editing: {editingProduct.title}</h2>
-                <div style={ts.grid2}>
-                  <div>
-                    <label style={ts.label}>Title</label>
-                    <input style={ts.input} value={editingProduct.title} onChange={e => setEditingProduct(p => ({ ...p, title: e.target.value }))} />
-                    <label style={ts.label}>Category</label>
-                    <select style={ts.input} value={editingProduct.categoryId} onChange={e => setEditingProduct(p => ({ ...p, categoryId: e.target.value }))}>
-                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                    <label style={ts.label}>Also appears in <span style={ts.labelHint}>(optional)</span></label>
-                    <div style={ts.chipGrid}>
-                      {categories.filter(c => c.id !== editingProduct.categoryId).map(c => {
-                        const active = (editingProduct.secondaryCategories||[]).includes(c.id);
-                        return (
-                          <button type="button" key={c.id}
-                            onClick={() => setEditingProduct(p => ({
-                              ...p,
-                              secondaryCategories: active
-                                ? (p.secondaryCategories||[]).filter(x => x !== c.id)
-                                : [...(p.secondaryCategories||[]), c.id]
-                            }))}
-                            style={active ? ts.chipActive : ts.chip}>{c.name}</button>
-                        );
-                      })}
-                    </div>
-                    <label style={ts.label}>Price (Rs.)</label>
-                    <input style={ts.input} type="number" value={editingProduct.price} onChange={e => setEditingProduct(p => ({ ...p, price: Number(e.target.value) }))} />
-                    <label style={ts.label}>Description</label>
-                    <textarea style={{ ...ts.input, height: 100, resize: "vertical" }} value={editingProduct.description}
-                      onChange={e => setEditingProduct(p => ({ ...p, description: e.target.value }))} />
-                    <p style={ts.fieldHint}>Line breaks removed before saving.</p>
-                    <label style={ts.label}>Tags (comma-separated)</label>
-                    <input style={ts.input} value={editingProduct.tags.join(", ")}
-                      onChange={e => setEditingProduct(p => ({ ...p, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) }))} />
-                    <label style={ts.label}>Keywords (comma-separated)</label>
-                    <input style={ts.input} value={(editingProduct.keywords || []).join(", ")}
-                      onChange={e => setEditingProduct(p => ({ ...p, keywords: e.target.value.split(",").map(k => k.trim()).filter(Boolean) }))} />
-                    <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional)</span></label>
-                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                      <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add a colour"
-                        id="editColorInput"
-                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); e.target.value = ""; } } }} />
-                      <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                        onClick={() => { const inp = document.getElementById("editColorInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); inp.value = ""; } }}>+</button>
-                    </div>
-                    {(editingProduct.colors||[]).length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-                        {editingProduct.colors.map((c, i) => {
-                          const name = typeof c === "object" ? c.name : c;
-                          return (
-                            <span key={i} style={ts.colorChip}>
-                              {name}
-                              <button type="button" onClick={() => setEditingProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                    <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
-                    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                      <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L or 6, 8, 10"
-                        id="editSizeInput"
-                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); e.target.value = ""; } } }} />
-                      <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                        onClick={() => { const inp = document.getElementById("editSizeInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); inp.value = ""; } }}>+</button>
-                    </div>
-                    {(editingProduct.sizes||[]).length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-                        {editingProduct.sizes.map((s, i) => (
-                          <span key={i} style={ts.colorChip}>
-                            {s}
-                            <button type="button" onClick={() => setEditingProduct(p => ({ ...p, sizes: p.sizes.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
-                    <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
-                      onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
-                    <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
-                    <select style={ts.input} value={editingProduct.sellerId || ""}
-                      onChange={e => {
-                        const sel = sellers.find(s => s.id === e.target.value);
-                        setEditingProduct(p => ({ ...p, sellerId: e.target.value, sellerCode: sel?.seller_code || "" }));
-                      }}>
-                      <option value="">— Select seller —</option>
-                      {sellers.map(s => <option key={s.id} value={s.id}>{s.seller_code ? `${s.seller_code} — ` : ""}{s.business_name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={ts.label}>Flags</label>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "8px 0 16px" }}>
-                      {["inStock", "popular", "featured"].map(flag => (
-                        <label key={flag} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, color: "#333" }}>
-                          <input type="checkbox" checked={editingProduct[flag]} onChange={() => setEditingProduct(p => ({ ...p, [flag]: !p[flag] }))} />
-                          <span style={{ textTransform: "capitalize" }}>{flag}</span>
-                        </label>
-                      ))}
-                    </div>
-                    <label style={ts.label}>Images</label>
-                    {/* Current images as removable thumbnails */}
-                    {editingProduct.images.length > 0 && (
-                      <div style={{ ...ts.thumbGrid, marginBottom: 10 }}>
-                        {editingProduct.images.map((src, i) => (
-                          <div key={i} style={ts.thumb}>
-                            <img src={src} alt="" style={ts.thumbImg} onError={e => { e.target.style.display = "none"; }} />
-                            {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
-                            <button type="button"
-                              onClick={() => setEditingProduct(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
-                              style={ts.removeBtn}>x</button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {/* Upload new images */}
-                    <div style={ts.editDropzone} onClick={() => editFileInputRef.current?.click()}>
-                      <input ref={editFileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }}
-                        onChange={e => processEditFiles(e.target.files)} />
-                      <span style={{ fontSize: 12, color: "#aaa" }}>+ Upload more images</span>
-                    </div>
-                    {editImageFiles.length > 0 && (
-                      <div>
-                        <div style={{ ...ts.thumbGrid, margin: "8px 0 6px" }}>
-                          {editImageFiles.map((img, i) => (
-                            <div key={i} style={ts.thumb}>
-                              <img src={img.preview} alt="" style={ts.thumbImg} />
-                              <button type="button" onClick={() => setEditImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
-                            </div>
-                          ))}
-                        </div>
-                        <button type="button" style={{ ...ts.ghostBtn, padding: "7px 14px", fontSize: 11 }}
-                          onClick={uploadEditImages} disabled={publishing}>
-                          {publishing ? "Uploading..." : `Upload ${editImageFiles.length} image(s) to GitHub`}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                  <button style={ts.ghostBtn} onClick={() => { setEditingProduct(null); setEditImageFiles([]); }}>Cancel</button>
-                  <button style={ts.primaryBtn} onClick={() => handleStageProductEdit(editingProduct)}>Stage Changes</button>
-                </div>
-              </div>
-            )}
-
             <div style={ts.productTable}>
               <div style={ts.productTableHeader}>
-                <span style={{ flex: 3 }}>Product</span>
+                <span style={{ flex: 3 }}>Product {productFilterCat !== "all" && <span style={{ fontSize: 10, color: "#c8a96e", marginLeft: 6 }}>⠿ drag to reorder</span>}</span>
                 <span style={{ flex: 1 }}>Price</span>
                 <span style={{ flex: 1 }}>Stock</span>
                 <span style={{ flex: 1 }}>Popular</span>
                 <span style={{ flex: 1 }}>Featured</span>
                 <span style={{ flex: 1 }}>Actions</span>
               </div>
-              {filteredProducts.map(product => {
+              {getDisplayedProducts().map(product => {
                 const p = pendingChanges[product.id] || product;
                 const isDirty = !!pendingChanges[product.id];
+                const isEditingThis = editingProduct?.id === product.id;
                 return (
-                  <div key={product.id} style={{ ...ts.productTableRow, background: isDirty ? "#fffbf3" : "#fff" }}>
+                  <React.Fragment key={product.id}>
+                  <div
+                    draggable={productFilterCat !== "all"}
+                    onDragStart={e => handleDragStart(e, product.id)}
+                    onDragOver={e => handleDragOver(e, product.id)}
+                    onDrop={handleDragEnd}
+                    onDragEnd={handleDragEnd}
+                    style={{ ...ts.productTableRow, background: isDirty ? "#fffbf3" : draggingId === product.id ? "#e8f0fe" : "#fff", opacity: draggingId === product.id ? 0.5 : 1, borderBottom: isEditingThis ? "none" : undefined }}>
+                    {productFilterCat !== "all" && (
+                      <span title="Drag to reorder" style={{ cursor: "grab", color: "#ccc", fontSize: 18, marginRight: 8, flexShrink: 0, userSelect: "none" }}>⠿</span>
+                    )}
                     <div style={{ flex: 3, display: "flex", alignItems: "center", gap: 10 }}>
                       <img src={p.images[0]} alt="" style={ts.rowThumb} onError={e => { e.target.style.display = "none"; }} />
                       <div>
@@ -1465,15 +1421,182 @@ export default function AdminPortal() {
                       </button>
                     </span>
                     <span style={{ flex: 1, display: "flex", gap: 4, alignItems: "center" }}>
-                      <button style={ts.editBtn} onClick={() => { setEditingProduct({ ...p }); window.scrollTo({ top: 0, behavior: "smooth" }); }}>Edit</button>
-                      <button style={{ ...ts.editBtn, padding: "3px 7px" }} title="Move up"
-                        onClick={() => handleReorderProduct(product.id, -1)}>↑</button>
-                      <button style={{ ...ts.editBtn, padding: "3px 7px" }} title="Move down"
-                        onClick={() => handleReorderProduct(product.id, 1)}>↓</button>
+                      <button style={ts.editBtn} onClick={() => {
+                        if (sellers.length === 0) loadSellers();
+                        setEditingProduct(isEditingThis ? null : { ...p });
+                        setEditImageFiles([]);
+                        setShowInlineAddSeller(false);
+                        setTimeout(() => editFormRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+                      }}>{isEditingThis ? "Close" : "Edit"}</button>
                       <button style={{ ...ts.editBtn, padding: "3px 7px", background: "#feeeed", color: "#c00", border: "1px solid #f5c6c6" }} title="Delete product"
                         onClick={() => handleDeleteProduct(product)}>✕</button>
                     </span>
                   </div>
+                  {isEditingThis && (
+                    <div ref={editFormRef} style={{ background: "#fdf8f0", border: "1px solid #e8d9b8", borderTop: "none", padding: 20, marginBottom: 0 }}>
+                      <div style={ts.grid2}>
+                        <div>
+                          <label style={ts.label}>Title</label>
+                          <input style={ts.input} value={editingProduct.title} onChange={e => setEditingProduct(p => ({ ...p, title: e.target.value }))} />
+                          <label style={ts.label}>Category</label>
+                          <select style={ts.input} value={editingProduct.categoryId} onChange={e => setEditingProduct(p => ({ ...p, categoryId: e.target.value }))}>
+                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                          </select>
+                          <label style={ts.label}>Also appears in <span style={ts.labelHint}>(optional)</span></label>
+                          <div style={ts.chipGrid}>
+                            {categories.filter(c => c.id !== editingProduct.categoryId).map(c => {
+                              const active = (editingProduct.secondaryCategories||[]).includes(c.id);
+                              return (
+                                <button type="button" key={c.id}
+                                  onClick={() => setEditingProduct(p => ({
+                                    ...p,
+                                    secondaryCategories: active
+                                      ? (p.secondaryCategories||[]).filter(x => x !== c.id)
+                                      : [...(p.secondaryCategories||[]), c.id]
+                                  }))}
+                                  style={active ? ts.chipActive : ts.chip}>{c.name}</button>
+                              );
+                            })}
+                          </div>
+                          <label style={ts.label}>Price (Rs.)</label>
+                          <input style={ts.input} type="number" value={editingProduct.price} onChange={e => setEditingProduct(p => ({ ...p, price: Number(e.target.value) }))} />
+                          <label style={ts.label}>Description</label>
+                          <textarea style={{ ...ts.input, height: 100, resize: "vertical" }} value={editingProduct.description}
+                            onChange={e => setEditingProduct(p => ({ ...p, description: e.target.value }))} />
+                          <p style={ts.fieldHint}>Line breaks removed before saving.</p>
+                          <label style={ts.label}>Tags (comma-separated)</label>
+                          <input style={ts.input} value={editingProduct.tags.join(", ")}
+                            onChange={e => setEditingProduct(p => ({ ...p, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) }))} />
+                          <label style={ts.label}>Keywords (comma-separated)</label>
+                          <input style={ts.input} value={(editingProduct.keywords || []).join(", ")}
+                            onChange={e => setEditingProduct(p => ({ ...p, keywords: e.target.value.split(",").map(k => k.trim()).filter(Boolean) }))} />
+                          <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional)</span></label>
+                          <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                            <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add a colour"
+                              id="editColorInput"
+                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); e.target.value = ""; } } }} />
+                            <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                              onClick={() => { const inp = document.getElementById("editColorInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); inp.value = ""; } }}>+</button>
+                          </div>
+                          {(editingProduct.colors||[]).length > 0 && (
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                              {editingProduct.colors.map((c, i) => {
+                                const name = typeof c === "object" ? c.name : c;
+                                return (
+                                  <span key={i} style={ts.colorChip}>
+                                    {name}
+                                    <button type="button" onClick={() => setEditingProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
+                          <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                            <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L"
+                              id="editSizeInput"
+                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); e.target.value = ""; } } }} />
+                            <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                              onClick={() => { const inp = document.getElementById("editSizeInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); inp.value = ""; } }}>+</button>
+                          </div>
+                          {(editingProduct.sizes||[]).length > 0 && (
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                              {editingProduct.sizes.map((s, i) => (
+                                <span key={i} style={ts.colorChip}>
+                                  {s}
+                                  <button type="button" onClick={() => setEditingProduct(p => ({ ...p, sizes: p.sizes.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
+                          <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
+                            onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
+                          <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
+                          <select style={ts.input} value={editingProduct.sellerId || ""}
+                            onChange={e => {
+                              const sel = sellers.find(s => s.id === e.target.value);
+                              setEditingProduct(p => ({ ...p, sellerId: e.target.value, sellerCode: sel?.seller_code || "" }));
+                            }}>
+                            <option value="">— Select seller —</option>
+                            {sellers.map(s => <option key={s.id} value={s.id}>{s.seller_code ? `${s.seller_code} — ` : ""}{s.business_name}</option>)}
+                          </select>
+                          <button type="button" style={{ ...ts.ghostBtn, padding: "6px 12px", fontSize: 11, marginTop: 4 }}
+                            onClick={() => setShowInlineAddSeller(s => !s)}>
+                            {showInlineAddSeller ? "Cancel new seller" : "+ Create new seller"}
+                          </button>
+                          {showInlineAddSeller && (
+                            <div style={{ background: "#fff", border: "1px solid #e8d9b8", borderRadius: 8, padding: 14, marginTop: 8 }}>
+                              <p style={{ ...ts.label, marginTop: 0 }}>New Seller (quick add)</p>
+                              <input style={ts.input} placeholder="Business name *" value={inlineNewSeller.business_name}
+                                onChange={e => setInlineNewSeller(s => ({ ...s, business_name: e.target.value }))} />
+                              <input style={{ ...ts.input, marginTop: 6 }} placeholder="Owner name" value={inlineOwnerInput}
+                                onChange={e => setInlineOwnerInput(e.target.value)} />
+                              <input style={{ ...ts.input, marginTop: 6 }} placeholder="Location (city)" value={inlineNewSeller.location}
+                                onChange={e => setInlineNewSeller(s => ({ ...s, location: e.target.value }))} />
+                              <button type="button" style={{ ...ts.primaryBtn, marginTop: 8, padding: "8px 16px" }}
+                                onClick={() => handleInlineCreateSeller((id, code) => {
+                                  setEditingProduct(p => ({ ...p, sellerId: id, sellerCode: code }));
+                                })} disabled={publishing}>
+                                {publishing ? "Creating..." : "Create & Select"}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <label style={ts.label}>Flags</label>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "8px 0 16px" }}>
+                            {["inStock", "popular", "featured"].map(flag => (
+                              <label key={flag} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, color: "#333" }}>
+                                <input type="checkbox" checked={editingProduct[flag]} onChange={() => setEditingProduct(p => ({ ...p, [flag]: !p[flag] }))} />
+                                <span style={{ textTransform: "capitalize" }}>{flag}</span>
+                              </label>
+                            ))}
+                          </div>
+                          <label style={ts.label}>Images</label>
+                          {editingProduct.images.length > 0 && (
+                            <div style={{ ...ts.thumbGrid, marginBottom: 10 }}>
+                              {editingProduct.images.map((src, i) => (
+                                <div key={i} style={ts.thumb}>
+                                  <img src={src} alt="" style={ts.thumbImg} onError={e => { e.target.style.display = "none"; }} />
+                                  {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
+                                  <button type="button"
+                                    onClick={() => setEditingProduct(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
+                                    style={ts.removeBtn}>x</button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div style={ts.editDropzone} onClick={() => editFileInputRef.current?.click()}>
+                            <input ref={editFileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }}
+                              onChange={e => processEditFiles(e.target.files)} />
+                            <span style={{ fontSize: 12, color: "#aaa" }}>+ Upload more images</span>
+                          </div>
+                          {editImageFiles.length > 0 && (
+                            <div>
+                              <div style={{ ...ts.thumbGrid, margin: "8px 0 6px" }}>
+                                {editImageFiles.map((img, i) => (
+                                  <div key={i} style={ts.thumb}>
+                                    <img src={img.preview} alt="" style={ts.thumbImg} />
+                                    <button type="button" onClick={() => setEditImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
+                                  </div>
+                                ))}
+                              </div>
+                              <button type="button" style={{ ...ts.ghostBtn, padding: "7px 14px", fontSize: 11 }}
+                                onClick={uploadEditImages} disabled={publishing}>
+                                {publishing ? "Uploading..." : `Upload ${editImageFiles.length} image(s) to GitHub`}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                        <button style={ts.ghostBtn} onClick={() => { setEditingProduct(null); setEditImageFiles([]); setShowInlineAddSeller(false); }}>Cancel</button>
+                        <button style={ts.primaryBtn} onClick={() => { handleStageProductEdit(editingProduct); setShowInlineAddSeller(false); }}>Stage Changes</button>
+                      </div>
+                    </div>
+                  )}
+                  </React.Fragment>
                 );
               })}
             </div>
