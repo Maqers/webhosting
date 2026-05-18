@@ -21,7 +21,8 @@ export const categories = [
 ];
 
 export const productsByCategory = {
-  "Cosmetics":[
+  "Cosmetics": [
+    
   ],
   "Kids-Accessories": [
     
