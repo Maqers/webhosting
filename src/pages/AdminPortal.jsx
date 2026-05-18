@@ -379,7 +379,7 @@ function buildEntry(id, product) {
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${product.inStock !== false}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {

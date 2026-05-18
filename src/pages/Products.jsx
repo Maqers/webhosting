@@ -20,9 +20,10 @@ const getCachedCategories = () => {
 
 const getCachedCategoryMap = () => {
   if (!cachedCategoryMap) {
-    const categories = getCachedCategories()
-    cachedCategoryMap = new Map(categories.map(cat => [cat.id, cat]))
-    categories.forEach(cat => {
+    const cats = getCachedCategories()
+    cachedCategoryMap = new Map(cats.map(cat => [cat.id, cat]))
+    // also index by name for legacy lookups
+    cats.forEach(cat => {
       if (!cachedCategoryMap.has(cat.name)) cachedCategoryMap.set(cat.name, cat)
     })
   }
@@ -251,12 +252,13 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
   const [addedFeedback, setAddedFeedback] = useState(false)
 
   const categoryName = useMemo(() => {
-    if (product.categoryId) {
-      const category = categoryMap.get(product.categoryId)
-      return category ? category.name : 'Handmade Gift'
-    }
-    const category = categoryMap.get(product.category)
-    return category ? category.name : (product.category || 'Handmade Gift')
+    // Always look up by categoryId first — this returns the display name (e.g. "Handmade Florals" not "Crochet")
+    const byId = categoryMap.get(product.categoryId)
+    if (byId) return byId.name
+    // Fallback: try the denormalised product.category string (may be stale)
+    const byName = categoryMap.get(product.category)
+    if (byName) return byName.name
+    return 'Handmade Gift'
   }, [product.categoryId, product.category, categoryMap])
 
   const handleAddToCart = useCallback((e) => {
