@@ -376,10 +376,11 @@ function buildEntry(id, product) {
   const colors = serializeColors(product.colors);
   const sizes = serializeSizes(product.sizes);
   const moq = Number(product.moq) || 0;
+  const deliveryTime = sanitizeForJS(product.delivery_time || product.meta?.delivery_time || "");
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -476,7 +477,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -1173,6 +1174,9 @@ export default function AdminPortal() {
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                       <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
                         onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
+                      <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
+                      <input style={ts.input} placeholder="e.g. 3–5 business days" value={newProduct.delivery_time || ""}
+                        onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
                       <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
                       <select style={ts.input} value={newProduct.sellerId || ""}
                         onChange={e => {
@@ -1512,6 +1516,9 @@ export default function AdminPortal() {
                           <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
+                          <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
+                          <input style={ts.input} placeholder="e.g. 3–5 business days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
+                            onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
                           <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
                           <select style={ts.input} value={editingProduct.sellerId || ""}
                             onChange={e => {
