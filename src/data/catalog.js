@@ -159,6 +159,7 @@ export const productsByCategory = {
 
     { id: 132, categoryId: "Home-decor", title: "Kesariya Bandarwal Set", slug: "kesariya-bandarwal-set", description: "Beautiful handcrafted Bandarwal with matching Shubh-Labh hangings, adorned with floral accents, mirror and mud magicand graceful tassel detailing. Perfect for weddings, festivals, housewarming, and every auspicious occasion, adding charm, positivity, and traditional beauty to your entrance. Let your doorway speak of warmth, blessings, and timeless style.", price: 3649, images: ["/images/-2026-04-22-pm.jpeg", "/images/2026-04-22-1.jpeg", "/images/2026-04-22-2.jpeg"], popular: false, featured: false, inStock: true, tags: ["bandarwal", "toran for door", "shubh labh hanging", "door hanging decor", "festive home decor", "indian toran", "wedding decor india", "traditional door decor", "housewarming decoration", "pooja decor", "ethnic home decor", "handmade bandarwal", "mirror work toran", "floral toran", "entrance decor india"], meta: { keywords: ["bandarwal for main door", "shubh labh door hanging india", "handmade toran online", "traditional indian door decor", "wedding entrance decoration ideas", "festive toran for home", "mirror work bandarwal", "floral door hanging india", "housewarming decor items india", "pooja room door hanging", "ethnic home entrance decor", "decorative toran for festivals", "indian doorway decoration", "auspicious home decor items"], colors: [], moq: 0, secondaryCategories: ["Wedding-Gifts"], sellerId: "rr1002", sellerCode: "" } },
 
+    { id: 191, categoryId: "Home-decor", title: "The Evil Eye Wish Tree", slug: "the-evil-eye-wish-tree", description: "More than something to gift — something to keep, cherish, and carry forward ✨\\n\\nThe Evil Eye Wish Tree is a meaningful keepsake that blends protection, intention, and thoughtful design. Created to bring warmth and positive energy into everyday spaces, it serves as a gentle reminder of love, hopes, and the moments that matter most. Beautiful as décor and meaningful as a gift, it’s designed to stay close long after the occasion has passed.\\n\\nA little protection, a lot of love, and a timeless piece for every home.", price: 889, images: ["/images/whatsapp-image-2026-05-19-at-3.49.23-pm-(1).jpeg", "/images/whatsapp-image-2026-05-19-at-3.49.23-pm-(2).jpeg", "/images/whatsapp-image-2026-05-19-at-3.49.23-pm.jpeg"], popular: false, featured: false, inStock: false, tags: ["evil eye wish tree", "evil eye decor", "spiritual gift", "meaningful keepsake", "home decor gift", "positive energy decor", "lucky charm gift", "aesthetic decor", "thoughtful gifting", "evil eye ornament"], meta: { keywords: ["evil eye wish tree gift", "decorative evil eye tree", "protection and positivity decor", "meaningful keepsake gift", "spiritual home decoration", "evil eye gift for loved ones", "aesthetic home decor accessory", "lucky charm decor", "gifting ideas for housewarming", "symbolic decor item"], colors: [], sizes: [], moq: 0, delivery_time: "5-6 days", secondaryCategories: [], sellerId: "as1001", sellerCode: "AS1001" } },
   ],
   "resin-products": [
     { id: 38, categoryId: "resin-products", title: "Resin flower clock", slug: "Resin-flower-clock", description: "This beautiful resin flower clock is handcrafted using real dried flowers sealed in premium resin, turning every second into a piece of art.", price: 1099, images: ["/images/29.png"], popular: false, featured: false, inStock: true, tags: ["resin","clock","handmade","flower"], meta: { keywords: ["resin","clock","handmade","flower"] } },
@@ -289,9 +290,9 @@ export const productsByCategory = {
 // ============================================================================
 export const occasionProductMap = {
   'shaadi-fever':          [115, 116, 117, 118, 119, 32, 33, 34, 35, 36, 37, 149, 150],
-  'for-your-best-friend':  [8, 10, 12, 64, 56, 57, 4, 62, 65, 156, 71, 159, 9, 110, 112, 113, 114, 157, 158, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
-  'for-your-girlfriend':   [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
-  'for-your-boyfriend':    [5, 9, 38, 59, 60, 41, 40, 113, 114, 156, 157, 158, 159, 112, 165, 166, 167],
+  'for-your-best-friend':  [8, 10, 12, 64, 56, 57, 4, 62, 65, 156, 71, 159, 9, 110, 112, 113, 114, 157, 158, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190, 191],
+  'for-your-girlfriend':   [5, 9, 29, 27, 64, 65, 8, 57, 32, 33, 35, 36, 37, 112, 113, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190, 191],
+  'for-your-boyfriend':    [5, 9, 38, 59, 60, 41, 40, 113, 114, 156, 157, 158, 159, 112, 165, 166, 167, 191],
   'situationship':         [10, 12, 1, 4, 39, 109, 110, 2, 63, 113, 114, 156, 157, 158, 159, 126, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
   'self-love-kits':        [109, 110, 111, 105, 107, 106, 108, 68, 69, 70, 71, 113, 114, 156, 157, 158, 159, 126, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
   'breakup-hampers':       [109, 65, 9, 5, 71, 64, 111, 68, 70, 110, 113, 156, 157, 158, 159],
@@ -299,16 +300,16 @@ export const occasionProductMap = {
   'late-night-cravings':   [10, 12, 39, 63, 1, 4, 65, 71, 109, 110, 113, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
   'the-main-character':    [57, 56, 8, 4, 79, 83, 74, 75, 76, 109, 111, 3, 7, 67, 113, 114, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
   'for-your-work-friend':  [39, 40, 41, 59, 60, 10, 12, 38, 113, 114, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
-  'for-your-mom':          [124, 64, 113, 77, 80, 83, 29, 73, 65, 114, 118, 81, 8, 10, 67, 123, 126, 110, 108, 109, 107, 106, 111, 105, 66, 112, 2, 9, 5, 141, 147, 133, 146, 33, 32, 34, 36, 100, 94, 58, 121, 129, 128, 145, 127, 143, 144, 142, 130, 72, 75, 125, 150, 148, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
-  'for-your-dad':          [113, 59, 41, 40, 114, 156, 157, 158, 159, 38, 165, 166, 167],
-  'for-your-sister':       [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 149, 112, 157, 158, 124, 141, 54, 55, 92, 127, 128, 130, 142, 143, 144, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190],
-  'for-your-brother':      [156, 157, 158, 159, 41, 127, 128, 165, 166, 167, 161, 162, 151, 190],
+  'for-your-mom':          [124, 64, 113, 77, 80, 83, 29, 73, 65, 114, 118, 81, 8, 10, 67, 123, 126, 110, 108, 109, 107, 106, 111, 105, 66, 112, 2, 9, 5, 141, 147, 133, 146, 33, 32, 34, 36, 100, 94, 58, 121, 129, 128, 145, 127, 143, 144, 142, 130, 72, 75, 125, 150, 148, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190, 191],
+  'for-your-dad':          [113, 59, 41, 40, 114, 156, 157, 158, 159, 38, 165, 166, 167, 191],
+  'for-your-sister':       [10, 12, 24, 25, 26, 42, 43, 44, 84, 94, 3, 7, 67, 114, 118, 149, 112, 157, 158, 124, 141, 54, 55, 92, 127, 128, 130, 142, 143, 144, 165, 166, 167, 184, 185, 186, 187, 188, 189, 190, 191],
+  'for-your-brother':      [156, 157, 158, 159, 41, 127, 128, 165, 166, 167, 161, 162, 151, 190, 191],
   'for-children':          [12, 39, 63, 4, 1, 155, 162, 161, 154, 151, 10, 163, 160, 153, 152, 168, 169, 170, 171, 172, 173, 174, 175, 168, 169, 170, 177, 178, 179, 180, 181, 182, 183, 190],
-  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 113, 107, 27, 28, 114, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190],
-  'housewarming':          [32, 33, 34, 35, 36, 37, 27, 28, 38, 59, 60, 106, 107, 117, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190],
+  'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 113, 107, 27, 28, 114, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190, 191],
+  'housewarming':          [32, 33, 34, 35, 36, 37, 27, 28, 38, 59, 60, 106, 107, 117, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190, 191],
   'bachelor-party':        [109, 110, 111, 113, 32, 33, 34, 35, 36, 37, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190],
   'godh-bharai':           [64, 65, 27, 28, 29, 68, 69, 70, 113, 114, 149, 150, 156, 157, 112, 126, 92, 94, 93, 95, 96, 97, 190],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 118, 119, 149, 150, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 191],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
