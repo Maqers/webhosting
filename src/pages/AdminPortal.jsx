@@ -243,6 +243,14 @@ function parseProducts(source) {
     const p = products.find(p => p.id === id);
     if (p) p.moq = parseInt(mq[2]) || 0;
   }
+  // Parse delivery_time
+  const dtRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*delivery_time:\s*"([^"]*)"/g;
+  let dt;
+  while ((dt = dtRegex.exec(source)) !== null) {
+    const id = parseInt(dt[1]);
+    const p = products.find(p => p.id === id);
+    if (p) p.delivery_time = dt[2];
+  }
   // Parse secondaryCategories
   const scRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*secondaryCategories:\s*\[([^\]]*)\]/g;
   let sc;
@@ -376,10 +384,11 @@ function buildEntry(id, product) {
   const colors = serializeColors(product.colors);
   const sizes = serializeSizes(product.sizes);
   const moq = Number(product.moq) || 0;
+  const deliveryTime = sanitizeForJS(product.delivery_time || product.meta?.delivery_time || "");
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
