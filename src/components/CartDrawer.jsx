@@ -84,7 +84,7 @@ export default function CartDrawer() {
               <span>SUBTOTAL</span>
               <span className="cart-total-amount">₹{total.toLocaleString('en-IN')}</span>
             </div>
-            <p className="cart-shipping-note">Shipping calculated at checkout</p>
+            <p className="cart-free-delivery">🎉 FREE DELIVERY on this order!</p>
             <Link to="/checkout" className="cart-checkout-btn" onClick={() => setIsOpen(false)}>
               PROCEED TO CHECKOUT
             </Link>

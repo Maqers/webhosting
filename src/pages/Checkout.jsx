@@ -11,10 +11,7 @@ const EMAILJS_TEMPLATE = 'template_e2n002e'
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
 
 function getDeliveryFee(subtotal) {
-  if (subtotal >= 4000) return 0
-  if (subtotal >= 3000) return 79
-  if (subtotal >= 1500) return 89
-  return 99
+  return 0
 }
 
 function generateOrderId() {
@@ -392,13 +389,9 @@ export default function Checkout() {
                 </div>
                 <div className="checkout-summary-row">
                   <span>Delivery</span>
-                  <span className={deliveryFee === 0 ? 'checkout-free-delivery' : ''}>
-                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
-                  </span>
+                  <span className='checkout-free-delivery'>FREE</span>
                 </div>
-                {deliveryFee === 0 && (
-                  <p className="checkout-free-msg">🎉 You qualify for free delivery!</p>
-                )}
+                <p className="checkout-free-msg">🎉 Free delivery!</p>
                 <div className="checkout-summary-row checkout-grand-total">
                   <span>Total</span>
                   <span className="checkout-total-val">₹{grandTotal.toLocaleString('en-IN')}</span>
