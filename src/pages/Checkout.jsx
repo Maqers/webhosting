@@ -223,16 +223,16 @@ export default function Checkout() {
               <h2 className="checkout-section-title">CONTACT INFORMATION</h2>
               <div className="checkout-field">
                 <label>FULL NAME *</label>
-                <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Priya Sharma" />
+                <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Enter your full name" />
                 {errors.name && <span className="checkout-error">{errors.name}</span>}
               </div>
               <div className="checkout-field">
                 <label>EMAIL ADDRESS</label>
-                <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="priya@email.com" />
+                <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="Enter your email address" />
               </div>
               <div className="checkout-field" style={{ marginBottom: 0 }}>
                 <label>PHONE NUMBER *</label>
-                <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="9876543210" />
+                <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="Enter your phone number" />
                 {errors.phone && <span className="checkout-error">{errors.phone}</span>}
               </div>
             </div>
@@ -246,17 +246,17 @@ export default function Checkout() {
               </div>
               <div className="checkout-field">
                 <label>CITY *</label>
-                <input value={form.city} onChange={e => set('city', e.target.value)} placeholder="Mumbai" />
+                <input value={form.city} onChange={e => set('city', e.target.value)} placeholder="Enter your city" />
                 {errors.city && <span className="checkout-error">{errors.city}</span>}
               </div>
               <div className="checkout-field">
                 <label>PIN CODE *</label>
-                <input value={form.pincode} onChange={e => set('pincode', e.target.value)} placeholder="400001" maxLength={6} />
+                <input value={form.pincode} onChange={e => set('pincode', e.target.value)} placeholder="Enter your pin code" maxLength={6} />
                 {errors.pincode && <span className="checkout-error">{errors.pincode}</span>}
               </div>
               <div className="checkout-field" style={{ marginBottom: 0 }}>
                 <label>STATE *</label>
-                <input value={form.state} onChange={e => set('state', e.target.value)} placeholder="Maharashtra" />
+                <input value={form.state} onChange={e => set('state', e.target.value)} placeholder="Enter your state" />
                 {errors.state && <span className="checkout-error">{errors.state}</span>}
               </div>
             </div>
