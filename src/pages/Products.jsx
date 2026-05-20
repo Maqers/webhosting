@@ -286,7 +286,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
   return (
     <article
       className="feat-card"
-      style={{ "--i": index % 12 }}
+      style={{ "--i": index % 12, ...(product.inStock === false ? { opacity: 0.45, filter: 'grayscale(80%)' } : {}) }}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -323,11 +323,12 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
 
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button
-            className={`feat-add-btn${addedFeedback ? " added" : ""}${product.inStock === false ? " disabled" : ""}`}
+            className={`feat-add-btn${addedFeedback ? " added" : ""}`}
             onClick={product.inStock === false ? undefined : handleAddToCart}
             type="button"
             aria-label="Add to cart"
             disabled={product.inStock === false}
+            style={product.inStock === false ? { background: '#aaa', cursor: 'not-allowed', pointerEvents: 'none' } : {}}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>

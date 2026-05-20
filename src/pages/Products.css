@@ -380,6 +380,11 @@
 .feat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07); }
 @media (hover: none) { .feat-card:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
 
+/* Out of stock card — entire tile greyed out */
+.feat-card--oos { opacity: 0.5; filter: grayscale(70%); }
+.feat-card--oos:hover { transform: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important; }
+.feat-card--oos .feat-add-btn { background: #bbb !important; color: #fff !important; cursor: not-allowed !important; pointer-events: none; }
+
 .feat-img-zone {
   position: relative; width: 100%; aspect-ratio: 1 / 1;
   background: #f5ede4; overflow: hidden; flex-shrink: 0;
