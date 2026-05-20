@@ -19,6 +19,7 @@ const desktopItems = [
 ];
 
 const mobileItems = [
+  "FREE DELIVERY on all orders",
   "🔍 Hand-picked sellers",
   "🎁 Genuinely handmade",
   "💬 Order via cart",
