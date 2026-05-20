@@ -4,10 +4,11 @@ import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
 import './Checkout.css'
 
-const UPI_ID = '9650800399@pthdfc' // e.g. maqers@okaxis
+const UPI_ID = '9650800399@pthdfc'
 const WHATSAPP_NUMBER = '919289955099'
 const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
+const EMAILJS_TEMPLATE_CUSTOMER = 'template_cp8gsrc' // ← replace with your EmailJS template ID
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
 
 function getDeliveryFee(subtotal) {
@@ -103,6 +104,31 @@ export default function Checkout() {
     )
   }
 
+  const sendCustomerConfirmation = async (oid) => {
+    if (!form.email || !form.email.includes('@')) return
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE_CUSTOMER,
+        {
+          order_id: oid,
+          customer_name: form.name,
+          customer_email: form.email,
+          customer_phone: form.phone,
+          shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+          items_list: buildItemsText(),
+          subtotal: `₹${total.toLocaleString('en-IN')}`,
+          delivery_fee: 'FREE',
+          grand_total: `₹${grandTotal.toLocaleString('en-IN')}`,
+          upi_id: UPI_ID,
+        },
+        EMAILJS_PUBLIC_KEY
+      )
+    } catch (err) {
+      console.error('Customer confirmation email failed:', err)
+    }
+  }
+
   const handlePlaceOrder = async () => {
     setSubmitAttempted(true)
     if (!validate()) return
@@ -118,6 +144,8 @@ export default function Checkout() {
       console.error('Email failed:', err)
     }
 
+    await sendCustomerConfirmation(oid)
+
     clearCart()
     setOrderPlaced(true)
     setSubmitting(false)
@@ -130,7 +158,6 @@ export default function Checkout() {
         setTimeout(() => setUpiCopied(false), 4000)
       })
       .catch(() => {
-        // Fallback for browsers that block clipboard
         setUpiCopied(true)
         setTimeout(() => setUpiCopied(false), 4000)
       })
@@ -178,6 +205,7 @@ export default function Checkout() {
     } catch (err) {
       console.error('Email 2 failed:', err)
     }
+    await sendCustomerConfirmation(pendingOrderId)
     clearCart()
     setShowPaymentConfirm(false)
     setMobileUPIStep(null)
@@ -264,7 +292,6 @@ export default function Checkout() {
             <div className="checkout-section">
               <h2 className="checkout-section-title">PAYMENT METHOD</h2>
 
-              {/* Mobile only: Copy UPI ID + Scan QR inline buttons */}
               {isMobile && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <button
@@ -306,7 +333,6 @@ export default function Checkout() {
                       <img
                         src="/images/upi-qr.png"
                         alt="UPI QR Code"
-                        id="upi-qr-img"
                         style={{ width: 180, height: 180, objectFit: 'contain', borderRadius: 8, border: '1px solid #eee' }}
                       />
                       <p style={{ fontSize: '0.78rem', color: '#888', marginTop: '0.5rem' }}>
@@ -334,7 +360,6 @@ export default function Checkout() {
                 </div>
               )}
 
-              {/* Desktop only: single option label */}
               {!isMobile && (
                 <div className="checkout-payment-options">
                   <label className="checkout-payment-option selected">
@@ -362,7 +387,6 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* Right: Order summary */}
           <div className="checkout-right">
             <div className="checkout-summary">
               <h2 className="checkout-summary-title">ORDER ({items.length} {items.length === 1 ? 'ITEM' : 'ITEMS'})</h2>
@@ -398,7 +422,6 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {/* Desktop only: QR in sidebar */}
               {!isMobile && (
                 <div className="checkout-upi-box">
                   <p className="checkout-upi-label">Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</p>
