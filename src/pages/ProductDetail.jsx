@@ -234,9 +234,18 @@ const ProductDetail = () => {
 
             <div className="product-actions">
               <div className="product-action-buttons">
-                <button type="button" onClick={handleAddToCart} className="add-to-cart-button">
-                  Add to Cart
-                </button>
+                {product.inStock === false ? (
+                  <>
+                    <button type="button" className="add-to-cart-button out-of-stock-button" disabled>
+                      Out of Stock
+                    </button>
+                    <p className="out-of-stock-note">This item is currently unavailable. Check back soon.</p>
+                  </>
+                ) : (
+                  <button type="button" onClick={handleAddToCart} className="add-to-cart-button">
+                    Add to Cart
+                  </button>
+                )}
                 <button type="button" onClick={() => toggleItem(product)} className={`add-to-wishlist-button ${wishlisted ? 'wishlisted' : ''}`}>
                   {wishlisted ? '♥ Wishlisted' : '♡ Wishlist'}
                 </button>
