@@ -56,9 +56,15 @@ export default function WishlistDrawer() {
                     <p className="wishlist-item-title">{item.title}</p>
                     <p className="wishlist-item-price">₹{item.price.toLocaleString('en-IN')}</p>
                     <div className="wishlist-item-actions">
-                      <button className="wishlist-add-cart" onClick={() => handleMoveToCart(item)}>
-                        Move to Cart
-                      </button>
+                      {item.inStock === false ? (
+                        <button className="wishlist-add-cart" disabled style={{ background: '#aaa', cursor: 'not-allowed' }}>
+                          Out of Stock
+                        </button>
+                      ) : (
+                        <button className="wishlist-add-cart" onClick={() => handleMoveToCart(item)}>
+                          Move to Cart
+                        </button>
+                      )}
                       <button className="wishlist-remove" onClick={() => toggleItem(item)}>
                         Remove
                       </button>

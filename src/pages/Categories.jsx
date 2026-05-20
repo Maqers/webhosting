@@ -137,7 +137,7 @@ const ProductCard = ({ product, index }) => {
   return (
     <article
       className="feat-card"
-      style={{ "--i": index % 12 }}
+      style={{ "--i": index % 12, ...(product.inStock === false ? { opacity: 0.45, filter: 'grayscale(80%)' } : {}) }}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -147,6 +147,7 @@ const ProductCard = ({ product, index }) => {
       <div className="feat-img-zone">
         <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading={index < 8 ? 'eager' : 'lazy'} />
         {product.popular && <span className="feat-badge-popular">Popular</span>}
+        {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
           <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -158,12 +159,19 @@ const ProductCard = ({ product, index }) => {
         <h3 className="feat-title">{product.title}</h3>
         <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
-          <button className={`feat-add-btn${addedFeedback ? " added" : ""}`} onClick={handleAddToCart} type="button" aria-label="Add to cart">
+          <button
+            className={`feat-add-btn${addedFeedback ? " added" : ""}`}
+            onClick={product.inStock === false ? undefined : handleAddToCart}
+            type="button"
+            aria-label="Add to cart"
+            disabled={product.inStock === false}
+            style={product.inStock === false ? { background: '#aaa', cursor: 'not-allowed', pointerEvents: 'none' } : {}}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            {addedFeedback ? "Added!" : "Add to Cart"}
+            {product.inStock === false ? "Out of Stock" : addedFeedback ? "Added!" : "Add to Cart"}
           </button>
           <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button">
             <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
