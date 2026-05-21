@@ -1037,6 +1037,7 @@ export default function AdminPortal() {
     { id: "dashboard", label: "Dashboard", icon: "◈" },
     { id: "add-product", label: "Add Product", icon: "+" },
     { id: "products", label: "Products", icon: "▤" },
+    { id: "by-category", label: "By Category", icon: "⊟" },
     { id: "categories", label: "Categories", icon: "⊞" },
     { id: "occasions", label: "Occasions", icon: "♡" },
     { id: "sellers", label: "Sellers", icon: "◎" },
@@ -1739,6 +1740,118 @@ export default function AdminPortal() {
         )}
 
         {/* ── OCCASIONS ── */}
+        {/* ── BY CATEGORY ── */}
+        {activeTab === "by-category" && (() => {
+          const [byCatDragging, setByCatDragging] = React.useState(null); // { catId, productId }
+          const [byCatOrder, setByCatOrder] = React.useState({}); // { catId: [id,...] }
+          const [byCatPublishing, setByCatPublishing] = React.useState(false);
+          const [openCats, setOpenCats] = React.useState({});
+
+          const hasChanges = Object.keys(byCatOrder).length > 0;
+
+          const getOrder = (catId) => {
+            if (byCatOrder[catId]) return byCatOrder[catId];
+            return products.filter(p => p.categoryId === catId).map(p => p.id);
+          };
+
+          const handleByCatPublish = async () => {
+            setByCatPublishing(true);
+            try {
+              let { source, sha } = await fetchCatalog(creds);
+              for (const catId of Object.keys(byCatOrder)) {
+                const newOrder = byCatOrder[catId];
+                const catProds = products.filter(p => p.categoryId === catId);
+                const entries = catProds
+                  .map(p => { const r = getEntryRange(source, p.id); return r ? { id: p.id, range: r } : null; })
+                  .filter(Boolean).sort((a, b) => a.range.start - b.range.start);
+                if (!entries.length) continue;
+                const entryTexts = {};
+                for (const e of entries) entryTexts[e.id] = source.slice(e.range.start, e.range.end);
+                const blockStart = entries[0].range.start;
+                const blockEnd = entries[entries.length - 1].range.end;
+                const orderedTexts = newOrder.map(id => entryTexts[id]).filter(Boolean).join("\n");
+                source = source.slice(0, blockStart) + orderedTexts + source.slice(blockEnd);
+              }
+              await commitCatalog(source, sha, `Reorder products by category (${Object.keys(byCatOrder).join(", ")})`, creds);
+              loadCatalogData(source, sha);
+              setByCatOrder({});
+              showToast("Category order published!");
+            } catch (err) { showToast(err.message, "error"); }
+            finally { setByCatPublishing(false); }
+          };
+
+          return (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <h1 style={ts.pageTitle}>By Category</h1>
+                {hasChanges && (
+                  <button style={ts.primaryBtn} onClick={handleByCatPublish} disabled={byCatPublishing}>
+                    {byCatPublishing ? "Publishing..." : `Publish Order`}
+                  </button>
+                )}
+              </div>
+              <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
+                Drag ⠿ to reorder products within each category. Hit Publish Order when done.
+              </p>
+              {categories.map(cat => {
+                const catProds = getOrder(cat.id).map(id => products.find(p => p.id === id)).filter(Boolean);
+                const isOpen = openCats[cat.id];
+                return (
+                  <div key={cat.id} style={{ ...ts.card, marginBottom: 12 }}>
+                    <div
+                      onClick={() => setOpenCats(o => ({ ...o, [cat.id]: !o[cat.id] }))}
+                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}>
+                      <h2 style={{ ...ts.cardTitle, margin: 0 }}>{cat.name}</h2>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        {byCatOrder[cat.id] && <span style={{ fontSize: 11, color: "#c8a96e", fontWeight: 600 }}>● unsaved</span>}
+                        <span style={ts.flag}>{catProds.length} products</span>
+                        <span style={{ fontSize: 12, color: "#aaa" }}>{isOpen ? "▲" : "▼"}</span>
+                      </div>
+                    </div>
+                    {isOpen && (
+                      <div style={{ marginTop: 12, border: "1px solid #f0ede8", borderRadius: 8, overflow: "hidden" }}>
+                        <div style={{ padding: "8px 12px", background: "#faf8f5", fontSize: 11, color: "#999", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                          ⠿ Drag to reorder
+                        </div>
+                        {catProds.map((p) => (
+                          <div key={p.id}
+                            draggable
+                            onDragStart={() => setByCatDragging({ catId: cat.id, productId: p.id })}
+                            onDragOver={e => {
+                              e.preventDefault();
+                              if (!byCatDragging || byCatDragging.catId !== cat.id || byCatDragging.productId === p.id) return;
+                              const cur = getOrder(cat.id);
+                              const newOrder = [...cur];
+                              const posA = newOrder.indexOf(byCatDragging.productId);
+                              const posB = newOrder.indexOf(p.id);
+                              if (posA !== -1 && posB !== -1) {
+                                newOrder.splice(posA, 1);
+                                newOrder.splice(posB, 0, byCatDragging.productId);
+                                setByCatOrder(prev => ({ ...prev, [cat.id]: newOrder }));
+                              }
+                            }}
+                            onDragEnd={() => setByCatDragging(null)}
+                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: byCatDragging?.productId === p.id ? "#f0ede8" : "#fff", cursor: "grab", userSelect: "none", opacity: byCatDragging?.productId === p.id ? 0.5 : 1 }}>
+                            <span style={{ color: "#ccc", fontSize: 18, flexShrink: 0 }}>⠿</span>
+                            <img src={p.images[0]} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, flexShrink: 0, border: "1px solid #eee" }} onError={e => { e.target.style.display = "none"; }} />
+                            <div style={{ flex: 1 }}>
+                              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#222" }}>{p.title}</p>
+                              <p style={{ margin: 0, fontSize: 11, color: "#999" }}>ID {p.id} · ₹{p.price}</p>
+                            </div>
+                            <span style={{ ...ts.flagToggle, background: p.inStock ? "#e8f5e8" : "#feeeed", color: p.inStock ? "#2a7a2a" : "#c00", fontSize: 11, padding: "3px 8px", borderRadius: 5 }}>
+                              {p.inStock ? "In Stock" : "Out"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+
         {activeTab === "occasions" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
