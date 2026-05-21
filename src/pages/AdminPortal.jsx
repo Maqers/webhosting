@@ -397,22 +397,37 @@ function insertProductIntoSource(source, product, id) {
   const catEscaped = catId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const catKeyPattern = `(?:"${catEscaped}"|${catEscaped})`;
 
-  // Non-empty category block — insert before closing ],
-  const blockPattern = new RegExp(`(${catKeyPattern}\\s*:\\s*\\[)([\\s\\S]*?)(\\n  \\],)`, "m");
-  const match = source.match(blockPattern);
-  if (match) {
-    const insertPos = match.index + match[1].length + match[2].length;
-    return source.slice(0, insertPos) + "\n" + entry + source.slice(insertPos);
+  // Find the category key position first
+  const catKeyRe = new RegExp(`${catKeyPattern}\\s*:\\s*\\[`);
+  const catMatch = source.match(catKeyRe);
+  if (!catMatch) throw new Error(`Category block "${catId}" not found in catalog`);
+
+  const blockStart = catMatch.index + catMatch[0].length;
+
+  // Find the closing ], of this category block using brace/bracket counting
+  let depth = 1; // we're already inside the [
+  let i = blockStart;
+  let closingIdx = -1;
+  while (i < source.length) {
+    const ch = source[i];
+    if (ch === '[' || ch === '{') depth++;
+    else if (ch === '}') depth--;
+    else if (ch === ']') {
+      depth--;
+      if (depth === 0) { closingIdx = i; break; }
+    }
+    i++;
+  }
+  if (closingIdx === -1) throw new Error(`Could not find closing ] for category "${catId}"`);
+
+  // Check if block is empty
+  const blockContent = source.slice(blockStart, closingIdx).trim();
+  if (!blockContent) {
+    return source.slice(0, blockStart) + "\n" + entry + "\n  " + source.slice(closingIdx);
   }
 
-  // Empty category block
-  const emptyPattern = new RegExp(`(${catKeyPattern}\\s*:\\s*)(\\[\\s*\\],?)`, "m");
-  const emptyMatch = source.match(emptyPattern);
-  if (emptyMatch) {
-    return source.replace(emptyPattern, `$1[\n${entry}\n  ],`);
-  }
-
-  throw new Error(`Category block "${catId}" not found in catalog`);
+  // Insert new entry before the closing ]
+  return source.slice(0, closingIdx) + ",\n" + entry + "\n  " + source.slice(closingIdx);
 }
 
 function insertCategoryIntoSource(source, cat, order) {
