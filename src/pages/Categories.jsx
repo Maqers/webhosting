@@ -33,11 +33,12 @@ const Categories = () => {
     : allCats.find(c => c.slug === selectedCategory || c.id === selectedCategory)
       || { name: selectedCategory, slug: selectedCategory, id: selectedCategory, emoji: '🎁' }
 
-  const categoryProducts = selectedCategory === 'All'
+  const categoryProducts = (selectedCategory === 'All'
     ? getAllProducts()
     : occasionProductMap[selectedCategory]
       ? getOccasionProducts(getAllProducts, occasionProductMap, selectedCategory)
       : getProductsByCategory(selectedCategory)
+  ).filter(Boolean)
 
   return (
     <div className="categories-page">
