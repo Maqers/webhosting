@@ -525,6 +525,10 @@ export default function AdminPortal() {
   // ── Drag-and-drop reorder state ──────────────────────────────────────────────
   const [draggingId, setDraggingId] = useState(null);
   const [draggingOcc, setDraggingOcc] = useState(null); // { occId, productId }
+  const [byCatDragging, setByCatDragging] = useState(null); // { catId, productId }
+  const [byCatOrder, setByCatOrder] = useState({}); // { catId: [id,...] }
+  const [byCatPublishing, setByCatPublishing] = useState(false);
+  const [openCats, setOpenCats] = useState({});
   const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
   const editFormRef = useRef(null);
 
@@ -1742,11 +1746,6 @@ export default function AdminPortal() {
         {/* ── OCCASIONS ── */}
         {/* ── BY CATEGORY ── */}
         {activeTab === "by-category" && (() => {
-          const [byCatDragging, setByCatDragging] = React.useState(null); // { catId, productId }
-          const [byCatOrder, setByCatOrder] = React.useState({}); // { catId: [id,...] }
-          const [byCatPublishing, setByCatPublishing] = React.useState(false);
-          const [openCats, setOpenCats] = React.useState({});
-
           const hasChanges = Object.keys(byCatOrder).length > 0;
 
           const getOrder = (catId) => {
