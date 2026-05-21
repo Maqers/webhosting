@@ -500,7 +500,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -628,7 +628,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -1208,6 +1208,9 @@ export default function AdminPortal() {
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                       <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
                         onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
+                      <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
+                      <input style={ts.input} placeholder="e.g. 3–5 business days" value={newProduct.delivery_time || ""}
+                        onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
                       <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
                       <select style={ts.input} value={newProduct.sellerId || ""}
                         onChange={e => {
@@ -1297,7 +1300,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", secondaryCategories: [], sellerId: "", sellerCode: "" });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -1339,7 +1342,9 @@ export default function AdminPortal() {
                       ["Description", newProduct.description.replace(/\r?\n/g, " ")],
                       ["Tags", newProduct.tags || "none"],
                       ["Keywords", newProduct.keywords || "none"],
-                      ["Colours", (newProduct.colors||[]).join(", ") || "none"],
+                      ["Colours", (newProduct.colors||[]).map(c => typeof c === "object" ? c.name : c).join(", ") || "none"],
+                      ["Sizes", (newProduct.sizes||[]).join(", ") || "none"],
+                      ["Delivery Time", newProduct.delivery_time || "none"],
                       ["MOQ", newProduct.moq || "none"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => occasionCategories.find(oc => oc.id === o)?.name).filter(Boolean).join(", ") || "None"],
@@ -1547,6 +1552,9 @@ export default function AdminPortal() {
                           <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
+                          <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
+                          <input style={ts.input} placeholder="e.g. 3–5 business days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
+                            onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
                           <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
                           <select style={ts.input} value={editingProduct.sellerId || ""}
                             onChange={e => {
