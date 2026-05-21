@@ -524,6 +524,7 @@ export default function AdminPortal() {
 
   // ── Drag-and-drop reorder state ──────────────────────────────────────────────
   const [draggingId, setDraggingId] = useState(null);
+  const [draggingOcc, setDraggingOcc] = useState(null); // { occId, productId }
   const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
   const editFormRef = useRef(null);
 
@@ -1766,29 +1767,30 @@ export default function AdminPortal() {
                         Display order (drag ↑↓ to reorder)
                       </div>
                       {selectedProducts.map((p, idx) => (
-                        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: "#fff" }}>
+                        <div key={p.id}
+                          draggable
+                          onDragStart={() => setDraggingOcc({ occId: occ.id, productId: p.id })}
+                          onDragOver={e => {
+                            e.preventDefault();
+                            if (!draggingOcc || draggingOcc.occId !== occ.id || draggingOcc.productId === p.id) return;
+                            const newIds = [...currentIds];
+                            const posA = newIds.indexOf(draggingOcc.productId);
+                            const posB = newIds.indexOf(p.id);
+                            if (posA !== -1 && posB !== -1) {
+                              newIds.splice(posA, 1);
+                              newIds.splice(posB, 0, draggingOcc.productId);
+                              setOccasionEdits(e2 => ({ ...e2, [occ.id]: newIds }));
+                            }
+                          }}
+                          onDragEnd={() => setDraggingOcc(null)}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: draggingOcc?.productId === p.id ? "#f0ede8" : "#fff", cursor: "grab", opacity: draggingOcc?.productId === p.id ? 0.5 : 1 }}>
+                          <span style={{ color: "#ccc", fontSize: 16, flexShrink: 0, userSelect: "none" }}>⠿</span>
                           <span style={{ fontSize: 11, color: "#ccc", width: 20, textAlign: "center", flexShrink: 0 }}>{idx + 1}</span>
                           <img src={p.images[0]} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
                           <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{p.title} <span style={{ color: "#bbb" }}>ID {p.id}</span></span>
-                          <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                            <button type="button" disabled={idx === 0}
-                              onClick={() => {
-                                const newIds = [...currentIds];
-                                [newIds[idx - 1], newIds[idx]] = [newIds[idx], newIds[idx - 1]];
-                                setOccasionEdits(e => ({ ...e, [occ.id]: newIds }));
-                              }}
-                              style={{ ...ts.editBtn, padding: "3px 8px", opacity: idx === 0 ? 0.3 : 1 }}>↑</button>
-                            <button type="button" disabled={idx === selectedProducts.length - 1}
-                              onClick={() => {
-                                const newIds = [...currentIds];
-                                [newIds[idx + 1], newIds[idx]] = [newIds[idx], newIds[idx + 1]];
-                                setOccasionEdits(e => ({ ...e, [occ.id]: newIds }));
-                              }}
-                              style={{ ...ts.editBtn, padding: "3px 8px", opacity: idx === selectedProducts.length - 1 ? 0.3 : 1 }}>↓</button>
-                            <button type="button"
-                              onClick={() => toggleOccasionProduct(occ.id, p.id)}
-                              style={{ ...ts.editBtn, padding: "3px 8px", color: "#c00" }}>×</button>
-                          </div>
+                          <button type="button"
+                            onClick={() => toggleOccasionProduct(occ.id, p.id)}
+                            style={{ ...ts.editBtn, padding: "3px 8px", color: "#c00", flexShrink: 0 }}>×</button>
                         </div>
                       ))}
                     </div>
