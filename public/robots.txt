@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Keep internal pages out of search results
+Disallow: /admin
+Disallow: /checkout
+
+Sitemap: https://maqers.in/sitemap.xml
