@@ -5,20 +5,22 @@ const DEFAULT_IMAGE = `${BASE_URL}/images/logo.png`
 const SITE_NAME = 'Maqers'
 const DEFAULT_TITLE = 'Maqers — Curated Handcrafted Gifts from India'
 const DEFAULT_DESCRIPTION =
-  "Discover unique handmade gifts from India's best independent artisans — jewellery, candles, home decor, skincare and more. Curated for every person, every occasion."
+  'Discover unique handmade gifts from India\u2019s best independent artisans \u2014 jewellery, candles, home decor, skincare and more. Curated for every person, every occasion.'
 
 /**
- * SeoHead — drop into any page to set title, description, and Open Graph tags.
+ * SeoHead — drop into any page to set title, description, Open Graph tags,
+ * and optional JSON-LD structured data.
  *
  * Props:
- *   title       string  — page title (will be appended with " | Maqers" if not the home page)
- *   description string  — meta description (keep under 155 chars)
+ *   title       string  — page title (appended with " | Maqers")
+ *   description string  — meta description (auto-truncated to 155 chars)
  *   image       string  — absolute URL for og:image (defaults to logo)
- *   url         string  — canonical URL path, e.g. "/products" (defaults to current path)
+ *   url         string  — canonical URL path, e.g. "/products"
  *   type        string  — og:type, "product" for product pages, "website" elsewhere
  *   price       number  — for product pages, the price in INR
  *   noIndex     bool    — set true for admin/checkout pages
- **/
+ *   jsonLd      object  — JSON-LD schema object, injected as <script type="application/ld+json">
+ */
 export default function SeoHead({
   title,
   description = DEFAULT_DESCRIPTION,
@@ -27,6 +29,7 @@ export default function SeoHead({
   type = 'website',
   price,
   noIndex = false,
+  jsonLd,
 }) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE
   const fullImage = image.startsWith('http') ? image : `${BASE_URL}${image}`
@@ -34,7 +37,7 @@ export default function SeoHead({
 
   // Truncate description to 155 chars for Google
   const safeDescription =
-    description.length > 155 ? description.slice(0, 152).trimEnd() + '…' : description
+    description.length > 155 ? description.slice(0, 152).trimEnd() + '\u2026' : description
 
   return (
     <Helmet>
@@ -60,9 +63,16 @@ export default function SeoHead({
       <meta name="twitter:description" content={safeDescription} />
       <meta name="twitter:image" content={fullImage} />
 
-      {/* Product-specific */}
+      {/* Product price meta (Facebook/Pinterest) */}
       {price && <meta property="product:price:amount" content={price} />}
       {price && <meta property="product:price:currency" content="INR" />}
+
+      {/* JSON-LD structured data */}
+      {jsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd)}
+        </script>
+      )}
     </Helmet>
   )
 }

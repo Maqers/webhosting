@@ -504,6 +504,9 @@ export default function AdminPortal() {
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
+  const [editColorInput, setEditColorInput] = useState("");
+  const [editColorImageIdx, setEditColorImageIdx] = useState(0);
+  const [editSizeInput, setEditSizeInput] = useState("");
   const [productQueue, setProductQueue] = useState([]); // batch add queue
   const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
@@ -542,7 +545,7 @@ export default function AdminPortal() {
   const [sellersLoading, setSellersLoading] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [showAddSeller, setShowAddSeller] = useState(false);
-  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [] });
+  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [], delivery_handled_by: "seller", commission_pct: 10 });
   const [newOwnerInput, setNewOwnerInput] = useState("");
   const [kycFiles, setKycFiles] = useState([]);
   const [kycUploading, setKycUploading] = useState(false);
@@ -947,7 +950,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, address: newSeller.address || "", pincode: newSeller.pincode, notes: newSeller.notes, gst_registered: newSeller.gst_registered || false, gst_number: newSeller.gst_number || "", hsn_codes: newSeller.hsn_codes || [], product_ids: [], kyc_documents: kycPaths };
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, address: newSeller.address || "", pincode: newSeller.pincode, notes: newSeller.notes, gst_registered: newSeller.gst_registered || false, gst_number: newSeller.gst_number || "", hsn_codes: newSeller.hsn_codes || [], delivery_handled_by: newSeller.delivery_handled_by || "seller", commission_pct: Number(newSeller.commission_pct) || 10, product_ids: [], kyc_documents: kycPaths };
       await sbCreateSeller(seller);
       await loadSellers();
       setNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [] });
@@ -969,7 +972,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, gst_registered: editingSeller.gst_registered || false, gst_number: editingSeller.gst_number || "", hsn_codes: editingSeller.hsn_codes || [], kyc_documents: kycPaths });
+      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, gst_registered: editingSeller.gst_registered || false, gst_number: editingSeller.gst_number || "", hsn_codes: editingSeller.hsn_codes || [], delivery_handled_by: editingSeller.delivery_handled_by || "seller", commission_pct: Number(editingSeller.commission_pct) || 10, kyc_documents: kycPaths });
       await loadSellers();
       setEditingSeller(null); setKycFiles([]);
       showToast("Seller updated!");
@@ -1471,6 +1474,7 @@ export default function AdminPortal() {
                         if (sellers.length === 0) loadSellers();
                         setEditingProduct(isEditingThis ? null : { ...p });
                         setEditImageFiles([]);
+                        setEditColorInput(""); setEditColorImageIdx(0); setEditSizeInput("");
                         setShowInlineAddSeller(false);
                         setTimeout(() => editFormRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
                       }}>{isEditingThis ? "Close" : "Edit"}</button>
@@ -1519,18 +1523,27 @@ export default function AdminPortal() {
                           <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional)</span></label>
                           <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
                             <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add a colour"
-                              id="editColorInput"
-                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); e.target.value = ""; } } }} />
+                              value={editColorInput}
+                              onChange={e => setEditColorInput(e.target.value)}
+                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = editColorInput.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: editColorImageIdx }] })); setEditColorInput(""); setEditColorImageIdx(0); } } }} />
+                            <select style={{ ...ts.input, width: 110, marginTop: 0 }} value={editColorImageIdx}
+                              onChange={e => setEditColorImageIdx(Number(e.target.value))}>
+                              {(editingProduct.images.length === 0 ? ["Image 1"] : editingProduct.images).map((_, i) => (
+                                <option key={i} value={i}>Image {i + 1}</option>
+                              ))}
+                            </select>
                             <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                              onClick={() => { const inp = document.getElementById("editColorInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: 0 }] })); inp.value = ""; } }}>+</button>
+                              onClick={() => { const v = editColorInput.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: editColorImageIdx }] })); setEditColorInput(""); setEditColorImageIdx(0); } }}>+</button>
                           </div>
+                          <p style={ts.fieldHint}>Select which image number this colour links to.</p>
                           {(editingProduct.colors||[]).length > 0 && (
                             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
                               {editingProduct.colors.map((c, i) => {
                                 const name = typeof c === "object" ? c.name : c;
+                                const imgIdx = typeof c === "object" ? (c.imageIndex ?? 0) : 0;
                                 return (
                                   <span key={i} style={ts.colorChip}>
-                                    {name}
+                                    {name} → Img {imgIdx + 1}
                                     <button type="button" onClick={() => setEditingProduct(p => ({ ...p, colors: p.colors.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
                                   </span>
                                 );
@@ -1540,10 +1553,11 @@ export default function AdminPortal() {
                           <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
                           <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
                             <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L"
-                              id="editSizeInput"
-                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = e.target.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); e.target.value = ""; } } }} />
+                              value={editSizeInput}
+                              onChange={e => setEditSizeInput(e.target.value)}
+                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = editSizeInput.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } } }} />
                             <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                              onClick={() => { const inp = document.getElementById("editSizeInput"); const v = inp.value.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); inp.value = ""; } }}>+</button>
+                              onClick={() => { const v = editSizeInput.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } }}>+</button>
                           </div>
                           {(editingProduct.sizes||[]).length > 0 && (
                             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
@@ -1602,45 +1616,71 @@ export default function AdminPortal() {
                               </label>
                             ))}
                           </div>
-                          <label style={ts.label}>Images</label>
+                          <label style={ts.label}>Images <span style={ts.labelHint}>(drag to reorder · × to remove)</span></label>
                           {editingProduct.images.length > 0 && (
                             <div style={{ ...ts.thumbGrid, marginBottom: 10 }}>
                               {editingProduct.images.map((src, i) => (
-                                <div key={i} style={ts.thumb}>
+                                <div key={src + i} style={{ ...ts.thumb, cursor: "grab" }}
+                                  draggable
+                                  onDragStart={e => e.dataTransfer.setData("imgIdx", String(i))}
+                                  onDragOver={e => e.preventDefault()}
+                                  onDrop={e => {
+                                    e.preventDefault();
+                                    const from = parseInt(e.dataTransfer.getData("imgIdx"));
+                                    if (from === i) return;
+                                    setEditingProduct(p => {
+                                      const imgs = [...p.images];
+                                      imgs.splice(from, 1);
+                                      imgs.splice(i, 0, src);
+                                      // Update color imageIndex references after reorder
+                                      const colors = (p.colors || []).map(c => {
+                                        if (typeof c !== "object") return c;
+                                        if (c.imageIndex === from) return { ...c, imageIndex: i };
+                                        if (c.imageIndex === i) return { ...c, imageIndex: from };
+                                        return c;
+                                      });
+                                      return { ...p, images: imgs, colors };
+                                    });
+                                  }}>
                                   <img src={src} alt="" style={ts.thumbImg} onError={e => { e.target.style.display = "none"; }} />
                                   {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
                                   <button type="button"
                                     onClick={() => setEditingProduct(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
-                                    style={ts.removeBtn}>x</button>
+                                    style={ts.removeBtn}>×</button>
                                 </div>
                               ))}
                             </div>
                           )}
-                          <div style={ts.editDropzone} onClick={() => editFileInputRef.current?.click()}>
+                          <div style={{ ...ts.editDropzone, marginBottom: 8 }} onClick={() => editFileInputRef.current?.click()}
+                            onDragOver={e => e.preventDefault()}
+                            onDrop={e => { e.preventDefault(); processEditFiles(e.dataTransfer.files); }}>
                             <input ref={editFileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }}
                               onChange={e => processEditFiles(e.target.files)} />
-                            <span style={{ fontSize: 12, color: "#aaa" }}>+ Upload more images</span>
+                            <span style={{ fontSize: 12, color: "#aaa" }}>↑ Drop or click to add images</span>
                           </div>
                           {editImageFiles.length > 0 && (
-                            <div>
-                              <div style={{ ...ts.thumbGrid, margin: "8px 0 6px" }}>
+                            <div style={{ background: "#fffbf3", border: "1px solid #e8d9b8", borderRadius: 8, padding: 10 }}>
+                              <p style={{ margin: "0 0 8px", fontSize: 11, color: "#a07840", fontWeight: 600 }}>
+                                {editImageFiles.length} new image(s) ready — upload to GitHub to add them to the product
+                              </p>
+                              <div style={{ ...ts.thumbGrid, marginBottom: 8 }}>
                                 {editImageFiles.map((img, i) => (
                                   <div key={i} style={ts.thumb}>
                                     <img src={img.preview} alt="" style={ts.thumbImg} />
-                                    <button type="button" onClick={() => setEditImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
+                                    <button type="button" onClick={() => setEditImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>×</button>
                                   </div>
                                 ))}
                               </div>
-                              <button type="button" style={{ ...ts.ghostBtn, padding: "7px 14px", fontSize: 11 }}
+                              <button type="button" style={{ ...ts.primaryBtn, padding: "8px 16px", fontSize: 12, width: "100%" }}
                                 onClick={uploadEditImages} disabled={publishing}>
-                                {publishing ? "Uploading..." : `Upload ${editImageFiles.length} image(s) to GitHub`}
+                                {publishing ? "Uploading to GitHub..." : `Upload ${editImageFiles.length} image(s) to GitHub →`}
                               </button>
                             </div>
                           )}
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                        <button style={ts.ghostBtn} onClick={() => { setEditingProduct(null); setEditImageFiles([]); setShowInlineAddSeller(false); }}>Cancel</button>
+                        <button style={ts.ghostBtn} onClick={() => { setEditingProduct(null); setEditImageFiles([]); setEditColorInput(""); setEditColorImageIdx(0); setEditSizeInput(""); setShowInlineAddSeller(false); }}>Cancel</button>
                         <button style={ts.primaryBtn} onClick={() => { handleStageProductEdit(editingProduct); setShowInlineAddSeller(false); }}>Stage Changes</button>
                       </div>
                     </div>
@@ -2007,6 +2047,23 @@ export default function AdminPortal() {
                     <input style={ts.input} placeholder="e.g. 6702, 9405"
                       value={(newSeller.hsn_codes || []).join(", ")}
                       onChange={e => setNewSeller(s => ({ ...s, hsn_codes: e.target.value.split(",").map(h => h.trim()).filter(Boolean) }))} />
+                    <label style={ts.label}>Delivery Handled By</label>
+                    <div style={{ display: "flex", gap: 12, margin: "4px 0 8px" }}>
+                      {[["seller", "Seller ships"], ["maqers", "Maqers ships"]].map(([val, label]) => (
+                        <label key={val} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 13 }}>
+                          <input type="radio" name="new_delivery" value={val} checked={newSeller.delivery_handled_by === val}
+                            onChange={() => setNewSeller(s => ({ ...s, delivery_handled_by: val }))} />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                    <label style={ts.label}>Commission % <span style={ts.labelHint}>(Maqers fee on each order)</span></label>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                      <input style={{ ...ts.input, width: 100, marginTop: 0 }} type="number" min="0" max="100" step="0.5"
+                        value={newSeller.commission_pct}
+                        onChange={e => setNewSeller(s => ({ ...s, commission_pct: e.target.value }))} />
+                      <span style={{ fontSize: 13, color: "#888" }}>%</span>
+                    </div>
                     <label style={ts.label}>Internal Notes</label>
                     <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} placeholder="Any notes..."
                       value={newSeller.notes} onChange={e => setNewSeller(s => ({ ...s, notes: e.target.value }))} />
@@ -2098,6 +2155,23 @@ export default function AdminPortal() {
                     <input style={ts.input} placeholder="e.g. 6702, 9405"
                       value={(editingSeller.hsn_codes || []).join(", ")}
                       onChange={e => setEditingSeller(s => ({ ...s, hsn_codes: e.target.value.split(",").map(h => h.trim()).filter(Boolean) }))} />
+                    <label style={ts.label}>Delivery Handled By</label>
+                    <div style={{ display: "flex", gap: 12, margin: "4px 0 8px" }}>
+                      {[["seller", "Seller ships"], ["maqers", "Maqers ships"]].map(([val, label]) => (
+                        <label key={val} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 13 }}>
+                          <input type="radio" name="edit_delivery" value={val} checked={(editingSeller.delivery_handled_by || "seller") === val}
+                            onChange={() => setEditingSeller(s => ({ ...s, delivery_handled_by: val }))} />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                    <label style={ts.label}>Commission % <span style={ts.labelHint}>(Maqers fee on each order)</span></label>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                      <input style={{ ...ts.input, width: 100, marginTop: 0 }} type="number" min="0" max="100" step="0.5"
+                        value={editingSeller.commission_pct ?? 10}
+                        onChange={e => setEditingSeller(s => ({ ...s, commission_pct: e.target.value }))} />
+                      <span style={{ fontSize: 13, color: "#888" }}>%</span>
+                    </div>
                     <label style={ts.label}>Internal Notes</label>
                     <textarea style={{ ...ts.input, height: 80, resize: "vertical" }} value={editingSeller.notes || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, notes: e.target.value }))} />
@@ -2197,6 +2271,9 @@ export default function AdminPortal() {
                       </div>
                       {seller.gst_number && <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>GST: {seller.gst_number}</div>}
                       {(seller.hsn_codes||[]).length > 0 && <div style={{ fontSize: 11, color: "#888" }}>HSN: {seller.hsn_codes.join(", ")}</div>}
+                      <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>
+                        🚚 {seller.delivery_handled_by === "maqers" ? "Maqers ships" : "Seller ships"} &nbsp;·&nbsp; Commission: {seller.commission_pct ?? 10}%
+                      </div>
                       {sellerProducts.length > 0 && (
                         <div style={{ marginTop: 8, fontSize: 11, color: "#999", lineHeight: 1.5 }}>
                           {sellerProducts.slice(0, 3).map(p => p.title).join(" · ")}

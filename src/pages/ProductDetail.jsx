@@ -92,6 +92,72 @@ const ProductDetail = () => {
   const currentImage = images[selectedImage]
   const categoryName = product.category || (product.categoryId ? getCategoryByIdOrSlug(product.categoryId)?.name : '') || ''
 
+  // ── JSON-LD Product schema ─────────────────────────────────────────────────
+  const BASE_URL = 'https://maqers.in'
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description,
+    image: images.map(img => img.startsWith('http') ? img : `${BASE_URL}${img}`),
+    sku: String(product.id),
+    brand: {
+      '@type': 'Brand',
+      name: 'Maqers',
+    },
+    ...(categoryName && {
+      category: categoryName,
+    }),
+    ...(product.tags?.length > 0 && {
+      keywords: product.tags.join(', '),
+    }),
+    offers: {
+      '@type': 'Offer',
+      url: `${BASE_URL}/product/${product.id}`,
+      priceCurrency: 'INR',
+      price: product.price,
+      priceValidUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0],
+      availability: product.inStock !== false
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: {
+        '@type': 'Organization',
+        name: 'Maqers',
+        url: BASE_URL,
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: 0,
+          currency: 'INR',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 7,
+            maxValue: 14,
+            unitCode: 'DAY',
+          },
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'IN',
+        },
+      },
+    },
+  }
+
   // ── More from this maker logic ─────────────────────────────────────────────
   const getMoreFromMaker = () => {
     const allProds = getAllProducts().filter(p => p.id !== product.id && p.inStock)
@@ -113,6 +179,7 @@ const ProductDetail = () => {
         url={`/product/${product.id}`}
         type="product"
         price={product.price}
+        jsonLd={productSchema}
       />
       <div className="container">
         <button onClick={handleBack} className="back-button">← Back</button>
