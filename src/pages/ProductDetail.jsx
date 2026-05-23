@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
-import { getProductById, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
+import { getProductById, getProductBySlug, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
 import { getWhatsAppNumber } from '../data/contactInfo'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -9,7 +9,7 @@ import SeoHead from '../components/SeoHead'
 import './ProductDetail.css'
 
 const ProductDetail = () => {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -23,7 +23,9 @@ const ProductDetail = () => {
     }
   };
 
-  const product = getProductById(id)
+  // Support both slug-based URLs (/product/customised-pouch) and
+  // old numeric-id URLs (/product/190) so existing shares don't 404
+  const product = getProductBySlug(slug) || getProductById(slug)
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedColor, setSelectedColor] = useState("")
   const [selectedSize, setSelectedSize] = useState("")
@@ -41,7 +43,7 @@ const ProductDetail = () => {
     addItem(product, selectedColor, selectedSize)
   }
   const handleContactUs = () => {
-    let message = `Hello! I want to buy Product ID: ${id} - ${product.title}.`
+    let message = `Hello! I want to buy ${product.title} — https://maqers.in/product/${product.slug}`
     if (selectedColor) message += ` Colour: ${selectedColor}.`
     if (selectedSize) message += ` Size: ${selectedSize}.`
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -113,7 +115,7 @@ const ProductDetail = () => {
     }),
     offers: {
       '@type': 'Offer',
-      url: `${BASE_URL}/product/${product.id}`,
+      url: `${BASE_URL}/product/${product.slug}`,
       priceCurrency: 'INR',
       price: product.price,
       priceValidUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
@@ -176,7 +178,7 @@ const ProductDetail = () => {
         title={product.title}
         description={product.description}
         image={images[0] || undefined}
-        url={`/product/${product.id}`}
+        url={`/product/${product.slug}`}
         type="product"
         price={product.price}
         jsonLd={productSchema}
@@ -352,7 +354,7 @@ const ProductDetail = () => {
               </h3>
               <div className="more-from-maker-grid">
                 {moreProducts.map(p => (
-                  <a key={p.id} href={`/product/${p.id}`} className="more-from-maker-card">
+                  <a key={p.id} href={`/product/${p.slug}`} className="more-from-maker-card">
                     <div className="more-from-maker-img">
                       {p.images[0] && <img src={p.images[0]} alt={p.title} loading="lazy" />}
                     </div>
