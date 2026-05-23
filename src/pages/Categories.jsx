@@ -171,7 +171,7 @@ const ProductCard = ({ product, index }) => {
       <div className="feat-info-zone">
         <p className="feat-category">{product.category || product.categoryId}</p>
         <h3 className="feat-title">{product.title}</h3>
-        <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
+        <p className="feat-price">{product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? `₹${product.price.toLocaleString("en-IN")} onwards` : `₹${product.price.toLocaleString("en-IN")}`}</p>
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button
             className={`feat-add-btn${addedFeedback ? " added" : ""}`}

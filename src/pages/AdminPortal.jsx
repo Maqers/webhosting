@@ -235,6 +235,20 @@ function parseProducts(source) {
     const p = products.find(p => p.id === id);
     if (p) p.sizes = sizes;
   }
+  // Parse sizePrices (e.g. sizePrices: { "Small": 499, "Large": 699 })
+  const spRegex = /id:\s*(\d+)[\s\S]*?sizePrices:\s*(\{[^}]+\})/g;
+  let sp;
+  while ((sp = spRegex.exec(source)) !== null) {
+    const id = parseInt(sp[1]);
+    const p = products.find(p => p.id === id);
+    if (p) {
+      try {
+        p.sizePrices = JSON.parse(sp[2].replace(/(['"])?([a-zA-Z0-9_ ]+)(['"])?:/g, '"$2":'));
+      } catch {
+        // malformed — skip
+      }
+    }
+  }
   // Parse moq
   const moqRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*moq:\s*(\d+)/g;
   let mq;
@@ -370,6 +384,14 @@ function serializeSizes(sizes) {
   return sizes.map(s => `"${sanitizeForJS(String(s))}"`).join(", ");
 }
 
+function serializeSizePrices(sizePrices) {
+  if (!sizePrices || typeof sizePrices !== "object" || Object.keys(sizePrices).length === 0) return null;
+  const entries = Object.entries(sizePrices)
+    .filter(([, v]) => v !== "" && v !== null && !isNaN(Number(v)))
+    .map(([k, v]) => `"${sanitizeForJS(k)}": ${Number(v)}`);
+  return entries.length > 0 ? `{ ${entries.join(", ")} }` : null;
+}
+
 function buildEntry(id, product) {
   const slug = slugify(product.title);
   const desc = sanitizeForJS(product.description);
@@ -383,12 +405,22 @@ function buildEntry(id, product) {
     : (product.keywords || "").split(",").map(k => `"${sanitizeForJS(k.trim())}"`).filter(k => k !== '""').join(", ");
   const colors = serializeColors(product.colors);
   const sizes = serializeSizes(product.sizes);
+  const sizePricesStr = serializeSizePrices(product.sizePrices);
   const moq = Number(product.moq) || 0;
   const deliveryTime = sanitizeForJS(product.delivery_time || product.meta?.delivery_time || "");
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${Number(product.price)}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}], moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
+
+  // If size-based pricing, auto-set product.price to the minimum size price
+  let basePrice = Number(product.price);
+  if (sizePricesStr && product.sizePrices) {
+    const vals = Object.values(product.sizePrices).map(Number).filter(v => !isNaN(v) && v > 0);
+    if (vals.length > 0) basePrice = Math.min(...vals);
+  }
+
+  const sizePricesPart = sizePricesStr ? `, sizePrices: ${sizePricesStr}` : "";
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -500,7 +532,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -636,7 +668,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -1198,20 +1230,39 @@ export default function AdminPortal() {
                       )}
                       <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
                       <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                        <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L or 6, 8, 10"
+                        <input style={{ ...ts.input, flex: 2, marginTop: 0 }} placeholder="Size name e.g. Small, 6 inch"
                           value={newSizeInput} onChange={e => setNewSizeInput(e.target.value)}
                           onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newSizeInput.trim(); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } } }} />
                         <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
                           onClick={() => { const v = newSizeInput.trim(); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } }}>+</button>
                       </div>
                       {(newProduct.sizes||[]).length > 0 && (
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                        <div style={{ marginTop: 8 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                            <span style={{ fontSize: 12, color: "#888" }}>Set a price per size? If yes, product will show "₹X onwards" on listings.</span>
+                          </div>
                           {newProduct.sizes.map((s, i) => (
-                            <span key={i} style={ts.colorChip}>
-                              {s}
-                              <button type="button" onClick={() => setNewProduct(p => ({ ...p, sizes: p.sizes.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
-                            </span>
+                            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                              <span style={{ ...ts.colorChip, margin: 0, minWidth: 90 }}>{s}</span>
+                              <input
+                                style={{ ...ts.input, width: 110, marginTop: 0 }}
+                                type="number" min="0" placeholder="Price (₹)"
+                                value={(newProduct.sizePrices||{})[s] || ""}
+                                onChange={e => setNewProduct(p => ({
+                                  ...p,
+                                  sizePrices: { ...(p.sizePrices||{}), [s]: e.target.value }
+                                }))} />
+                              <button type="button" onClick={() => setNewProduct(p => {
+                                const sizes = p.sizes.filter((_,j)=>j!==i);
+                                const sp = { ...(p.sizePrices||{}) };
+                                delete sp[s];
+                                return { ...p, sizes, sizePrices: sp };
+                              })} style={{ ...ts.colorChipX, fontSize: 16, padding: "0 6px", lineHeight: 1 }}>×</button>
+                            </div>
                           ))}
+                          {Object.values(newProduct.sizePrices||{}).some(v => v !== "") && (
+                            <p style={ts.fieldHint}>Min price: ₹{Math.min(...Object.values(newProduct.sizePrices||{}).filter(v=>v!=="").map(Number))} — this will be auto-set as the product price.</p>
+                          )}
                         </div>
                       )}
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
@@ -1309,7 +1360,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -1552,7 +1603,7 @@ export default function AdminPortal() {
                           )}
                           <label style={ts.label}>Size Options <span style={ts.labelHint}>(optional)</span></label>
                           <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                            <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. S, M, L"
+                            <input style={{ ...ts.input, flex: 2, marginTop: 0 }} placeholder="Size name e.g. Small, 6 inch"
                               value={editSizeInput}
                               onChange={e => setEditSizeInput(e.target.value)}
                               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = editSizeInput.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } } }} />
@@ -1560,13 +1611,32 @@ export default function AdminPortal() {
                               onClick={() => { const v = editSizeInput.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } }}>+</button>
                           </div>
                           {(editingProduct.sizes||[]).length > 0 && (
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                            <div style={{ marginTop: 8 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                                <span style={{ fontSize: 12, color: "#888" }}>Set a price per size? If yes, product will show "₹X onwards" on listings.</span>
+                              </div>
                               {editingProduct.sizes.map((s, i) => (
-                                <span key={i} style={ts.colorChip}>
-                                  {s}
-                                  <button type="button" onClick={() => setEditingProduct(p => ({ ...p, sizes: p.sizes.filter((_,j)=>j!==i) }))} style={ts.colorChipX}>×</button>
-                                </span>
+                                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                                  <span style={{ ...ts.colorChip, margin: 0, minWidth: 90 }}>{s}</span>
+                                  <input
+                                    style={{ ...ts.input, width: 110, marginTop: 0 }}
+                                    type="number" min="0" placeholder="Price (₹)"
+                                    value={(editingProduct.sizePrices||{})[s] || ""}
+                                    onChange={e => setEditingProduct(p => ({
+                                      ...p,
+                                      sizePrices: { ...(p.sizePrices||{}), [s]: e.target.value }
+                                    }))} />
+                                  <button type="button" onClick={() => setEditingProduct(p => {
+                                    const sizes = p.sizes.filter((_,j)=>j!==i);
+                                    const sp = { ...(p.sizePrices||{}) };
+                                    delete sp[s];
+                                    return { ...p, sizes, sizePrices: sp };
+                                  })} style={{ ...ts.colorChipX, fontSize: 16, padding: "0 6px", lineHeight: 1 }}>×</button>
+                                </div>
                               ))}
+                              {Object.values(editingProduct.sizePrices||{}).some(v => v !== "") && (
+                                <p style={ts.fieldHint}>Min price: ₹{Math.min(...Object.values(editingProduct.sizePrices||{}).filter(v=>v!=="").map(Number))} — will be auto-set as the product price.</p>
+                              )}
                             </div>
                           )}
                           <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>

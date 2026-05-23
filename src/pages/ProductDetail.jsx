@@ -264,7 +264,16 @@ const ProductDetail = () => {
 
             <div className="price-section">
               <span className="price-label">Price:</span>
-              <span className="product-detail-price">₹{product.price}</span>
+              {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
+                <span className="product-detail-price">
+                  {selectedSize && product.meta.sizePrices[selectedSize]
+                    ? `₹${Number(product.meta.sizePrices[selectedSize]).toLocaleString("en-IN")}`
+                    : `₹${product.price.toLocaleString("en-IN")} onwards`
+                  }
+                </span>
+              ) : (
+                <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
+              )}
               <p className="delivery-info">Delivery: 7-14 business days</p>
             </div>
 
@@ -296,16 +305,21 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Size dropdown */}
+            {/* Size dropdown — shows per-size price if available */}
             {product.meta?.sizes && product.meta.sizes.length > 0 && (
               <div className="product-colors">
                 <label className="colors-label" htmlFor="size-select">Select Size:</label>
                 <select id="size-select" className="colors-select" value={selectedSize}
                   onChange={e => setSelectedSize(e.target.value)}>
                   <option value="">— Choose a size —</option>
-                  {product.meta.sizes.map((s, i) => (
-                    <option key={i} value={s}>{s}</option>
-                  ))}
+                  {product.meta.sizes.map((s, i) => {
+                    const sizePrice = product.meta.sizePrices?.[s];
+                    return (
+                      <option key={i} value={s}>
+                        {s}{sizePrice ? ` — ₹${Number(sizePrice).toLocaleString("en-IN")}` : ""}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}
