@@ -1,368 +1,255 @@
-import { useState, useRef, useCallback } from 'react'
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
-import { getProductById, getProductBySlug, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
-import { getWhatsAppNumber } from '../data/contactInfo'
+import { useState, useMemo, useEffect, memo, useCallback } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
+import { searchAll } from '../utils/search'
+import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
+import ProductSort from '../components/ProductSort'
+import ImageWithFallback from '../components/ImageWithFallback'
+import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
-import ImageWithFallback from '../components/ImageWithFallback'
 import SeoHead from '../components/SeoHead'
-import './ProductDetail.css'
+import './Products.css'
 
-const ProductDetail = () => {
-  const { slug } = useParams()
-  const navigate = useNavigate()
+let cachedCategories = null
+let cachedCategoryMap = null
+
+const getCachedCategories = () => {
+  if (!cachedCategories) cachedCategories = getSortedCategories()
+  return cachedCategories
+}
+
+const getCachedCategoryMap = () => {
+  if (!cachedCategoryMap) {
+    const cats = getCachedCategories()
+    cachedCategoryMap = new Map(cats.map(cat => [cat.id, cat]))
+    // also index by name for legacy lookups
+    cats.forEach(cat => {
+      if (!cachedCategoryMap.has(cat.name)) cachedCategoryMap.set(cat.name, cat)
+    })
+  }
+  return cachedCategoryMap
+}
+
+const Products = () => {
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedCategories, setSelectedCategories] = useState([])
 
-  const handleBack = () => {
-    if (location.state?.from) {
-      navigate(location.state.from);
-    } else if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/products");
+  const sortBy = searchParams.get('sort') || DEFAULT_SORT
+  const searchQuery = location.state?.searchQuery
+  const searchResults = location.state?.searchResults
+
+  const categories = useMemo(() => getCachedCategories(), [])
+  const categoryMap = useMemo(() => getCachedCategoryMap(), [])
+
+  const searchResultsData = useMemo(() => {
+    if (searchQuery && searchQuery.trim().length >= 1) {
+      return searchAll(searchQuery, { productLimit: 50, categoryLimit: 10 })
     }
-  };
+    return null
+  }, [searchQuery])
 
-  // Support both slug-based URLs (/product/customised-pouch) and
-  // old numeric-id URLs (/product/190) so existing shares don't 404
-  const product = getProductBySlug(slug) || getProductById(slug)
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [selectedColor, setSelectedColor] = useState("")
-  const [selectedSize, setSelectedSize] = useState("")
-  const [lensVisible, setLensVisible] = useState(false)
-  const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
-  const imageWrapRef = useRef(null)
-  const imgRef = useRef(null)
+  const relevanceScores = useMemo(() => {
+    return extractRelevanceScores(searchResultsData || searchResults)
+  }, [searchResultsData, searchResults])
 
-  const whatsappNumber = getWhatsAppNumber()
-  const { addItem } = useCart()
-  const { toggleItem, isWishlisted } = useWishlist()
-  const wishlisted = isWishlisted(product?.id)
+  const filteredProducts = useMemo(() => {
+    const hasSearch = searchQuery && searchQuery.trim().length >= 1
 
-  const handleAddToCart = () => {
-    addItem(product, selectedColor, selectedSize)
-  }
-  const handleContactUs = () => {
-    let message = `Hello! I want to buy ${product.title} — https://maqers.in/product/${product.slug}`
-    if (selectedColor) message += ` Colour: ${selectedColor}.`
-    if (selectedSize) message += ` Size: ${selectedSize}.`
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank')
-  }
+    let filtered = hasSearch
+      ? (searchResultsData?.products ?? searchResults?.products ?? [])
+      : (searchResultsData?.products ?? searchResults?.products ?? getAllProducts())
 
-  const images = product?.images || []
-  const hasMultiple = images.length > 1
-  const goPrev = () => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1))
-  const goNext = () => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1))
+    if (selectedCategories.length > 0) {
+      const occasionSelected = selectedCategories.filter(id => occasionProductMap[id])
+      const sourceSelected = selectedCategories.filter(id => !occasionProductMap[id])
 
-  const LENS_SIZE = 120
-  const ZOOM = 2
-  const handleMouseMove = useCallback(
-    (e) => {
-      if (!imageWrapRef.current || !images[selectedImage]) return
-      const rect = imageWrapRef.current.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-        setLensVisible(true)
-        const bgX = LENS_SIZE / 2 - x * ZOOM
-        const bgY = LENS_SIZE / 2 - y * ZOOM
-        setLensPos({ x, y, bgX, bgY, w: rect.width, h: rect.height })
-      } else {
-        setLensVisible(false)
-      }
-    },
-    [selectedImage, images]
-  )
-  const handleMouseLeave = useCallback(() => setLensVisible(false), [])
+      const occasionIds = new Set(
+        occasionSelected.flatMap(id => occasionProductMap[id] || [])
+      )
+      const sourceSet = new Set(sourceSelected)
 
-  if (!product) {
-    return (
-      <div className="product-not-found">
+      filtered = filtered.filter(product => {
+        if (occasionSelected.length > 0 && occasionIds.has(product.id)) return true;
+        if (sourceSelected.length > 0 && sourceSet.has(product.categoryId)) return true;
+        if (sourceSelected.length > 0 && product.meta?.secondaryCategories?.some(c => sourceSet.has(c))) return true;
+        return false;
+      });
+    }
+
+    filtered = sortProducts(filtered, sortBy, {
+      searchQuery: searchQuery || null,
+      relevanceScores
+    })
+
+    return filtered
+  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
+
+  const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
+
+  const handleCategoryToggle = useCallback((categoryId) => {
+    setSelectedCategories(prev => {
+      if (categoryId === 'All') return []
+      if (prev.includes(categoryId)) return prev.filter(id => id !== categoryId)
+      return [...prev, categoryId]
+    })
+    const newParams = new URLSearchParams(searchParams)
+    newParams.delete('page')
+    setSearchParams(newParams, { replace: true })
+  }, [searchParams, setSearchParams])
+
+  const handleClearAll = useCallback(() => {
+    setSelectedCategories([])
+    const newParams = new URLSearchParams(searchParams)
+    newParams.delete('page')
+    setSearchParams(newParams, { replace: true })
+  }, [searchParams, setSearchParams])
+
+  // Restore category filter from URL param (e.g. when navigating back from product detail)
+  useEffect(() => {
+    const cat = searchParams.get('category')
+    if (cat) {
+      setSelectedCategories([cat])
+      // Remove from URL so filter chip shows correctly
+      setSearchParams(prev => { const next = new URLSearchParams(prev); next.delete('category'); return next }, { replace: true })
+    }
+  }, []) // eslint-disable-line
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const productsGrid = document.querySelector('.products-grid')
+      if (productsGrid) void productsGrid.offsetHeight
+      document.querySelectorAll('.feat-card').forEach(card => {
+        card.style.visibility = 'visible'
+        card.style.opacity = '1'
+      })
+    })
+  }, [sortBy, selectedCategories.length, filteredProducts.length])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      sessionStorage.setItem('productsScrollY', window.scrollY)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem('productsScrollY')
+    if (saved) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+        sessionStorage.removeItem('productsScrollY')
+      })
+    }
+  }, [])
+
+  const seoTitle = searchQuery
+    ? `Results for "${searchQuery}"`
+    : selectedCategories.length === 1
+      ? `${getCachedCategoryMap().get(selectedCategories[0])?.name || selectedCategories[0]} Gifts`
+      : 'All Handcrafted Gifts'
+  const seoDescription = searchQuery
+    ? `Showing handmade gift results for "${searchQuery}" from India's finest independent artisans.`
+    : "Browse 190+ handpicked handmade gifts from India's best independent artisans — jewellery, candles, home decor, skincare, hampers and more."
+
+  return (
+    <div className="products-page">
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        url="/products"
+      />
+      <div className="products-hero">
         <div className="container">
-          <h2>Product not found</h2>
-          <p>The product you're looking for doesn't exist or has been removed.</p>
-          <div className="product-not-found-actions">
-            <Link to="/products" className="back-link">Browse All Products</Link>
-            <Link to="/" className="back-link secondary">Back to Home</Link>
+          <h1 className="products-title">Our Custom Collection</h1>
+          <p className="products-subtitle">Discover unique, handcrafted gifts from Indian home businesses</p>
+        </div>
+      </div>
+
+      <div className="products-filters-section">
+        <div className="container">
+          <div className="filters-wrapper">
+            <div className="category-filters">
+              <button
+                className={`filter-chip ${selectedCategories.length === 0 ? 'active' : ''}`}
+                onClick={handleClearAll}
+                aria-label="Show all products"
+                type="button"
+              >
+                All Products
+                {selectedCategories.length > 0 && (
+                  <span className="filter-count">({selectedCategories.length} selected)</span>
+                )}
+              </button>
+              {categories.map((category) => {
+                const isSelected = selectedCategories.includes(category.id)
+                return (
+                  <button
+                    key={category.id}
+                    className={`filter-chip ${isSelected ? 'active' : ''}`}
+                    onClick={() => handleCategoryToggle(category.id)}
+                    aria-label={`${isSelected ? 'Deselect' : 'Select'} ${category.name}`}
+                    aria-pressed={isSelected}
+                    type="button"
+                  >
+                    <span>{category.emoji} {category.name}</span>
+                    {isSelected && (
+                      <svg className="check-icon" width="16" height="16" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            <ProductSort onSortChange={() => { }} />
           </div>
         </div>
       </div>
-    )
-  }
 
-  const currentImage = images[selectedImage]
-  const categoryName = product.category || (product.categoryId ? getCategoryByIdOrSlug(product.categoryId)?.name : '') || ''
+      <div className="products-content">
+        <div className="container">
+          {(searchQuery || searchResults) && (
+            <div className="search-results-header">
+              <h2>{searchQuery ? `Search Results for "${searchQuery}"` : 'Search Results'}</h2>
+              <p>{filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found</p>
+            </div>
+          )}
 
-  // ── JSON-LD Product schema ─────────────────────────────────────────────────
-  const BASE_URL = 'https://maqers.in'
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.title,
-    description: product.description,
-    image: images.map(img => img.startsWith('http') ? img : `${BASE_URL}${img}`),
-    sku: String(product.id),
-    brand: {
-      '@type': 'Brand',
-      name: 'Maqers',
-    },
-    ...(categoryName && {
-      category: categoryName,
-    }),
-    ...(product.tags?.length > 0 && {
-      keywords: product.tags.join(', '),
-    }),
-    offers: {
-      '@type': 'Offer',
-      url: `${BASE_URL}/product/${product.slug}`,
-      priceCurrency: 'INR',
-      price: product.price,
-      priceValidUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split('T')[0],
-      availability: product.inStock !== false
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      itemCondition: 'https://schema.org/NewCondition',
-      seller: {
-        '@type': 'Organization',
-        name: 'Maqers',
-        url: BASE_URL,
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: 0,
-          currency: 'INR',
-        },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 1,
-            maxValue: 3,
-            unitCode: 'DAY',
-          },
-          transitTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 7,
-            maxValue: 14,
-            unitCode: 'DAY',
-          },
-        },
-        shippingDestination: {
-          '@type': 'DefinedRegion',
-          addressCountry: 'IN',
-        },
-      },
-    },
-  }
-
-  // ── More from this maker logic ─────────────────────────────────────────────
-  const getMoreFromMaker = () => {
-    const allProds = getAllProducts().filter(p => p.id !== product.id && p.inStock)
-    const sellerCode = product.meta?.sellerCode
-    if (sellerCode) {
-      const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode)
-      if (fromSeller.length > 0) return { products: fromSeller, sellerCode }
-    }
-    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6), sellerCode: null }
-  }
-  const { products: moreProducts, sellerCode: makerCode } = getMoreFromMaker()
-
-  return (
-    <div className="product-detail">
-      <SeoHead
-        title={product.title}
-        description={product.description}
-        image={images[0] || undefined}
-        url={`/product/${product.slug}`}
-        type="product"
-        price={product.price}
-        jsonLd={productSchema}
-      />
-      <div className="container">
-        <button onClick={handleBack} className="back-button">← Back</button>
-
-        <div className="product-detail-content">
-          {/* Left: Image slider */}
-          <div className="product-images-section">
-            <div
-              ref={imageWrapRef}
-              className="main-image-wrap"
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            >
-              <div className="main-image-container">
-                <ImageWithFallback
-                  ref={imgRef}
-                  src={currentImage}
-                  alt={product.title}
-                  className="main-image"
-                  priority
-                  loading="eager"
+          {showSkeletons ? (
+            <div className="products-grid">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <ProductSkeleton key={`skeleton-${index}`} />
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="products-grid">
+              {filteredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  index={index}
+                  categoryMap={categoryMap}
+                  priority={index < 12}
+                  selectedCategories={selectedCategories}
                 />
-              </div>
-              {hasMultiple && (
-                <>
-                  <button type="button" className="slider-btn slider-prev" onClick={goPrev} aria-label="Previous image">‹</button>
-                  <button type="button" className="slider-btn slider-next" onClick={goNext} aria-label="Next image">›</button>
-                </>
-              )}
-              {lensVisible && currentImage && lensPos.w != null && (
-                <div
-                  className="zoom-lens"
-                  style={{
-                    left: lensPos.x,
-                    top: lensPos.y,
-                    backgroundImage: `url(${currentImage})`,
-                    backgroundSize: `${lensPos.w * ZOOM}px ${lensPos.h * ZOOM}px`,
-                    backgroundPosition: `${lensPos.bgX ?? 0}px ${lensPos.bgY ?? 0}px`,
-                  }}
-                  aria-hidden
-                />
-              )}
+              ))}
             </div>
-            {hasMultiple && (
-              <div className="thumbnail-images">
-                {images.map((src, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                    onClick={() => setSelectedImage(index)}
-                    aria-label={`View image ${index + 1}`}
-                  >
-                    <ImageWithFallback src={src} alt={`${product.title} ${index + 1}`} loading={index < 4 ? 'eager' : 'lazy'} />
-                  </button>
-                ))}
+          ) : (
+            <div className="no-results">
+              <div className="no-results-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="64" height="64">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                  <line x1="11" y1="8" x2="11" y2="14" />
+                  <line x1="8" y1="11" x2="14" y2="11" />
+                </svg>
               </div>
-            )}
-          </div>
-
-          {/* Right: Product info */}
-          <div className="product-info-section">
-            {categoryName && <span className="product-category-badge">{categoryName}</span>}
-
-            {/* Also in */}
-            {product.meta?.secondaryCategories && product.meta.secondaryCategories.length > 0 && (
-              <p className="product-also-in">
-                Also in:{" "}
-                {product.meta.secondaryCategories.map((catId, i) => {
-                  const cat = getCategoryByIdOrSlug(catId)
-                  return cat ? <span key={i} className="product-also-in-tag">{cat.name}</span> : null
-                })}
-              </p>
-            )}
-
-            {product.popular && <span className="popular-tag">Popular</span>}
-            <h1 className="product-detail-title">{product.title}</h1>
-            <p className="product-detail-id">Product ID: {product.id}</p>
-            <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: product.description.split('\\n').join('<br/>') }} />
-
-            <div className="price-section">
-              <span className="price-label">Price:</span>
-              <span className="product-detail-price">₹{product.price}</span>
-              <p className="delivery-info">Delivery: 7-14 business days</p>
-            </div>
-
-            {/* MOQ */}
-            {product.meta?.moq > 0 && (
-              <p className="product-moq">Minimum Order Quantity: <strong>{product.meta.moq} units</strong></p>
-            )}
-
-            {/* Colour dropdown — switches image */}
-            {product.meta?.colors && product.meta.colors.length > 0 && (
-              <div className="product-colors">
-                <label className="colors-label" htmlFor="color-select">Select Colour:</label>
-                <select id="color-select" className="colors-select" value={selectedColor}
-                  onChange={e => {
-                    setSelectedColor(e.target.value);
-                    const found = product.meta.colors.find(c =>
-                      (typeof c === "object" ? c.name : c) === e.target.value
-                    );
-                    if (found && typeof found === "object" && found.imageIndex != null) {
-                      setSelectedImage(found.imageIndex);
-                    }
-                  }}>
-                  <option value="">— Choose a colour —</option>
-                  {product.meta.colors.map((c, i) => {
-                    const name = typeof c === "object" ? c.name : c;
-                    return <option key={i} value={name}>{name}</option>;
-                  })}
-                </select>
-              </div>
-            )}
-
-            {/* Size dropdown */}
-            {product.meta?.sizes && product.meta.sizes.length > 0 && (
-              <div className="product-colors">
-                <label className="colors-label" htmlFor="size-select">Select Size:</label>
-                <select id="size-select" className="colors-select" value={selectedSize}
-                  onChange={e => setSelectedSize(e.target.value)}>
-                  <option value="">— Choose a size —</option>
-                  {product.meta.sizes.map((s, i) => (
-                    <option key={i} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div className="product-actions">
-              <div className="product-action-buttons">
-                {product.inStock === false ? (
-                  <>
-                    <button type="button" className="add-to-cart-button out-of-stock-button" disabled>
-                      Out of Stock
-                    </button>
-                    <p className="out-of-stock-note">This item is currently unavailable. Check back soon.</p>
-                  </>
-                ) : (
-                  <button type="button" onClick={handleAddToCart} className="add-to-cart-button">
-                    Add to Cart
-                  </button>
-                )}
-                <button type="button" onClick={() => toggleItem(product)} className={`add-to-wishlist-button ${wishlisted ? 'wishlisted' : ''}`}>
-                  {wishlisted ? '♥ Wishlisted' : '♡ Wishlist'}
-                </button>
-              </div>
-            </div>
-
-            <div className="product-features">
-              <h3>Product Features</h3>
-              <ul>
-                <li>Premium quality materials</li>
-                <li>Handcrafted with attention to detail</li>
-                <li>Elegant royal design</li>
-                <li>Perfect for gifting</li>
-                <li>Authentic Indian home businesses & small businesses</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* More from this maker — spans full width */}
-          {moreProducts.length > 0 && (
-            <div className="more-from-maker">
-              <h3 className="more-from-maker-title">
-                {makerCode ? (
-                  <a href={`/maker/${makerCode}`} className="more-from-maker-link">
-                    More from this maker →
-                  </a>
-                ) : "You'd also love →"}
-              </h3>
-              <div className="more-from-maker-grid">
-                {moreProducts.map(p => (
-                  <a key={p.id} href={`/product/${p.slug}`} className="more-from-maker-card">
-                    <div className="more-from-maker-img">
-                      {p.images[0] && <img src={p.images[0]} alt={p.title} loading="lazy" />}
-                    </div>
-                    <p className="more-from-maker-name">{p.title}</p>
-                    <p className="more-from-maker-price">₹{p.price}</p>
-                  </a>
-                ))}
-              </div>
+              <h3>No products found</h3>
+              <p>Try adjusting your filters or search terms</p>
             </div>
           )}
         </div>
@@ -371,4 +258,114 @@ const ProductDetail = () => {
   )
 }
 
-export default ProductDetail
+const ProductCard = ({ product, index, categoryMap, priority = false, selectedCategories = [] }) => {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { addItem } = useCart()
+  const { toggleItem, isWishlisted } = useWishlist()
+  const wishlisted = isWishlisted(product.id)
+  const [addedFeedback, setAddedFeedback] = useState(false)
+
+  const categoryName = useMemo(() => {
+    // Always look up by categoryId first — this returns the display name (e.g. "Handmade Florals" not "Crochet")
+    const byId = categoryMap.get(product.categoryId)
+    if (byId) return byId.name
+    // Fallback: try the denormalised product.category string (may be stale)
+    const byName = categoryMap.get(product.category)
+    if (byName) return byName.name
+    return 'Handmade Gift'
+  }, [product.categoryId, product.category, categoryMap])
+
+  const handleAddToCart = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addItem(product)
+    setAddedFeedback(true)
+    setTimeout(() => setAddedFeedback(false), 1400)
+  }, [product, addItem])
+
+  const handleWishlist = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleItem(product)
+  }, [product, toggleItem])
+
+  const handleCardClick = useCallback(() => {
+    // Build the return URL including any active category filter
+    const params = selectedCategories.length > 0
+      ? `?category=${selectedCategories[0]}`
+      : location.search
+    navigate(`/product/${product.slug}`, { state: { from: location.pathname + params } })
+  }, [product.id, navigate, location, selectedCategories])
+
+  return (
+    <article
+      className="feat-card"
+      style={{ "--i": index % 12, ...(product.inStock === false ? { opacity: 0.45, filter: 'grayscale(80%)' } : {}) }}
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
+      aria-label={product.title}
+    >
+      <div className="feat-img-zone">
+        <ImageWithFallback
+          src={product.images[0]}
+          alt={product.title}
+          className="feat-img"
+          loading={priority ? "eager" : "lazy"}
+          priority={priority}
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        />
+        {product.popular && <span className="feat-badge-popular">Popular</span>}
+        {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
+        <button
+          className={`feat-wishlist-btn${wishlisted ? " active" : ""}`}
+          onClick={handleWishlist}
+          aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          type="button"
+        >
+          <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div className="feat-info-zone">
+        <p className="feat-category">{categoryName}</p>
+        <h3 className="feat-title">{product.title}</h3>
+        <p className="feat-price">₹{product.price.toLocaleString("en-IN")}</p>
+
+        <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
+          <button
+            className={`feat-add-btn${addedFeedback ? " added" : ""}`}
+            onClick={product.inStock === false ? undefined : handleAddToCart}
+            type="button"
+            aria-label="Add to cart"
+            disabled={product.inStock === false}
+            style={product.inStock === false ? { background: '#aaa', cursor: 'not-allowed', pointerEvents: 'none' } : {}}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {product.inStock === false ? "Out of Stock" : addedFeedback ? "Added!" : "Add to Cart"}
+          </button>
+          <button
+            className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`}
+            onClick={handleWishlist}
+            type="button"
+            aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}
+          >
+            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {wishlisted ? "Saved" : "Wishlist"}
+          </button>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export default Products
