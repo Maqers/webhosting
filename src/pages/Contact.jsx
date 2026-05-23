@@ -3,6 +3,7 @@ import { copyToClipboard } from '../utils/clipboard'
 import Toast from '../components/Toast'
 import PhoneCard from '../components/PhoneCard'
 import { getAllPhones, getWhatsAppNumber, getEmail, getInstagramUsername } from '../data/contactInfo'
+import SeoHead from '../components/SeoHead'
 import './Contact.css'
 
 const Contact = () => {
@@ -28,6 +29,11 @@ const Contact = () => {
 
   return (
     <div className="contact-page">
+      <SeoHead
+        title="Contact Maqers"
+        description="Get in touch with Maqers for orders, corporate gifting enquiries, seller onboarding, or any questions. We're on WhatsApp and Instagram."
+        url="/contact"
+      />
       <div className="contact-hero">
         <div className="hero-overlay"></div>
         <div className="container">

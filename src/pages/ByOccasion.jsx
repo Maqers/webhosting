@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom'
 import { occasionCategories } from '../data/occasionCatalog'
 import { occasionProductMap } from '../data/catalog'
+import SeoHead from '../components/SeoHead'
 import './ByOccasion.css'
 
 export default function ByOccasion() {
   return (
     <div className="by-page">
+      <SeoHead
+        title="Shop Gifts by Occasion"
+        description="Find the perfect handmade gift by occasion — birthdays, weddings, anniversaries, Diwali and more. Curated from India's finest artisans."
+        url="/by-occasion"
+      />
       <div className="by-page-header">
         <h1>Shop by Occasion</h1>
         <p>Who are you gifting?</p>

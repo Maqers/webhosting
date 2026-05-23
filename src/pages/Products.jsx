@@ -8,6 +8,7 @@ import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
+import SeoHead from '../components/SeoHead'
 import './Products.css'
 
 let cachedCategories = null
@@ -144,8 +145,22 @@ const Products = () => {
     }
   }, [])
 
+  const seoTitle = searchQuery
+    ? `Results for "${searchQuery}"`
+    : selectedCategories.length === 1
+      ? `${getCachedCategoryMap().get(selectedCategories[0])?.name || selectedCategories[0]} Gifts`
+      : 'All Handcrafted Gifts'
+  const seoDescription = searchQuery
+    ? `Showing handmade gift results for "${searchQuery}" from India's finest independent artisans.`
+    : 'Browse 190+ handpicked handmade gifts from India\'s best independent artisans — jewellery, candles, home decor, skincare, hampers and more.'
+
   return (
     <div className="products-page">
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        url="/products"
+      />
       <div className="products-hero">
         <div className="container">
           <h1 className="products-title">Our Custom Collection</h1>

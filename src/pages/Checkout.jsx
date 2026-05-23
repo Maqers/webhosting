@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
+import SeoHead from '../components/SeoHead'
 import './Checkout.css'
 
 const UPI_ID = '9650800399@pthdfc'
@@ -238,6 +239,7 @@ export default function Checkout() {
 
   return (
     <div className="checkout-page">
+      <SeoHead title="Checkout" noIndex={true} />
       <div className="checkout-container">
         <div className="checkout-header">
           <h1 className="checkout-title">Checkout</h1>

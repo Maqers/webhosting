@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import SeoHead from '../components/SeoHead'
 import './AboutUs.css'
 
 const AboutUs = () => {
@@ -13,6 +14,11 @@ const AboutUs = () => {
 
   return (
     <div className="about-us">
+      <SeoHead
+        title="About Maqers — India's Curated Handmade Gifting Platform"
+        description="Maqers connects gift buyers with India's finest independent artisans. Discover the story behind India's most thoughtful gifting destination."
+        url="/about"
+      />
       <div className="about-hero">
         <div className="hero-overlay"></div>
         <div className="container">

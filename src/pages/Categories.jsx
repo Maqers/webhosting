@@ -5,6 +5,7 @@ import { occasionCategories, getOccasionProducts } from '../data/occasionCatalog
 import ImageWithFallback from '../components/ImageWithFallback'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
+import SeoHead from '../components/SeoHead'
 import './Categories.css'
 
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
@@ -40,8 +41,20 @@ const Categories = () => {
       : getProductsByCategory(selectedCategory)
   ).filter(Boolean)
 
+  const seoTitle = selectedCategoryObj
+    ? `${selectedCategoryObj.name} — Handmade Gifts`
+    : 'Shop All Collections'
+  const seoDescription = selectedCategoryObj
+    ? `Browse handpicked ${selectedCategoryObj.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`
+    : 'Browse curated handmade gift collections from India\'s best independent artisans — by occasion or by product type.'
+
   return (
     <div className="categories-page">
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        url={selectedCategory !== 'All' ? `/category/${selectedCategory}` : '/categories'}
+      />
       {selectedCategory === 'All' && (
         <div className="categories-hero">
           <div className="container">

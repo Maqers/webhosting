@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { getSortedCategories, getCategoryProductCount } from '../data/catalog'
+import SeoHead from '../components/SeoHead'
 import './ByOccasion.css'
 
 export default function ByProduct() {
@@ -7,6 +8,11 @@ export default function ByProduct() {
 
   return (
     <div className="by-page">
+      <SeoHead
+        title="Shop Gifts by Category"
+        description="Browse handcrafted gifts by category — jewellery, candles, home decor, soaps, hampers and more. All from independent Indian artisans."
+        url="/by-product"
+      />
       <div className="by-page-header">
         <h1>Shop by Category</h1>
         <p>Browse by what you're looking for</p>

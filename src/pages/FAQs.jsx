@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import SeoHead from '../components/SeoHead'
 import './FAQs.css'
 
 const FAQs = () => {
@@ -71,6 +72,11 @@ const FAQs = () => {
 
   return (
     <div className="faqs">
+      <SeoHead
+        title="FAQs — Orders, Shipping & Payments"
+        description="Common questions about ordering on Maqers — how to pay, delivery timelines, customisation options, and returns."
+        url="/faqs"
+      />
       <div className="faqs-hero">
         <div className="hero-overlay"></div>
         <div className="container">

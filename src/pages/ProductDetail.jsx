@@ -5,6 +5,7 @@ import { getWhatsAppNumber } from '../data/contactInfo'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import ImageWithFallback from '../components/ImageWithFallback'
+import SeoHead from '../components/SeoHead'
 import './ProductDetail.css'
 
 const ProductDetail = () => {
@@ -105,6 +106,14 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail">
+      <SeoHead
+        title={product.title}
+        description={product.description}
+        image={images[0] || undefined}
+        url={`/product/${product.id}`}
+        type="product"
+        price={product.price}
+      />
       <div className="container">
         <button onClick={handleBack} className="back-button">← Back</button>
 

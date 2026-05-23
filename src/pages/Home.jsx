@@ -5,6 +5,7 @@ import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import SeoHead from "../components/SeoHead";
 import "./Home.css";
 
 const Home = () => {
@@ -12,6 +13,11 @@ const Home = () => {
 
   return (
     <div className="home">
+      <SeoHead
+        title="Curated Handcrafted Gifts from India"
+        description="Discover unique handmade gifts from India's best independent artisans — jewellery, candles, home decor, skincare and more. Curated for every person, every occasion."
+        url="/"
+      />
 
       <section className="hero-bright">
         <div className="container hero-bright-inner">
