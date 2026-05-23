@@ -48,7 +48,7 @@ const SearchBar = ({ onSearch }) => {
   const handleSuggestionClick = (item) => {
     setSearchQuery(item.title)
     setShowSuggestions(false)
-    navigate(`/product/${item.id}`)
+    navigate(`/product/${item.slug}`)
   }
 
   const handleSubmit = (e) => {
@@ -118,4 +118,3 @@ const SearchBar = ({ onSearch }) => {
 }
 
 export default SearchBar
-

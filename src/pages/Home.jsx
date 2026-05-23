@@ -115,7 +115,7 @@ export const FeaturedCard = ({ product, index }) => {
   }, [product, toggleItem]);
 
   const handleCardClick = useCallback(() => {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.slug}`);
   }, [product.id, navigate]);
 
   return (

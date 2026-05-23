@@ -64,7 +64,7 @@ function AppContent() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/product/:slug" element={<ProductDetail />} />
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="/maker/:sellerCode" element={<SellerPage />} />
           <Route path="/checkout" element={<Checkout />} />

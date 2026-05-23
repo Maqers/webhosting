@@ -56,7 +56,7 @@ const EnhancedSearchBar = ({ onSearch }) => {
   }
 
   const handleResultClick = (item) => {
-    navigate(`/product/${item.id}`)
+    navigate(`/product/${item.slug}`)
     setShowResults(false); setSearchQuery(''); setSelectedIndex(-1)
     setTimeout(() => inputRef.current?.blur(), 100)
   }

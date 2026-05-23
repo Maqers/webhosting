@@ -145,7 +145,7 @@ const ProductCard = ({ product, index }) => {
   }, [product, toggleItem])
 
   const handleCardClick = useCallback(() => {
-    navigate(`/product/${product.id}`, { state: { from: location.pathname } })
+    navigate(`/product/${product.slug}`, { state: { from: location.pathname } })
   }, [product.id, navigate, location])
 
   return (
