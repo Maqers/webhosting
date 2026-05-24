@@ -506,10 +506,10 @@
   gap: 0.9rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0.25rem 0 0.6rem;
+  padding: 0.25rem 1.5rem 0.6rem 1.5rem;
   scrollbar-width: none;
   touch-action: pan-x;
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
   scroll-behavior: smooth;
 }
 .category-circles-strip--products .category-circles-scroll::-webkit-scrollbar { display: none; }
