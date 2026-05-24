@@ -509,6 +509,7 @@
   scroll-snap-type: x mandatory;
   padding: 0.25rem 0 0.6rem;
   scrollbar-width: none;
+  touch-action: pan-x;
 }
 .category-circles-strip--products .category-circles-scroll::-webkit-scrollbar { display: none; }
 
