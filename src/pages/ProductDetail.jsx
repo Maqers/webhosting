@@ -356,6 +356,52 @@ const ProductDetail = () => {
             </div>
           </div>
 
+          {/* ── Customer Reviews ─────────────────────────────────────────── */}
+          <div className="reviews-section">
+            <h3 className="reviews-title">Customer Reviews</h3>
+            {product.meta?.reviews && product.meta.reviews.length > 0 ? (
+              <>
+                <div className="reviews-summary">
+                  <span className="reviews-avg">
+                    {(product.meta.reviews.reduce((s, r) => s + r.rating, 0) / product.meta.reviews.length).toFixed(1)}
+                  </span>
+                  <div className="reviews-stars-big">
+                    {[1,2,3,4,5].map(n => (
+                      <svg key={n} viewBox="0 0 24 24" width="20" height="20"
+                        fill={n <= Math.round(product.meta.reviews.reduce((s,r)=>s+r.rating,0)/product.meta.reviews.length) ? "var(--primary-color)" : "none"}
+                        stroke="var(--primary-color)" strokeWidth="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="reviews-count">({product.meta.reviews.length} review{product.meta.reviews.length !== 1 ? "s" : ""})</span>
+                </div>
+                <div className="reviews-list">
+                  {product.meta.reviews.map((r, i) => (
+                    <div key={i} className="review-card">
+                      <div className="review-card-top">
+                        <div className="review-stars">
+                          {[1,2,3,4,5].map(n => (
+                            <svg key={n} viewBox="0 0 24 24" width="14" height="14"
+                              fill={n <= r.rating ? "var(--primary-color)" : "none"}
+                              stroke="var(--primary-color)" strokeWidth="2">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="review-name">{r.name}</span>
+                        {r.date && <span className="review-date">{r.date}</span>}
+                      </div>
+                      {r.text && <p className="review-text">{r.text}</p>}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="reviews-empty">No reviews yet — be the first to order and share your experience!</p>
+            )}
+          </div>
+
           {/* More from this maker — spans full width */}
           {moreProducts.length > 0 && (
             <div className="more-from-maker">

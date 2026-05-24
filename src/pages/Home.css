@@ -314,3 +314,129 @@
     object-position: center !important;
   }
 }
+/* ── Category circles strip ── */
+.category-circles-strip {
+  background: #fff;
+  padding: 1.25rem 0 1rem;
+  border-bottom: 1px solid #f0ebe8;
+}
+.category-circles-scroll {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  padding: 0.25rem 1rem 0.6rem;
+  scrollbar-width: none;
+}
+.category-circles-scroll::-webkit-scrollbar { display: none; }
+
+.category-circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  width: 84px;
+}
+.category-circle-img {
+  width: 76px;
+  height: 76px;
+  min-width: 76px;
+  min-height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #faf5f5;
+  border: 2px solid #ede0e0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s, transform 0.18s;
+  aspect-ratio: 1 / 1;
+}
+.category-circle-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transform: scale(1.08);
+}
+.category-circle-fallback {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.category-circle-item:hover .category-circle-img,
+.category-circle-item:active .category-circle-img {
+  border-color: var(--primary-color);
+  transform: scale(1.06);
+}
+.category-circle-label {
+  font-family: var(--font-family-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #3a2020;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  width: 84px;
+}
+@media (min-width: 768px) {
+  .category-circles-scroll {
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding: 0.5rem 2rem;
+    gap: 1.5rem;
+  }
+  .category-circle-item { width: 90px; }
+  .category-circle-img  { width: 80px; height: 80px; min-width: 80px; min-height: 80px; }
+  .category-circle-label { width: 90px; }
+}
+
+/* ── Circle buttons (Products page filter) ── */
+.category-circle-item--btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  width: 84px;
+}
+.category-circles-strip--products {
+  border-bottom: none;
+  padding: 0.75rem 0 0.25rem;
+  background: transparent;
+}
+.category-circle-item--btn:hover .category-circle-img,
+.category-circle-item--btn:active .category-circle-img {
+  border-color: var(--primary-color);
+  transform: scale(1.06);
+}
+.category-circle-item--btn.circle-active .category-circle-img {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+.category-circle-all {
+  background: #faf5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #760909;
+}
+.category-circle-item--btn.circle-active .category-circle-all {
+  background: #760909;
+  color: #fff;
+}

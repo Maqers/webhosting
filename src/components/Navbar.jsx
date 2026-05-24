@@ -146,17 +146,74 @@ const Navbar = () => {
     { path: '/contact', label: 'Contact Us' },
   ]
 
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+
   return (
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} ref={navbarRef} role="navigation" aria-label="Main navigation">
         <div className="navbar-container">
-          <div className="navbar-top-row">
 
+          {/* ════════════════════════════════════════════════
+              MOBILE TOP ROW  [burger+search] [logo] [♥ 🛒]
+              Only visible below 969px — desktop-* classes hide it
+          ════════════════════════════════════════════════ */}
+          <div className="navbar-mobile-row">
+            {/* LEFT: burger + search */}
+            <div className="mobile-left">
+              <button className={`navbar-toggle ${isOpen ? 'active' : ''}`} onClick={() => { setIsOpen(!isOpen); setMobileSearchOpen(false) }} aria-label="Menu" type="button">
+                <span className="hamburger-line"/><span className="hamburger-line"/><span className="hamburger-line"/>
+              </button>
+              <button className="navbar-search-icon-btn" onClick={() => { setMobileSearchOpen(o => !o); setIsOpen(false) }} aria-label="Search" type="button">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* CENTER: logo */}
+            <Link to="/" className="navbar-logo mobile-logo" onClick={closeMenu}>
+              <span className="logo-text">maqers.in</span>
+            </Link>
+
+            {/* RIGHT: wishlist + cart */}
+            <div className="mobile-right">
+              <button className="navbar-icon-btn" onClick={() => setWishlistOpen(true)} aria-label="Wishlist" type="button">
+                <div className="navbar-cart-icon-wrap">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                  </svg>
+                  {wishlistCount > 0 && <span className="navbar-cart-count">{wishlistCount}</span>}
+                </div>
+              </button>
+              <button className="navbar-icon-btn navbar-icon-btn--cart" onClick={() => setCartOpen(true)} aria-label="Cart" type="button">
+                <div className="navbar-cart-icon-wrap">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 01-8 0"/>
+                  </svg>
+                  {count > 0 && <span className="navbar-cart-count">{count}</span>}
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile inline search drop */}
+          {mobileSearchOpen && (
+            <div className="navbar-mobile-search-inline-bar">
+              <EnhancedSearchBar onSearch={(r) => { handleSearch(r); setMobileSearchOpen(false) }} autoFocus />
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════
+              DESKTOP ROW  [logo+categories] [search] [links+icons+burger]
+              Only visible at 969px+
+          ════════════════════════════════════════════════ */}
+          <div className="navbar-desktop-row">
             <div className="navbar-left-section">
               <Link to="/" className="navbar-logo" onClick={closeMenu} aria-label="Home">
                 <span className="logo-text">maqers.in</span>
               </Link>
-
               <div className="navbar-products-categories" ref={catRef}>
                 <Link to="/products" className={`navbar-dropdown-trigger ${isProductsActive() ? 'active' : ''}`} onMouseEnter={() => setCategoriesOpen(false)}>
                   All Products
@@ -166,22 +223,18 @@ const Navbar = () => {
                   onMouseEnter={() => { if (catTimerRef.current) { clearTimeout(catTimerRef.current); catTimerRef.current = null } setCategoriesOpen(true) }}
                   onMouseLeave={() => { catTimerRef.current = setTimeout(() => setCategoriesOpen(false), 150) }}
                 >
-                  <button
-                    className={`navbar-dropdown-trigger ${location.pathname.startsWith('/category/') ? 'active' : ''}`}
+                  <button className={`navbar-dropdown-trigger ${location.pathname.startsWith('/category/') ? 'active' : ''}`}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCategoriesOpen(!categoriesOpen) }}
-                    aria-expanded={categoriesOpen} aria-haspopup="true" type="button"
-                  >
+                    aria-expanded={categoriesOpen} aria-haspopup="true" type="button">
                     Categories
                     <svg className={`dropdown-arrow ${categoriesOpen ? 'open' : ''}`} width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
                   {categoriesOpen && (
-                    <div
-                      className="navbar-dropdown-menu navbar-dropdown-menu--wide"
+                    <div className="navbar-dropdown-menu navbar-dropdown-menu--wide"
                       onMouseEnter={() => { if (catTimerRef.current) { clearTimeout(catTimerRef.current); catTimerRef.current = null } }}
-                      onMouseLeave={() => { catTimerRef.current = setTimeout(() => setCategoriesOpen(false), 150) }}
-                    >
+                      onMouseLeave={() => { catTimerRef.current = setTimeout(() => setCategoriesOpen(false), 150) }}>
                       <div className="navbar-dropdown-two-col">
                         <div className="navbar-dropdown-col">
                           <div className="navbar-dropdown-col-heading">Shop by Occasion</div>
@@ -208,11 +261,9 @@ const Navbar = () => {
               </div>
             </div>
 
-            <div className="navbar-center-section navbar-search-desktop">
+            <div className="navbar-center-section">
               <EnhancedSearchBar onSearch={handleSearch} />
             </div>
-
-            <div className="navbar-mobile-search-inline" style={{display:'none'}} />
 
             <div className="navbar-right-section">
               <div className="navbar-menu-desktop">
@@ -247,6 +298,7 @@ const Navbar = () => {
               </button>
             </div>
           </div>
+
         </div>
       </nav>
 

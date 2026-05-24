@@ -8,7 +8,6 @@ import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
-import SeoHead from '../components/SeoHead'
 import './Products.css'
 
 let cachedCategories = null
@@ -156,11 +155,6 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <SeoHead
-        title={seoTitle}
-        description={seoDescription}
-        url="/products"
-      />
       <div className="products-hero">
         <div className="container">
           <h1 className="products-title">Our Custom Collection</h1>
@@ -171,39 +165,55 @@ const Products = () => {
       <div className="products-filters-section">
         <div className="container">
           <div className="filters-wrapper">
-            <div className="category-filters">
-              <button
-                className={`filter-chip ${selectedCategories.length === 0 ? 'active' : ''}`}
-                onClick={handleClearAll}
-                aria-label="Show all products"
-                type="button"
-              >
-                All Products
-                {selectedCategories.length > 0 && (
-                  <span className="filter-count">({selectedCategories.length} selected)</span>
-                )}
-              </button>
-              {categories.map((category) => {
-                const isSelected = selectedCategories.includes(category.id)
-                return (
-                  <button
-                    key={category.id}
-                    className={`filter-chip ${isSelected ? 'active' : ''}`}
-                    onClick={() => handleCategoryToggle(category.id)}
-                    aria-label={`${isSelected ? 'Deselect' : 'Select'} ${category.name}`}
-                    aria-pressed={isSelected}
-                    type="button"
-                  >
-                    <span>{category.emoji} {category.name}</span>
-                    {isSelected && (
-                      <svg className="check-icon" width="16" height="16" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </button>
-                )
-              })}
+            <div className="category-circles-strip category-circles-strip--products">
+              <div className="category-circles-scroll">
+
+                {/* All Products circle */}
+                <button
+                  type="button"
+                  className={`category-circle-item category-circle-item--btn ${selectedCategories.length === 0 ? 'circle-active' : ''}`}
+                  onClick={handleClearAll}
+                >
+                  <div className="category-circle-img category-circle-all">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                  </div>
+                  <span className="category-circle-label">All</span>
+                </button>
+
+                {[
+                  { id: "Handbags",             name: "Handbags",    img: "/images/photo-2026-05-12-09-25-50.jpg" },
+                  { id: "Handmade-Accessories", name: "Jewellery",   img: "/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg" },
+                  { id: "Candles",              name: "Candles",     img: "/images/8.png" },
+                  { id: "Florals",              name: "Florals",     img: "/images/remove-the-background-make-it-transparent.jpeg" },
+                  { id: "Wedding-Gifts",        name: "Wedding",     img: "/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg" },
+                  { id: "Kids-Accessories",     name: "Kids",        img: "/images/dsc_8211.jpg" },
+                  { id: "Home-decor",           name: "Home Decor",  img: "/images/28.png" },
+                  { id: "Handmade-Soaps",       name: "Soaps",       img: "/images/56.png" },
+                  { id: "Customised-Hampers",   name: "Hampers",     img: "/images/48.png" },
+                  { id: "Cosmetics",            name: "Cosmetics",   img: "/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg" },
+                  { id: "resin-products",       name: "Resin Art",   img: "/images/29.png" },
+                  { id: "Frames&Paintings",     name: "Frames",      img: "/images/17.png" },
+                ].map(cat => {
+                  const isSelected = selectedCategories.includes(cat.id)
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      className={`category-circle-item category-circle-item--btn ${isSelected ? 'circle-active' : ''}`}
+                      onClick={() => handleCategoryToggle(cat.id)}
+                    >
+                      <div className="category-circle-img">
+                        <img src={cat.img} alt={cat.name} loading="lazy"
+                          onError={e => { e.target.style.display='none' }} />
+                      </div>
+                      <span className="category-circle-label">{cat.name}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
             <ProductSort onSortChange={() => { }} />
           </div>

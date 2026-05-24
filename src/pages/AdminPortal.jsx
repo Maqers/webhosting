@@ -249,6 +249,20 @@ function parseProducts(source) {
       }
     }
   }
+  // Parse reviews array
+  const revRegex = /id:\s*(\d+)[\s\S]*?reviews:\s*\[([^\]]*)\]/g;
+  let rv;
+  while ((rv = revRegex.exec(source)) !== null) {
+    const id = parseInt(rv[1]);
+    const p = products.find(p => p.id === id);
+    if (!p || !rv[2].trim()) continue;
+    try {
+      const safe = rv[2].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":');
+      p.reviews = JSON.parse(`[${safe}]`);
+    } catch {
+      // malformed — skip
+    }
+  }
   // Parse moq
   const moqRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*moq:\s*(\d+)/g;
   let mq;
@@ -420,7 +434,10 @@ function buildEntry(id, product) {
   }
 
   const sizePricesPart = sizePricesStr ? `, sizePrices: ${sizePricesStr}` : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode} } },`;
+  const reviewsPart = (product.reviews && product.reviews.length > 0)
+    ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}" }`).join(", ")}]`
+    : "";
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -539,6 +556,8 @@ export default function AdminPortal() {
   const [editColorInput, setEditColorInput] = useState("");
   const [editColorImageIdx, setEditColorImageIdx] = useState(0);
   const [editSizeInput, setEditSizeInput] = useState("");
+  const [newReviewInput, setNewReviewInput] = useState({ name: "", rating: 5, text: "", date: "" });
+  const [editReviewInput, setEditReviewInput] = useState({ name: "", rating: 5, text: "", date: "" });
   const [productQueue, setProductQueue] = useState([]); // batch add queue
   const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
@@ -1271,6 +1290,33 @@ export default function AdminPortal() {
                       <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
                       <input style={ts.input} placeholder="e.g. 3–5 business days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
+                      <label style={ts.label}>Customer Reviews <span style={ts.labelHint}>(optional — add manually)</span></label>
+                      <div style={{ background: "#faf7f5", border: "1px solid #ede0e0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
+                        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                          <input style={{ ...ts.input, flex: 2, marginTop: 0 }} placeholder="Customer name" value={newReviewInput.name} onChange={e => setNewReviewInput(r => ({ ...r, name: e.target.value }))} />
+                          <select style={{ ...ts.input, width: 80, marginTop: 0 }} value={newReviewInput.rating} onChange={e => setNewReviewInput(r => ({ ...r, rating: Number(e.target.value) }))}>
+                            {[5,4,3,2,1].map(n => <option key={n} value={n}>{"★".repeat(n)}</option>)}
+                          </select>
+                          <input style={{ ...ts.input, width: 110, marginTop: 0 }} placeholder="Date" value={newReviewInput.date} onChange={e => setNewReviewInput(r => ({ ...r, date: e.target.value }))} />
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Review text (optional)" value={newReviewInput.text} onChange={e => setNewReviewInput(r => ({ ...r, text: e.target.value }))} />
+                          <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                            onClick={() => { if (newReviewInput.name.trim()) { setNewProduct(p => ({ ...p, reviews: [...(p.reviews||[]), { ...newReviewInput }] })); setNewReviewInput({ name: "", rating: 5, text: "", date: "" }); } }}>+</button>
+                        </div>
+                        {(newProduct.reviews||[]).length > 0 && (
+                          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+                            {newProduct.reviews.map((r, i) => (
+                              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                                <span>{"★".repeat(r.rating)}</span>
+                                <span style={{ fontWeight: 600 }}>{r.name}</span>
+                                {r.text && <span style={{ color: "#888", flex: 1 }}>{r.text}</span>}
+                                <button type="button" onClick={() => setNewProduct(p => ({ ...p, reviews: p.reviews.filter((_,j)=>j!==i) }))} style={{ ...ts.colorChipX, fontSize: 16, padding: "0 6px" }}>×</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
                       <select style={ts.input} value={newProduct.sellerId || ""}
                         onChange={e => {
@@ -1645,6 +1691,33 @@ export default function AdminPortal() {
                           <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
                           <input style={ts.input} placeholder="e.g. 3–5 business days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
+                          <label style={ts.label}>Customer Reviews <span style={ts.labelHint}>(optional — add manually)</span></label>
+                          <div style={{ background: "#faf7f5", border: "1px solid #ede0e0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
+                            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                              <input style={{ ...ts.input, flex: 2, marginTop: 0 }} placeholder="Customer name" value={editReviewInput.name} onChange={e => setEditReviewInput(r => ({ ...r, name: e.target.value }))} />
+                              <select style={{ ...ts.input, width: 80, marginTop: 0 }} value={editReviewInput.rating} onChange={e => setEditReviewInput(r => ({ ...r, rating: Number(e.target.value) }))}>
+                                {[5,4,3,2,1].map(n => <option key={n} value={n}>{"★".repeat(n)}</option>)}
+                              </select>
+                              <input style={{ ...ts.input, width: 110, marginTop: 0 }} placeholder="Date" value={editReviewInput.date} onChange={e => setEditReviewInput(r => ({ ...r, date: e.target.value }))} />
+                            </div>
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Review text (optional)" value={editReviewInput.text} onChange={e => setEditReviewInput(r => ({ ...r, text: e.target.value }))} />
+                              <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
+                                onClick={() => { if (editReviewInput.name.trim()) { setEditingProduct(p => ({ ...p, reviews: [...(p.reviews||[]), { ...editReviewInput }] })); setEditReviewInput({ name: "", rating: 5, text: "", date: "" }); } }}>+</button>
+                            </div>
+                            {(editingProduct.reviews||[]).length > 0 && (
+                              <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+                                {editingProduct.reviews.map((r, i) => (
+                                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                                    <span>{"★".repeat(r.rating)}</span>
+                                    <span style={{ fontWeight: 600 }}>{r.name}</span>
+                                    {r.text && <span style={{ color: "#888", flex: 1 }}>{r.text}</span>}
+                                    <button type="button" onClick={() => setEditingProduct(p => ({ ...p, reviews: p.reviews.filter((_,j)=>j!==i) }))} style={{ ...ts.colorChipX, fontSize: 16, padding: "0 6px" }}>×</button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                           <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
                           <select style={ts.input} value={editingProduct.sellerId || ""}
                             onChange={e => {

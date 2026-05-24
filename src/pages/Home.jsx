@@ -30,13 +30,45 @@ const Home = () => {
           </p>
           <div className="hero-bright-actions">
             <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
-            <Link to="/by-occasion" className="hero-bright-btn-primary">Shop by Occasion</Link>
-            <Link to="/by-product" className="hero-bright-btn-primary">Shop by Category</Link>
           </div>
         </div>
       </section>
 
       <MarqueeBanner />
+
+      {/* ── Scrollable category circles ──────────────────────────────────── */}
+      <section className="category-circles-strip">
+        <div className="category-circles-scroll">
+          {[
+            { id: "Handbags",             name: "Handbags",    img: "/images/photo-2026-05-12-09-25-50.jpg" },
+            { id: "Handmade-Accessories", name: "Jewellery",   img: "/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg" },
+            { id: "Candles",              name: "Candles",     img: "/images/8.png" },
+            { id: "Florals",              name: "Florals",     img: "/images/remove-the-background-make-it-transparent.jpeg" },
+            { id: "Wedding-Gifts",        name: "Wedding",     img: "/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg" },
+            { id: "Kids-Accessories",     name: "Kids",        img: "/images/dsc_8211.jpg" },
+            { id: "Home-decor",           name: "Home Decor",  img: "/images/28.png" },
+            { id: "Handmade-Soaps",       name: "Soaps",       img: "/images/56.png" },
+            { id: "Customised-Hampers",   name: "Hampers",     img: "/images/48.png" },
+            { id: "Cosmetics",            name: "Cosmetics",   img: "/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg" },
+            { id: "resin-products",       name: "Resin Art",   img: "/images/29.png" },
+            { id: "Frames&Paintings",     name: "Frames",      img: "/images/17.png" },
+          ].map(cat => (
+            <Link
+              key={cat.id}
+              to={`/category/${cat.id}`}
+              className="category-circle-item"
+            >
+              <div className="category-circle-img">
+                <img src={cat.img} alt={cat.name} loading="lazy"
+                  onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                />
+                <span className="category-circle-fallback" style={{display:'none'}}>{cat.name[0]}</span>
+              </div>
+              <span className="category-circle-label">{cat.name}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section className="trust-bar">
         <div className="container trust-bar-inner">
@@ -79,18 +111,6 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="home-cta-section">
-        <div className="container">
-          <div className="home-cta-content">
-            <h2>Not sure what to get?</h2>
-            <p>Chat with us on WhatsApp — tell us who you're buying for and your budget, and we'll find the right gift in minutes.</p>
-            <div className="home-cta-buttons">
-              <Link to="/products" className="home-cta-btn">Browse All Gifts</Link>
-              <Link to="/contact" className="home-cta-btn">Chat with us on WhatsApp</Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
