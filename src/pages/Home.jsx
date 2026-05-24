@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts } from "../data/catalog";
 import ImageWithFallback from "../components/ImageWithFallback";
@@ -10,6 +10,32 @@ import "./Home.css";
 
 const Home = () => {
   const popularProducts = useMemo(() => getPopularProducts(), []);
+  const circlesRef = useRef(null);
+
+  // Prevent iOS from stealing the gesture when horizontal scroll hits right edge
+  useEffect(() => {
+    const el = circlesRef.current;
+    if (!el) return;
+    let startX = 0, startY = 0;
+    const onTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+    const onTouchMove = (e) => {
+      const dx = Math.abs(e.touches[0].clientX - startX);
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      // Only intercept clearly horizontal swipes
+      if (dx > dy) {
+        e.stopPropagation();
+      }
+    };
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+    };
+  }, []);
 
   return (
     <div className="home">
@@ -38,7 +64,7 @@ const Home = () => {
 
       {/* ── Scrollable category circles ──────────────────────────────────── */}
       <section className="category-circles-strip">
-        <div className="category-circles-scroll">
+        <div className="category-circles-scroll" ref={circlesRef}>
           {[
             { id: "Handbags",             name: "Handbags",    img: "/images/photo-2026-05-12-09-25-50.jpg" },
             { id: "Handmade-Accessories", name: "Jewellery",   img: "/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg" },
