@@ -580,8 +580,7 @@
    ============================================================================ */
 
 body.menu-open {
-  overflow: hidden; position: fixed; width: 100%; height: 100%;
-  touch-action: none;
+  overflow: hidden;
 }
 
 body.menu-open #root.menu-open-blur main,
