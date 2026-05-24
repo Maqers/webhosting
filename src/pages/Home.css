@@ -325,10 +325,11 @@
   gap: 0.9rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
   padding: 0.25rem 1rem 0.6rem;
   scrollbar-width: none;
   touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
 }
 .category-circles-scroll::-webkit-scrollbar { display: none; }
 
@@ -339,7 +340,6 @@
   gap: 0.5rem;
   text-decoration: none;
   flex-shrink: 0;
-  scroll-snap-align: start;
   width: 84px;
 }
 .category-circle-img {
@@ -413,7 +413,6 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-  scroll-snap-align: start;
   width: 84px;
 }
 .category-circles-strip--products {
