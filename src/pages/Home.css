@@ -379,6 +379,17 @@
   border-color: var(--primary-color);
   transform: scale(1.06);
 }
+
+/* No hover/active highlight on mobile — avoids tap-vs-scroll confusion */
+@media (max-width: 768px) {
+  .category-circle-item:hover .category-circle-img,
+  .category-circle-item:active .category-circle-img,
+  .category-circle-item--btn:hover .category-circle-img,
+  .category-circle-item--btn:active .category-circle-img {
+    border-color: #ede0e0;
+    transform: none;
+  }
+}
 .category-circle-label {
   font-family: var(--font-family-primary);
   font-size: 0.72rem;
