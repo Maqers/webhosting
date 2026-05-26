@@ -195,6 +195,7 @@ const Products = () => {
                   { id: "Customised-Hampers",   name: "Hampers",     img: "/images/48.png" },
                   { id: "Cosmetics",            name: "Cosmetics",   img: "/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg" },
                   { id: "resin-products",       name: "Resin Art",   img: "/images/29.png" },
+                  { id: "Charm-accessories",    name: "Charm Accessories",  img: "/images/whatsapp-image-2026-05-21-at-2.04.45-pm-(1).jpeg" },
                   { id: "Frames&Paintings",     name: "Frames",      img: "/images/17.png" },
                 ].map(cat => {
                   const isSelected = selectedCategories.includes(cat.id)

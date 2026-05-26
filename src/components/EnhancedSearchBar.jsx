@@ -5,7 +5,7 @@ import { categories } from '../data/catalog'
 import ImageWithFallback from './ImageWithFallback'
 import './SearchBar.css'
 
-const EnhancedSearchBar = ({ onSearch }) => {
+const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
   const [searchQuery, setSearchQuery]     = useState('')
   const [showResults, setShowResults]     = useState(false)
   const [searchResults, setSearchResults] = useState(null)
@@ -17,6 +17,13 @@ const EnhancedSearchBar = ({ onSearch }) => {
   const resultsRef = useRef(null)
   const timerRef   = useRef(null)
   const prevPathRef = useRef(location.pathname)
+
+  // Auto-focus when used in mobile search bar
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => inputRef.current?.focus(), 50)
+    }
+  }, [autoFocus])
 
   const sanitize = useCallback((q) => {
     if (!q) return ''

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { occasionCategories, getOccasionProducts } from '../data/occasionCatalog'
@@ -10,9 +10,84 @@ import './Categories.css'
 
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
 
+// Smart sub-filters per category — curated from real product tags
+const CATEGORY_FILTERS = {
+  'Handbags':             ['Potli', 'Clutch', 'Tote Bag', 'Sling Bag', 'Backpack'],
+  'Candles':              ['Scented', 'Soy Wax', 'Luxury', 'Colourful', 'Reed Diffuser'],
+  'Florals':              ['Bouquet', 'Crochet', 'Keychain', 'Basket'],
+  'Handmade-Accessories': ['Bangles', 'Watches', 'Earrings', 'Necklace', 'Bracelet'],
+  'Kids-Accessories':     ['Hair Clips', 'Brooches', 'Plush Toys', 'Collars'],
+  'Wedding-Gifts':        ['Potli', 'Shagun Envelope', 'Decor', 'Return Gifts'],
+  'Home-decor':           ['Brass', 'Evil Eye', 'Spiritual', 'Dining'],
+  'Customised-Hampers':   ['Anniversary', 'Luxury', 'Personalised', 'Photo Frame'],
+  'Handmade-Soaps':       ['Grape Soap', 'Decorative', 'Strawberry'],
+  'resin-products':       ['Clock', 'Keychain', 'Photo Frame', 'Nameplate', 'Flower'],
+  'Cosmetics':            ['Pouch', 'Personalised', 'Travel'],
+}
+
+// Map filter label → tag keywords to match against
+const FILTER_KEYWORDS = {
+  'Potli':           ['potli','potlis','pouch'],
+  'Clutch':          ['clutch'],
+  'Tote Bag':        ['tote'],
+  'Sling Bag':       ['sling'],
+  'Backpack':        ['backpack','bagpack'],
+  'Scented':         ['scented','fragrance','aromatherapy'],
+  'Soy Wax':         ['soy'],
+  'Luxury':          ['luxury'],
+  'Colourful':       ['color','colour','colorful','colourful'],
+  'Reed Diffuser':   ['reed diffuser','diffuser'],
+  'Bouquet':         ['bouquet'],
+  'Crochet':         ['crochet'],
+  'Keychain':        ['keychain','key chain','key-ring','keyring'],
+  'Basket':          ['basket'],
+  'Bangles':         ['bangle','bangles'],
+  'Watches':         ['watch'],
+  'Earrings':        ['earring','jhumka','chaandbaali'],
+  'Necklace':        ['necklace','haar'],
+  'Bracelet':        ['bracelet','kada'],
+  'Hair Clips':      ['hair clip','hair-clip'],
+  'Brooches':        ['brooch','pin'],
+  'Plush Toys':      ['teddy','bear','bunny','plush','crochet toy'],
+  'Collars':         ['collar'],
+  'Shagun Envelope': ['shagun','envelope'],
+  'Decor':           ['decor','decoration'],
+  'Return Gifts':    ['return gift'],
+  'Brass':           ['brass'],
+  'Evil Eye':        ['evil eye'],
+  'Spiritual':       ['spiritual','ganesha'],
+  'Dining':          ['dining','serving'],
+  'Anniversary':     ['anniversary'],
+  'Personalised':    ['personal','custom','customis'],
+  'Photo Frame':     ['photo','frame'],
+  'Grape Soap':      ['grape'],
+  'Decorative':      ['decorative','aesthetic'],
+  'Strawberry':      ['strawberry'],
+  'Clock':           ['clock'],
+  'Nameplate':       ['nameplate','name plate'],
+  'Flower':          ['flower','floral'],
+  'Pouch':           ['pouch','makeup bag'],
+  'Travel':          ['travel'],
+}
+
 const Categories = () => {
   const { name } = useParams()
   const [selectedCategory, setSelectedCategory] = useState(name || 'All')
+  const [activeFilter, setActiveFilter] = useState(null)
+  const [sortBy, setSortBy] = useState('default')
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => { setSelectedCategory(name || 'All'); setActiveFilter(null); setSortBy('default') }, [name])
+
+  // Smart back
+  const handleBack = () => {
+    if (location.state?.from === '/') navigate('/')
+    else if (location.state?.from) navigate(location.state.from)
+    else if (window.history.length > 1) navigate(-1)
+    else navigate('/categories')
+  }
+  const backLabel = location.state?.from === '/' ? '← Home' : '← All Categories'
 
   useEffect(() => { setSelectedCategory(name || 'All') }, [name])
 
@@ -34,12 +109,33 @@ const Categories = () => {
     : allCats.find(c => c.slug === selectedCategory || c.id === selectedCategory)
       || { name: selectedCategory, slug: selectedCategory, id: selectedCategory, emoji: '🎁' }
 
-  const categoryProducts = (selectedCategory === 'All'
+  const rawCategoryProducts = (selectedCategory === 'All'
     ? getAllProducts()
     : occasionProductMap[selectedCategory]
       ? getOccasionProducts(getAllProducts, occasionProductMap, selectedCategory)
       : getProductsByCategory(selectedCategory)
   ).filter(Boolean)
+
+  const categoryProducts = useMemo(() => {
+    let products = rawCategoryProducts
+    // Apply sub-filter
+    if (activeFilter && FILTER_KEYWORDS[activeFilter]) {
+      const keywords = FILTER_KEYWORDS[activeFilter]
+      products = products.filter(p => {
+        const searchable = [
+          ...(p.tags || []),
+          p.title,
+          p.description || ''
+        ].join(' ').toLowerCase()
+        return keywords.some(kw => searchable.includes(kw))
+      })
+    }
+    // Apply sort
+    if (sortBy === 'price-asc') return [...products].sort((a,b) => a.price - b.price)
+    if (sortBy === 'price-desc') return [...products].sort((a,b) => b.price - a.price)
+    if (sortBy === 'name') return [...products].sort((a,b) => a.title.localeCompare(b.title))
+    return products
+  }, [rawCategoryProducts, activeFilter, sortBy])
 
   const seoTitle = selectedCategoryObj
     ? `${selectedCategoryObj.name} — Handmade Gifts`
@@ -97,12 +193,37 @@ const Categories = () => {
           {selectedCategory !== 'All' && (
             <div className="category-products-section">
               <div className="category-header">
-                <Link to="/categories" className="back-to-categories">← All Categories</Link>
+                <button onClick={handleBack} className="back-to-categories">{backLabel}</button>
                 <h1 className="category-page-title">
                   {selectedCategoryObj?.emoji && <span className="category-page-emoji">{selectedCategoryObj.emoji} </span>}
                   {selectedCategoryObj?.name || selectedCategory}
                 </h1>
               </div>
+
+              {/* Sub-filters + sort */}
+              {CATEGORY_FILTERS[selectedCategory] && (
+                <div className="category-filters-row">
+                  <div className="category-filter-chips">
+                    <button
+                      className={`cat-filter-chip${!activeFilter ? ' active' : ''}`}
+                      onClick={() => setActiveFilter(null)}
+                    >All</button>
+                    {CATEGORY_FILTERS[selectedCategory].map(f => (
+                      <button
+                        key={f}
+                        className={`cat-filter-chip${activeFilter === f ? ' active' : ''}`}
+                        onClick={() => setActiveFilter(f === activeFilter ? null : f)}
+                      >{f}</button>
+                    ))}
+                  </div>
+                  <select className="cat-sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                    <option value="default">Sort: Relevance</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="name">Name: A–Z</option>
+                  </select>
+                </div>
+              )}
 
               {categoryProducts.length > 0 ? (
                 <div className="products-grid">

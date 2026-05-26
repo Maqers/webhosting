@@ -90,6 +90,7 @@ const Home = () => {
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
+              state={{ from: '/' }}
               className="category-circle-item"
             >
               <div className="category-circle-img">

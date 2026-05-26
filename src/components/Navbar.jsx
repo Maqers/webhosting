@@ -201,7 +201,10 @@ const Navbar = () => {
           {/* Mobile inline search drop */}
           {mobileSearchOpen && (
             <div className="navbar-mobile-search-inline-bar">
-              <EnhancedSearchBar onSearch={(r) => { handleSearch(r); setMobileSearchOpen(false) }} autoFocus />
+              <EnhancedSearchBar
+                onSearch={(r) => { handleSearch(r); setTimeout(() => setMobileSearchOpen(false), 100) }}
+                autoFocus
+              />
             </div>
           )}
 
