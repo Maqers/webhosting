@@ -18,7 +18,7 @@ export const categories = [
   { id: "Wedding-Gifts", name: "Wedding Gifts", slug: "Wedding-Gifts", description: "Unique gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
   { id: "Cosmetics", name: "Cosmetics", slug: "cosmetics", description: "Discover our beautifully curated cosmetic collection, designed to combine elegance with functionality.", icon: "fashion", order: 11, featured: false, meta: { keywords: [] } },
   { id: "Kids-Accessories", name: "Kids Accessories", slug: "Kids-Accessories", description: "", icon: "fashion", order: 12, featured: false, meta: { keywords: [] } },
-  { id: "Charm-accessories", name: "Charm", slug: "Charm-Accessories", description: "Small, decorative pendants or trinkets attached to jewelry or personal items.", icon: "jewelry", order: 13, featured: false, meta: { keywords: [] } },
+  { id: "Charm-accessories", name: "Charms", slug: "Charm-Accessories", description: "Small, decorative pendants or trinkets attached to jewelry or personal items.", icon: "jewelry", order: 13, featured: false, meta: { keywords: [] } },
 ];
 
 export const productsByCategory = {
