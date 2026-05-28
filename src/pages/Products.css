@@ -584,10 +584,14 @@
 
 @media (min-width: 768px) {
   .category-circles-strip--products .category-circles-scroll {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    gap: 1.25rem;
-    padding: 0.5rem 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 0.5rem 1.5rem 0.75rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
-  .category-circle-item--btn { width: 84px; }
+  .category-circles-strip--products .category-circles-scroll::-webkit-scrollbar { display: none; }
+  .category-circle-item--btn { width: 88px; }
+  .category-circle-label { font-size: 0.76rem; }
 }

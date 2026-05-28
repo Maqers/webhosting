@@ -394,23 +394,30 @@
   font-family: var(--font-family-primary);
   font-size: 0.72rem;
   font-weight: 600;
+  font-style: italic;
   color: #3a2020;
   text-align: center;
   line-height: 1.2;
   white-space: nowrap;
   width: 84px;
+  max-width: 84px;
+  display: block;
+  margin: 0 auto;
 }
 @media (min-width: 768px) {
   .category-circles-scroll {
-    justify-content: center;
-    flex-wrap: wrap;
-    overflow-x: visible;
-    padding: 0.5rem 2rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 0.5rem 2rem 0.75rem;
     gap: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .category-circles-scroll::-webkit-scrollbar { display: none; }
   .category-circle-item { width: 90px; }
   .category-circle-img  { width: 80px; height: 80px; min-width: 80px; min-height: 80px; }
-  .category-circle-label { width: 90px; }
+  .category-circle-label { width: 90px; max-width: 90px; }
 }
 
 /* ── Circle buttons (Products page filter) ── */
@@ -450,4 +457,41 @@
 .category-circle-item--btn.circle-active .category-circle-all {
   background: #760909;
   color: #fff;
+}
+/* ── Circle scroll arrows ─────────────────────────────────────────────────── */
+.circles-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.circles-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #e0d4d4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--primary-color);
+  transition: box-shadow 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.circles-arrow:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  border-color: var(--primary-color);
+}
+.circles-arrow--left  { left: 0; }
+.circles-arrow--right { right: 0; }
+
+/* Only show on desktop — mobile uses touch */
+@media (max-width: 768px) {
+  .circles-arrow { display: none; }
 }

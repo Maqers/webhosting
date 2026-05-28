@@ -11,7 +11,7 @@ const desktopItems = [
   "Handcrafted with love",
   "Straight from artisan hands",
   "Prepaid orders only",
-  "Ships across India",
+  "🚚 FREE delivery above ₹499",
   "Curated from Instagram's best finds",
   "One-of-a-kind pieces",
   "Support local artisans",
@@ -19,7 +19,7 @@ const desktopItems = [
 ];
 
 const mobileItems = [
-  "FREE DELIVERY on all orders",
+  "🚚 FREE delivery above ₹499",
   "🔍 Hand-picked sellers",
   "🎁 Genuinely handmade",
   "💬 Order via cart",

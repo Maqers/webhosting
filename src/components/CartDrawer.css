@@ -298,3 +298,44 @@
 
 .cart-continue-btn:hover,
 .cart-continue-link:hover { color: var(--primary-color, #760909); }
+.cart-free-delivery-banner {
+  background: #1a6e3c;
+  color: #fff;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.cart-delivery-nudge {
+  background: #fff8e8;
+  border: 1px solid #e8d494;
+  color: #7a5c00;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.cart-delivery-free {
+  color: #1a6e3c;
+  font-weight: 700;
+}
+
+.cart-grand-total {
+  border-top: 1.5px solid #ede0e0;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  font-weight: 700;
+}

@@ -13,6 +13,23 @@ import './Products.css'
 let cachedCategories = null
 let cachedCategoryMap = null
 
+// First product image per category — used in category circles
+const CAT_IMAGES = {
+  'Handbags':             '/images/photo-2026-05-12-09-25-50.jpg',
+  'Handmade-Accessories': '/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg',
+  'Candles':              '/images/8.png',
+  'Florals':              '/images/remove-the-background-make-it-transparent.jpeg',
+  'Wedding-Gifts':        '/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg',
+  'Kids-Accessories':     '/images/dsc_8211.jpg',
+  'Home-decor':           '/images/28.png',
+  'Handmade-Soaps':       '/images/56.png',
+  'Customised-Hampers':   '/images/48.png',
+  'Cosmetics':            '/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg',
+  'resin-products':       '/images/29.png',
+  'Charm-accessories':    '/images/enchanted_charm_watch_2.png',
+  'Frames&Paintings':     '/images/17.png',
+}
+
 const getCachedCategories = () => {
   if (!cachedCategories) cachedCategories = getSortedCategories()
   return cachedCategories
@@ -167,8 +184,7 @@ const Products = () => {
           <div className="filters-wrapper">
             <div className="category-circles-strip category-circles-strip--products">
               <div className="category-circles-scroll">
-
-                {/* All Products circle */}
+                {/* All — always first */}
                 <button
                   type="button"
                   className={`category-circle-item category-circle-item--btn ${selectedCategories.length === 0 ? 'circle-active' : ''}`}
@@ -182,38 +198,30 @@ const Products = () => {
                   </div>
                   <span className="category-circle-label">All</span>
                 </button>
-
-                {[
-                  { id: "Handbags",             name: "Handbags",    img: "/images/photo-2026-05-12-09-25-50.jpg" },
-                  { id: "Handmade-Accessories", name: "Jewellery",   img: "/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg" },
-                  { id: "Candles",              name: "Candles",     img: "/images/8.png" },
-                  { id: "Florals",              name: "Florals",     img: "/images/remove-the-background-make-it-transparent.jpeg" },
-                  { id: "Wedding-Gifts",        name: "Wedding",     img: "/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg" },
-                  { id: "Kids-Accessories",     name: "Kids",        img: "/images/dsc_8211.jpg" },
-                  { id: "Home-decor",           name: "Home Decor",  img: "/images/28.png" },
-                  { id: "Handmade-Soaps",       name: "Soaps",       img: "/images/56.png" },
-                  { id: "Customised-Hampers",   name: "Hampers",     img: "/images/48.png" },
-                  { id: "Cosmetics",            name: "Cosmetics",   img: "/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg" },
-                  { id: "resin-products",       name: "Resin Art",   img: "/images/29.png" },
-                  { id: "Charm-accessories",    name: "Charm Accessories",  img: "/images/whatsapp-image-2026-05-21-at-2.04.45-pm-(1).jpeg" },
-                  { id: "Frames&Paintings",     name: "Frames",      img: "/images/17.png" },
-                ].map(cat => {
-                  const isSelected = selectedCategories.includes(cat.id)
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      className={`category-circle-item category-circle-item--btn ${isSelected ? 'circle-active' : ''}`}
-                      onClick={() => handleCategoryToggle(cat.id)}
-                    >
-                      <div className="category-circle-img">
-                        <img src={cat.img} alt={cat.name} loading="lazy"
-                          onError={e => { e.target.style.display='none' }} />
-                      </div>
-                      <span className="category-circle-label">{cat.name}</span>
-                    </button>
-                  )
-                })}
+                {/* Dynamic from catalog — picks up admin name/category changes automatically */}
+                {getCachedCategories()
+                  .filter(c => c.id !== 'Oxidised-jewellery')
+                  .map(cat => {
+                    const isSelected = selectedCategories.includes(cat.id)
+                    const img = CAT_IMAGES[cat.id] || ''
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        className={`category-circle-item category-circle-item--btn ${isSelected ? 'circle-active' : ''}`}
+                        onClick={() => handleCategoryToggle(cat.id)}
+                      >
+                        <div className="category-circle-img">
+                          {img
+                            ? <img src={img} alt={cat.name} loading="lazy" onError={e => { e.target.style.display='none' }} />
+                            : <span style={{ fontSize: '1.2rem' }}>{cat.icon || '🎁'}</span>
+                          }
+                        </div>
+                        <span className="category-circle-label">{cat.name}</span>
+                      </button>
+                    )
+                  })
+                }
               </div>
             </div>
             <ProductSort onSortChange={() => { }} />

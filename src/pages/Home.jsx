@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getPopularProducts } from "../data/catalog";
+import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
 import { useCart } from "../context/CartContext";
@@ -10,6 +10,23 @@ import "./Home.css";
 
 const Home = () => {
   const popularProducts = useMemo(() => getPopularProducts(), []);
+
+// First product image per category for circles
+const HOME_CAT_IMAGES = {
+  'Handbags':             '/images/photo-2026-05-12-09-25-50.jpg',
+  'Handmade-Accessories': '/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg',
+  'Candles':              '/images/8.png',
+  'Florals':              '/images/remove-the-background-make-it-transparent.jpeg',
+  'Wedding-Gifts':        '/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg',
+  'Kids-Accessories':     '/images/dsc_8211.jpg',
+  'Home-decor':           '/images/28.png',
+  'Handmade-Soaps':       '/images/56.png',
+  'Customised-Hampers':   '/images/48.png',
+  'Cosmetics':            '/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg',
+  'resin-products':       '/images/29.png',
+  'Charm-accessories':    '/images/enchanted_charm_watch_2.png',
+  'Frames&Paintings':     '/images/17.png',
+}
   const circlesRef = useRef(null);
 
   // Smooth horizontal scroll on iOS without page takeover
@@ -70,38 +87,33 @@ const Home = () => {
 
       <MarqueeBanner />
 
-      {/* ── Scrollable category circles ──────────────────────────────────── */}
+      {/* ── Scrollable category circles — dynamic from catalog ────────────── */}
       <section className="category-circles-strip">
         <div className="category-circles-scroll" ref={circlesRef}>
-          {[
-            { id: "Handbags",             name: "Handbags",    img: "/images/photo-2026-05-12-09-25-50.jpg" },
-            { id: "Handmade-Accessories", name: "Jewellery",   img: "/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg" },
-            { id: "Candles",              name: "Candles",     img: "/images/8.png" },
-            { id: "Florals",              name: "Florals",     img: "/images/remove-the-background-make-it-transparent.jpeg" },
-            { id: "Wedding-Gifts",        name: "Wedding",     img: "/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg" },
-            { id: "Kids-Accessories",     name: "Kids",        img: "/images/dsc_8211.jpg" },
-            { id: "Home-decor",           name: "Home Decor",  img: "/images/28.png" },
-            { id: "Handmade-Soaps",       name: "Soaps",       img: "/images/56.png" },
-            { id: "Customised-Hampers",   name: "Hampers",     img: "/images/48.png" },
-            { id: "Cosmetics",            name: "Cosmetics",   img: "/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg" },
-            { id: "resin-products",       name: "Resin Art",   img: "/images/29.png" },
-            { id: "Frames&Paintings",     name: "Frames",      img: "/images/17.png" },
-          ].map(cat => (
-            <Link
-              key={cat.id}
-              to={`/category/${cat.id}`}
-              state={{ from: '/' }}
-              className="category-circle-item"
-            >
-              <div className="category-circle-img">
-                <img src={cat.img} alt={cat.name} loading="lazy"
-                  onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
-                />
-                <span className="category-circle-fallback" style={{display:'none'}}>{cat.name[0]}</span>
-              </div>
-              <span className="category-circle-label">{cat.name}</span>
-            </Link>
-          ))}
+          {getSortedCategories()
+            .filter(c => c.id !== 'Oxidised-jewellery')
+            .map(cat => {
+              const img = HOME_CAT_IMAGES[cat.id] || ''
+              return (
+                <Link
+                  key={cat.id}
+                  to={`/category/${cat.id}`}
+                  state={{ from: '/' }}
+                  className="category-circle-item"
+                >
+                  <div className="category-circle-img">
+                    {img
+                      ? <img src={img} alt={cat.name} loading="lazy"
+                          onError={e => { e.target.style.display='none'; e.target.nextSibling && (e.target.nextSibling.style.display='flex') }} />
+                      : null
+                    }
+                    <span className="category-circle-fallback" style={{display:'none'}}>{cat.name[0]}</span>
+                  </div>
+                  <span className="category-circle-label">{cat.name}</span>
+                </Link>
+              )
+            })
+          }
         </div>
       </section>
 

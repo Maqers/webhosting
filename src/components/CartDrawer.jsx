@@ -6,6 +6,11 @@ import './CartDrawer.css'
 export default function CartDrawer() {
   const { items, removeItem, updateQty, total, count, isOpen, setIsOpen } = useCart()
 
+  const DELIVERY_THRESHOLD = 500
+  const DELIVERY_CHARGE = 49
+  const deliveryFree = total >= DELIVERY_THRESHOLD
+  const grandTotal = deliveryFree ? total : total + DELIVERY_CHARGE
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -80,11 +85,29 @@ export default function CartDrawer() {
 
         {items.length > 0 && (
           <div className="cart-footer">
+            {deliveryFree ? (
+              <div className="cart-free-delivery-banner">
+                🎉 FREE DELIVERY UNLOCKED!
+              </div>
+            ) : (
+              <div className="cart-delivery-nudge">
+                Add ₹{(DELIVERY_THRESHOLD - total).toLocaleString('en-IN')} more for FREE delivery
+              </div>
+            )}
             <div className="cart-subtotal">
               <span>SUBTOTAL</span>
               <span className="cart-total-amount">₹{total.toLocaleString('en-IN')}</span>
             </div>
-            <p className="cart-free-delivery">🎉 FREE DELIVERY on this order!</p>
+            <div className="cart-subtotal">
+              <span>DELIVERY</span>
+              <span className={`cart-total-amount ${deliveryFree ? 'cart-delivery-free' : ''}`}>
+                {deliveryFree ? 'FREE' : `₹${DELIVERY_CHARGE}`}
+              </span>
+            </div>
+            <div className="cart-subtotal cart-grand-total">
+              <span>TOTAL</span>
+              <span className="cart-total-amount">₹{grandTotal.toLocaleString('en-IN')}</span>
+            </div>
             <Link to="/checkout" className="cart-checkout-btn" onClick={() => setIsOpen(false)}>
               PROCEED TO CHECKOUT
             </Link>
