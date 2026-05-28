@@ -8,7 +8,7 @@ const PLACEHOLDER = "/images/logo.png";
 export const categories = [
   { id: "Florals", name: "Handmade Florals", slug: "Florals", description: "Beautiful floral handmade products", icon: "home", order: 4, featured: false, meta: { keywords: ["crochet","flowers","bouquets","handmade","anniversary","gift"] } },
   { id: "Candles", name: "Candles", slug: "Candles", description: "Beautiful fragnant candles, customisations available", icon: "gift", order: 2, featured: false, meta: { keywords: ["personalized","candles","gift","candle","birthday","anniversary"] } },
-  { id: "Handbags", name: "Handbags", slug: "Handbags", description: "Elegant fashion items and bags", icon: "fashion", order: 3, featured: false, meta: { keywords: ["bags","handbags","prints","printed","bag"] } },
+  { id: "Handbags", name: "Bags & Purses", slug: "Handbags", description: "Elegant fashion items and bags", icon: "fashion", order: 3, featured: false, meta: { keywords: ["bags","handbags","prints","printed","bag"] } },
   { id: "Frames&Paintings", name: "Frames & Paintings", slug: "Frames&Paintings", description: "Handmade paintings in beautiful frames", icon: "jewelry", order: 10, featured: false, meta: { keywords: ["jewelry","accessories","traditional","handmade","ornaments"] } },
   { id: "Home-decor", name: "Home & Living", slug: "Home-decor", description: "Fancy home and dining utilities", icon: "kitchen", order: 5, featured: false, meta: { keywords: ["homedecor","decor","glasses","glass","homeutilities"] } },
   { id: "resin-products", name: "Resin Products", slug: "resin-products", description: "Resin art and collectible items", icon: "art", order: 7, featured: false, meta: { keywords: ["art","resin","frames","flowers"] } },
