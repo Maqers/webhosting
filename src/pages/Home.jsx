@@ -195,18 +195,20 @@ export const FeaturedCard = ({ product, index }) => {
   useEffect(() => {
     if (!secondImage || !imgZoneRef.current) return;
     const el = imgZoneRef.current;
+    let timer = null
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          el.classList.add('mobile-swap');
+          timer = setTimeout(() => el.classList.add('mobile-swap'), 600)
         } else {
-          el.classList.remove('mobile-swap');
+          clearTimeout(timer)
+          el.classList.remove('mobile-swap')
         }
       },
-      { threshold: 0.6 }
+      { threshold: 0.85 }
     );
     obs.observe(el);
-    return () => obs.disconnect();
+    return () => { obs.disconnect(); clearTimeout(timer); };
   }, [secondImage]);
 
   return (

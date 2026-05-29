@@ -172,13 +172,6 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <div className="products-hero">
-        <div className="container">
-          <h1 className="products-title">Our Custom Collection</h1>
-          <p className="products-subtitle">Discover unique, handcrafted gifts from Indian home businesses</p>
-        </div>
-      </div>
-
       <div className="products-filters-section">
         <div className="container">
           <div className="filters-wrapper">
@@ -300,14 +293,20 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
   useEffect(() => {
     if (!secondImage || !imgZoneRef.current) return
     const el = imgZoneRef.current
+    let timer = null
     const obs = new IntersectionObserver(
       ([entry]) => {
-        el.classList.toggle('mobile-swap', entry.isIntersecting)
+        if (entry.isIntersecting) {
+          timer = setTimeout(() => el.classList.add('mobile-swap'), 600)
+        } else {
+          clearTimeout(timer)
+          el.classList.remove('mobile-swap')
+        }
       },
-      { threshold: 0.6 }
+      { threshold: 0.85 }
     )
     obs.observe(el)
-    return () => obs.disconnect()
+    return () => { obs.disconnect(); clearTimeout(timer) }
   }, [secondImage])
 
   const handleAddToCart = useCallback((e) => {

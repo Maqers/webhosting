@@ -259,12 +259,20 @@ const ProductCard = ({ product, index }) => {
   useEffect(() => {
     if (!secondImage || !imgZoneRef.current) return
     const el = imgZoneRef.current
+    let timer = null
     const obs = new IntersectionObserver(
-      ([entry]) => { el.classList.toggle('mobile-swap', entry.isIntersecting) },
-      { threshold: 0.6 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          timer = setTimeout(() => el.classList.add('mobile-swap'), 600)
+        } else {
+          clearTimeout(timer)
+          el.classList.remove('mobile-swap')
+        }
+      },
+      { threshold: 0.85 }
     )
     obs.observe(el)
-    return () => obs.disconnect()
+    return () => { obs.disconnect(); clearTimeout(timer) }
   }, [secondImage])
 
   const handleAddToCart = useCallback((e) => {
