@@ -401,10 +401,16 @@
 .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
 .feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
 @media (hover: none) {
-  .feat-img-zone .feat-img { opacity: 1; transform: none; }
-  .feat-img-zone .feat-img-hover { opacity: 0; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1; }
+  .feat-img-zone.has-second-img:hover .feat-img { opacity: 1; transform: none; }
+  .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 0; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover {
+    opacity: 1;
+    transition: opacity 0.8s ease-in-out;
+  }
 }
 
 @keyframes heartPop {
