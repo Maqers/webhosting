@@ -5,8 +5,10 @@ import { getWhatsAppNumber } from '../data/contactInfo'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import ImageWithFallback from '../components/ImageWithFallback'
+import { FeaturedCard } from './Home'
 import SeoHead from '../components/SeoHead'
 import './ProductDetail.css'
+import './Home.css'
 
 const ProductDetail = () => {
   const { slug } = useParams()
@@ -462,25 +464,13 @@ const ProductDetail = () => {
           </div>
           )}
 
-          {/* More from this maker — spans full width */}
+          {/* More from this maker — compact FeaturedCard grid */}
           {moreProducts.length > 0 && (
             <div className="more-from-maker">
-              <h3 className="more-from-maker-title">
-                {makerCode ? (
-                  <a href={`/maker/${makerCode}`} className="more-from-maker-link">
-                    More from this maker →
-                  </a>
-                ) : "You'd also love →"}
-              </h3>
+              <h3 className="more-from-maker-title">More from this maker</h3>
               <div className="more-from-maker-grid">
-                {moreProducts.map(p => (
-                  <a key={p.id} href={`/product/${p.slug}`} className="more-from-maker-card">
-                    <div className="more-from-maker-img">
-                      {p.images[0] && <img src={p.images[0]} alt={p.title} loading="lazy" />}
-                    </div>
-                    <p className="more-from-maker-name">{p.title}</p>
-                    <p className="more-from-maker-price">₹{p.price}</p>
-                  </a>
+                {moreProducts.slice(0, 4).map((p, i) => (
+                  <FeaturedCard key={p.id} product={p} index={i} />
                 ))}
               </div>
             </div>

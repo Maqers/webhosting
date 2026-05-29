@@ -238,21 +238,21 @@
 }
 .feat-img {
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.8s ease-in-out;
 }
 .feat-img-hover {
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  opacity: 0; transition: opacity 0.35s ease; pointer-events: none;
+  opacity: 0; transition: opacity 0.8s ease-in-out; pointer-events: none;
 }
 .feat-img-zone.has-second-img:hover .feat-img { opacity: 0; transform: scale(1.02); }
 .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
 .feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
 @media (hover: none) {
-  .feat-img-zone .feat-img { opacity: 1 !important; transform: none !important; }
-  .feat-img-zone .feat-img-hover { opacity: 0 !important; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0 !important; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1 !important; }
+  .feat-img-zone .feat-img { opacity: 1; transform: none; }
+  .feat-img-zone .feat-img-hover { opacity: 0; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1; }
 }
 @keyframes heartPop {
   0%   { transform: scale(1); }
@@ -265,7 +265,7 @@
 .feat-badge-popular {
   position: absolute; top: 10px; left: 10px;
   background: #760909; color: #fff;
-  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 700;
+  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 400;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 6px; pointer-events: none;
 }
@@ -286,7 +286,7 @@
   padding: 0.875rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex: 1;
 }
 .feat-category {
-  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 700;
+  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 400;
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary-color); margin: 0; opacity: 0.85;
 }
 .feat-title {
@@ -399,4 +399,7 @@
   .category-filter-chips { gap: 0.4rem; }
   .cat-filter-chip { font-size: 0.8rem; padding: 0.3rem 0.75rem; }
   .cat-sort-select { font-size: 0.8rem; }
+}
+@media (hover: hover), (min-width: 769px) {
+  .feat-img-zone { aspect-ratio: 1 / 1 !important; }
 }

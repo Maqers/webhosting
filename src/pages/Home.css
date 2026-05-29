@@ -180,7 +180,7 @@
 
 .feat-img {
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.8s ease-in-out;
 }
 
 /* Second image — hidden by default, fades in on hover */
@@ -188,7 +188,7 @@
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.8s ease-in-out;
   pointer-events: none;
 }
 
@@ -198,17 +198,17 @@
 /* On cards without second image, keep normal zoom */
 .feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
 @media (hover: none) {
-  .feat-img-zone .feat-img { opacity: 1 !important; transform: none !important; }
-  .feat-img-zone .feat-img-hover { opacity: 0 !important; }
+  .feat-img-zone .feat-img { opacity: 1; transform: none; }
+  .feat-img-zone .feat-img-hover { opacity: 0; }
   /* Mobile: swap when card is centred in viewport (IntersectionObserver adds this class) */
-  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0 !important; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1; }
 }
 
 .feat-badge-popular {
   position: absolute; top: 10px; left: 10px;
   background: #760909; color: #fff;
-  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 700;
+  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 400;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 6px; pointer-events: none;
 }
@@ -239,7 +239,7 @@
   padding: 0.875rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex: 1;
 }
 .feat-category {
-  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 700;
+  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 400;
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary-color); margin: 0; opacity: 0.85;
 }
 .feat-title {
@@ -346,11 +346,17 @@
   gap: 0.9rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0.25rem 1.5rem 0.6rem 1.5rem;
+  padding: 0.25rem 0 0.6rem 1.5rem;
   scrollbar-width: none;
   touch-action: pan-x;
   overscroll-behavior-x: none;
   scroll-behavior: smooth;
+}
+.category-circles-scroll::after {
+  content: '';
+  display: block;
+  min-width: 1.5rem;
+  flex-shrink: 0;
 }
 .category-circles-scroll::-webkit-scrollbar { display: none; }
 
@@ -512,4 +518,7 @@
 /* Only show on desktop — mobile uses touch */
 @media (max-width: 768px) {
   .circles-arrow { display: none; }
+}
+@media (hover: hover), (min-width: 769px) {
+  .feat-img-zone { aspect-ratio: 1 / 1 !important; }
 }

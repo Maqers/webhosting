@@ -191,15 +191,35 @@ export const FeaturedCard = ({ product, index }) => {
   const secondImage = product.images[1] || null;
   const imgZoneRef = useRef(null);
 
+  // Match tile dimension to taller image — touch/mobile only
+  useEffect(() => {
+    if (!secondImage || !imgZoneRef.current) return
+    if (!window.matchMedia('(hover: none) and (max-width: 768px)').matches) return
+    const el = imgZoneRef.current
+    const loadImg = (src) => new Promise((res) => {
+      const img = new Image()
+      img.onload = () => res(img.naturalWidth / img.naturalHeight)
+      img.onerror = () => res(1)
+      img.src = src
+    })
+    Promise.all([loadImg(product.images[0]), loadImg(secondImage)]).then(([r1, r2]) => {
+      const ratio = Math.min(r1, r2)
+      if (el) el.style.aspectRatio = String(ratio)
+    })
+  }, [product.images[0], secondImage]);
+
   // Mobile: swap to second image when card scrolls into centre of viewport
   useEffect(() => {
     if (!secondImage || !imgZoneRef.current) return;
     const el = imgZoneRef.current;
+    // Only run on touch devices
+    const isTouch = window.matchMedia('(hover: none) and (max-width: 768px)').matches
+    if (!isTouch) return
     let timer = null
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          timer = setTimeout(() => el.classList.add('mobile-swap'), 600)
+          timer = setTimeout(() => el.classList.add('mobile-swap'), 250)
         } else {
           clearTimeout(timer)
           el.classList.remove('mobile-swap')
