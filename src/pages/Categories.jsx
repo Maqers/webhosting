@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { occasionCategories, getOccasionProducts } from '../data/occasionCatalog'
@@ -252,6 +252,20 @@ const ProductCard = ({ product, index }) => {
   const { toggleItem, isWishlisted } = useWishlist()
   const wishlisted = isWishlisted(product.id)
   const [addedFeedback, setAddedFeedback] = useState(false)
+  const [heartPop, setHeartPop] = useState(false)
+  const imgZoneRef = useRef(null)
+  const secondImage = product.images[1] || null
+
+  useEffect(() => {
+    if (!secondImage || !imgZoneRef.current) return
+    const el = imgZoneRef.current
+    const obs = new IntersectionObserver(
+      ([entry]) => { el.classList.toggle('mobile-swap', entry.isIntersecting) },
+      { threshold: 0.6 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [secondImage])
 
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation()
@@ -263,11 +277,13 @@ const ProductCard = ({ product, index }) => {
   const handleWishlist = useCallback((e) => {
     e.preventDefault(); e.stopPropagation()
     toggleItem(product)
+    setHeartPop(true)
+    setTimeout(() => setHeartPop(false), 400)
   }, [product, toggleItem])
 
   const handleCardClick = useCallback(() => {
     navigate(`/product/${product.slug}`, { state: { from: location.pathname } })
-  }, [product.id, navigate, location])
+  }, [product.slug, navigate, location])
 
   return (
     <article
@@ -279,11 +295,12 @@ const ProductCard = ({ product, index }) => {
       onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
       aria-label={product.title}
     >
-      <div className="feat-img-zone">
+      <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
         <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading={index < 8 ? 'eager' : 'lazy'} />
+        {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
         {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
-        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
+        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
           <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>

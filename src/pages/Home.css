@@ -9,8 +9,8 @@
    ================================================================ */
 
 .hero-bright {
-  background: linear-gradient(160deg, #e8b8b8 0%, #dba8a8 50%, #e8bfbf 100%);
-  padding: 3rem 0 2.75rem;
+  background: #760909;
+  padding: 3.5rem 0 3rem;
   text-align: center;
 }
 
@@ -29,40 +29,25 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.hero-eyebrow-pill {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-family-primary);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--primary-color);
-  background: rgba(118,9,9,0.1);
-  border: 1px solid rgba(118,9,9,0.2);
-  padding: 0.35rem 0.9rem;
-  border-radius: 9999px;
-}
-
 .hero-bright-title {
   font-family: var(--font-family-heading);
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
   font-weight: 700;
-  color: #1a1714;
-  line-height: 1.15;
+  color: #fff;
+  line-height: 1.12;
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
 
 .hero-bright-title em {
   font-style: italic;
-  color: var(--primary-color);
+  color: #f5ede4;
 }
 
 .hero-bright-subtitle {
   font-family: var(--font-family-primary);
   font-size: clamp(0.95rem, 2vw, 1.05rem);
-  color: #5a3a3a;
+  color: rgba(255,255,255,0.78);
   line-height: 1.6;
   margin: 0;
 }
@@ -78,15 +63,26 @@
 .hero-bright-btn-primary {
   display: inline-flex; align-items: center;
   padding: 0.75rem 1.75rem;
-  background: var(--primary-color); color: #fff !important;
+  background: #fff; color: #760909 !important;
   font-family: var(--font-family-primary); font-size: 0.9rem; font-weight: 700;
   letter-spacing: 0.03em; border-radius: 9999px; text-decoration: none;
   transition: background 0.2s, transform 0.18s;
 }
-.hero-bright-btn-primary:hover { background: #5a0707; transform: translateY(-2px); color: #fff !important; }
+.hero-bright-btn-primary:hover { background: #f5ede4; transform: translateY(-2px); color: #760909 !important; }
+
+.hero-bright-btn-secondary {
+  display: inline-flex; align-items: center;
+  padding: 0.75rem 1.75rem;
+  background: rgba(255,255,255,0.12); color: #fff !important;
+  font-family: var(--font-family-primary); font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.02em; border-radius: 9999px; text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: background 0.2s, transform 0.18s;
+}
+.hero-bright-btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); color: #fff !important; }
 
 @media (max-width: 768px) {
-  .hero-bright { padding: 2.25rem 0 2rem; }
+  .hero-bright { padding: 2.5rem 0 2.25rem; }
   .hero-bright-title { font-size: clamp(1.9rem, 7vw, 2.6rem); }
 }
 
@@ -162,11 +158,11 @@
 .feat-card {
   background: #ffffff; border-radius: 16px; overflow: hidden; cursor: pointer;
   border: 1px solid rgba(118,9,9,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);
+  transition: box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);
   display: flex; flex-direction: column;
   animation: featCardIn 0.45s cubic-bezier(0.4,0,0.2,1) both;
   animation-delay: calc(var(--i, 0) * 60ms);
-  -webkit-tap-highlight-color: transparent; will-change: transform;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes featCardIn {
@@ -174,11 +170,8 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.feat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07);
-}
-@media (hover: none) { .feat-card:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
+.feat-card:hover { box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07); }
+@media (hover: none) { .feat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
 
 .feat-img-zone {
   position: relative; width: 100%; aspect-ratio: 1 / 1;
@@ -187,10 +180,30 @@
 
 .feat-img {
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease;
 }
-.feat-card:hover .feat-img { transform: scale(1.04); }
-@media (hover: none) { .feat-card:hover .feat-img { transform: none; } }
+
+/* Second image — hidden by default, fades in on hover */
+.feat-img-hover {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+/* Only fade primary out when a second image actually exists (.has-second-img on the zone) */
+.feat-img-zone.has-second-img:hover .feat-img { opacity: 0; transform: scale(1.02); }
+.feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
+/* On cards without second image, keep normal zoom */
+.feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
+@media (hover: none) {
+  .feat-img-zone .feat-img { opacity: 1 !important; transform: none !important; }
+  .feat-img-zone .feat-img-hover { opacity: 0 !important; }
+  /* Mobile: swap when card is centred in viewport (IntersectionObserver adds this class) */
+  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1 !important; }
+}
 
 .feat-badge-popular {
   position: absolute; top: 10px; left: 10px;
@@ -198,6 +211,14 @@
   font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 6px; pointer-events: none;
+}
+
+/* Wishlist heart — pop animation */
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.45); }
+  60%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
 }
 
 .feat-wishlist-btn {
@@ -212,6 +233,7 @@
 .feat-wishlist-btn svg { width: 16px; height: 16px; }
 .feat-wishlist-btn:hover  { color: var(--primary-color); background: #fff; transform: scale(1.1); }
 .feat-wishlist-btn.active { color: var(--primary-color); background: #fff; }
+.feat-wishlist-btn.heart-pop { animation: heartPop 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
 .feat-info-zone {
   padding: 0.875rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex: 1;
@@ -304,13 +326,12 @@
 
 @media (max-width: 968px) {
   .feat-img-zone {
-    aspect-ratio: unset !important;
-    height: auto !important;
+    aspect-ratio: 1 / 1;
   }
   .feat-img {
     width: 100% !important;
-    height: auto !important;
-    object-fit: contain !important;
+    height: 100% !important;
+    object-fit: cover !important;
     object-position: center !important;
   }
 }
@@ -350,7 +371,7 @@
   border-radius: 50%;
   overflow: hidden;
   background: #faf5f5;
-  border: 2px solid #ede0e0;
+  border: 1.5px solid rgba(118,9,9,0.15);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -391,10 +412,10 @@
   }
 }
 .category-circle-label {
-  font-family: var(--font-family-primary);
+  font-family: var(--font-family-heading);
   font-size: 0.72rem;
-  font-weight: 600;
-  font-style: italic;
+  font-weight: 700;
+  font-style: normal;
   color: #3a2020;
   text-align: center;
   line-height: 1.2;

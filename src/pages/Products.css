@@ -44,7 +44,6 @@
   z-index: 99;
   box-shadow: var(--shadow-sm);
   width: 100%;
-  overflow-x: hidden;
   isolation: isolate;
 }
 
@@ -250,8 +249,8 @@
   line-height: 1.4;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -366,19 +365,19 @@
 .feat-card {
   background: #ffffff; border-radius: 16px; overflow: hidden; cursor: pointer;
   border: 1px solid rgba(118,9,9,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);
+  transition: box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);
   display: flex; flex-direction: column;
   animation: featCardIn 0.45s cubic-bezier(0.4,0,0.2,1) both;
   animation-delay: calc(var(--i, 0) * 60ms);
-  -webkit-tap-highlight-color: transparent; will-change: transform;
+  -webkit-tap-highlight-color: transparent;
   height: 100%; width: 100%;
 }
 @keyframes featCardIn {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.feat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07); }
-@media (hover: none) { .feat-card:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
+.feat-card:hover { box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07); }
+@media (hover: none) { .feat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
 
 /* Out of stock card — entire tile greyed out */
 .feat-card--oos { opacity: 0.5; filter: grayscale(70%); }
@@ -388,14 +387,46 @@
 .feat-img-zone {
   position: relative; width: 100%; aspect-ratio: 1 / 1;
   background: #f5ede4; overflow: hidden; flex-shrink: 0;
-  /* Never override on mobile */
 }
 .feat-img {
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease;
 }
-.feat-card:hover .feat-img { transform: scale(1.04); }
-@media (hover: none) { .feat-card:hover .feat-img { transform: none; } }
+.feat-img-hover {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
+  opacity: 0; transition: opacity 0.35s ease; pointer-events: none;
+}
+.feat-img-zone.has-second-img:hover .feat-img { opacity: 0; transform: scale(1.02); }
+.feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
+.feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
+@media (hover: none) {
+  .feat-img-zone .feat-img { opacity: 1 !important; transform: none !important; }
+  .feat-img-zone .feat-img-hover { opacity: 0 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1 !important; }
+}
+
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.45); }
+  60%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+.feat-wishlist-btn {
+  position: absolute; top: 10px; right: 10px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.92); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #aaa; box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  transition: color 0.2s, background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent; z-index: 2;
+}
+.feat-wishlist-btn svg { width: 16px; height: 16px; }
+.feat-wishlist-btn:hover  { color: var(--primary-color); background: #fff; transform: scale(1.1); }
+.feat-wishlist-btn.active { color: var(--primary-color); background: #fff; }
+.feat-wishlist-btn.heart-pop { animation: heartPop 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
 .feat-badge-popular {
   position: absolute; top: 10px; left: 10px;
@@ -411,18 +442,6 @@
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 6px; pointer-events: none;
 }
-.feat-wishlist-btn {
-  position: absolute; top: 10px; right: 10px;
-  width: 34px; height: 34px; border-radius: 50%;
-  background: rgba(255,255,255,0.92); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  color: #aaa; box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  transition: color 0.2s, background 0.2s, transform 0.15s;
-  -webkit-tap-highlight-color: transparent; z-index: 2;
-}
-.feat-wishlist-btn svg { width: 16px; height: 16px; }
-.feat-wishlist-btn:hover  { color: var(--primary-color); background: #fff; transform: scale(1.1); }
-.feat-wishlist-btn.active { color: var(--primary-color); background: #fff; }
 
 .feat-info-zone {
   padding: 0.875rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex: 1;
@@ -482,16 +501,15 @@
   .feat-info-zone { padding: 0.75rem 0.875rem 0.875rem; }
 }
 
-/* Mobile: show full image, no cropping */
+/* Mobile: fill tile with image */
 @media (max-width: 968px) {
   .feat-img-zone {
-    aspect-ratio: unset !important;
-    height: auto !important;
+    aspect-ratio: 1 / 1;
   }
   .feat-img {
     width: 100% !important;
-    height: auto !important;
-    object-fit: contain !important;
+    height: 100% !important;
+    object-fit: cover !important;
     object-position: center !important;
   }
 }
@@ -500,17 +518,25 @@
   background: transparent;
   padding: 0.75rem 0 0.25rem;
   border-bottom: none;
+  overflow: visible;
 }
 .category-circles-strip--products .category-circles-scroll {
   display: flex;
   gap: 0.9rem;
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  padding: 0.25rem 1.5rem 0.6rem 1.5rem;
+  padding: 0.5rem 0 0.75rem 1.5rem;
   scrollbar-width: none;
   touch-action: pan-x;
   overscroll-behavior-x: none;
   scroll-behavior: smooth;
+}
+.category-circles-strip--products .category-circles-scroll::after {
+  content: '';
+  display: block;
+  min-width: 1.5rem;
+  flex-shrink: 0;
 }
 .category-circles-strip--products .category-circles-scroll::-webkit-scrollbar { display: none; }
 
@@ -535,7 +561,7 @@
   border-radius: 50%;
   overflow: hidden;
   background: #faf5f5;
-  border: 2px solid #ede0e0;
+  border: 1.5px solid rgba(118,9,9,0.15);
   flex-shrink: 0;
   display: flex;
   align-items: center;

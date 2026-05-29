@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getProductById, getProductBySlug, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
 import { getWhatsAppNumber } from '../data/contactInfo'
@@ -38,6 +38,45 @@ const ProductDetail = () => {
   const { addItem } = useCart()
   const { toggleItem, isWishlisted } = useWishlist()
   const wishlisted = isWishlisted(product?.id)
+
+  // ── Delivery timeline ─────────────────────────────────────────────────────
+  const deliveryTimeline = useMemo(() => {
+    const today = new Date()
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]}`
+    const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r }
+
+    // Parse delivery_time like "3-4 days", "7 days", etc. Default 3-4 making + 3-4 delivery
+    const raw = product?.meta?.delivery_time || ''
+    const nums = raw.match(/\d+/g)?.map(Number) || []
+    const makingMin = nums[0] || 3
+    const makingMax = nums[1] || makingMin + 1
+
+    const dispatchMin = addDays(today, makingMin)
+    const dispatchMax = addDays(today, makingMax)
+    const deliveryMin = addDays(dispatchMin, 3)
+    const deliveryMax = addDays(dispatchMax, 4)
+
+    const dispatchStr = dispatchMin.getDate() === dispatchMax.getDate() && dispatchMin.getMonth() === dispatchMax.getMonth()
+      ? fmt(dispatchMin)
+      : `${fmt(dispatchMin)} – ${fmt(dispatchMax)}`
+    const deliveryStr = `${fmt(deliveryMin)} – ${fmt(deliveryMax)}`
+
+    return { orderDate: fmt(today), dispatchStr, deliveryStr }
+  }, [product?.meta?.delivery_time])
+
+  // ── Track recently viewed ──────────────────────────────────────────────────
+  const [recentlyViewed, setRecentlyViewed] = useState([])
+  useEffect(() => {
+    if (!product) return
+    const KEY = 'maqers_recently_viewed'
+    const stored = JSON.parse(localStorage.getItem(KEY) || '[]')
+    const filtered = stored.filter(id => id !== product.id).slice(0, 7)
+    localStorage.setItem(KEY, JSON.stringify([product.id, ...filtered]))
+    const all = getAllProducts()
+    const recent = filtered.map(id => all.find(p => p.id === id)).filter(Boolean).slice(0, 6)
+    setRecentlyViewed(recent)
+  }, [product?.id])
 
   const handleAddToCart = () => {
     addItem(product, selectedColor, selectedSize)
@@ -259,7 +298,6 @@ const ProductDetail = () => {
 
             {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
-            <p className="product-detail-id">Product ID: {product.id}</p>
             <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: product.description.split('\\n').join('<br/>') }} />
 
             <div className="price-section">
@@ -274,7 +312,6 @@ const ProductDetail = () => {
               ) : (
                 <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
               )}
-              <p className="delivery-info">Delivery: 7-14 business days</p>
             </div>
 
             {/* MOQ */}
@@ -344,6 +381,33 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            {/* Delivery timeline — below actions */}
+            <div className="delivery-timeline">
+              <div className="dtl-step">
+                <div className="dtl-icon dtl-icon--done">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <div className="dtl-label">{deliveryTimeline.orderDate}</div>
+                <div className="dtl-sublabel">Order Placed</div>
+              </div>
+              <div className="dtl-line"><span className="dtl-line-label">Being Crafted</span></div>
+              <div className="dtl-step">
+                <div className="dtl-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                </div>
+                <div className="dtl-label">{deliveryTimeline.dispatchStr}</div>
+                <div className="dtl-sublabel">Dispatched</div>
+              </div>
+              <div className="dtl-line"><span className="dtl-line-label">In Transit</span></div>
+              <div className="dtl-step">
+                <div className="dtl-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div className="dtl-label">{deliveryTimeline.deliveryStr}</div>
+                <div className="dtl-sublabel">Delivered</div>
+              </div>
+            </div>
+
             <div className="product-features">
               <h3>Product Features</h3>
               <ul>
@@ -356,11 +420,10 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* ── Customer Reviews ─────────────────────────────────────────── */}
+          {/* ── Customer Reviews — only shown if reviews exist ── */}
+          {product.meta?.reviews && product.meta.reviews.length > 0 && (
           <div className="reviews-section">
             <h3 className="reviews-title">Customer Reviews</h3>
-            {product.meta?.reviews && product.meta.reviews.length > 0 ? (
-              <>
                 <div className="reviews-summary">
                   <span className="reviews-avg">
                     {(product.meta.reviews.reduce((s, r) => s + r.rating, 0) / product.meta.reviews.length).toFixed(1)}
@@ -396,11 +459,8 @@ const ProductDetail = () => {
                     </div>
                   ))}
                 </div>
-              </>
-            ) : (
-              <p className="reviews-empty">No reviews yet — be the first to order and share your experience!</p>
-            )}
           </div>
+          )}
 
           {/* More from this maker — spans full width */}
           {moreProducts.length > 0 && (
@@ -427,6 +487,26 @@ const ProductDetail = () => {
           )}
         </div>
       </div>
+
+      {/* ── Recently Viewed ── */}
+      {recentlyViewed.length > 0 && (
+        <div className="recently-viewed-section">
+          <div className="container">
+            <h3 className="recently-viewed-title">Recently viewed</h3>
+            <div className="recently-viewed-grid">
+              {recentlyViewed.map(p => (
+                <a key={p.id} href={`/product/${p.slug}`} className="rv-card">
+                  <div className="rv-img">
+                    {p.images[0] && <img src={p.images[0]} alt={p.title} loading="lazy" />}
+                  </div>
+                  <p className="rv-title">{p.title}</p>
+                  <p className="rv-price">₹{p.price.toLocaleString('en-IN')}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

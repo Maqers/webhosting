@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, memo, useCallback } from 'react'
+import { useState, useMemo, useEffect, useRef, memo, useCallback } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { searchAll } from '../utils/search'
@@ -75,7 +75,7 @@ const Products = () => {
 
     let filtered = hasSearch
       ? (searchResultsData?.products ?? searchResults?.products ?? [])
-      : (searchResultsData?.products ?? searchResults?.products ?? getAllProducts())
+      : getAllProducts()
 
     if (selectedCategories.length > 0) {
       const occasionSelected = selectedCategories.filter(id => occasionProductMap[id])
@@ -284,16 +284,31 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
   const { toggleItem, isWishlisted } = useWishlist()
   const wishlisted = isWishlisted(product.id)
   const [addedFeedback, setAddedFeedback] = useState(false)
+  const [heartPop, setHeartPop] = useState(false)
+  const imgZoneRef = useRef(null)
+  const secondImage = product.images[1] || null
 
   const categoryName = useMemo(() => {
-    // Always look up by categoryId first — this returns the display name (e.g. "Handmade Florals" not "Crochet")
     const byId = categoryMap.get(product.categoryId)
     if (byId) return byId.name
-    // Fallback: try the denormalised product.category string (may be stale)
     const byName = categoryMap.get(product.category)
     if (byName) return byName.name
     return 'Handmade Gift'
   }, [product.categoryId, product.category, categoryMap])
+
+  // Mobile: swap image when card scrolls into centre of viewport
+  useEffect(() => {
+    if (!secondImage || !imgZoneRef.current) return
+    const el = imgZoneRef.current
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        el.classList.toggle('mobile-swap', entry.isIntersecting)
+      },
+      { threshold: 0.6 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [secondImage])
 
   const handleAddToCart = useCallback((e) => {
     e.preventDefault()
@@ -307,15 +322,16 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
     e.preventDefault()
     e.stopPropagation()
     toggleItem(product)
+    setHeartPop(true)
+    setTimeout(() => setHeartPop(false), 400)
   }, [product, toggleItem])
 
   const handleCardClick = useCallback(() => {
-    // Build the return URL including any active category filter
     const params = selectedCategories.length > 0
       ? `?category=${selectedCategories[0]}`
       : location.search
     navigate(`/product/${product.slug}`, { state: { from: location.pathname + params } })
-  }, [product.id, navigate, location, selectedCategories])
+  }, [product.slug, navigate, location, selectedCategories])
 
   return (
     <article
@@ -327,7 +343,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
       onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
       aria-label={product.title}
     >
-      <div className="feat-img-zone">
+      <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
         <ImageWithFallback
           src={product.images[0]}
           alt={product.title}
@@ -336,10 +352,11 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
           priority={priority}
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
+        {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
         {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button
-          className={`feat-wishlist-btn${wishlisted ? " active" : ""}`}
+          className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`}
           onClick={handleWishlist}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           type="button"

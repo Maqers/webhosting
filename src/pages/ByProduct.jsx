@@ -19,7 +19,7 @@ export default function ByProduct() {
       </div>
       <div className="by-page-list">
         {categories.map(cat => (
-          <Link key={cat.id} to={`/products?category=${cat.id}`} className="by-page-item">
+          <Link key={cat.id} to={`/category/${cat.id}`} className="by-page-item">
             <span className="by-page-name">{cat.name}</span>
             <span className="by-page-arrow">›</span>
           </Link>

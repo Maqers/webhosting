@@ -58,35 +58,34 @@ const AboutUs = () => {
 
           {/* ── OUR STORY ────────────────────────────────────── */}
           <div className="about-section scroll-animate">
-            <h2>Our Story</h2>
+            <h2>Saw it on Instagram? Buy it here.</h2>
             <p>
-              Instagram is full of incredible Indian home businesses — people making stunning crochet bouquets,
-              hand-poured candles, pressed flower frames, oxidised jewellery, and custom gift hampers from their homes.
-              You've scrolled past them. You've saved them. You've wanted to buy from them.
+              You've been there. You're scrolling Instagram at midnight and you see it — a stunning hand-poured candle,
+              a crochet bouquet that looks like it's from a movie set, a custom name frame that would be perfect for
+              your best friend's birthday. You hit save. You DM the seller. And then you wait. And wait. And maybe
+              get a reply three days later asking for your address in a DM chain that somehow never leads to an actual purchase.
             </p>
             <p>
-              But actually buying? That's a leap of faith. Will they deliver on time? Is the product as good as the photo?
-              What if something goes wrong? There's no accountability, no protection, no way to know who you're really buying from.
+              That's the gap Maqers fills. We spent months finding the best independent home businesses on Instagram —
+              the ones who actually make great things — and built the infrastructure around them that Instagram never had.
+              Verified sellers. Real products. A proper checkout. No DM anxiety.
             </p>
             <p>
-              That's why Maqers exists. We spend the time finding, ordering from, and vetting the best gifting
-              businesses on Instagram — so you get all the charm of a handmade gift without any of the risk.
-              Every seller on Maqers has been personally verified by us. Every product has been reviewed.
+              Every seller on Maqers has been personally vetted by us. We've ordered from them, verified their identity,
+              and confirmed their products match what they show online. What you see is what you get.
             </p>
           </div>
 
-          {/* ── HOW WE VERIFY ────────────────────────────────── */}
-       
-
           {/* ── OUR MISSION ──────────────────────────────────── */}
           <div className="about-section scroll-animate">
-            <h2>Our Mission</h2>
+            <h2>We're on both sides of this.</h2>
             <p>
-              Make gifting genuinely easy for buyers, and give India's best home businesses the visibility and trust they deserve.
-              Most sellers on Maqers are one or two-person operations — a student who turned a craft into income,
-              someone working from their apartment. They make beautiful things. We give you a reason to trust them.
+              Most sellers on Maqers are one or two-person operations — someone who turned a skill into a side hustle,
+              a student funding their own education through craft, a parent building something of their own from home.
+              They make genuinely beautiful things. The problem was never the product — it was discoverability and trust.
             </p>
             <p>
+              Maqers gives buyers a reason to trust them, and gives sellers the reach they couldn't build alone.
               When you buy on Maqers, you're not choosing between quality and supporting small. You get both.
             </p>
           </div>
@@ -138,6 +137,29 @@ const AboutUs = () => {
             </div>
           </div>
 
+          {/* ── SELL ON MAQERS ────────────────────────────────── */}
+          <div className="about-section scroll-animate">
+            <div className="seller-cta-block">
+              <div className="seller-cta-text">
+                <h2>Have a home business? Start selling today.</h2>
+                <p>
+                  If you make something — jewellery, candles, baked goods, skincare, art, accessories — and you've
+                  been selling (or thinking about selling) through Instagram DMs, Maqers is built for you.
+                </p>
+                <p>
+                  You don't need a website. You don't need a GST number to start. You don't need to figure out
+                  logistics, payment gateways, or how to write product descriptions. We handle all of that.
+                  You just make the thing.
+                </p>
+                <p>
+                  Whether you're a solo creator working from your bedroom or a small team with big ideas —
+                  list on Maqers and reach buyers who are already looking for exactly what you make.
+                </p>
+                <a href="/contact" className="seller-cta-btn">Apply to sell on Maqers →</a>
+              </div>
+            </div>
+          </div>
+
           {/* ── GET IN TOUCH ──────────────────────────────────── */}
           <div className="get-in-touch-section scroll-animate">
             <div className="get-in-touch-content">
@@ -151,7 +173,7 @@ const AboutUs = () => {
                   <svg className="quote-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                   </svg>
-                  <p className="quote-text">"Instagram's best gifting businesses, verified and delivered to your door."</p>
+                  <p className="quote-text">"Saw it on Instagram? Buy it here."</p>
                   <p className="quote-author">— Maqers</p>
                 </div>
               </div>

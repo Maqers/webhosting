@@ -238,10 +238,29 @@
 }
 .feat-img {
   width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease;
 }
-.feat-card:hover .feat-img { transform: scale(1.04); }
-@media (hover: none) { .feat-card:hover .feat-img { transform: none; } }
+.feat-img-hover {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
+  opacity: 0; transition: opacity 0.35s ease; pointer-events: none;
+}
+.feat-img-zone.has-second-img:hover .feat-img { opacity: 0; transform: scale(1.02); }
+.feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
+.feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
+@media (hover: none) {
+  .feat-img-zone .feat-img { opacity: 1 !important; transform: none !important; }
+  .feat-img-zone .feat-img-hover { opacity: 0 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1 !important; }
+}
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.45); }
+  60%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+.feat-wishlist-btn.heart-pop { animation: heartPop 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
 .feat-badge-popular {
   position: absolute; top: 10px; left: 10px;
@@ -314,13 +333,12 @@
 
 @media (max-width: 968px) {
   .feat-img-zone {
-    aspect-ratio: unset !important;
-    height: auto !important;
+    aspect-ratio: 1 / 1;
   }
   .feat-img {
     width: 100% !important;
-    height: auto !important;
-    object-fit: contain !important;
+    height: 100% !important;
+    object-fit: cover !important;
     object-position: center !important;
   }
 }

@@ -296,9 +296,6 @@ const Navbar = () => {
                   <span className="navbar-icon-label">Cart</span>
                 </button>
               </div>
-              <button className={`navbar-toggle ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? 'Close menu' : 'Open menu'} aria-expanded={isOpen} type="button">
-                <span className="hamburger-line"/><span className="hamburger-line"/><span className="hamburger-line"/>
-              </button>
             </div>
           </div>
 

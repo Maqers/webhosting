@@ -72,22 +72,22 @@ const HOME_CAT_IMAGES = {
 
       <section className="hero-bright">
         <div className="container hero-bright-inner">
-          <span className="hero-eyebrow-pill">✦ India's Finest Artisan Gifts</span>
           <h1 className="hero-bright-title">
-            Gifts That Actually<br /><em>Mean Something</em>
+            Saw it on Instagram?<br /><em>Buy it here.</em>
           </h1>
           <p className="hero-bright-subtitle">
-            Handpicked from India's best home businesses — for every occasion, every person.
+            The best independent Indian sellers, in one place.
           </p>
           <div className="hero-bright-actions">
             <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
+            <Link to="/by-occasion" className="hero-bright-btn-secondary">Shop by Occasion</Link>
           </div>
         </div>
       </section>
 
       <MarqueeBanner />
 
-      {/* ── Scrollable category circles — dynamic from catalog ────────────── */}
+      {/* ── Scrollable category circles ── */}
       <section className="category-circles-strip">
         <div className="category-circles-scroll" ref={circlesRef}>
           {getSortedCategories()
@@ -118,6 +118,22 @@ const HOME_CAT_IMAGES = {
         </div>
       </section>
 
+      <section className="featured-section">
+        <div className="container">
+          <div className="featured-header">
+            <div className="featured-header-left">
+              <h2 className="featured-title">Most Loved Right Now</h2>
+            </div>
+            <Link to="/products" className="featured-view-all">View all →</Link>
+          </div>
+          <div className="featured-grid">
+            {popularProducts.slice(0, 8).map((product, index) => (
+              <FeaturedCard key={product.id} product={product} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="trust-bar">
         <div className="container trust-bar-inner">
           <div className="trust-item">
@@ -142,23 +158,6 @@ const HOME_CAT_IMAGES = {
         </div>
       </section>
 
-      <section className="featured-section">
-        <div className="container">
-          <div className="featured-header">
-            <div className="featured-header-left">
-              <span className="featured-eyebrow">✦ Crowd Favourites</span>
-              <h2 className="featured-title">Most Loved Right Now</h2>
-            </div>
-            <Link to="/products" className="featured-view-all">View all →</Link>
-          </div>
-          <div className="featured-grid">
-            {popularProducts.slice(0, 8).map((product, index) => (
-              <FeaturedCard key={product.id} product={product} index={index} />
-            ))}
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 };
@@ -169,6 +168,7 @@ export const FeaturedCard = ({ product, index }) => {
   const navigate = useNavigate();
   const wishlisted = isWishlisted(product.id);
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [heartPop, setHeartPop] = useState(false);
 
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation();
@@ -180,11 +180,34 @@ export const FeaturedCard = ({ product, index }) => {
   const handleWishlist = useCallback((e) => {
     e.preventDefault(); e.stopPropagation();
     toggleItem(product);
+    setHeartPop(true);
+    setTimeout(() => setHeartPop(false), 400);
   }, [product, toggleItem]);
 
   const handleCardClick = useCallback(() => {
     navigate(`/product/${product.slug}`);
-  }, [product.id, navigate]);
+  }, [product.slug, navigate]);
+
+  const secondImage = product.images[1] || null;
+  const imgZoneRef = useRef(null);
+
+  // Mobile: swap to second image when card scrolls into centre of viewport
+  useEffect(() => {
+    if (!secondImage || !imgZoneRef.current) return;
+    const el = imgZoneRef.current;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('mobile-swap');
+        } else {
+          el.classList.remove('mobile-swap');
+        }
+      },
+      { threshold: 0.6 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [secondImage]);
 
   return (
     <article
@@ -196,11 +219,12 @@ export const FeaturedCard = ({ product, index }) => {
       onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
       aria-label={product.title}
     >
-      <div className="feat-img-zone">
+      <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
         <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading="lazy" />
+        {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
         {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
-        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
+        <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
           <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
