@@ -99,7 +99,8 @@ const HOME_CAT_IMAGES = {
                   key={cat.id}
                   to={`/category/${cat.id}`}
                   state={{ from: '/' }}
-                  className="category-circle-item"
+                  className="category-circle-item category-circle-item--btn"
+                  style={{ textDecoration: 'none' }}
                 >
                   <div className="category-circle-img">
                     {img

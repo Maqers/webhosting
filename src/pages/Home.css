@@ -333,7 +333,7 @@
 }
 .category-circles-scroll::-webkit-scrollbar { display: none; }
 
-.category-circle-item {
+.category-circle-item, .category-circle-item--btn {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -380,7 +380,7 @@
   transform: scale(1.06);
 }
 
-/* No hover/active highlight on mobile — avoids tap-vs-scroll confusion */
+/* No hover/active highlight on mobile */
 @media (max-width: 768px) {
   .category-circle-item:hover .category-circle-img,
   .category-circle-item:active .category-circle-img,
@@ -394,14 +394,12 @@
   font-family: var(--font-family-primary);
   font-size: 0.72rem;
   font-weight: 600;
+  font-style: italic;
   color: #3a2020;
   text-align: center;
   line-height: 1.2;
   white-space: nowrap;
   width: 84px;
-  max-width: 84px;
-  display: block;
-  margin: 0 auto;
 }
 @media (min-width: 768px) {
   .category-circles-scroll {
@@ -414,9 +412,9 @@
     scrollbar-width: none;
   }
   .category-circles-scroll::-webkit-scrollbar { display: none; }
-  .category-circle-item { width: 90px; }
+  .category-circle-item, .category-circle-item--btn { width: 88px; }
   .category-circle-img  { width: 80px; height: 80px; min-width: 80px; min-height: 80px; }
-  .category-circle-label { width: 90px; max-width: 90px; }
+  .category-circle-label { font-size: 0.76rem; width: 88px; }
 }
 
 /* ── Circle buttons (Products page filter) ── */
