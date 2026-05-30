@@ -47,76 +47,11 @@ const getCachedCategoryMap = () => {
   return cachedCategoryMap
 }
 
-const ALL_PRODUCTS_MAX = 30000
-
-const PriceRangeFilter = ({ onApply }) => {
-  const [min, setMin] = useState(0)
-  const [max, setMax] = useState(ALL_PRODUCTS_MAX)
-  const [active, setActive] = useState(false)
-  const [open, setOpen] = useState(false)
-  const wrapRef = useRef(null)
-
-  useEffect(() => {
-    if (!open) return
-    const fn = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
-    document.addEventListener('mousedown', fn)
-    return () => document.removeEventListener('mousedown', fn)
-  }, [open])
-
-  const minPct = (min / ALL_PRODUCTS_MAX) * 100
-  const maxPct = (max / ALL_PRODUCTS_MAX) * 100
-
-  const handleApply = () => {
-    onApply(min, max >= ALL_PRODUCTS_MAX ? Infinity : max)
-    setActive(min > 0 || max < ALL_PRODUCTS_MAX)
-    setOpen(false)
-  }
-  const handleReset = () => {
-    setMin(0); setMax(ALL_PRODUCTS_MAX)
-    onApply(0, Infinity); setActive(false); setOpen(false)
-  }
-
-  return (
-    <div className="price-filter-wrap" ref={wrapRef}>
-      <button className={`price-filter-toggle${active ? ' active' : ''}`} onClick={() => setOpen(o => !o)} type="button">
-        Price {active ? `· ₹${min.toLocaleString('en-IN')}–${max >= ALL_PRODUCTS_MAX ? '30k+' : '₹' + max.toLocaleString('en-IN')}` : ''}
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{marginLeft:4}}>
-          <path d={open ? 'M18 15l-6-6-6 6' : 'M6 9l6 6 6-6'} />
-        </svg>
-      </button>
-      {open && (
-        <div className="price-filter-dropdown">
-          <div className="price-filter-header-row">
-            <span className="price-filter-title">Price Range</span>
-            <span className="price-filter-values">₹{min.toLocaleString('en-IN')} – {max >= ALL_PRODUCTS_MAX ? '₹30,000+' : '₹' + max.toLocaleString('en-IN')}</span>
-          </div>
-          <div className="dual-slider-container">
-            <div className="dual-slider-track">
-              <div className="dual-slider-range" style={{left:`${minPct}%`, right:`${100-maxPct}%`}} />
-            </div>
-            <input type="range" className="dual-slider-input" min={0} max={ALL_PRODUCTS_MAX} step={100} value={min}
-              onChange={e => { const v = Number(e.target.value); if (v < max - 100) setMin(v) }} />
-            <input type="range" className="dual-slider-input" min={0} max={ALL_PRODUCTS_MAX} step={100} value={max}
-              onChange={e => { const v = Number(e.target.value); if (v > min + 100) setMax(v) }} />
-          </div>
-          <div className="dual-slider-labels">
-            <span>₹0</span><span>₹30,000+</span>
-          </div>
-          <div className="price-filter-actions">
-            <button className="price-filter-apply" onClick={handleApply}>Apply</button>
-            {active && <button className="price-filter-clear" onClick={handleReset}>Reset</button>}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
 
 const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
-  const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
   const searchQuery = location.state?.searchQuery
@@ -165,13 +100,8 @@ const Products = () => {
       relevanceScores
     })
 
-    // Apply price range filter
-    if (priceRange.min > 0 || priceRange.max < Infinity) {
-      filtered = filtered.filter(p => p.price >= priceRange.min && p.price <= priceRange.max)
-    }
-
     return filtered
-  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores, priceRange])
+  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
 
@@ -290,7 +220,6 @@ const Products = () => {
             </div>
             <div className="filters-controls-row">
               <ProductSort onSortChange={() => { }} />
-              <PriceRangeFilter onApply={(min, max) => setPriceRange({ min, max })} />
             </div>
           </div>
         </div>
