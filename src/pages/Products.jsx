@@ -54,6 +54,18 @@ const PriceRangeFilter = ({ onApply }) => {
   const [max, setMax] = useState(ALL_PRODUCTS_MAX)
   const [active, setActive] = useState(false)
   const [open, setOpen] = useState(false)
+  const wrapRef = useRef(null)
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return
+    const fn = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', fn)
+    return () => document.removeEventListener('mousedown', fn)
+  }, [open])
+
+  const minPct = (min / ALL_PRODUCTS_MAX) * 100
+  const maxPct = (max / ALL_PRODUCTS_MAX) * 100
 
   const handleApply = () => {
     onApply(min, max >= ALL_PRODUCTS_MAX ? Infinity : max)
@@ -66,7 +78,7 @@ const PriceRangeFilter = ({ onApply }) => {
   }
 
   return (
-    <div className="price-filter-wrap" style={{ position: 'relative' }}>
+    <div className="price-filter-wrap" ref={wrapRef}>
       <button
         className={`price-filter-toggle${active ? ' active' : ''}`}
         onClick={() => setOpen(o => !o)}
@@ -74,7 +86,7 @@ const PriceRangeFilter = ({ onApply }) => {
       >
         Price {active ? `· ₹${min.toLocaleString('en-IN')}–${max >= ALL_PRODUCTS_MAX ? '30k+' : '₹' + max.toLocaleString('en-IN')}` : ''}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: 4 }}>
-          <path d={open ? "M18 15l-6-6-6 6" : "M6 9l6 6 6-6"} />
+          <path d={open ? 'M18 15l-6-6-6 6' : 'M6 9l6 6 6-6'} />
         </svg>
       </button>
       {open && (
@@ -83,13 +95,19 @@ const PriceRangeFilter = ({ onApply }) => {
             <span>Price Range</span>
             <span className="price-slider-values">₹{min.toLocaleString('en-IN')} – {max >= ALL_PRODUCTS_MAX ? '₹30,000+' : '₹' + max.toLocaleString('en-IN')}</span>
           </div>
-          <div className="price-slider-inputs">
-            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={50} value={min}
-              onChange={e => setMin(Math.min(Number(e.target.value), max - 50))}
-              className="price-range-input" />
-            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={50} value={max}
-              onChange={e => setMax(Math.max(Number(e.target.value), min + 50))}
-              className="price-range-input" />
+          <div className="dual-range-wrap">
+            <div className="dual-range-track">
+              <div className="dual-range-fill" style={{ left: `${minPct}%`, width: `${maxPct - minPct}%` }} />
+            </div>
+            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={100} value={min}
+              onChange={e => setMin(Math.min(Number(e.target.value), max - 100))}
+              className="dual-range-input dual-range-min" />
+            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={100} value={max}
+              onChange={e => setMax(Math.max(Number(e.target.value), min + 100))}
+              className="dual-range-input dual-range-max" />
+          </div>
+          <div className="dual-range-labels">
+            <span>₹0</span><span>₹30,000+</span>
           </div>
           <div className="price-slider-actions">
             <button className="price-filter-apply" onClick={handleApply}>Apply</button>
@@ -277,8 +295,10 @@ const Products = () => {
                 }
               </div>
             </div>
-            <ProductSort onSortChange={() => { }} />
-            <PriceRangeFilter onApply={(min, max) => setPriceRange({ min, max })} />
+            <div className="filters-controls-row">
+              <ProductSort onSortChange={() => { }} />
+              <PriceRangeFilter onApply={(min, max) => setPriceRange({ min, max })} />
+            </div>
           </div>
         </div>
       </div>
