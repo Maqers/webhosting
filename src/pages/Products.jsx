@@ -56,7 +56,6 @@ const PriceRangeFilter = ({ onApply }) => {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return
     const fn = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
@@ -79,37 +78,31 @@ const PriceRangeFilter = ({ onApply }) => {
 
   return (
     <div className="price-filter-wrap" ref={wrapRef}>
-      <button
-        className={`price-filter-toggle${active ? ' active' : ''}`}
-        onClick={() => setOpen(o => !o)}
-        type="button"
-      >
+      <button className={`price-filter-toggle${active ? ' active' : ''}`} onClick={() => setOpen(o => !o)} type="button">
         Price {active ? `· ₹${min.toLocaleString('en-IN')}–${max >= ALL_PRODUCTS_MAX ? '30k+' : '₹' + max.toLocaleString('en-IN')}` : ''}
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: 4 }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{marginLeft:4}}>
           <path d={open ? 'M18 15l-6-6-6 6' : 'M6 9l6 6 6-6'} />
         </svg>
       </button>
       {open && (
         <div className="price-filter-dropdown">
-          <div className="price-filter-dropdown-header">
-            <span>Price Range</span>
-            <span className="price-slider-values">₹{min.toLocaleString('en-IN')} – {max >= ALL_PRODUCTS_MAX ? '₹30,000+' : '₹' + max.toLocaleString('en-IN')}</span>
+          <div className="price-filter-header-row">
+            <span className="price-filter-title">Price Range</span>
+            <span className="price-filter-values">₹{min.toLocaleString('en-IN')} – {max >= ALL_PRODUCTS_MAX ? '₹30,000+' : '₹' + max.toLocaleString('en-IN')}</span>
           </div>
-          <div className="dual-range-wrap">
-            <div className="dual-range-track">
-              <div className="dual-range-fill" style={{ left: `${minPct}%`, width: `${maxPct - minPct}%` }} />
+          <div className="dual-slider-container">
+            <div className="dual-slider-track">
+              <div className="dual-slider-range" style={{left:`${minPct}%`, right:`${100-maxPct}%`}} />
             </div>
-            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={100} value={min}
-              onChange={e => setMin(Math.min(Number(e.target.value), max - 100))}
-              className="dual-range-input dual-range-min" />
-            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={100} value={max}
-              onChange={e => setMax(Math.max(Number(e.target.value), min + 100))}
-              className="dual-range-input dual-range-max" />
+            <input type="range" className="dual-slider-input" min={0} max={ALL_PRODUCTS_MAX} step={100} value={min}
+              onChange={e => { const v = Number(e.target.value); if (v < max - 100) setMin(v) }} />
+            <input type="range" className="dual-slider-input" min={0} max={ALL_PRODUCTS_MAX} step={100} value={max}
+              onChange={e => { const v = Number(e.target.value); if (v > min + 100) setMax(v) }} />
           </div>
-          <div className="dual-range-labels">
+          <div className="dual-slider-labels">
             <span>₹0</span><span>₹30,000+</span>
           </div>
-          <div className="price-slider-actions">
+          <div className="price-filter-actions">
             <button className="price-filter-apply" onClick={handleApply}>Apply</button>
             {active && <button className="price-filter-clear" onClick={handleReset}>Reset</button>}
           </div>
