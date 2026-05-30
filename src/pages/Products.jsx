@@ -47,10 +47,65 @@ const getCachedCategoryMap = () => {
   return cachedCategoryMap
 }
 
+const ALL_PRODUCTS_MAX = 30000
+
+const PriceRangeFilter = ({ onApply }) => {
+  const [min, setMin] = useState(0)
+  const [max, setMax] = useState(ALL_PRODUCTS_MAX)
+  const [active, setActive] = useState(false)
+  const [open, setOpen] = useState(false)
+
+  const handleApply = () => {
+    onApply(min, max >= ALL_PRODUCTS_MAX ? Infinity : max)
+    setActive(min > 0 || max < ALL_PRODUCTS_MAX)
+    setOpen(false)
+  }
+  const handleReset = () => {
+    setMin(0); setMax(ALL_PRODUCTS_MAX)
+    onApply(0, Infinity); setActive(false); setOpen(false)
+  }
+
+  return (
+    <div className="price-filter-wrap" style={{ position: 'relative' }}>
+      <button
+        className={`price-filter-toggle${active ? ' active' : ''}`}
+        onClick={() => setOpen(o => !o)}
+        type="button"
+      >
+        Price {active ? `· ₹${min.toLocaleString('en-IN')}–${max >= ALL_PRODUCTS_MAX ? '30k+' : '₹' + max.toLocaleString('en-IN')}` : ''}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: 4 }}>
+          <path d={open ? "M18 15l-6-6-6 6" : "M6 9l6 6 6-6"} />
+        </svg>
+      </button>
+      {open && (
+        <div className="price-filter-dropdown">
+          <div className="price-filter-dropdown-header">
+            <span>Price Range</span>
+            <span className="price-slider-values">₹{min.toLocaleString('en-IN')} – {max >= ALL_PRODUCTS_MAX ? '₹30,000+' : '₹' + max.toLocaleString('en-IN')}</span>
+          </div>
+          <div className="price-slider-inputs">
+            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={50} value={min}
+              onChange={e => setMin(Math.min(Number(e.target.value), max - 50))}
+              className="price-range-input" />
+            <input type="range" min={0} max={ALL_PRODUCTS_MAX} step={50} value={max}
+              onChange={e => setMax(Math.max(Number(e.target.value), min + 50))}
+              className="price-range-input" />
+          </div>
+          <div className="price-slider-actions">
+            <button className="price-filter-apply" onClick={handleApply}>Apply</button>
+            {active && <button className="price-filter-clear" onClick={handleReset}>Reset</button>}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
+  const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
   const searchQuery = location.state?.searchQuery
@@ -99,8 +154,13 @@ const Products = () => {
       relevanceScores
     })
 
+    // Apply price range filter
+    if (priceRange.min > 0 || priceRange.max < Infinity) {
+      filtered = filtered.filter(p => p.price >= priceRange.min && p.price <= priceRange.max)
+    }
+
     return filtered
-  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
+  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores, priceRange])
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
 
@@ -218,6 +278,7 @@ const Products = () => {
               </div>
             </div>
             <ProductSort onSortChange={() => { }} />
+            <PriceRangeFilter onApply={(min, max) => setPriceRange({ min, max })} />
           </div>
         </div>
       </div>

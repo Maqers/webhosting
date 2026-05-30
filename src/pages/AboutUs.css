@@ -120,7 +120,6 @@
   padding: 4rem 0;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 .about-section {
@@ -824,4 +823,85 @@
 .category-card-emoji {
   font-size: 2rem; line-height: 1; margin-bottom: .5rem; display: block;
   font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif;
+}
+
+/* ── Seller CTA Block ── */
+.seller-cta-block {
+  background: #1a1714;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  color: #f5ede4;
+}
+
+.seller-cta-text h2 {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.seller-cta-text p {
+  font-size: 1rem;
+  color: rgba(245, 237, 228, 0.78);
+  line-height: 1.7;
+  margin-bottom: 0.85rem;
+}
+
+.seller-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.75rem;
+  background: #760909;
+  color: #fff !important;
+  font-family: var(--font-family-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.18s;
+}
+.seller-cta-btn:hover { background: #5a0707; transform: translateY(-2px); }
+
+/* ── Founders ── */
+.founders-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+@media (max-width: 600px) {
+  .founders-block { grid-template-columns: 1fr; }
+}
+.founder-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #faf7f4;
+  border: 1px solid rgba(118,9,9,0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+.founder-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #760909; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-family-heading);
+  font-size: 1.3rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.founder-name {
+  font-family: var(--font-family-heading);
+  font-size: 1.05rem; font-weight: 700;
+  color: #1a1714; margin: 0 0 2px;
+}
+.founder-role {
+  font-size: 0.75rem; color: #760909;
+  font-weight: 600; margin: 0 0 6px;
+  letter-spacing: 0.02em;
+}
+.founder-bio {
+  font-size: 0.85rem; color: #5a3a3a;
+  line-height: 1.5; margin: 0;
 }

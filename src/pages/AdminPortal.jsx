@@ -422,6 +422,12 @@ function buildEntry(id, product) {
   const sizePricesStr = serializeSizePrices(product.sizePrices);
   const moq = Number(product.moq) || 0;
   const deliveryTime = sanitizeForJS(product.delivery_time || product.meta?.delivery_time || "");
+  const personalisationOpts = (product.personalisation_options || product.meta?.personalisation_options || [])
+    .filter(o => o && o.trim())
+    .map(o => sanitizeForJS(o.trim()));
+  const personalisationPart = personalisationOpts.length > 0
+    ? `, personalisation_options: [${personalisationOpts.map(o => `"${o}"`).join(', ')}]`
+    : '';
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
@@ -437,7 +443,7 @@ function buildEntry(id, product) {
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}" }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -549,7 +555,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -687,7 +693,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [] });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -1290,6 +1296,13 @@ export default function AdminPortal() {
                       <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
                       <input style={ts.input} placeholder="e.g. 3–5 business days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
+                      <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(one per line — shown as checkboxes on product page)</span></label>
+                      <textarea
+                        style={{ ...ts.input, height: 80, resize: 'vertical', fontFamily: 'inherit' }}
+                        placeholder={"e.g.\nAdd name on product (+₹50)\nAdd custom message (+₹30)\nGift wrap (+₹20)"}
+                        value={(newProduct.personalisation_options || []).join('\n')}
+                        onChange={e => setNewProduct(p => ({ ...p, personalisation_options: e.target.value.split('\n') }))}
+                      />
                       <label style={ts.label}>Customer Reviews <span style={ts.labelHint}>(optional — add manually)</span></label>
                       <div style={{ background: "#faf7f5", border: "1px solid #ede0e0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
                         <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
@@ -1406,7 +1419,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "" });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [] });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -1691,6 +1704,13 @@ export default function AdminPortal() {
                           <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
                           <input style={ts.input} placeholder="e.g. 3–5 business days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
+                          <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(one per line — shown as checkboxes on product page)</span></label>
+                          <textarea
+                            style={{ ...ts.input, height: 80, resize: 'vertical', fontFamily: 'inherit' }}
+                            placeholder={"e.g.\nAdd name on product (+₹50)\nAdd custom message (+₹30)\nGift wrap (+₹20)"}
+                            value={(editingProduct.personalisation_options || editingProduct.meta?.personalisation_options || []).join('\n')}
+                            onChange={e => setEditingProduct(p => ({ ...p, personalisation_options: e.target.value.split('\n') }))}
+                          />
                           <label style={ts.label}>Customer Reviews <span style={ts.labelHint}>(optional — add manually)</span></label>
                           <div style={{ background: "#faf7f5", border: "1px solid #ede0e0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
                             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>

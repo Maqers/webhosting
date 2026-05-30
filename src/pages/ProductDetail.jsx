@@ -32,6 +32,8 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState("")
   const [selectedSize, setSelectedSize] = useState("")
   const [lensVisible, setLensVisible] = useState(false)
+  const [selectedPersonalisation, setSelectedPersonalisation] = useState([])
+  const [orderNote, setOrderNote] = useState("")
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   const imageWrapRef = useRef(null)
   const imgRef = useRef(null)
@@ -81,12 +83,14 @@ const ProductDetail = () => {
   }, [product?.id])
 
   const handleAddToCart = () => {
-    addItem(product, selectedColor, selectedSize)
+    addItem(product, selectedColor, selectedSize, selectedPersonalisation, orderNote)
   }
   const handleContactUs = () => {
     let message = `Hello! I want to buy ${product.title} — https://maqers.in/product/${product.slug}`
     if (selectedColor) message += ` Colour: ${selectedColor}.`
     if (selectedSize) message += ` Size: ${selectedSize}.`
+    if (selectedPersonalisation.length > 0) message += ` Personalisation: ${selectedPersonalisation.join(', ')}.`
+    if (orderNote.trim()) message += ` Note: ${orderNote.trim()}.`
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank')
   }
@@ -363,6 +367,39 @@ const ProductDetail = () => {
                 </select>
               </div>
             )}
+
+            {/* ── Personalisation options ── */}
+            {product.meta?.personalisation_options?.filter(o => o.trim()).length > 0 && (
+              <div className="personalisation-section">
+                <label className="personalisation-title">Add Personalisation</label>
+                <div className="personalisation-options">
+                  {product.meta.personalisation_options.filter(o => o.trim()).map((opt, i) => (
+                    <label key={i} className="personalisation-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedPersonalisation.includes(opt)}
+                        onChange={e => setSelectedPersonalisation(prev =>
+                          e.target.checked ? [...prev, opt] : prev.filter(o => o !== opt)
+                        )}
+                      />
+                      <span>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Order note ── */}
+            <div className="order-note-section">
+              <label className="order-note-label">Add a note for us <span className="order-note-hint">(optional)</span></label>
+              <textarea
+                className="order-note-input"
+                placeholder="Any special instructions, customisation details, or requests..."
+                value={orderNote}
+                onChange={e => setOrderNote(e.target.value)}
+                rows={2}
+              />
+            </div>
 
             <div className="product-actions">
               <div className="product-action-buttons">

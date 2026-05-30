@@ -165,7 +165,7 @@ const AboutUs = () => {
             <div className="get-in-touch-content">
               <h2>Get in Touch</h2>
               <p>
-                Question about an order? Want to list your business on Maqers? We're real people —
+                Question about an order? Want to list your business on Maqers? We respond fast —
                 reach us on WhatsApp or email and we'll actually respond.
               </p>
               <div className="quote-section scroll-animate">

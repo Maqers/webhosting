@@ -32,8 +32,10 @@ const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
 
   const isValid = useCallback((q) => q && q.trim().length >= 1 && /[\w]/.test(q), [])
 
-  // Updates dropdown suggestions only — never navigates
+  // Updates dropdown suggestions — desktop only
   const updateSuggestions = useCallback((q) => {
+    const isMobile = window.innerWidth <= 768
+    if (isMobile) return // No dropdown on mobile — Enter navigates
     const sq = sanitize(q)
     if (!isValid(sq)) { setSearchResults(null); setShowResults(false); return }
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -58,8 +60,9 @@ const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
   }, [sanitize, isValid, navigate, location.pathname, onSearch])
 
   const handleInputChange = (e) => {
-    const v = sanitize(e.target.value)
-    setSearchQuery(v); updateSuggestions(v)
+    const raw = e.target.value
+    setSearchQuery(raw)
+    updateSuggestions(raw)
   }
 
   const handleResultClick = (item) => {
@@ -89,7 +92,12 @@ const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
     setTimeout(() => inputRef.current?.focus(), 0)
   }
 
-  const handleSubmit = (e) => { e.preventDefault(); executeSearch(searchQuery) }
+  const handleSubmit = (e) => { 
+    e.preventDefault()
+    executeSearch(searchQuery)
+    inputRef.current?.blur()
+    setShowResults(false)
+  }
 
   // Outside click
   useEffect(() => {

@@ -160,7 +160,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: white;
+  color: #760909;
   padding: 6px;
   border-radius: 6px;
   transition: opacity 0.2s;
@@ -170,7 +170,7 @@
 
 .navbar-mobile-search-inline-bar {
   padding: 0 12px 10px;
-  background: #760909;
+  background: #FDF0EC;
   animation: searchSlideDown 0.18s ease;
 }
 @keyframes searchSlideDown {
