@@ -337,7 +337,7 @@
     aspect-ratio: 4 / 5 !important;
     height: auto !important;
     overflow: hidden !important;
-    background: #1a1714 !important;
+    background: #f5ede4 !important;
   }
   .feat-img {
     position: absolute !important;
@@ -345,7 +345,7 @@
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center !important;
+    object-position: center top !important;
     display: block !important;
   }
   .feat-img-hover {
@@ -354,6 +354,7 @@
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+    object-position: center top !important;
     display: block !important;
   }
 }

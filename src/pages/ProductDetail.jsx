@@ -230,6 +230,21 @@ const ProductDetail = () => {
         <div className="product-detail-content">
           {/* Left: Image slider */}
           <div className="product-images-section">
+            {hasMultiple && (
+              <div className="thumbnail-images">
+                {images.map((src, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
+                    onClick={() => setSelectedImage(index)}
+                    aria-label={`View image ${index + 1}`}
+                  >
+                    <ImageWithFallback src={src} alt={`${product.title} ${index + 1}`} loading={index < 4 ? 'eager' : 'lazy'} />
+                  </button>
+                ))}
+              </div>
+            )}
             <div
               ref={imageWrapRef}
               className="main-image-wrap"
@@ -266,21 +281,7 @@ const ProductDetail = () => {
                 />
               )}
             </div>
-            {hasMultiple && (
-              <div className="thumbnail-images">
-                {images.map((src, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                    onClick={() => setSelectedImage(index)}
-                    aria-label={`View image ${index + 1}`}
-                  >
-                    <ImageWithFallback src={src} alt={`${product.title} ${index + 1}`} loading={index < 4 ? 'eager' : 'lazy'} />
-                  </button>
-                ))}
-              </div>
-            )}
+
           </div>
 
           {/* Right: Product info */}

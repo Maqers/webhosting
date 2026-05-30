@@ -329,7 +329,7 @@
     aspect-ratio: 4 / 5 !important;
     height: auto !important;
     overflow: hidden !important;
-    background: #1a1714 !important;
+    background: #f5ede4 !important;
   }
   .feat-img {
     position: absolute !important;
@@ -337,7 +337,7 @@
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center !important;
+    object-position: center top !important;
     display: block !important;
   }
   .feat-img-hover {
@@ -346,21 +346,25 @@
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+    object-position: center top !important;
     display: block !important;
   }
 }
 /* ── Category circles strip ── */
 .category-circles-strip {
   background: #fff;
-  padding: 1.25rem 0 1rem;
+  padding: 1rem 0 0.875rem;
   border-bottom: 1px solid #f0ebe8;
+  overflow: visible;
 }
 .category-circles-scroll {
   display: flex;
-  gap: 0.9rem;
+  gap: 0.75rem;
   overflow-x: auto;
+  overflow-y: visible;
+  align-items: flex-start;
   -webkit-overflow-scrolling: touch;
-  padding: 0.25rem 0 0.6rem 1.5rem;
+  padding: 0.5rem 0 0.5rem 1rem;
   scrollbar-width: none;
   touch-action: pan-x;
   overscroll-behavior-x: none;
@@ -369,7 +373,7 @@
 .category-circles-scroll::after {
   content: '';
   display: block;
-  min-width: 1.5rem;
+  min-width: 1rem;
   flex-shrink: 0;
 }
 .category-circles-scroll::-webkit-scrollbar { display: none; }
@@ -378,16 +382,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   text-decoration: none;
   flex-shrink: 0;
-  width: 84px;
+  width: 90px;
 }
 .category-circle-img {
-  width: 76px;
-  height: 76px;
-  min-width: 76px;
-  min-height: 76px;
+  width: 82px;
+  height: 82px;
+  min-width: 82px;
+  min-height: 82px;
   border-radius: 50%;
   overflow: hidden;
   background: #faf5f5;
@@ -406,6 +410,7 @@
   object-position: center top;
   display: block;
   transform: scale(1.08);
+  transition: transform 0.25s ease;
 }
 .category-circle-fallback {
   font-size: 1.5rem;
@@ -418,7 +423,10 @@
 .category-circle-item:hover .category-circle-img,
 .category-circle-item:active .category-circle-img {
   border-color: var(--primary-color);
-  transform: scale(1.06);
+}
+.category-circle-item:hover .category-circle-img img,
+.category-circle-item:active .category-circle-img img {
+  transform: scale(1.12);
 }
 
 /* No hover/active highlight on mobile */
@@ -433,14 +441,18 @@
 }
 .category-circle-label {
   font-family: var(--font-family-heading);
-  font-size: 0.72rem;
+  font-size: 0.67rem;
   font-weight: 700;
   font-style: normal;
   color: #3a2020;
   text-align: center;
-  line-height: 1.2;
-  white-space: nowrap;
-  width: 84px;
+  line-height: 1.3;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  width: 92px;
+  max-width: 92px;
 }
 @media (min-width: 768px) {
   .category-circles-scroll {
@@ -453,9 +465,9 @@
     scrollbar-width: none;
   }
   .category-circles-scroll::-webkit-scrollbar { display: none; }
-  .category-circle-item, .category-circle-item--btn { width: 88px; }
-  .category-circle-img  { width: 80px; height: 80px; min-width: 80px; min-height: 80px; }
-  .category-circle-label { font-size: 0.76rem; width: 88px; }
+  .category-circle-item, .category-circle-item--btn { width: 96px; }
+  .category-circle-img  { width: 84px; height: 84px; min-width: 84px; min-height: 84px; }
+  .category-circle-label { font-size: 0.72rem; width: 96px; }
 }
 
 /* ── Circle buttons (Products page filter) ── */
@@ -486,11 +498,19 @@
   box-shadow: 0 0 0 2px var(--primary-color);
 }
 .category-circle-all {
-  background: #faf5f5;
+  width: 82px;
+  height: 82px;
+  min-width: 82px;
+  min-height: 82px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #760909;
+  border: 1.5px solid rgba(118,9,9,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #760909;
+  color: #fff;
+  flex-shrink: 0;
 }
 .category-circle-item--btn.circle-active .category-circle-all {
   background: #760909;

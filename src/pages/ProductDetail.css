@@ -5,7 +5,6 @@
   padding: var(--spacing-lg) var(--spacing-md);
   background: var(--bg-secondary);
   width: 100%;
-  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -70,14 +69,15 @@
 
 .back-button:hover { text-decoration: underline; }
 
-/* 50 / 50 layout */
+/* PDP layout: 42% image | 58% info */
 .product-detail-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xl);
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 2rem;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
+  align-items: flex-start;
 }
 
 @media (max-width: 768px) {
@@ -87,29 +87,36 @@
   }
 }
 
-/* ========== Left 50%: Image slider + zoom lens only ========== */
+/* Left: vertical thumbnail strip + main image */
 .product-images-section {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  flex-direction: row;
+  gap: 10px;
   min-width: 0;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .product-images-section {
+    flex-direction: column-reverse;
+    gap: var(--spacing-sm);
+  }
 }
 
 .main-image-wrap {
   position: relative;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-primary);
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
 }
 
 @media (max-width: 768px) {
   .main-image-wrap {
-    aspect-ratio: 1 / 1;
-    height: auto;
-    min-height: 260px;
-    max-height: 420px;
+    width: 100%;
+    aspect-ratio: 3 / 4;
   }
 }
 
@@ -122,17 +129,6 @@
   align-items: center;
   justify-content: center;
   background: var(--bg-primary);
-}
-
-@media (max-width: 768px) {
-  .main-image-container {
-    position: relative;
-    inset: unset;
-    width: 100%;
-    height: 100%;
-    min-height: 260px;
-    max-height: 420px;
-  }
 }
 
 .main-image {
@@ -175,37 +171,36 @@
 
 /* Zoom lens: desktop only */
 .zoom-lens {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.9);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  pointer-events: none;
-  z-index: 3;
-  transform: translate(-50%, -50%);
-  background-repeat: no-repeat;
-  background-color: var(--cream-color);
+  display: none !important;
 }
 
-@media (max-width: 768px) {
-  .zoom-lens { display: none !important; }
-}
-
-/* Thumbnails */
+/* Thumbnails — vertical strip on desktop, horizontal on mobile */
 .thumbnail-images {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.thumbnail-images::-webkit-scrollbar { display: none; }
+
+@media (max-width: 768px) {
+  .thumbnail-images {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: unset;
+    justify-content: center;
+  }
 }
 
 .thumbnail {
-  width: 4rem;
-  height: 4rem;
-  min-width: 4rem;
-  min-height: 4rem;
-  border-radius: var(--radius-md);
+  width: 3.5rem;
+  height: 3.5rem;
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  border-radius: 8px;
   overflow: hidden;
   border: 2px solid transparent;
   padding: 0;
@@ -226,7 +221,7 @@
 }
 
 @media (max-width: 480px) {
-  .thumbnail { width: 3.25rem; height: 3.25rem; min-width: 3.25rem; min-height: 3.25rem; }
+  .thumbnail { width: 3rem; height: 3rem; min-width: 3rem; min-height: 3rem; }
 }
 
 /* ========== Right 50%: Content ========== */
@@ -235,6 +230,12 @@
   flex-direction: column;
   gap: 1rem;
   min-width: 0;
+  overflow: hidden;
+}
+
+.product-info-section * {
+  max-width: 100%;
+  word-break: break-word;
 }
 
 .product-category-badge {
@@ -473,20 +474,22 @@
 
 /* Add to Cart button */
 .add-to-cart-button {
-  display: block;
-  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
   background: var(--primary-color);
   color: white;
   border: none;
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
   font-family: inherit;
   letter-spacing: 0.03em;
-  margin-bottom: 0.75rem;
+  white-space: nowrap;
 }
 
 .add-to-cart-button:hover { background: #5a0707; transform: translateY(-1px); }
@@ -510,19 +513,23 @@
 
 /* Wishlist button */
 .add-to-wishlist-button {
-  display: block;
-  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
   background: transparent;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
-  padding: 0.875rem 1.5rem;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   font-family: inherit;
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .add-to-wishlist-button:hover {
@@ -538,35 +545,36 @@
 .product-action-buttons {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
-.product-action-buttons .add-to-cart-button {
-  flex: 2;
+.product-action-buttons .add-to-cart-button,
+.product-action-buttons .add-to-wishlist-button {
+  flex: 1;
+  min-width: 0;
   margin-bottom: 0;
+  white-space: nowrap;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
 }
 
 .product-action-buttons .add-to-wishlist-button {
-  flex: 1;
-  background: var(--primary-color);
-  color: white;
+  background: transparent;
+  color: var(--primary-color);
   border: 2px solid var(--primary-color);
-  font-weight: 700;
 }
 
 .product-action-buttons .add-to-wishlist-button:hover {
-  background: #5a0707;
+  background: rgba(118,9,9,0.06);
   border-color: #5a0707;
+  color: #5a0707;
 }
 
 .product-action-buttons .add-to-wishlist-button.wishlisted {
-  background: #5a0707;
-  border-color: #5a0707;
-}
-
-/* Fix wishlisted button text wrapping */
-.product-action-buttons .add-to-wishlist-button {
-  white-space: nowrap;
-  min-width: 120px;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 /* ── Reviews section ────────────────────────────────────────────────────────── */
 .reviews-section {
