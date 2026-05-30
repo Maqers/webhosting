@@ -281,22 +281,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
   const imgZoneRef = useRef(null)
   const secondImage = product.images[1] || null
 
-  // Match tile dimension to taller image — touch/mobile only
-  useEffect(() => {
-    if (!secondImage || !imgZoneRef.current) return
-    if (!window.matchMedia('(hover: none) and (max-width: 768px)').matches) return
-    const el = imgZoneRef.current
-    const loadImg = (src) => new Promise((res) => {
-      const img = new Image()
-      img.onload = () => res(img.naturalWidth / img.naturalHeight)
-      img.onerror = () => res(1)
-      img.src = src
-    })
-    Promise.all([loadImg(product.images[0]), loadImg(secondImage)]).then(([r1, r2]) => {
-      const ratio = Math.min(r1, r2)
-      if (el) el.style.aspectRatio = String(ratio)
-    })
-  }, [product.images[0], secondImage])
+
 
   const categoryName = useMemo(() => {
     const byId = categoryMap.get(product.categoryId)
@@ -317,7 +302,11 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          timer = setTimeout(() => el.classList.add('mobile-swap'), 250)
+          timer = setTimeout(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => { el.classList.add('mobile-swap') })
+            })
+          }, 250)
         } else {
           clearTimeout(timer)
           el.classList.remove('mobile-swap')

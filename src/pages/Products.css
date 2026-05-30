@@ -401,16 +401,10 @@
 .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
 .feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
 @media (hover: none) {
-  .feat-img-zone.has-second-img:hover .feat-img { opacity: 1; transform: none; }
-  .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 0; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img {
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-  }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover {
-    opacity: 1;
-    transition: opacity 0.8s ease-in-out;
-  }
+  .feat-img-zone.has-second-img:hover .feat-img { opacity: 1 !important; transform: none !important; }
+  .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 0 !important; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0; }
+  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1; }
 }
 
 @keyframes heartPop {
@@ -510,13 +504,28 @@
 /* Mobile: fill tile with image */
 @media (max-width: 968px) {
   .feat-img-zone {
-    aspect-ratio: 1 / 1;
+    position: relative !important;
+    aspect-ratio: 4 / 5 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    background: #1a1714 !important;
   }
   .feat-img {
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
     object-position: center !important;
+    display: block !important;
+  }
+  .feat-img-hover {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
   }
 }
 /* ── Category circles (imported from Home layout) ── */
@@ -626,7 +635,4 @@
   .category-circles-strip--products .category-circles-scroll::-webkit-scrollbar { display: none; }
   .category-circle-item--btn { width: 88px; }
   .category-circle-label { font-size: 0.76rem; }
-}
-@media (hover: hover), (min-width: 769px) {
-  .feat-img-zone { aspect-ratio: 1 / 1 !important; }
 }
