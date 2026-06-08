@@ -595,11 +595,11 @@ button:active::before {
   height: min(300px, 100vw);
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled):not(.slider-btn) {
   transform: translateY(-1px) scale(1.02);
 }
 
-button:active:not(:disabled) {
+button:active:not(:disabled):not(.slider-btn) {
   transform: translateY(0) scale(0.98);
   transition: transform var(--duration-fast) var(--ease-out-expo);
 }

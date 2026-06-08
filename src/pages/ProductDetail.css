@@ -166,7 +166,6 @@
 .slider-btn:hover {
   background: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transform: translateY(-50%); /* keep vertical centering — overrides global button hover */
 }
 
 .slider-btn:active {
