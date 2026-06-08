@@ -48,10 +48,13 @@ const getCachedCategoryMap = () => {
 }
 
 
+const PAGE_SIZE = 24
+
 const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
   const searchQuery = location.state?.searchQuery
@@ -104,6 +107,9 @@ const Products = () => {
   }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
+  const visibleProducts = filteredProducts.slice(0, visibleCount)
+
+  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [sortBy, searchQuery])
 
   const handleCategoryToggle = useCallback((categoryId) => {
     setSelectedCategories(prev => {
@@ -111,6 +117,7 @@ const Products = () => {
       if (prev.includes(categoryId)) return prev.filter(id => id !== categoryId)
       return [...prev, categoryId]
     })
+    setVisibleCount(PAGE_SIZE)
     const newParams = new URLSearchParams(searchParams)
     newParams.delete('page')
     setSearchParams(newParams, { replace: true })
@@ -118,6 +125,7 @@ const Products = () => {
 
   const handleClearAll = useCallback(() => {
     setSelectedCategories([])
+    setVisibleCount(PAGE_SIZE)
     const newParams = new URLSearchParams(searchParams)
     newParams.delete('page')
     setSearchParams(newParams, { replace: true })
@@ -241,18 +249,30 @@ const Products = () => {
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="products-grid">
-              {filteredProducts.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  index={index}
-                  categoryMap={categoryMap}
-                  priority={index < 12}
-                  selectedCategories={selectedCategories}
-                />
-              ))}
-            </div>
+            <>
+              <div className="products-grid">
+                {visibleProducts.map((product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    index={index}
+                    categoryMap={categoryMap}
+                    priority={index < 12}
+                    selectedCategories={selectedCategories}
+                  />
+                ))}
+              </div>
+              {visibleCount < filteredProducts.length && (
+                <div className="products-load-more">
+                  <button
+                    className="products-load-more-btn"
+                    onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                  >
+                    Show more ({filteredProducts.length - visibleCount} remaining)
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="no-results">
               <div className="no-results-icon">

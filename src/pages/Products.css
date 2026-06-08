@@ -301,6 +301,30 @@
 @media (min-width: 1024px) { .product-price { font-size: 1.1rem; } }
 
 /* ============================================================================
+   LOAD MORE
+   ============================================================================ */
+.products-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0 1rem;
+}
+.products-load-more-btn {
+  background: transparent;
+  border: 1.5px solid #760909;
+  color: #760909;
+  padding: 0.65rem 2rem;
+  border-radius: 24px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.products-load-more-btn:hover {
+  background: #760909;
+  color: #fff;
+}
+
+/* ============================================================================
    NO RESULTS
    ============================================================================ */
 .no-results {

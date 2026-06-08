@@ -231,6 +231,7 @@ const ImageWithFallback = forwardRef(
         alt={alt}
         className={className}
         loading={priority ? 'eager' : loading}
+        fetchPriority={priority ? 'high' : undefined}
         decoding={priority ? 'sync' : 'async'}
         sizes={sizes}
         srcSet={srcSet}
