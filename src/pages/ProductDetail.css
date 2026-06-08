@@ -166,6 +166,11 @@
 .slider-btn:hover {
   background: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: translateY(-50%); /* keep vertical centering — overrides global button hover */
+}
+
+.slider-btn:active {
+  transform: translateY(-50%) scale(0.95);
 }
 
 .slider-prev { left: var(--spacing-sm); }
@@ -862,12 +867,29 @@
   font-size: 0.85rem;
   color: #3a1a1a;
   cursor: pointer;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.personalisation-option:has(input:checked) {
+  background: rgba(118, 9, 9, 0.06);
+  border-color: rgba(118, 9, 9, 0.25);
+  color: #760909;
+  font-weight: 600;
 }
 .personalisation-option input[type="checkbox"] {
   width: 16px; height: 16px;
   accent-color: #760909;
   cursor: pointer;
   flex-shrink: 0;
+}
+.personalisation-option-price {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #760909;
+  white-space: nowrap;
 }
 
 /* ── Order note ── */

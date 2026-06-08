@@ -104,7 +104,7 @@ const HOME_CAT_IMAGES = {
                 >
                   <div className="category-circle-img">
                     {img
-                      ? <img src={img} alt={cat.name} loading="lazy"
+                      ? <img src={img} alt={cat.name} loading="eager" fetchPriority="high"
                           onError={e => { e.target.style.display='none'; e.target.nextSibling && (e.target.nextSibling.style.display='flex') }} />
                       : null
                     }

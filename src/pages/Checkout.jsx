@@ -79,7 +79,15 @@ export default function Checkout() {
   }
 
   const buildItemsText = () =>
-    items.map(i => `• ${i.title} (ID ${i.id}) x${i.qty}${i.selectedColor ? ` [${i.selectedColor}]` : ''}${i.selectedSize ? ` [${i.selectedSize}]` : ''} — ₹${(i.price * i.qty).toLocaleString('en-IN')}`).join('\n')
+    items.map(i => {
+      let line = `• ${i.title} (ID ${i.id}) x${i.qty}`
+      if (i.selectedColor) line += ` [${i.selectedColor}]`
+      if (i.selectedSize) line += ` [${i.selectedSize}]`
+      if (i.selectedPersonalisation?.length > 0) line += ` [${i.selectedPersonalisation.join(', ')}]`
+      if (i.orderNote?.trim()) line += ` | Note: ${i.orderNote.trim()}`
+      line += ` — ₹${(i.price * i.qty).toLocaleString('en-IN')}`
+      return line
+    }).join('\n')
 
   const buildSellersText = () => {
     const sellers = [...new Set(items.filter(i => i.sellerCode).map(i => i.sellerCode))]

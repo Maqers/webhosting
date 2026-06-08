@@ -18,10 +18,9 @@ const ProductDetail = () => {
   const handleBack = () => {
     if (location.state?.from) {
       navigate(location.state.from);
-    } else if (window.history.length > 1) {
-      navigate(-1);
     } else {
-      navigate("/products");
+      // No history state — go to the product's own category
+      navigate(product ? `/category/${product.categoryId}` : '/products');
     }
   };
 
@@ -97,8 +96,19 @@ const ProductDetail = () => {
 
   const images = product?.images || []
   const hasMultiple = images.length > 1
-  const goPrev = () => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1))
-  const goNext = () => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1))
+  const goPrev = useCallback(() => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1)), [images.length])
+  const goNext = useCallback(() => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1)), [images.length])
+
+  const touchStartX = useRef(null)
+  const handleTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX
+  }, [])
+  const handleTouchEnd = useCallback((e) => {
+    if (touchStartX.current === null || !hasMultiple) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(dx) > 50) dx < 0 ? goNext() : goPrev()
+    touchStartX.current = null
+  }, [hasMultiple, goNext, goPrev])
 
   const LENS_SIZE = 120
   const ZOOM = 2
@@ -254,6 +264,8 @@ const ProductDetail = () => {
               className="main-image-wrap"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
               <div className="main-image-container">
                 <ImageWithFallback
@@ -373,18 +385,22 @@ const ProductDetail = () => {
               <div className="personalisation-section">
                 <label className="personalisation-title">Add Personalisation</label>
                 <div className="personalisation-options">
-                  {product.meta.personalisation_options.filter(o => o.trim()).map((opt, i) => (
-                    <label key={i} className="personalisation-option">
-                      <input
-                        type="checkbox"
-                        checked={selectedPersonalisation.includes(opt)}
-                        onChange={e => setSelectedPersonalisation(prev =>
-                          e.target.checked ? [...prev, opt] : prev.filter(o => o !== opt)
-                        )}
-                      />
-                      <span>{opt}</span>
-                    </label>
-                  ))}
+                  {product.meta.personalisation_options.filter(o => o.trim()).map((opt, i) => {
+                    const price = product.meta.personalisation_prices?.[i]
+                    return (
+                      <label key={i} className="personalisation-option">
+                        <input
+                          type="checkbox"
+                          checked={selectedPersonalisation.includes(opt)}
+                          onChange={e => setSelectedPersonalisation(prev =>
+                            e.target.checked ? [...prev, opt] : prev.filter(o => o !== opt)
+                          )}
+                        />
+                        <span>{opt}</span>
+                        {price > 0 && <span className="personalisation-option-price">+₹{Number(price).toLocaleString('en-IN')}</span>}
+                      </label>
+                    )
+                  })}
                 </div>
               </div>
             )}

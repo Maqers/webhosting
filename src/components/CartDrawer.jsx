@@ -63,6 +63,12 @@ export default function CartDrawer() {
                     <p className="cart-item-title">{item.title}</p>
                     {item.selectedColor && <p className="cart-item-variant">Colour: {item.selectedColor}</p>}
                     {item.selectedSize && <p className="cart-item-variant">Size: {item.selectedSize}</p>}
+                    {item.selectedPersonalisation?.length > 0 && (
+                      <p className="cart-item-variant">+ {item.selectedPersonalisation.join(', ')}</p>
+                    )}
+                    {item.orderNote?.trim() && (
+                      <p className="cart-item-variant">Note: {item.orderNote.trim()}</p>
+                    )}
                     <p className="cart-item-price">₹{item.price.toLocaleString('en-IN')}</p>
                     <div className="cart-item-controls">
                       <div className="cart-qty">

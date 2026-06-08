@@ -422,11 +422,18 @@ function buildEntry(id, product) {
   const sizePricesStr = serializeSizePrices(product.sizePrices);
   const moq = Number(product.moq) || 0;
   const deliveryTime = sanitizeForJS(product.delivery_time || product.meta?.delivery_time || "");
-  const personalisationOpts = (product.personalisation_options || product.meta?.personalisation_options || [])
-    .filter(o => o && o.trim())
-    .map(o => sanitizeForJS(o.trim()));
+  const rawPersonalisationOpts = (product.personalisation_options || product.meta?.personalisation_options || []);
+  const rawPersonalisationPrices = (product.personalisation_prices || product.meta?.personalisation_prices || []);
+  const personalisationPairs = rawPersonalisationOpts
+    .map((o, i) => ({ opt: o?.trim(), price: Number(rawPersonalisationPrices[i]) || 0 }))
+    .filter(pair => pair.opt);
+  const personalisationOpts = personalisationPairs.map(pair => sanitizeForJS(pair.opt));
+  const personalisationPriceNums = personalisationPairs.map(pair => pair.price);
   const personalisationPart = personalisationOpts.length > 0
     ? `, personalisation_options: [${personalisationOpts.map(o => `"${o}"`).join(', ')}]`
+    : '';
+  const personalisationPricesPart = (personalisationPriceNums.length > 0 && personalisationPriceNums.some(p => p > 0))
+    ? `, personalisation_prices: [${personalisationPriceNums.join(', ')}]`
     : '';
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
@@ -443,7 +450,7 @@ function buildEntry(id, product) {
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}" }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -555,7 +562,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -693,7 +700,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [] });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -1296,13 +1303,52 @@ export default function AdminPortal() {
                       <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
                       <input style={ts.input} placeholder="e.g. 3–5 business days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
-                      <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(one per line — shown as checkboxes on product page)</span></label>
-                      <textarea
-                        style={{ ...ts.input, height: 80, resize: 'vertical', fontFamily: 'inherit' }}
-                        placeholder={"e.g.\nAdd name on product (+₹50)\nAdd custom message (+₹30)\nGift wrap (+₹20)"}
-                        value={(newProduct.personalisation_options || []).join('\n')}
-                        onChange={e => setNewProduct(p => ({ ...p, personalisation_options: e.target.value.split('\n') }))}
-                      />
+                      <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(each shown as a checkbox on product page)</span></label>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {(newProduct.personalisation_options || []).map((opt, i) => (
+                          <div key={i} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                            <input
+                              style={{ ...ts.input, flex: 1, marginTop: 0 }}
+                              placeholder="e.g. Add name on product"
+                              value={opt}
+                              onChange={e => setNewProduct(p => {
+                                const options = [...(p.personalisation_options || [])];
+                                options[i] = e.target.value;
+                                return { ...p, personalisation_options: options };
+                              })}
+                            />
+                            <span style={{ color: "#888", fontSize: 13, flexShrink: 0 }}>₹</span>
+                            <input
+                              style={{ ...ts.input, width: 80, marginTop: 0 }}
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              value={(newProduct.personalisation_prices || [])[i] ?? ""}
+                              onChange={e => setNewProduct(p => {
+                                const prices = [...(p.personalisation_prices || [])];
+                                prices[i] = e.target.value;
+                                return { ...p, personalisation_prices: prices };
+                              })}
+                            />
+                            <button type="button"
+                              onClick={() => setNewProduct(p => ({
+                                ...p,
+                                personalisation_options: (p.personalisation_options || []).filter((_, j) => j !== i),
+                                personalisation_prices: (p.personalisation_prices || []).filter((_, j) => j !== i),
+                              }))}
+                              style={{ ...ts.colorChipX, fontSize: 16, padding: "0 6px", lineHeight: 1 }}>×</button>
+                          </div>
+                        ))}
+                        <button type="button"
+                          onClick={() => setNewProduct(p => ({
+                            ...p,
+                            personalisation_options: [...(p.personalisation_options || []), ""],
+                            personalisation_prices: [...(p.personalisation_prices || []), ""],
+                          }))}
+                          style={{ ...ts.ghostBtn, alignSelf: "flex-start", fontSize: 13, padding: "5px 12px" }}>
+                          + Add option
+                        </button>
+                      </div>
                       <label style={ts.label}>Customer Reviews <span style={ts.labelHint}>(optional — add manually)</span></label>
                       <div style={{ background: "#faf7f5", border: "1px solid #ede0e0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
                         <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
@@ -1419,7 +1465,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [] });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -1704,13 +1750,55 @@ export default function AdminPortal() {
                           <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
                           <input style={ts.input} placeholder="e.g. 3–5 business days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
-                          <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(one per line — shown as checkboxes on product page)</span></label>
-                          <textarea
-                            style={{ ...ts.input, height: 80, resize: 'vertical', fontFamily: 'inherit' }}
-                            placeholder={"e.g.\nAdd name on product (+₹50)\nAdd custom message (+₹30)\nGift wrap (+₹20)"}
-                            value={(editingProduct.personalisation_options || editingProduct.meta?.personalisation_options || []).join('\n')}
-                            onChange={e => setEditingProduct(p => ({ ...p, personalisation_options: e.target.value.split('\n') }))}
-                          />
+                          <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(each shown as a checkbox on product page)</span></label>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            {(editingProduct.personalisation_options || editingProduct.meta?.personalisation_options || []).map((opt, i) => {
+                              const prices = editingProduct.personalisation_prices || editingProduct.meta?.personalisation_prices || [];
+                              return (
+                                <div key={i} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                  <input
+                                    style={{ ...ts.input, flex: 1, marginTop: 0 }}
+                                    placeholder="e.g. Add name on product"
+                                    value={opt}
+                                    onChange={e => setEditingProduct(p => {
+                                      const options = [...(p.personalisation_options || p.meta?.personalisation_options || [])];
+                                      options[i] = e.target.value;
+                                      return { ...p, personalisation_options: options };
+                                    })}
+                                  />
+                                  <span style={{ color: "#888", fontSize: 13, flexShrink: 0 }}>₹</span>
+                                  <input
+                                    style={{ ...ts.input, width: 80, marginTop: 0 }}
+                                    type="number"
+                                    min="0"
+                                    placeholder="0"
+                                    value={prices[i] ?? ""}
+                                    onChange={e => setEditingProduct(p => {
+                                      const ps = [...(p.personalisation_prices || p.meta?.personalisation_prices || [])];
+                                      ps[i] = e.target.value;
+                                      return { ...p, personalisation_prices: ps };
+                                    })}
+                                  />
+                                  <button type="button"
+                                    onClick={() => setEditingProduct(p => ({
+                                      ...p,
+                                      personalisation_options: (p.personalisation_options || p.meta?.personalisation_options || []).filter((_, j) => j !== i),
+                                      personalisation_prices: (p.personalisation_prices || p.meta?.personalisation_prices || []).filter((_, j) => j !== i),
+                                    }))}
+                                    style={{ ...ts.colorChipX, fontSize: 16, padding: "0 6px", lineHeight: 1 }}>×</button>
+                                </div>
+                              );
+                            })}
+                            <button type="button"
+                              onClick={() => setEditingProduct(p => ({
+                                ...p,
+                                personalisation_options: [...(p.personalisation_options || p.meta?.personalisation_options || []), ""],
+                                personalisation_prices: [...(p.personalisation_prices || p.meta?.personalisation_prices || []), ""],
+                              }))}
+                              style={{ ...ts.ghostBtn, alignSelf: "flex-start", fontSize: 13, padding: "5px 12px" }}>
+                              + Add option
+                            </button>
+                          </div>
                           <label style={ts.label}>Customer Reviews <span style={ts.labelHint}>(optional — add manually)</span></label>
                           <div style={{ background: "#faf7f5", border: "1px solid #ede0e0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
                             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>

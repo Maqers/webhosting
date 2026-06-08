@@ -15,24 +15,36 @@ export function CartProvider({ children }) {
     try { localStorage.setItem('maqers_cart', JSON.stringify(items)) } catch {}
   }, [items])
 
-  const addItem = useCallback((product, selectedColor = '', selectedSize = '') => {
+  const addItem = useCallback((product, selectedColor = '', selectedSize = '', selectedPersonalisation = [], orderNote = '') => {
     setItems(prev => {
-      const key = `${product.id}-${selectedColor}-${selectedSize}`
+      const personalisationKey = selectedPersonalisation.slice().sort().join('|')
+      const key = `${product.id}-${selectedColor}-${selectedSize}-${personalisationKey}`
       const existing = prev.find(i => i.key === key)
       if (existing) {
         return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i)
       }
+      // Compute extra price from selected personalisation options
+      const prices = product.meta?.personalisation_prices || []
+      const opts = product.meta?.personalisation_options || []
+      const personalisationExtra = selectedPersonalisation.reduce((sum, opt) => {
+        const idx = opts.indexOf(opt)
+        return sum + (idx !== -1 && prices[idx] ? Number(prices[idx]) : 0)
+      }, 0)
       return [...prev, {
         key,
         id: product.id,
         title: product.title,
-        price: product.price,
+        price: product.price + personalisationExtra,
+        basePrice: product.price,
+        personalisationExtra,
         image: product.images?.[0] || '',
         categoryId: product.categoryId,
         sellerId: product.meta?.sellerId || '',
         sellerCode: product.meta?.sellerCode || '',
         selectedColor,
         selectedSize,
+        selectedPersonalisation,
+        orderNote,
         qty: 1,
       }]
     })
