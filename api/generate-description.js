@@ -1,31 +1,3 @@
-const MODELS = [
-  'gemini-2.5-flash-lite',
-  'gemini-2.5-flash',
-  'gemini-2.0-flash-lite',
-  'gemini-2.0-flash',
-]
-
-async function callGemini(apiKey, model, imagePart, prompt) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [imagePart, { text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
-      }),
-    }
-  )
-  const data = await res.json()
-  if (!res.ok) {
-    const msg = data.error?.message || `HTTP ${res.status}`
-    const isQuotaOrNotFound = msg.includes('quota') || msg.includes('not found') || msg.includes('RESOURCE_EXHAUSTED') || res.status === 404 || res.status === 429
-    return { ok: false, retryable: isQuotaOrNotFound, error: msg, model }
-  }
-  return { ok: true, data, model }
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -36,19 +8,26 @@ export default async function handler(req, res) {
   try {
     const { imageBase64, mimeType, imageUrl, extraDetails } = req.body
 
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY is not configured in Vercel environment variables.' })
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY is not configured in Vercel environment variables.' })
 
-    let imagePart
+    // Build the image content block
+    let imageContent
     if (imageBase64 && mimeType) {
-      imagePart = { inline_data: { mime_type: mimeType, data: imageBase64 } }
+      imageContent = {
+        type: 'image_url',
+        image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: 'low' },
+      }
     } else if (imageUrl) {
       const imgRes = await fetch(imageUrl)
       if (!imgRes.ok) return res.status(400).json({ error: 'Could not fetch the product image URL.' })
       const arrayBuffer = await imgRes.arrayBuffer()
       const base64 = Buffer.from(arrayBuffer).toString('base64')
       const ct = imgRes.headers.get('content-type') || 'image/jpeg'
-      imagePart = { inline_data: { mime_type: ct, data: base64 } }
+      imageContent = {
+        type: 'image_url',
+        image_url: { url: `data:${ct};base64,${base64}`, detail: 'low' },
+      }
     } else {
       return res.status(400).json({ error: 'Provide either imageBase64+mimeType or imageUrl.' })
     }
@@ -57,41 +36,55 @@ export default async function handler(req, res) {
 
 Analyse this product image and generate compelling, specific copy for it.
 
-${extraDetails ? `The seller has provided these additional details:\n${extraDetails}\n\nMake sure to incorporate these specifics into the description and keywords.\n` : ''}
-Return ONLY valid JSON (no markdown, no explanation) in exactly this format:
+${extraDetails ? `The seller has provided these additional details:\n${extraDetails}\n\nIncorporate these specifics into the description and keywords.\n` : ''}
+Return ONLY a valid JSON object in exactly this format:
 {
   "title": "A concise product name, 4–7 words, title case",
-  "description": "2–3 sentences. Highlight craftsmanship, materials, and what makes it special. Suitable for an Indian gifting/artisan store. No line breaks.",
+  "description": "2–3 sentences. Highlight craftsmanship, materials, and what makes it special. Warm artisan tone. No line breaks.",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"],
   "keywords": ["keyword phrase 1", "keyword phrase 2", "keyword phrase 3", "keyword phrase 4", "keyword phrase 5", "keyword phrase 6"]
 }
 
 Rules:
-- title: specific to THIS product (not generic like "Handmade Product")
-- description: warm, artisan tone; mention materials if visible or provided
-- tags: 6–8 single words or short phrases, lowercase (e.g. "handmade", "gifting", category name)
-- keywords: 6–8 lowercase search phrases people would type (e.g. "handmade silver bracelet India", "personalised gift for her")`
+- title: specific to THIS product, not generic
+- tags: 6–8 lowercase words/short phrases (e.g. "handmade", "gifting")
+- keywords: 6–8 lowercase search phrases (e.g. "handmade silver bracelet India")`
 
-    let lastError = ''
-    for (const model of MODELS) {
-      const result = await callGemini(apiKey, model, imagePart, prompt)
-      if (result.ok) {
-        const raw = result.data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-        const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim()
-        const parsed = JSON.parse(cleaned)
-        return res.status(200).json({
-          title: parsed.title || '',
-          description: parsed.description || '',
-          tags: Array.isArray(parsed.tags) ? parsed.tags : [],
-          keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
-          _model: model,
-        })
-      }
-      lastError = `${model}: ${result.error}`
-      if (!result.retryable) break
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: [imageContent, { type: 'text', text: prompt }],
+          },
+        ],
+        max_tokens: 600,
+        temperature: 0.7,
+        response_format: { type: 'json_object' },
+      }),
+    })
+
+    if (!openaiRes.ok) {
+      const err = await openaiRes.json()
+      return res.status(502).json({ error: err.error?.message || 'OpenAI API returned an error.' })
     }
 
-    return res.status(502).json({ error: `All models failed. Last error — ${lastError}` })
+    const data = await openaiRes.json()
+    const raw = data.choices?.[0]?.message?.content || ''
+    const parsed = JSON.parse(raw)
+
+    return res.status(200).json({
+      title: parsed.title || '',
+      description: parsed.description || '',
+      tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+      keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+    })
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' })
   }
