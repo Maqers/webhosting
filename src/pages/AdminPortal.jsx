@@ -665,22 +665,13 @@ export default function AdminPortal() {
 
   const onDrop = useCallback(e => { e.preventDefault(); setDragOver(false); processFiles(e.dataTransfer.files); }, []);
 
-  async function runAiGenerate({ file, imageUrl, extraDetails, onResult, onError, setGenerating }) {
+  async function runAiGenerate({ imageBase64, mimeType, imageUrl, extraDetails, onResult, onError, setGenerating }) {
     setGenerating(true);
     onError('');
     try {
-      let body;
-      if (file) {
-        const base64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-        body = { imageBase64: base64, mimeType: file.type, extraDetails };
-      } else {
-        body = { imageUrl, extraDetails };
-      }
+      const body = imageBase64
+        ? { imageBase64, mimeType, extraDetails }
+        : { imageUrl, extraDetails };
       const res = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -697,10 +688,11 @@ export default function AdminPortal() {
   }
 
   function handleGenerateAI() {
-    const file = imageFiles[0] || null;
-    if (!file) { setAiError('Upload an image first.'); return; }
+    const imgObj = imageFiles[0];
+    if (!imgObj) { setAiError('Upload an image first.'); return; }
     runAiGenerate({
-      file,
+      imageBase64: imgObj.base64,
+      mimeType: imgObj.mime || 'image/jpeg',
       extraDetails: aiExtraDetails.trim(),
       setGenerating: setAiGenerating,
       onError: setAiError,
@@ -715,12 +707,13 @@ export default function AdminPortal() {
   }
 
   function handleGenerateAIEdit() {
-    const file = editImageFiles[0] || null;
-    const imageUrl = !file ? (editingProduct?.images?.[0] || '') : '';
-    if (!file && !imageUrl) { setAiEditError('No image available for this product.'); return; }
+    const imgObj = editImageFiles[0] || null;
+    const imageUrl = !imgObj ? (editingProduct?.images?.[0] || '') : '';
+    if (!imgObj && !imageUrl) { setAiEditError('No image available for this product.'); return; }
     runAiGenerate({
-      file,
-      imageUrl,
+      imageBase64: imgObj ? imgObj.base64 : undefined,
+      mimeType: imgObj ? (imgObj.mime || 'image/jpeg') : undefined,
+      imageUrl: imgObj ? undefined : imageUrl,
       extraDetails: aiEditExtraDetails.trim(),
       setGenerating: setAiEditGenerating,
       onError: setAiEditError,
@@ -924,6 +917,7 @@ export default function AdminPortal() {
         preview: ev.target.result,
         name: file.name.toLowerCase().replace(/\s+/g, "-"),
         base64: ev.target.result.split(",")[1],
+        mime: file.type,
       }]);
       reader.readAsDataURL(file);
     });
