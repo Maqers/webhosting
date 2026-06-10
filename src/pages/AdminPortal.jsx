@@ -576,6 +576,12 @@ export default function AdminPortal() {
   const [imageFiles, setImageFiles] = useState([]);
   const [dragOver, setDragOver] = useState(false);
   const [formError, setFormError] = useState("");
+  const [aiExtraDetails, setAiExtraDetails] = useState('');
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [aiEditExtraDetails, setAiEditExtraDetails] = useState('');
+  const [aiEditGenerating, setAiEditGenerating] = useState(false);
+  const [aiEditError, setAiEditError] = useState('');
   const [productStep, setProductStep] = useState("form");
   const fileInputRef = useRef();
   const editFileInputRef = useRef();
@@ -658,6 +664,75 @@ export default function AdminPortal() {
   }
 
   const onDrop = useCallback(e => { e.preventDefault(); setDragOver(false); processFiles(e.dataTransfer.files); }, []);
+
+  async function runAiGenerate({ file, imageUrl, extraDetails, onResult, onError, setGenerating }) {
+    setGenerating(true);
+    onError('');
+    try {
+      let body;
+      if (file) {
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        body = { imageBase64: base64, mimeType: file.type, extraDetails };
+      } else {
+        body = { imageUrl, extraDetails };
+      }
+      const res = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Generation failed');
+      onResult(result);
+    } catch (err) {
+      onError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function handleGenerateAI() {
+    const file = imageFiles[0] || null;
+    if (!file) { setAiError('Upload an image first.'); return; }
+    runAiGenerate({
+      file,
+      extraDetails: aiExtraDetails.trim(),
+      setGenerating: setAiGenerating,
+      onError: setAiError,
+      onResult: r => setNewProduct(p => ({
+        ...p,
+        title: r.title || p.title,
+        description: r.description || p.description,
+        tags: r.tags?.join(', ') || p.tags,
+        keywords: r.keywords?.join(', ') || p.keywords,
+      })),
+    });
+  }
+
+  function handleGenerateAIEdit() {
+    const file = editImageFiles[0] || null;
+    const imageUrl = !file ? (editingProduct?.images?.[0] || '') : '';
+    if (!file && !imageUrl) { setAiEditError('No image available for this product.'); return; }
+    runAiGenerate({
+      file,
+      imageUrl,
+      extraDetails: aiEditExtraDetails.trim(),
+      setGenerating: setAiEditGenerating,
+      onError: setAiEditError,
+      onResult: r => setEditingProduct(p => ({
+        ...p,
+        title: r.title || p.title,
+        description: r.description || p.description,
+        tags: r.tags?.length ? r.tags : p.tags,
+        keywords: r.keywords?.length ? r.keywords : p.keywords,
+      })),
+    });
+  }
 
   function handleProductPreview(e) {
     e.preventDefault(); setFormError("");
@@ -1196,6 +1271,37 @@ export default function AdminPortal() {
                   <div>
                     <div style={ts.card}>
                       <h2 style={ts.cardTitle}>Product Details</h2>
+
+                      {/* ── AI Generation Panel ── */}
+                      <div style={{ background: "linear-gradient(135deg,#fdf6ee 0%,#faf0f0 100%)", border: "1.5px solid #e8d4b8", borderRadius: 10, padding: "14px 16px", marginBottom: 18 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                          <span style={{ fontSize: 15, color: "#c8a96e" }}>✦</span>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: "#7a4f1a", fontFamily: "Georgia,serif" }}>Generate with AI</span>
+                          <span style={{ fontSize: 10, color: "#bbb", marginLeft: 2 }}>Gemini</span>
+                        </div>
+                        <label style={ts.label}>Extra details <span style={ts.labelHint}>(optional — material, dimensions, occasion, etc.)</span></label>
+                        <textarea
+                          style={{ ...ts.input, height: 58, resize: "vertical", fontFamily: "inherit", marginBottom: 10 }}
+                          placeholder="e.g. Made with 925 sterling silver, 18cm length, perfect for gifting"
+                          value={aiExtraDetails}
+                          onChange={e => setAiExtraDetails(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          disabled={aiGenerating || imageFiles.length === 0}
+                          onClick={handleGenerateAI}
+                          style={{ ...ts.primaryBtn, opacity: aiGenerating || imageFiles.length === 0 ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
+                        >
+                          {aiGenerating
+                            ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid #c8a96e", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Generating…</>
+                            : <><span>✦</span>Generate title, description &amp; tags</>}
+                        </button>
+                        {imageFiles.length === 0 && !aiGenerating && (
+                          <p style={{ ...ts.fieldHint, color: "#b07820", marginTop: 6 }}>Upload an image on the right first to enable AI generation.</p>
+                        )}
+                        {aiError && <p style={{ ...ts.fieldHint, color: "#c00", marginTop: 6 }}>{aiError}</p>}
+                      </div>
+
                       <label style={ts.label}>Title *</label>
                       <input style={ts.input} placeholder="e.g. Lavender Soy Candle" value={newProduct.title}
                         onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} />
@@ -1642,6 +1748,34 @@ export default function AdminPortal() {
                     <div ref={editFormRef} style={{ background: "#fdf8f0", border: "1px solid #e8d9b8", borderTop: "none", padding: 20, marginBottom: 0 }}>
                       <div style={ts.grid2}>
                         <div>
+                          {/* ── AI Generation Panel (Edit) ── */}
+                          <div style={{ background: "linear-gradient(135deg,#fdf6ee 0%,#faf0f0 100%)", border: "1.5px solid #e8d4b8", borderRadius: 10, padding: "14px 16px", marginBottom: 18 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                              <span style={{ fontSize: 15, color: "#c8a96e" }}>✦</span>
+                              <span style={{ fontWeight: 700, fontSize: 13, color: "#7a4f1a", fontFamily: "Georgia,serif" }}>Regenerate with AI</span>
+                              <span style={{ fontSize: 10, color: "#bbb", marginLeft: 2 }}>Gemini</span>
+                            </div>
+                            <label style={ts.label}>Extra details <span style={ts.labelHint}>(optional — material, dimensions, occasion, etc.)</span></label>
+                            <textarea
+                              style={{ ...ts.input, height: 58, resize: "vertical", fontFamily: "inherit", marginBottom: 10 }}
+                              placeholder="e.g. Made with 925 sterling silver, 18cm length, perfect for gifting"
+                              value={aiEditExtraDetails}
+                              onChange={e => setAiEditExtraDetails(e.target.value)}
+                            />
+                            <button
+                              type="button"
+                              disabled={aiEditGenerating}
+                              onClick={handleGenerateAIEdit}
+                              style={{ ...ts.primaryBtn, opacity: aiEditGenerating ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
+                            >
+                              {aiEditGenerating
+                                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid #c8a96e", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Generating…</>
+                                : <><span>✦</span>Regenerate title, description &amp; tags</>}
+                            </button>
+                            {aiEditError && <p style={{ ...ts.fieldHint, color: "#c00", marginTop: 6 }}>{aiEditError}</p>}
+                            <p style={{ ...ts.fieldHint, marginTop: 6 }}>Uses the product's existing image (or a newly uploaded one if added below).</p>
+                          </div>
+
                           <label style={ts.label}>Title</label>
                           <input style={ts.input} value={editingProduct.title} onChange={e => setEditingProduct(p => ({ ...p, title: e.target.value }))} />
                           <label style={ts.label}>Category</label>
