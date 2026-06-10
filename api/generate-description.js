@@ -1,3 +1,31 @@
+const MODELS = [
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash-8b',
+  'gemini-1.5-flash',
+  'gemini-2.0-flash',
+]
+
+async function callGemini(apiKey, model, imagePart, prompt) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [imagePart, { text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
+      }),
+    }
+  )
+  const data = await res.json()
+  if (!res.ok) {
+    const msg = data.error?.message || `HTTP ${res.status}`
+    const isQuotaOrNotFound = msg.includes('quota') || msg.includes('not found') || msg.includes('RESOURCE_EXHAUSTED') || res.status === 404 || res.status === 429
+    return { ok: false, retryable: isQuotaOrNotFound, error: msg, model }
+  }
+  return { ok: true, data, model }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -11,7 +39,6 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY is not configured in Vercel environment variables.' })
 
-    // Build the image part — either inline base64 or fetched from a URL
     let imagePart
     if (imageBase64 && mimeType) {
       imagePart = { inline_data: { mime_type: mimeType, data: imageBase64 } }
@@ -45,34 +72,26 @@ Rules:
 - tags: 6–8 single words or short phrases, lowercase (e.g. "handmade", "gifting", category name)
 - keywords: 6–8 lowercase search phrases people would type (e.g. "handmade silver bracelet India", "personalised gift for her")`
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [imagePart, { text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
-        }),
+    let lastError = ''
+    for (const model of MODELS) {
+      const result = await callGemini(apiKey, model, imagePart, prompt)
+      if (result.ok) {
+        const raw = result.data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+        const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim()
+        const parsed = JSON.parse(cleaned)
+        return res.status(200).json({
+          title: parsed.title || '',
+          description: parsed.description || '',
+          tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+          keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+          _model: model,
+        })
       }
-    )
-
-    if (!geminiRes.ok) {
-      const err = await geminiRes.json()
-      return res.status(502).json({ error: err.error?.message || 'Gemini API returned an error.' })
+      lastError = `${model}: ${result.error}`
+      if (!result.retryable) break
     }
 
-    const data = await geminiRes.json()
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-    const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim()
-    const result = JSON.parse(cleaned)
-
-    return res.status(200).json({
-      title: result.title || '',
-      description: result.description || '',
-      tags: Array.isArray(result.tags) ? result.tags : [],
-      keywords: Array.isArray(result.keywords) ? result.keywords : [],
-    })
+    return res.status(502).json({ error: `All models failed. Last error — ${lastError}` })
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' })
   }
