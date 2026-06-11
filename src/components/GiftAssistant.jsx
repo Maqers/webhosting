@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './GiftAssistant.css'
 
 const RECIPIENTS = ['Mom', 'Dad', 'Partner', 'Friend', 'Sister', 'Brother', 'Colleague', 'Child']
@@ -12,7 +12,6 @@ const BUDGETS = [
 ]
 
 export default function GiftAssistant() {
-  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
   const [recipient, setRecipient] = useState('')
   const [occasion, setOccasion] = useState('')
@@ -21,9 +20,6 @@ export default function GiftAssistant() {
   const [results, setResults] = useState(null)
   const [error, setError] = useState('')
   const modalRef = useRef(null)
-
-  // Don't show on admin page
-  if (location.pathname === '/admin') return null
 
   const canFind = recipient && occasion && budget
 

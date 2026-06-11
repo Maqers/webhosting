@@ -74,7 +74,7 @@ function AppContent() {
         </Routes>
       </Suspense>
       <Footer />
-      <GiftAssistant />
+      {location.pathname !== '/admin' && <GiftAssistant />}
       <WhatsAppButton />
       <BottomNav />
     </>
