@@ -15,35 +15,46 @@ export default async function handler(req, res) {
     if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY is not configured.' })
 
     const catalog = products
-      .map(p => `${p.id}|${p.title}|${p.category}|₹${p.price}|${p.desc || ''}|${p.slug}|${p.image}`)
+      .map(p => `[${p.id}] ${p.title} | ${p.category} | ₹${p.price} | ${p.desc || ''} | slug:${p.slug} | img:${p.image}`)
       .join('\n')
 
-    const prompt = `You are a thoughtful gift recommendation assistant for Maqers — an Indian artisan e-commerce store selling handmade, handcrafted products.
+    const prompt = `You are a senior gift consultant for Maqers, an Indian artisan e-commerce store selling handmade, handcrafted products.
 
-A customer wants to buy a gift:
+GIFT REQUEST:
 - Recipient: ${recipient}
 - Occasion: ${occasion}
 - Budget: ${budget}
 
-Product catalog (format: id|title|category|price|description|slug|image):
+YOUR APPROACH (follow these steps in order):
+1. Think about who ${recipient} is and what ${occasion} calls for emotionally. What would genuinely delight them? What would feel thoughtful vs generic?
+2. Consider what is culturally appropriate in India for this recipient:
+   - Dad / Brother / male: practical items, home decor, unique artisan pieces, drinkware, resin art. Avoid handbags, ladies jewellery, cosmetics, hair accessories.
+   - Mom / Sister / female: candles, florals, accessories, soaps, cosmetics, art, hampers, bags — almost anything works.
+   - Partner: romantic, personalised, or elegant items.
+   - Friend / Colleague: fun, unique, or shareable items.
+   - Child: playful, colourful items. Avoid adult cosmetics or drinkware.
+3. From the catalog below, select exactly 5 products that match your thinking. Do NOT just grab the most "obviously giftable" categories — look across the full catalog and pick what is genuinely appropriate for THIS person.
+4. Ensure variety: pick from at least 3 different categories.
+5. Prefer products that feel special and handmade over generic ones.
+
+PRODUCT CATALOG (format: [id] title | category | price | description | slug | image):
 ${catalog}
 
-Your job: choose exactly 3 products that are genuinely suitable for this specific recipient and occasion. Use the description to understand what the product actually is before recommending it.
-
-Rules for selection:
-- Pick products that make intuitive sense for the recipient (e.g. for "Dad", avoid handbags, ladies accessories, cosmetics, kids items)
-- Price must fit within the stated budget range
-- Variety matters — don't pick 3 products from the same category
-- If no products perfectly match, pick the 3 most thoughtful options available
-
-Return ONLY a valid JSON object:
+Return ONLY this JSON object — no extra text:
 {
   "recommendations": [
-    { "id": <number>, "title": "...", "slug": "...", "price": <number>, "image": "...", "reason": "One warm, specific sentence explaining why this suits ${recipient} for ${occasion}." }
+    {
+      "id": <number>,
+      "title": "exact title from catalog",
+      "slug": "exact slug from catalog",
+      "price": <exact number from catalog>,
+      "image": "exact image from catalog",
+      "reason": "One warm sentence explaining specifically why this is a great gift for ${recipient} on ${occasion} — mention something unique about the product."
+    }
   ]
 }
 
-Use exact id, slug, price, and image values from the catalog. Never invent values.`
+Return exactly 5 items. Use ONLY values from the catalog — never invent slugs, prices, or ids.`
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -70,7 +81,7 @@ Use exact id, slug, price, and image values from the catalog. Never invent value
     const parsed = JSON.parse(raw)
     const recommendations = Array.isArray(parsed.recommendations) ? parsed.recommendations : []
 
-    return res.status(200).json({ recommendations: recommendations.slice(0, 4) })
+    return res.status(200).json({ recommendations: recommendations.slice(0, 5) })
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' })
   }

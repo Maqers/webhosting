@@ -2,6 +2,22 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import './GiftAssistant.css'
 
+const CATEGORY_NAMES = {
+  'Charm-accessories': 'Charms & Bag Accessories',
+  'Home-decor': 'Home Decor',
+  'Handbags': 'Bags & Purses',
+  'Handmade-Accessories': 'Handmade Accessories',
+  'Candles': 'Scented Candles',
+  'Florals': 'Florals & Bouquets',
+  'Wedding-Gifts': 'Wedding Gifts',
+  'Kids-Accessories': 'Kids Accessories',
+  'Handmade-Soaps': 'Handmade Soaps',
+  'Customised-Hampers': 'Custom Gift Hampers',
+  'Cosmetics': 'Cosmetics',
+  'resin-products': 'Resin Art',
+  'Frames&Paintings': 'Art & Frames',
+}
+
 const RECIPIENTS = ['Mom', 'Dad', 'Partner', 'Friend', 'Sister', 'Brother', 'Colleague', 'Child']
 const OCCASIONS = ['Birthday', 'Anniversary', 'Wedding', 'Festival', 'Just Because', 'Thank You', 'New Baby']
 const BUDGETS = [
@@ -76,9 +92,9 @@ export default function GiftAssistant() {
       const products = pool.map(p => ({
         id: p.id,
         title: p.title,
-        category: p.categoryId,
+        category: CATEGORY_NAMES[p.categoryId] || p.categoryId,
         price: p.price,
-        desc: (p.description || '').replace(/\\n/g, ' ').slice(0, 120),
+        desc: (p.description || '').replace(/\\n/g, ' ').replace(/\s+/g, ' ').slice(0, 200),
         slug: p.slug,
         image: p.images?.[0] || '',
       }))
