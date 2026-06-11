@@ -73,17 +73,12 @@ export default function GiftAssistant() {
       const budgetMatches = allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
       const pool = budgetMatches.length >= 6 ? budgetMatches : allProducts.filter(p => p.inStock)
 
-      // Cap at 80 products to keep prompt size manageable and avoid timeouts
-      const sample = pool.length > 80
-        ? pool.filter((_, i) => i % Math.ceil(pool.length / 80) === 0).slice(0, 80)
-        : pool
-
-      const products = sample.map(p => ({
+      const products = pool.map(p => ({
         id: p.id,
         title: p.title,
         category: p.categoryId,
         price: p.price,
-        tags: (p.tags || []).slice(0, 4),
+        desc: (p.description || '').replace(/\\n/g, ' ').slice(0, 120),
         slug: p.slug,
         image: p.images?.[0] || '',
       }))

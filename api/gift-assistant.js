@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY is not configured.' })
 
     const catalog = products
-      .map(p => `${p.id}|${p.title}|${p.category}|₹${p.price}|${(p.tags || []).slice(0, 4).join(',')}|${p.slug}|${p.image}`)
+      .map(p => `${p.id}|${p.title}|${p.category}|₹${p.price}|${p.desc || ''}|${p.slug}|${p.image}`)
       .join('\n')
 
     const prompt = `You are a thoughtful gift recommendation assistant for Maqers — an Indian artisan e-commerce store selling handmade, handcrafted products.
@@ -25,22 +25,25 @@ A customer wants to buy a gift:
 - Occasion: ${occasion}
 - Budget: ${budget}
 
-Product catalog (format: id|title|category|price|tags|slug|image):
+Product catalog (format: id|title|category|price|description|slug|image):
 ${catalog}
 
-Choose 3–4 products from this catalog that best match the recipient, occasion, and budget. Prefer products whose price fits the stated budget. If few products fit exactly, pick the closest options overall.
+Your job: choose exactly 3 products that are genuinely suitable for this specific recipient and occasion. Use the description to understand what the product actually is before recommending it.
 
-Return ONLY a valid JSON object with this exact shape:
+Rules for selection:
+- Pick products that make intuitive sense for the recipient (e.g. for "Dad", avoid handbags, ladies accessories, cosmetics, kids items)
+- Price must fit within the stated budget range
+- Variety matters — don't pick 3 products from the same category
+- If no products perfectly match, pick the 3 most thoughtful options available
+
+Return ONLY a valid JSON object:
 {
   "recommendations": [
-    { "id": <number>, "title": "...", "slug": "...", "price": <number>, "image": "...", "reason": "One warm sentence explaining why this is perfect for ${recipient} for ${occasion}." }
+    { "id": <number>, "title": "...", "slug": "...", "price": <number>, "image": "...", "reason": "One warm, specific sentence explaining why this suits ${recipient} for ${occasion}." }
   ]
 }
 
-Rules:
-- Use exact id, slug, price, and image values from the catalog — never invent values
-- Reason should be specific and personal (mention the recipient and/or occasion)
-- 3–4 recommendations only`
+Use exact id, slug, price, and image values from the catalog. Never invent values.`
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
