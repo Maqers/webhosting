@@ -73,7 +73,12 @@ export default function GiftAssistant() {
       const budgetMatches = allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
       const pool = budgetMatches.length >= 6 ? budgetMatches : allProducts.filter(p => p.inStock)
 
-      const products = pool.map(p => ({
+      // Cap at 80 products to keep prompt size manageable and avoid timeouts
+      const sample = pool.length > 80
+        ? pool.filter((_, i) => i % Math.ceil(pool.length / 80) === 0).slice(0, 80)
+        : pool
+
+      const products = sample.map(p => ({
         id: p.id,
         title: p.title,
         category: p.categoryId,
@@ -88,8 +93,15 @@ export default function GiftAssistant() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipient, occasion, budget: budget.label, products }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.')
+
+      let data
+      try {
+        data = await res.json()
+      } catch {
+        throw new Error('Server returned an unexpected response. Please try again.')
+      }
+
+      if (!res.ok) throw new Error(data?.error || 'Something went wrong. Please try again.')
       setResults(data.recommendations)
     } catch (err) {
       setError(err.message)
