@@ -53,6 +53,7 @@ export default defineConfig({
   
   // Server optimizations for dev
   server: {
+    port: parseInt(process.env.PORT) || 5173,
     headers: {
       'Cache-Control': 'public, max-age=31536000',
     },
