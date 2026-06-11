@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
+import GiftAssistant from './components/GiftAssistant'
 import PageLoader from './components/PageLoader'
 import CartDrawer from './components/CartDrawer'
 import WishlistDrawer from './components/WishlistDrawer'
@@ -73,6 +74,7 @@ function AppContent() {
         </Routes>
       </Suspense>
       <Footer />
+      <GiftAssistant />
       <WhatsAppButton />
       <BottomNav />
     </>
