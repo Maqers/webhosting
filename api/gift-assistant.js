@@ -18,43 +18,44 @@ export default async function handler(req, res) {
       .map(p => `[${p.id}] ${p.title} | ${p.category} | ₹${p.price} | ${p.desc || ''} | slug:${p.slug} | img:${p.image}`)
       .join('\n')
 
-    const prompt = `You are a senior gift consultant for Maqers, an Indian artisan e-commerce store selling handmade, handcrafted products.
+    const prompt = `You are a gifting curator for Maqers — an Indian artisan brand known for unique, handmade products that feel personal and special. Your job is to recommend gifts that make someone say "wow, where did you find this?" — not "oh, a candle."
 
 GIFT REQUEST:
 - Recipient: ${recipient}
 - Occasion: ${occasion}
 - Budget: ${budget}
 
-YOUR APPROACH (follow these steps in order):
-1. Think about who ${recipient} is and what ${occasion} calls for emotionally. What would genuinely delight them? What would feel thoughtful vs generic?
-2. Consider what is culturally appropriate in India for this recipient:
-   - Dad / Brother / male: practical items, home decor, unique artisan pieces, drinkware, resin art. Avoid handbags, ladies jewellery, cosmetics, hair accessories.
-   - Mom / Sister / female: candles, florals, accessories, soaps, cosmetics, art, hampers, bags — almost anything works.
-   - Partner: romantic, personalised, or elegant items.
-   - Friend / Colleague: fun, unique, or shareable items.
-   - Child: playful, colourful items. Avoid adult cosmetics or drinkware.
-3. From the catalog below, select exactly 5 products that match your thinking. Do NOT just grab the most "obviously giftable" categories — look across the full catalog and pick what is genuinely appropriate for THIS person.
-4. Ensure variety: pick from at least 3 different categories.
-5. Prefer products that feel special and handmade over generic ones.
+CRITICAL RULES — read carefully before picking anything:
+1. DO NOT default to candles, plain flowers, or generic hampers. These are last resort, not first choice. Maqers has handpainted charms, resin art, artisan bags, custom keepsakes, handcrafted accessories — lead with what is UNIQUE and TRENDY.
+2. Scan the ENTIRE catalog before deciding. The best pick might be in an unexpected category.
+3. Pick from at least 3 different categories. Maximum 1 candle. Maximum 1 floral item.
+4. Budget must fit the stated range.
+5. Recipient rules:
+   - Dad / Brother / male: resin art, home decor, artisan drinkware, frames, statement decor pieces. STRICTLY avoid: handbags, ladies jewellery, cosmetics, hair accessories, charm keychains.
+   - Mom / Sister / female: handmade charms, artisan bags, personalised keepsakes, handpainted accessories, soaps, art — favour unique items over obvious ones.
+   - Partner: personalised / custom items, romantic keepsakes, handmade jewellery, handpainted art, elegant accessories.
+   - Friend / Colleague: trendy, quirky, fun items — standout charms, unique bags, conversation-starter pieces.
+   - Child: bright, playful, colourful items.
+6. The "reason" must mention something SPECIFIC about the product — its material, the handmade craft, or personalisation. Do not write generic reasons like "X is great for Y's occasion."
 
-PRODUCT CATALOG (format: [id] title | category | price | description | slug | image):
+PRODUCT CATALOG (format: [id] title | category | price | description | slug | img):
 ${catalog}
 
-Return ONLY this JSON object — no extra text:
+Return ONLY this JSON — no other text:
 {
   "recommendations": [
     {
-      "id": <number>,
-      "title": "exact title from catalog",
-      "slug": "exact slug from catalog",
-      "price": <exact number from catalog>,
-      "image": "exact image from catalog",
-      "reason": "One warm sentence explaining specifically why this is a great gift for ${recipient} on ${occasion} — mention something unique about the product."
+      "id": <exact number from catalog>,
+      "title": "<exact title from catalog>",
+      "slug": "<exact slug from catalog>",
+      "price": <exact price from catalog>,
+      "image": "<exact img path from catalog>",
+      "reason": "<Specific sentence: what makes this product special + why it suits ${recipient}'s ${occasion}.>"
     }
   ]
 }
 
-Return exactly 5 items. Use ONLY values from the catalog — never invent slugs, prices, or ids.`
+Exactly 5 items. Copy all field values exactly from the catalog — never invent or modify them.`
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -63,10 +64,10 @@ Return exactly 5 items. Use ONLY values from the catalog — never invent slugs,
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 900,
-        temperature: 0.7,
+        max_tokens: 1200,
+        temperature: 0.5,
         response_format: { type: 'json_object' },
       }),
     })
