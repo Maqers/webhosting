@@ -18,25 +18,27 @@ export default async function handler(req, res) {
       .map(p => `[${p.id}] ${p.title} | ${p.category} | ₹${p.price} | ${p.desc || ''} | slug:${p.slug} | img:${p.image}`)
       .join('\n')
 
-    const prompt = `You are a gifting curator for Maqers — an Indian artisan brand known for unique, handmade products that feel personal and special. Your job is to recommend gifts that make someone say "wow, where did you find this?" — not "oh, a candle."
+    const prompt = `You are a gifting expert for Maqers — an Indian artisan store with a wide range of handmade products: charms, bags, candles, florals, resin art, soaps, cosmetics, home decor, art frames, accessories, hampers and more.
 
 GIFT REQUEST:
 - Recipient: ${recipient}
 - Occasion: ${occasion}
 - Budget: ${budget}
 
-CRITICAL RULES — read carefully before picking anything:
-1. DO NOT default to candles, plain flowers, or generic hampers. These are last resort, not first choice. Maqers has handpainted charms, resin art, artisan bags, custom keepsakes, handcrafted accessories — lead with what is UNIQUE and TRENDY.
-2. Scan the ENTIRE catalog before deciding. The best pick might be in an unexpected category.
-3. Pick from at least 3 different categories. Maximum 1 candle. Maximum 1 floral item.
-4. Budget must fit the stated range.
-5. Recipient rules:
-   - Dad / Brother / male: resin art, home decor, artisan drinkware, frames, statement decor pieces. STRICTLY avoid: handbags, ladies jewellery, cosmetics, hair accessories, charm keychains.
-   - Mom / Sister / female: handmade charms, artisan bags, personalised keepsakes, handpainted accessories, soaps, art — favour unique items over obvious ones.
-   - Partner: personalised / custom items, romantic keepsakes, handmade jewellery, handpainted art, elegant accessories.
-   - Friend / Colleague: trendy, quirky, fun items — standout charms, unique bags, conversation-starter pieces.
-   - Child: bright, playful, colourful items.
-6. The "reason" must mention something SPECIFIC about the product — its material, the handmade craft, or personalisation. Do not write generic reasons like "X is great for Y's occasion."
+YOUR TASK:
+Read every product in the catalog carefully. Then select exactly 5 products that feel genuinely right for THIS specific person on THIS specific occasion. Think like a thoughtful friend who knows the recipient — not an algorithm.
+
+RULES:
+1. Match the recipient's likely tastes and the occasion's emotional tone. A Birthday calls for something celebratory. An Anniversary calls for something romantic or sentimental. A Festival calls for something warm and giftable.
+2. Pick from at least 3 different categories for variety.
+3. Gender awareness:
+   - Dad / Brother / male recipient: home decor, artisan drinkware, resin art, frames, unique statement pieces. Avoid: handbags, ladies jewellery, cosmetics, hair accessories.
+   - Mom / Sister / Partner / female: any category can work — charms, bags, soaps, candles, florals, accessories, art. Pick what feels most appropriate for the occasion.
+   - Friend / Colleague: fun, unique, memorable items.
+   - Child: playful, bright, age-appropriate items.
+4. Price must fit the stated budget range.
+5. Scan the full catalog — do not just pick the first items you see. The best recommendation might be in any category.
+6. Each "reason" must be specific to the product — mention what makes it handmade, unique, or particularly suited to this person and occasion.
 
 PRODUCT CATALOG (format: [id] title | category | price | description | slug | img):
 ${catalog}
@@ -50,12 +52,12 @@ Return ONLY this JSON — no other text:
       "slug": "<exact slug from catalog>",
       "price": <exact price from catalog>,
       "image": "<exact img path from catalog>",
-      "reason": "<Specific sentence: what makes this product special + why it suits ${recipient}'s ${occasion}.>"
+      "reason": "<One specific sentence explaining why this product is right for ${recipient}'s ${occasion} — reference something concrete about the product.>"
     }
   ]
 }
 
-Exactly 5 items. Copy all field values exactly from the catalog — never invent or modify them.`
+Exactly 5 items. All field values must be copied exactly from the catalog.`
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
