@@ -32,14 +32,27 @@ const RECIPIENTS = [
 ]
 
 const OCCASIONS = [
-  { label: 'Birthday',    occasionKey: 'birthday' },
-  { label: 'Anniversary', occasionKey: 'for-your-girlfriend' },
-  { label: 'Wedding',     occasionKey: 'shaadi-fever' },
-  { label: 'Festival',    occasionKey: 'occasion-gifts' },
+  { label: 'Birthday',     occasionKey: 'birthday' },
+  { label: 'Anniversary',  occasionKey: null },
+  { label: 'Wedding',      occasionKey: 'shaadi-fever' },
+  { label: 'Festival',     occasionKey: 'occasion-gifts' },
   { label: 'Just Because', occasionKey: null },
-  { label: 'Thank You',   occasionKey: null },
-  { label: 'New Baby',    occasionKey: 'godh-bharai' },
+  { label: 'Thank You',    occasionKey: null },
+  { label: 'New Baby',     occasionKey: 'godh-bharai' },
 ]
+
+// Category priority by occasion — applied in code, not left to the model to guess.
+// Order matters: categories listed first are shown first in the pool sent to the model.
+// null = no category filter, send everything in budget.
+const OCCASION_CATEGORY_PRIORITY = {
+  'Birthday':     ['Customised-Hampers', 'Florals', 'Frames&Paintings', 'Handmade-Accessories', 'Oxidised-jewellery', 'Candles', 'Charm-accessories', 'resin-products'],
+  'Anniversary':  ['Florals', 'Customised-Hampers', 'Candles', 'Frames&Paintings', 'Handmade-Accessories', 'Oxidised-jewellery'],
+  'Wedding':      ['Handbags', 'Customised-Hampers', 'Handmade-Accessories', 'Oxidised-jewellery', 'Wedding-Gifts', 'Frames&Paintings'],
+  'Festival':     ['Oxidised-jewellery', 'Handmade-Accessories', 'Candles', 'Home-decor', 'Charm-accessories', 'resin-products'],
+  'Just Because': null,
+  'Thank You':    ['Customised-Hampers', 'Candles', 'Frames&Paintings', 'Florals', 'Charm-accessories'],
+  'New Baby':     ['Kids-Accessories', 'Customised-Hampers', 'Frames&Paintings', 'Florals'],
+}
 
 const BUDGETS = [
   { label: 'Under ₹300',    min: 0,    max: 300 },
@@ -118,33 +131,49 @@ export default function GiftAssistant() {
       const { getAllProducts, occasionProductMap } = await import('../data/catalog')
       const allProducts = getAllProducts().filter(Boolean)
 
-      // Always use the recipient's curated list as the pool.
-      // Occasion context is passed to the model via the prompt — not used to narrow the product pool,
-      // since occasion lists are too small and skew the category distribution badly.
-      const recipientKey = recipient.recipientKey
-      const occasionKey  = occasion.occasionKey
+      const recipientKey     = recipient.recipientKey
+      const occasionLabel    = occasion.label
+      const categoryPriority = OCCASION_CATEGORY_PRIORITY[occasionLabel] || null
 
+      // Step 1: Start from the recipient's curated list
       const curatedIds = recipientKey ? (occasionProductMap[recipientKey] || null) : null
-
-      // Start from curated pool if available, otherwise all products
       let pool = curatedIds
         ? allProducts.filter(p => curatedIds.includes(p.id))
         : allProducts
 
-      // Apply budget filter within the curated pool
-      const budgetFiltered = pool.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
-
-      // If budget filter leaves fewer than 8 products, relax it slightly (±20%)
+      // Step 2: Apply budget filter
       const relaxedMin = budget.min * 0.8
       const relaxedMax = budget.max === 99999 ? 99999 : budget.max * 1.2
-      const finalPool = budgetFiltered.length >= 8
-        ? budgetFiltered
-        : pool.filter(p => p.inStock && p.price >= relaxedMin && p.price <= relaxedMax)
+      let budgetPool = pool.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+      if (budgetPool.length < 5) {
+        budgetPool = pool.filter(p => p.inStock && p.price >= relaxedMin && p.price <= relaxedMax)
+      }
+      if (budgetPool.length < 5) {
+        budgetPool = allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+      }
 
-      // If still tiny, fall back to all in-stock products in budget
-      const sendPool = finalPool.length >= 5
-        ? finalPool
-        : allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+      // Step 3: Sort by occasion category priority — done in code, not left to the model.
+      // Products from priority categories rise to the top, in priority order.
+      // Products not in the priority list are appended after (not removed — fallback if pool is thin).
+      let sendPool
+      if (categoryPriority) {
+        const prioritised = []
+        const rest = []
+        categoryPriority.forEach(catId => {
+          budgetPool.forEach(p => {
+            if ((p.categoryId === catId) && !prioritised.find(x => x.id === p.id)) {
+              prioritised.push(p)
+            }
+          })
+        })
+        budgetPool.forEach(p => {
+          if (!prioritised.find(x => x.id === p.id)) rest.push(p)
+        })
+        // Only send prioritised products; fall back to full pool if too few
+        sendPool = prioritised.length >= 5 ? prioritised : [...prioritised, ...rest]
+      } else {
+        sendPool = budgetPool
+      }
 
       // Map to API payload — send FULL description (not truncated)
       const products = sendPool.map(p => ({
@@ -165,8 +194,6 @@ export default function GiftAssistant() {
           recipient: recipient.label,
           occasion: occasion.label,
           budget: budget.label,
-          occasionKey,
-          recipientKey,
           products,
         }),
       })
