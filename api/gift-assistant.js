@@ -18,32 +18,31 @@ export default async function handler(req, res) {
       .map(p => `[${p.id}] ${p.title} | ${p.category} | ₹${p.price} | ${p.desc || ''} | slug:${p.slug} | img:${p.image}`)
       .join('\n')
 
-    const prompt = `You are a gifting expert for Maqers — an Indian artisan store with a wide range of handmade products: charms, bags, candles, florals, resin art, soaps, cosmetics, home decor, art frames, accessories, hampers and more.
+    const prompt = `You are a gift curator for Maqers, an Indian artisan marketplace.
 
-GIFT REQUEST:
-- Recipient: ${recipient}
+RECIPIENT PROFILE:
+- Who: ${recipient}
 - Occasion: ${occasion}
 - Budget: ${budget}
 
-YOUR TASK:
-Read every product in the catalog carefully. Then select exactly 5 products that feel genuinely right for THIS specific person on THIS specific occasion. Think like a thoughtful friend who knows the recipient — not an algorithm.
+STEP 1 — BUILD A RECIPIENT MENTAL MODEL (do this silently before picking):
+Based on the recipient and occasion, define:
+- What emotional tone does this gift need? (e.g. warm, celebratory, practical, luxurious)
+- What product types naturally fit this person? Be specific — not "home decor" but "objects they'd display or use daily"
+- What must you actively avoid for this person?
 
-RULES:
-1. Match the recipient's likely tastes and the occasion's emotional tone. A Birthday calls for something celebratory. An Anniversary calls for something romantic or sentimental. A Festival calls for something warm and giftable.
-2. Pick from at least 3 different categories for variety.
-3. Gender awareness:
-   - Dad / Brother / male recipient: home decor, artisan drinkware, resin art, frames, unique statement pieces. Avoid: handbags, ladies jewellery, cosmetics, hair accessories.
-   - Mom / Sister / Partner / female: any category can work — charms, bags, soaps, candles, florals, accessories, art. Pick what feels most appropriate for the occasion.
-   - Friend / Colleague: fun, unique, memorable items.
-   - Child: playful, bright, age-appropriate items.
-4. Price must fit the stated budget range.
-5. Scan the full catalog — do not just pick the first items you see. The best recommendation might be in any category.
-6. Each "reason" must be specific to the product — mention what makes it handmade, unique, or particularly suited to this person and occasion.
+STEP 2 — SCAN AND SHORTLIST:
+Read every product below. Tag each one mentally as: STRONG FIT / POSSIBLE / SKIP.
+Criteria: emotional fit > category variety > price.
+
+STEP 3 — FINAL 5:
+From your STRONG FIT pile, pick exactly 5. If you don't have 5 strong fits, pull from POSSIBLE — but flag those.
+Ensure at least 3 different categories are represented.
 
 PRODUCT CATALOG (format: [id] title | category | price | description | slug | img):
 ${catalog}
 
-Return ONLY this JSON — no other text:
+Return ONLY this JSON — no preamble, no explanation outside the JSON:
 {
   "recommendations": [
     {
@@ -52,7 +51,7 @@ Return ONLY this JSON — no other text:
       "slug": "<exact slug from catalog>",
       "price": <exact price from catalog>,
       "image": "<exact img path from catalog>",
-      "reason": "<One specific sentence explaining why this product is right for ${recipient}'s ${occasion} — reference something concrete about the product.>"
+      "reason": "One sentence. Must name something specific about the product AND why it fits this person on this occasion."
     }
   ]
 }
