@@ -88,6 +88,16 @@ export default function GiftAssistant() {
     setError('')
   }
 
+  useEffect(() => {
+    const handleExternalOpen = () => {
+      setIsOpen(true)
+      setResults(null)
+      setError('')
+    }
+    window.addEventListener('maqers:open-gift-finder', handleExternalOpen)
+    return () => window.removeEventListener('maqers:open-gift-finder', handleExternalOpen)
+  }, [])
+
   const handleClose = () => {
     setIsOpen(false)
     setResults(null)
@@ -206,8 +216,8 @@ export default function GiftAssistant() {
         <div ref={modalRef} className="gift-assistant-modal" role="dialog" aria-modal="true" aria-label="Gift Finder">
           <div className="gift-modal-header">
             <div>
-              <h2 className="gift-modal-title">Find the Perfect Gift</h2>
-              <p className="gift-modal-subtitle">3 quick questions — we'll find something special</p>
+              <h2 className="gift-modal-title">✨ AI Gift Finder</h2>
+              <p className="gift-modal-subtitle">3 quick questions — our AI picks what actually fits</p>
             </div>
             <button className="gift-modal-close" onClick={handleClose} aria-label="Close" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="18" height="18" aria-hidden="true">

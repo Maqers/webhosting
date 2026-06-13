@@ -80,7 +80,13 @@ const HOME_CAT_IMAGES = {
           </p>
           <div className="hero-bright-actions">
             <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
-            <Link to="/by-occasion" className="hero-bright-btn-secondary">Shop by Occasion</Link>
+            <button
+              className="hero-bright-btn-secondary"
+              onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
+              type="button"
+            >
+              ✨ Find the Perfect Gift
+            </button>
           </div>
         </div>
       </section>
