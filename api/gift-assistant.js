@@ -6,7 +6,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
-    const { recipient, occasion, budget, products } = req.body
+    const { recipient, occasion, budget, products, occasionKey, recipientKey } = req.body
+
     if (!recipient || !occasion || !budget || !Array.isArray(products) || products.length === 0) {
       return res.status(400).json({ error: 'Missing required fields.' })
     }
@@ -14,35 +15,52 @@ export default async function handler(req, res) {
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY is not configured.' })
 
+    // Build catalog string with FULL descriptions (not truncated)
+    // Also include category prominently so the model sees the actual product type
     const catalog = products
-      .map(p => `[${p.id}] ${p.title} | ${p.category} | ₹${p.price} | ${p.desc || ''} | slug:${p.slug} | img:${p.image}`)
+      .map(p => `[${p.id}] ${p.title} | CATEGORY: ${p.category} | ₹${p.price} | ${p.desc} | slug:${p.slug} | img:${p.image}`)
       .join('\n')
 
-    const prompt = `You are a gift curator for Maqers, an Indian artisan marketplace.
+    const prompt = `You are a gift curator for Maqers, an Indian artisan marketplace. Your job is to pick gifts that feel genuinely right — not generically appropriate.
 
 RECIPIENT PROFILE:
 - Who: ${recipient}
 - Occasion: ${occasion}
 - Budget: ${budget}
+${occasionKey ? `- Occasion key: ${occasionKey}` : ''}
+${recipientKey ? `- Recipient key: ${recipientKey}` : ''}
 
-STEP 1 — BUILD A RECIPIENT MENTAL MODEL (do this silently before picking):
-Based on the recipient and occasion, define:
-- What emotional tone does this gift need? (e.g. warm, celebratory, practical, luxurious)
-- What product types naturally fit this person? Be specific — not "home decor" but "objects they'd display or use daily"
-- What must you actively avoid for this person?
+STEP 1 — RECIPIENT MENTAL MODEL (reason through this before picking):
+- What emotional tone does this gift need for ${occasion}? (celebratory? intimate? practical?)
+- What does ${recipient} actually want to receive, not just what is safe to give?
+- What categories are genuinely right for ${recipient}? Be specific.
+- What must you actively avoid? (e.g. for Dad: skip jewellery, bags, cosmetics, hair accessories. For Mom: skip generic candles unless exceptional. For kids: skip adult accessories.)
 
-STEP 2 — SCAN AND SHORTLIST:
-Read every product below. Tag each one mentally as: STRONG FIT / POSSIBLE / SKIP.
-Criteria: emotional fit > category variety > price.
+STEP 2 — SCAN EVERY PRODUCT:
+Read every product in the catalog below. The CATEGORY field tells you the product type — use it. The description tells you the material, technique, and emotional fit — read it carefully.
+Tag each product: STRONG FIT / POSSIBLE / SKIP
+
+Scoring criteria (in order of importance):
+1. Emotional fit for this specific person on this specific occasion
+2. Category appropriateness (would ${recipient} actually use/wear/display this?)
+3. Price within budget
+4. Category variety across final 5
 
 STEP 3 — FINAL 5:
-From your STRONG FIT pile, pick exactly 5. If you don't have 5 strong fits, pull from POSSIBLE — but flag those.
-Ensure at least 3 different categories are represented.
+Pick exactly 5 from your STRONG FIT pile. Cover at least 3 different categories.
+If fewer than 5 strong fits exist, pull from POSSIBLE — but only if genuinely suitable.
 
-PRODUCT CATALOG (format: [id] title | category | price | description | slug | img):
+IMPORTANT RULES:
+- Do NOT default to candles just because they are safe. Only pick a candle if it's genuinely the best fit.
+- Do NOT pick products that feel generic. Every pick must have a clear, specific reason.
+- For Dad/Brother/male recipient: favour home decor, resin art, drinkware, frames, statement pieces. Avoid: handbags, ladies jewellery, cosmetics, hair accessories.
+- For Mom: favour jewellery she'd actually wear, art frames, meaningful decor, florals, personalised items.
+- Read descriptions fully — handmade technique and material details matter for the reason.
+
+PRODUCT CATALOG (format: [id] title | CATEGORY | price | description | slug | img):
 ${catalog}
 
-Return ONLY this JSON — no preamble, no explanation outside the JSON:
+Return ONLY this JSON — no preamble, no markdown, no explanation outside the JSON:
 {
   "recommendations": [
     {
@@ -51,12 +69,12 @@ Return ONLY this JSON — no preamble, no explanation outside the JSON:
       "slug": "<exact slug from catalog>",
       "price": <exact price from catalog>,
       "image": "<exact img path from catalog>",
-      "reason": "One sentence. Must name something specific about the product AND why it fits this person on this occasion."
+      "reason": "One specific sentence: name what makes this product special (material, technique, design detail) AND exactly why it fits ${recipient} for ${occasion}."
     }
   ]
 }
 
-Exactly 5 items. All field values must be copied exactly from the catalog.`
+Exactly 5 items. All field values must match the catalog exactly.`
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -80,10 +98,19 @@ Exactly 5 items. All field values must be copied exactly from the catalog.`
 
     const data = await openaiRes.json()
     const raw = data.choices?.[0]?.message?.content || ''
-    const parsed = JSON.parse(raw)
-    const recommendations = Array.isArray(parsed.recommendations) ? parsed.recommendations : []
 
+    let parsed
+    try {
+      // Strip any accidental markdown fences
+      const clean = raw.replace(/```json|```/g, '').trim()
+      parsed = JSON.parse(clean)
+    } catch {
+      return res.status(500).json({ error: 'Failed to parse recommendations. Please try again.' })
+    }
+
+    const recommendations = Array.isArray(parsed.recommendations) ? parsed.recommendations : []
     return res.status(200).json({ recommendations: recommendations.slice(0, 5) })
+
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' })
   }

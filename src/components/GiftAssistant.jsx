@@ -7,6 +7,7 @@ const CATEGORY_NAMES = {
   'Home-decor': 'Home Decor',
   'Handbags': 'Bags & Purses',
   'Handmade-Accessories': 'Handmade Accessories',
+  'Oxidised-jewellery': 'Oxidised Jewellery',
   'Candles': 'Scented Candles',
   'Florals': 'Florals & Bouquets',
   'Wedding-Gifts': 'Wedding Gifts',
@@ -18,23 +19,42 @@ const CATEGORY_NAMES = {
   'Frames&Paintings': 'Art & Frames',
 }
 
-const RECIPIENTS = ['Mom', 'Dad', 'Partner', 'Friend', 'Sister', 'Brother', 'Colleague', 'Child']
-const OCCASIONS = ['Birthday', 'Anniversary', 'Wedding', 'Festival', 'Just Because', 'Thank You', 'New Baby']
+const RECIPIENTS = [
+  { label: 'Mom',       recipientKey: 'for-your-mom' },
+  { label: 'Dad',       recipientKey: 'for-your-dad' },
+  { label: 'Partner',   recipientKey: 'for-your-girlfriend' },
+  { label: 'Friend',    recipientKey: 'for-your-best-friend' },
+  { label: 'Sister',    recipientKey: 'for-your-sister' },
+  { label: 'Brother',   recipientKey: 'for-your-brother' },
+  { label: 'Colleague', recipientKey: 'for-your-work-friend' },
+  { label: 'Child',     recipientKey: 'for-children' },
+]
+
+const OCCASIONS = [
+  { label: 'Birthday',    occasionKey: 'birthday' },
+  { label: 'Anniversary', occasionKey: 'for-your-girlfriend' },
+  { label: 'Wedding',     occasionKey: 'shaadi-fever' },
+  { label: 'Festival',    occasionKey: 'occasion-gifts' },
+  { label: 'Just Because', occasionKey: null },
+  { label: 'Thank You',   occasionKey: null },
+  { label: 'New Baby',    occasionKey: 'godh-bharai' },
+]
+
 const BUDGETS = [
-  { label: 'Under ₹300', min: 0, max: 300 },
-  { label: '₹300 – ₹600', min: 300, max: 600 },
-  { label: '₹600 – ₹1,500', min: 600, max: 1500 },
+  { label: 'Under ₹300',    min: 0,    max: 300 },
+  { label: '₹300 – ₹600',  min: 300,  max: 600 },
+  { label: '₹600 – ₹1,500', min: 600,  max: 1500 },
   { label: 'Above ₹1,500', min: 1500, max: 99999 },
 ]
 
 export default function GiftAssistant() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [recipient, setRecipient] = useState('')
-  const [occasion, setOccasion] = useState('')
-  const [budget, setBudget] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [results, setResults] = useState(null)
-  const [error, setError] = useState('')
+  const [isOpen, setIsOpen]       = useState(false)
+  const [recipient, setRecipient] = useState(null)
+  const [occasion, setOccasion]   = useState(null)
+  const [budget, setBudget]       = useState(null)
+  const [loading, setLoading]     = useState(false)
+  const [results, setResults]     = useState(null)
+  const [error, setError]         = useState('')
   const modalRef = useRef(null)
 
   const canFind = recipient && occasion && budget
@@ -71,8 +91,8 @@ export default function GiftAssistant() {
     setIsOpen(false)
     setResults(null)
     setError('')
-    setRecipient('')
-    setOccasion('')
+    setRecipient(null)
+    setOccasion(null)
     setBudget(null)
   }
 
@@ -83,18 +103,49 @@ export default function GiftAssistant() {
     setResults(null)
 
     try {
-      // Dynamic import to keep catalog out of the initial bundle
-      const { getAllProducts } = await import('../data/catalog')
+      const { getAllProducts, occasionProductMap } = await import('../data/catalog')
       const allProducts = getAllProducts().filter(Boolean)
-      const budgetMatches = allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
-      const pool = budgetMatches.length >= 6 ? budgetMatches : allProducts.filter(p => p.inStock)
 
-      const products = pool.map(p => ({
+      const recipientKey = recipient.recipientKey
+      const occasionKey  = occasion.occasionKey
+
+      let curatedIds = null
+
+      if (recipientKey && occasionKey) {
+        const rIds = new Set(occasionProductMap[recipientKey] || [])
+        const oIds = new Set(occasionProductMap[occasionKey] || [])
+        const intersection = [...rIds].filter(id => oIds.has(id))
+        curatedIds = intersection.length >= 5 ? intersection : [
+          ...(new Set([...intersection, ...(occasionProductMap[recipientKey] || [])]))
+        ]
+      } else if (recipientKey) {
+        curatedIds = occasionProductMap[recipientKey] || null
+      } else if (occasionKey) {
+        curatedIds = occasionProductMap[occasionKey] || null
+      }
+
+      let pool = curatedIds
+        ? allProducts.filter(p => curatedIds.includes(p.id))
+        : allProducts
+
+      const budgetFiltered = pool.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+
+      const relaxedMin = budget.min * 0.8
+      const relaxedMax = budget.max === 99999 ? 99999 : budget.max * 1.2
+      const finalPool = budgetFiltered.length >= 8
+        ? budgetFiltered
+        : pool.filter(p => p.inStock && p.price >= relaxedMin && p.price <= relaxedMax)
+
+      const sendPool = finalPool.length >= 5
+        ? finalPool
+        : allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+
+      const products = sendPool.map(p => ({
         id: p.id,
         title: p.title,
         category: CATEGORY_NAMES[p.categoryId] || p.categoryId,
         price: p.price,
-        desc: (p.description || '').replace(/\\n/g, ' ').replace(/\s+/g, ' ').slice(0, 200),
+        desc: (p.description || '').replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim(),
         slug: p.slug,
         image: p.images?.[0] || '',
       }))
@@ -102,7 +153,14 @@ export default function GiftAssistant() {
       const res = await fetch('/api/gift-assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipient, occasion, budget: budget.label, products }),
+        body: JSON.stringify({
+          recipient: recipient.label,
+          occasion: occasion.label,
+          budget: budget.label,
+          occasionKey,
+          recipientKey,
+          products,
+        }),
       })
 
       let data
@@ -124,8 +182,8 @@ export default function GiftAssistant() {
   const handleReset = () => {
     setResults(null)
     setError('')
-    setRecipient('')
-    setOccasion('')
+    setRecipient(null)
+    setOccasion(null)
     setBudget(null)
   }
 
@@ -172,7 +230,7 @@ export default function GiftAssistant() {
             {!loading && results && (
               <div className="gift-results">
                 <p className="gift-results-label">
-                  Great picks for <strong>{recipient}</strong> — <strong>{occasion}</strong>
+                  Great picks for <strong>{recipient.label}</strong> — <strong>{occasion.label}</strong>
                 </p>
                 <div className="gift-results-list">
                   {results.map(r => (
@@ -208,12 +266,12 @@ export default function GiftAssistant() {
                   <div className="gift-chips">
                     {RECIPIENTS.map(r => (
                       <button
-                        key={r}
+                        key={r.label}
                         type="button"
-                        className={`gift-chip${recipient === r ? ' selected' : ''}`}
+                        className={`gift-chip${recipient?.label === r.label ? ' selected' : ''}`}
                         onClick={() => setRecipient(r)}
                       >
-                        {r}
+                        {r.label}
                       </button>
                     ))}
                   </div>
@@ -224,12 +282,12 @@ export default function GiftAssistant() {
                   <div className="gift-chips">
                     {OCCASIONS.map(o => (
                       <button
-                        key={o}
+                        key={o.label}
                         type="button"
-                        className={`gift-chip${occasion === o ? ' selected' : ''}`}
+                        className={`gift-chip${occasion?.label === o.label ? ' selected' : ''}`}
                         onClick={() => setOccasion(o)}
                       >
-                        {o}
+                        {o.label}
                       </button>
                     ))}
                   </div>
