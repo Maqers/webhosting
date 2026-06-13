@@ -20,14 +20,15 @@ const CATEGORY_NAMES = {
 }
 
 const RECIPIENTS = [
-  { label: 'Mom',       recipientKey: 'for-your-mom' },
-  { label: 'Dad',       recipientKey: 'for-your-dad' },
-  { label: 'Partner',   recipientKey: 'for-your-girlfriend' },
-  { label: 'Friend',    recipientKey: 'for-your-best-friend' },
-  { label: 'Sister',    recipientKey: 'for-your-sister' },
-  { label: 'Brother',   recipientKey: 'for-your-brother' },
-  { label: 'Colleague', recipientKey: 'for-your-work-friend' },
-  { label: 'Child',     recipientKey: 'for-children' },
+  { label: 'Mom',        recipientKey: 'for-your-mom' },
+  { label: 'Dad',        recipientKey: 'for-your-dad' },
+  { label: 'Girlfriend', recipientKey: 'for-your-girlfriend' },
+  { label: 'Boyfriend',  recipientKey: 'for-your-boyfriend' },
+  { label: 'Friend',     recipientKey: 'for-your-best-friend' },
+  { label: 'Sister',     recipientKey: 'for-your-sister' },
+  { label: 'Brother',    recipientKey: 'for-your-brother' },
+  { label: 'Colleague',  recipientKey: 'for-your-work-friend' },
+  { label: 'Child',      recipientKey: 'for-children' },
 ]
 
 const OCCASIONS = [
@@ -49,8 +50,8 @@ const BUDGETS = [
 
 export default function GiftAssistant() {
   const [isOpen, setIsOpen]       = useState(false)
-  const [recipient, setRecipient] = useState(null)
-  const [occasion, setOccasion]   = useState(null)
+  const [recipient, setRecipient] = useState(null)   // full object { label, recipientKey }
+  const [occasion, setOccasion]   = useState(null)   // full object { label, occasionKey }
   const [budget, setBudget]       = useState(null)
   const [loading, setLoading]     = useState(false)
   const [results, setResults]     = useState(null)
@@ -103,48 +104,45 @@ export default function GiftAssistant() {
     setResults(null)
 
     try {
+      // Dynamic import to keep catalog out of the initial bundle
       const { getAllProducts, occasionProductMap } = await import('../data/catalog')
       const allProducts = getAllProducts().filter(Boolean)
 
+      // Always use the recipient's curated list as the pool.
+      // Occasion context is passed to the model via the prompt — not used to narrow the product pool,
+      // since occasion lists are too small and skew the category distribution badly.
       const recipientKey = recipient.recipientKey
       const occasionKey  = occasion.occasionKey
 
-      let curatedIds = null
+      const curatedIds = recipientKey ? (occasionProductMap[recipientKey] || null) : null
 
-      if (recipientKey && occasionKey) {
-        const rIds = new Set(occasionProductMap[recipientKey] || [])
-        const oIds = new Set(occasionProductMap[occasionKey] || [])
-        const intersection = [...rIds].filter(id => oIds.has(id))
-        curatedIds = intersection.length >= 5 ? intersection : [
-          ...(new Set([...intersection, ...(occasionProductMap[recipientKey] || [])]))
-        ]
-      } else if (recipientKey) {
-        curatedIds = occasionProductMap[recipientKey] || null
-      } else if (occasionKey) {
-        curatedIds = occasionProductMap[occasionKey] || null
-      }
-
+      // Start from curated pool if available, otherwise all products
       let pool = curatedIds
         ? allProducts.filter(p => curatedIds.includes(p.id))
         : allProducts
 
+      // Apply budget filter within the curated pool
       const budgetFiltered = pool.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
 
+      // If budget filter leaves fewer than 8 products, relax it slightly (±20%)
       const relaxedMin = budget.min * 0.8
       const relaxedMax = budget.max === 99999 ? 99999 : budget.max * 1.2
       const finalPool = budgetFiltered.length >= 8
         ? budgetFiltered
         : pool.filter(p => p.inStock && p.price >= relaxedMin && p.price <= relaxedMax)
 
+      // If still tiny, fall back to all in-stock products in budget
       const sendPool = finalPool.length >= 5
         ? finalPool
         : allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
 
+      // Map to API payload — send FULL description (not truncated)
       const products = sendPool.map(p => ({
         id: p.id,
         title: p.title,
         category: CATEGORY_NAMES[p.categoryId] || p.categoryId,
         price: p.price,
+        // Full description, clean up escaped newlines
         desc: (p.description || '').replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim(),
         slug: p.slug,
         image: p.images?.[0] || '',
