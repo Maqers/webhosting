@@ -37,7 +37,7 @@
 
 .products-filters-section {
   background: var(--bg-primary);
-  padding: var(--spacing-lg) 0 var(--spacing-sm);
+  padding: 0.3rem 0;
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: var(--navbar-height-mobile, 64px);
@@ -49,7 +49,7 @@
 .filters-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
 }
 
 .filters-controls-row {
@@ -143,12 +143,12 @@
   opacity: 1;
   visibility: visible;
   contain: layout style;
-  padding: var(--spacing-2xl) 0 4rem;
+  padding: 0.75rem 0 4rem;
 }
 
 .products-filters-section .container {
   padding-top: 0;
-  padding-bottom: var(--spacing-sm);
+  padding-bottom: 0;
 }
 
 /* ============================================================================
@@ -367,16 +367,18 @@
 }
 
 @media (max-width: 768px) {
-  .products-filters-section { padding: var(--spacing-md) 0; }
-  .filters-wrapper { gap: var(--spacing-md); flex-direction: column; align-items: stretch; }
+  .products-filters-section { padding: 0.4rem 0 0.3rem !important; }
+  .filters-wrapper { gap: 0.4rem !important; flex-direction: column; align-items: stretch; }
+  .products-content { padding: 0.5rem 0 2rem !important; }
   .category-filters { gap: 0.625rem; padding: var(--spacing-xs) 0; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .filter-chip { padding: 0.6875rem 1.25rem; font-size: 0.875rem; min-height: 44px; }
 }
 
 @media (max-width: 480px) {
-  .products-hero { padding: var(--spacing-lg) 0; }
-  .products-filters-section { top: var(--navbar-height-mobile, 64px); padding: var(--spacing-md) 0; }
-  .filters-wrapper { gap: var(--spacing-md); }
+  .products-hero { padding: 0.5rem 0 !important; }
+  .products-filters-section { top: var(--navbar-height-mobile, 64px); padding: 0.3rem 0 0.2rem !important; }
+  .filters-wrapper { gap: 0.3rem !important; }
+  .products-content { padding: 0.5rem 0 2rem !important; }
   .category-filters { gap: 0.5rem; }
   .filter-chip { padding: 0.625rem 1rem; font-size: 0.875rem; min-height: 44px; }
   .product-title { font-size: 0.875rem; line-height: 1.4; }
@@ -558,10 +560,21 @@
     display: block !important;
   }
 }
+
+@media (max-width: 480px) {
+  .products-grid { gap: 0.5rem !important; }
+  .feat-img-zone { aspect-ratio: 3 / 4 !important; }
+  .feat-category { display: none !important; }
+  .feat-info-zone { padding: 0.45rem 0.6rem 0.55rem !important; gap: 0.08rem !important; justify-content: flex-start !important; }
+  .feat-title { font-size: 0.72rem !important; line-height: 1.3 !important; margin: 0 !important; }
+  .feat-price { font-size: 0.8rem !important; margin: 0 !important; }
+  .feat-actions { display: none !important; }
+}
+
 /* ── Category circles (imported from Home layout) ── */
 .category-circles-strip--products {
   background: transparent;
-  padding: 0.5rem 0 0.5rem;
+  padding: 0.25rem 0 0.15rem;
   border-bottom: none;
   overflow: visible;
 }
@@ -572,7 +585,7 @@
   overflow-y: visible;
   align-items: flex-start;
   -webkit-overflow-scrolling: touch;
-  padding: 0.5rem 0 0.5rem 1rem;
+  padding: 0.25rem 0 0.25rem 0.75rem;
   scrollbar-width: none;
   touch-action: pan-x;
   overscroll-behavior-x: none;
@@ -590,7 +603,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 0 !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -598,6 +611,7 @@
   flex-shrink: 0;
   scroll-snap-align: start;
   width: 92px;
+  min-height: unset !important;
 }
 .category-circle-img {
   width: 82px;
@@ -683,4 +697,13 @@
   .category-circles-strip--products .category-circles-scroll::-webkit-scrollbar { display: none; }
   .category-circle-item--btn { width: 96px; }
   .category-circle-label { font-size: 0.72rem; }
+}
+
+@media (max-width: 480px) {
+  .category-circles-strip--products { padding: 0.2rem 0 0.1rem !important; }
+  .category-circles-strip--products .category-circles-scroll { padding: 0.2rem 0 0.2rem 0.75rem !important; gap: 0.5rem !important; }
+  .category-circle-img,
+  .category-circle-all { width: 64px !important; height: 64px !important; min-width: 64px !important; min-height: 64px !important; }
+  .category-circle-item--btn { width: 70px !important; gap: 0.3rem !important; }
+  .category-circle-label { font-size: 0.6rem !important; width: 70px !important; max-width: 70px !important; }
 }

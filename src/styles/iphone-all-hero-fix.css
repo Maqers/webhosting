@@ -13,7 +13,7 @@
 @media (max-width: 767px) {
   /* Products Hero */
   .products-hero {
-    padding: var(--spacing-lg) 0 !important;
+    padding: 0.75rem 0 !important;
     height: auto !important;
     min-height: unset !important;
     max-height: 200px !important;
@@ -25,7 +25,7 @@
 
   /* Categories Hero */
   .categories-hero {
-    padding: var(--spacing-lg) 0 !important;
+    padding: 0.75rem 0 !important;
     height: auto !important;
     min-height: unset !important;
     max-height: 200px !important;
@@ -116,7 +116,7 @@
   .about-hero,
   .contact-hero,
   .faqs-hero {
-    padding: var(--spacing-md) 0 !important;
+    padding: 0.5rem 0 !important;
     max-height: 180px !important;
   }
 
@@ -203,8 +203,8 @@
       min-height: auto !important;
       max-height: 200px !important;
       height: auto !important;
-      padding-top: var(--spacing-md) !important;
-      padding-bottom: var(--spacing-md) !important;
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
       box-sizing: border-box !important;
       overflow: hidden !important;
       width: 100vw !important;

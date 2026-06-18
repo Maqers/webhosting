@@ -771,8 +771,7 @@ img {
   .container {
     width: 100% !important;
     max-width: 100% !important;
-    /* Zoom-safe: Fixed spacing */
-    padding: 0 var(--spacing-md) !important;
+    padding: 0 0.375rem !important;
     margin: 0 !important;
     box-sizing: border-box;
   }

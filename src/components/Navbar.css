@@ -211,7 +211,7 @@
   border: none;
   cursor: pointer;
   color: #3a1a1a;
-  padding: 4px 6px;
+  padding: 4px 6px !important;
   border-radius: 6px;
   transition: color 0.15s, background 0.15s;
   font-family: inherit;
@@ -231,10 +231,10 @@
 }
 @media (max-width: 968px) {
   .navbar-icon-label { display: none; }
-  .navbar-icon-btn   { padding: 4px 6px; }
+  .navbar-icon-btn   { padding: 4px 6px !important; }
 }
 @media (min-width: 969px) {
-  .navbar-icon-btn { padding: 6px 8px; }
+  .navbar-icon-btn { padding: 6px 8px !important; }
   .navbar-icon-btn svg { width: 20px; height: 20px; }
 }
 

@@ -148,8 +148,7 @@
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;
 }
 @media (max-width: 1024px) { .featured-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 768px)  { .featured-grid { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; } }
-@media (max-width: 400px)  { .featured-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px)  { .featured-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } }
 
 /* ================================================================
    FEAT CARD — used everywhere: home, products, categories, seller
@@ -290,6 +289,7 @@
   .feat-info-zone { padding: 0.75rem 0.875rem 0.875rem; }
 }
 
+
 /* ================================================================
    CTA
    ================================================================ */
@@ -349,6 +349,16 @@
     object-position: center top !important;
     display: block !important;
   }
+}
+
+@media (max-width: 480px) {
+  .featured-grid { gap: 0.5rem !important; }
+  .feat-img-zone { aspect-ratio: 3 / 4 !important; }
+  .feat-category { display: none !important; }
+  .feat-info-zone { padding: 0.45rem 0.6rem 0.55rem !important; gap: 0.08rem !important; justify-content: flex-start !important; }
+  .feat-title { font-size: 0.72rem !important; line-height: 1.3 !important; margin: 0 !important; }
+  .feat-price { font-size: 0.8rem !important; margin: 0 !important; }
+  .feat-actions { display: none !important; }
 }
 /* ── Category circles strip ── */
 .category-circles-strip {

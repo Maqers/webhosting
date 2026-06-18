@@ -287,15 +287,15 @@ body,
    ============================================================================ */
 
 .products-content {
-  padding: clamp(var(--spacing-lg), 4vw, var(--spacing-2xl)) 0;
+  padding: clamp(var(--spacing-md), 4vw, var(--spacing-2xl)) 0;
 }
 
 .products-hero {
-  padding: clamp(var(--spacing-lg), 5vw, var(--spacing-2xl)) 0;
+  padding: clamp(var(--spacing-md), 5vw, var(--spacing-2xl)) 0;
 }
 
 .products-filters-section {
-  padding: clamp(var(--spacing-sm), 2vw, var(--spacing-lg)) 0;
+  padding: 0.3rem 0;
 }
 
 /* ============================================================================
