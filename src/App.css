@@ -8,3 +8,11 @@
   box-sizing: border-box;
   /* overflow-x removed — was breaking position:sticky on navbar */
 }
+
+/* Hide floating buttons when cart or wishlist drawer is open */
+body:has(.cart-drawer.open) .gift-assistant-btn,
+body:has(.cart-drawer.open) .whatsapp-button,
+body:has(.wishlist-drawer.open) .gift-assistant-btn,
+body:has(.wishlist-drawer.open) .whatsapp-button {
+  display: none !important;
+}

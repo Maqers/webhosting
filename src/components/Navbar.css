@@ -212,6 +212,8 @@
   cursor: pointer;
   color: #3a1a1a;
   padding: 4px 6px !important;
+  min-height: unset !important;
+  min-width: unset !important;
   border-radius: 6px;
   transition: color 0.15s, background 0.15s;
   font-family: inherit;
