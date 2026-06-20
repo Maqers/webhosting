@@ -831,13 +831,20 @@ export default function AdminPortal() {
       // Clean up extra blank line left behind
       if (before.endsWith("\n") && after.startsWith("\n")) after = after.slice(1);
       source = before + after;
-      // Remove product id from occasion maps only — use placeholder to avoid partial matches
+      // Remove product id from occasionProductMap ONLY — scoped to avoid corrupting
+      // order numbers in the categories array or IDs elsewhere in the file.
       const pid = String(product.id);
-      source = source.replace(new RegExp(`,\\s*\\b${pid}\\b`, "g"), "");  // trailing: ", 42"
-      source = source.replace(new RegExp(`\\b${pid}\\b\\s*,\\s*`, "g"), ""); // leading: "42, "
-      source = source.replace(new RegExp(`\\b${pid}\\b`, "g"), "");          // standalone
-      // Tidy up any resulting empty arrays or double-commas in occasion maps
-      source = source.replace(/,\s*,/g, ",").replace(/\[\s*,/g, "[").replace(/,\s*\]/g, "]");
+      const mapKey = 'export const occasionProductMap';
+      const mapIdx = source.indexOf(mapKey);
+      if (mapIdx !== -1) {
+        const beforeMap = source.slice(0, mapIdx);
+        let mapSection = source.slice(mapIdx);
+        mapSection = mapSection.replace(new RegExp(`,\\s*\\b${pid}\\b`, "g"), "");
+        mapSection = mapSection.replace(new RegExp(`\\b${pid}\\b\\s*,\\s*`, "g"), "");
+        mapSection = mapSection.replace(new RegExp(`\\b${pid}\\b`, "g"), "");
+        mapSection = mapSection.replace(/,\s*,/g, ",").replace(/\[\s*,/g, "[").replace(/,\s*\]/g, "]");
+        source = beforeMap + mapSection;
+      }
       await commitCatalog(source, sha, `Delete product: ${product.title} (ID ${product.id})`, creds);
       loadCatalogData(source, sha);
       showToast(`"${product.title}" deleted.`);
