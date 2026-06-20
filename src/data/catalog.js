@@ -9,7 +9,7 @@ export const categories = [
   { id: "Florals", name: "Florals", slug: "Florals", description: "Beautiful floral handmade products", icon: "home", order: 4, featured: false, meta: { keywords: ["crochet","flowers","bouquets","handmade","anniversary","gift"] } },
   { id: "Candles", name: "Candles", slug: "Candles", description: "Beautiful fragnant candles, customisations available", icon: "gift", order: 2, featured: false, meta: { keywords: ["personalized","candles","gift","candle","birthday","anniversary"] } },
   { id: "Handbags", name: "Bags & Purses", slug: "Handbags", description: "Elegant fashion items and bags", icon: "fashion", order: 3, featured: false, meta: { keywords: ["bags","handbags","prints","printed","bag"] } },
-  { id: "Frames&Paintings", name: "Art & Decor", slug: "Frames&Paintings", description: "Handmade paintings in beautiful frames", icon: "jewelry", order: featured: false, meta: { keywords: ["jewelry","accessories","traditional","handmade","ornaments"] } },
+  { id: "Frames&Paintings", name: "Art & Decor", slug: "Frames&Paintings", description: "Handmade paintings in beautiful frames", icon: "jewelry", order: 10, featured: false, meta: { keywords: ["jewelry","accessories","traditional","handmade","ornaments"] } },
   { id: "Home-decor", name: "Home & Living", slug: "Home-decor", description: "Fancy home and dining utilities", icon: "kitchen", order: 5, featured: false, meta: { keywords: ["homedecor","decor","glasses","glass","homeutilities"] } },
   { id: "resin-products", name: "Resin Products", slug: "resin-products", description: "Resin art and collectible items", icon: "art", order: 7, featured: false, meta: { keywords: ["art","resin","frames","flowers"] } },
   { id: "Handmade-Accessories", name: "Accessories", slug: "Handmade-Accessories", description: "Accessories for weddings and celebrations", icon: "wedding", order: 6, featured: false, meta: { keywords: ["wedding","occasion","celebration","gift","special"] } },
@@ -17,7 +17,7 @@ export const categories = [
   { id: "Handmade-Soaps", name: "Soaps", slug: "Handmade-Soaps", description: "Handcrafted soaps in various fragnances", icon: "soaps", order: 9, featured: false, meta: { keywords: ["soaps","handwash","fragnance","soap","hanging"] } },
   { id: "Wedding-Gifts", name: "Wedding", slug: "Wedding-Gifts", description: "Unique gifts for weddings and anniversaries", icon: "wedding-gift", order: 1, featured: false, meta: { keywords: ["wedding","anniversary","gift","special","couple"] } },
   { id: "Cosmetics", name: "Cosmetics", slug: "cosmetics", description: "Discover our beautifully curated cosmetic collection, designed to combine elegance with functionality.", icon: "fashion", order: 11, featured: false, meta: { keywords: [] } },
-  { id: "Kids-Accessories", name: "Kids", slug: "Kids-Accessories", description: "", icon: "fashion", order: featured: false, meta: { keywords: [] } },
+  { id: "Kids-Accessories", name: "Kids", slug: "Kids-Accessories", description: "", icon: "fashion", order: 12, featured: false, meta: { keywords: [] } },
   { id: "Charm-accessories", name: "Charms", slug: "Charm-Accessories", description: "Small, decorative pendants or trinkets attached to jewelry or personal items.", icon: "jewelry", order: 13, featured: false, meta: { keywords: [] } }];
 
 export const productsByCategory = {
