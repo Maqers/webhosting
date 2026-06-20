@@ -254,14 +254,8 @@ export const productsByCategory = {
 
     { id: 176, categoryId: "Handmade-Soaps", title: "Transparent Grape Soap", slug: "transparent-grape-soap", description: "A beautifully sculpted transparent grape-shaped soap crafted using a premium soap base, designed to add a playful yet elegant touch to your kitchen or bathroom décor. With its crystal-clear finish and realistic grape-inspired design, this soap doubles as both a functional cleansing bar and a decorative accent. Gentle on the skin and visually aesthetic, it makes a unique addition to self-care spaces, festive hampers, and thoughtful gifting.", price: 449, images: ["/images/whatsapp-image-2026-05-16-at-2.13.08-pm-(1).jpeg", "/images/whatsapp-image-2026-05-16-at-10.00.00-am.jpeg"], popular: false, featured: false, inStock: false, tags: ["transparent grape soap", "glycerin soap", "decorative soap", "handmade soap", "aesthetic soap", "novelty soap", "bath soap", "gifting soap", "artisan soap", "bathroom decor soap"], meta: { keywords: ["transparent grape shaped soap", "handmade decorative soap india", "clear soap base grape soap", "aesthetic soap for gifting", "novelty soap gift ideas", "decorative bathroom soap online", "artisan transparent soaps india", "unique handmade soap designs", "luxury glycerin soaps india", "cute soap gift hampers india"], colors: [], sizes: [], moq: 0, delivery_time: "", secondaryCategories: [], sellerId: "", sellerCode: "" } }],
   "Wedding-Gifts": [
-    
-
-
-
-
-
-
-],
+    { id: 261, categoryId: "Wedding-Gifts", title: "Organza Trousseau Bag", slug: "organza-trousseau-bag", description: "This exquisite organza trousseau bag showcases intricate craftsmanship with delicate golden embroidery that adds a touch of luxury. Perfect for celebrating special occasions, each piece is thoughtfully handmade by skilled artisans, making it a unique addition to your collection. Elevate your gifting experience with this stunning and versatile accessory.", price: 135, images: ["/images/whatsapp-image-2026-06-18-at-10.11.21-am-(1).jpeg", "/images/whatsapp-image-2026-06-18-at-3.51.35-pm.jpeg"], popular: false, featured: false, inStock: true, tags: ["handmade", "organza bag", "luxury gifting", "artisan crafted", "wedding essentials", "special occasion"], meta: { keywords: ["handmade organza trousseau bag", "artisan gift bag India", "luxury wedding bag", "unique gifting solutions", "embroidered organza bag", "special occasion accessories"], colors: [], sizes: [], moq: 3, delivery_time: "3-4 days", secondaryCategories: [], sellerId: "tj1001", sellerCode: "TJ1001" } },
+  ],
 };
 
 
@@ -269,7 +263,7 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
-  'shaadi-fever':          [32, 116, 33, 34, 35, 36, 37, 197],
+  'shaadi-fever':          [32, 116, 33, 34, 35, 36, 37, 197, 261],
   'for-your-best-friend':  [71, 112, 190, 189, 8, 188, 10, 12, 64, 56, 57, 4, 62, 65, 156, 159, 9, 110, 113, 114, 157, 158, 165, 166, 167, 184, 185, 186, 187, 191, 197, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 216, 217, 218, 219, 220, 221, 222, 223, 224, 226, 229, 230, 231, 232, 233, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 248, 249, 250, 252, 253],
   'for-your-girlfriend':   [112, 36, 5, 29, 27, 9, 64, 190, 65, 8, 57, 32, 33, 35, 37, 113, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 191, 196, 197, 200, 201, 202, 203, 204, 205, 206, 207, 208, 210, 211, 212, 213, 214, 218, 219, 220, 221, 222, 223, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 248, 249, 250, 252, 253, 254, 256, 257, 258, 259, 260],
   'for-your-boyfriend':    [112, 41, 113, 9, 191, 38, 60, 40, 5, 59, 114, 156, 157, 158, 159, 165, 166, 167, 208, 209, 210, 235, 247],
@@ -288,8 +282,8 @@ export const occasionProductMap = {
   'the-host-gift':         [32, 33, 34, 35, 36, 37, 9, 5, 106, 113, 107, 27, 28, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190, 191, 232, 233, 247],
   'housewarming':          [32, 33, 34, 35, 36, 37, 27, 28, 38, 59, 60, 106, 107, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 190, 191, 210, 225, 247, 254],
   'bachelor-party':        [184, 190, 109, 110, 111, 113, 32, 33, 34, 35, 36, 37, 156, 157, 158, 159, 165, 166, 167, 185, 186, 187, 188, 208, 209, 210, 225, 238, 239, 245, 253],
-  'godh-bharai':           [64, 65, 27, 28, 29, 68, 69, 70, 113, 114, 156, 157, 112, 126, 92, 94, 93, 95, 96, 97, 190, 210],
-  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 191, 196, 197, 200, 201, 202, 203, 204, 205, 206, 209, 211, 212, 214, 215, 217, 218, 219, 220, 221, 222, 223, 227, 229, 232, 233, 235, 239, 240],
+  'godh-bharai':           [64, 65, 27, 28, 29, 68, 69, 70, 113, 114, 156, 157, 112, 126, 92, 94, 93, 95, 96, 97, 190, 210, 261],
+  'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 191, 196, 197, 200, 201, 202, 203, 204, 205, 206, 209, 211, 212, 214, 215, 217, 218, 219, 220, 221, 222, 223, 227, 229, 232, 233, 235, 239, 240, 261],
 };
 
 export const getAllProducts = () => Object.values(productsByCategory).flat();
