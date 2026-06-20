@@ -53,7 +53,9 @@ Your description must cover ALL of the following points, woven together into flo
 Formatting rules:
 - Use \\n\\n to separate paragraphs
 - Minimum 180 words in the description
-- Tone: warm, artisan, specific — never generic. Avoid hollow phrases like "perfect gift" or "made with love" without concrete detail to back them up.
+- Tone: warm, artisan, specific. Never generic. Avoid hollow phrases like "perfect gift" or "made with love" without concrete detail to back them up.
+- NO em dashes (do not use the character —). Use a comma, colon, or rewrite the sentence instead.
+- SEO: naturally weave in searchable keywords throughout the description (materials, occasion, product type, Indian handmade context). The description itself should read well on a product page and rank for long-tail searches.
 
 Return ONLY a valid JSON object in exactly this format:
 {
