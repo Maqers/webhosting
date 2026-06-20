@@ -261,7 +261,7 @@ export const productsByCategory = {
 
 
 
-    { id: 136, categoryId: "Wedding-Gifts", title: "Rawsilk Coin Pouches", slug: "rawsilk-coin-pouches", description: "Designed with stylish tassel detailing, each pouch reflects traditional charm with a modern finish. The soft sponge padding and smooth satin inner lining ensure durability while keeping your items safe. Finished with a secure press button closure, these pouches are perfect for gifting, festive occasions, weddings, or everyday luxury storage.", price: 180, images: ["/images/whatsapp-image-2026-04-22-at-6.48.34-pm-(1).jpeg"], popular: false, featured: false, inStock: true, tags: ["raw silk pouch", "mirror work pouch", "pearl work pouch", "ethnic pouch bag", "designer pouch", "wedding return gift pouch", "festive pouch india", "traditional pouch", "handcrafted pouch", "tassel pouch", "ladies pouch bag", "indian ethnic accessories"], meta: { keywords: ["raw silk pouch with mirror work", "pearl work pouch india", "designer ethnic pouch online", "wedding return gift pouches india", "festive gift pouch for women", "traditional indian pouches", "handcrafted mirror work pouch", "tassel pouch bag india", "luxury ethnic pouch for gifting", "satin lined pouch with button closure", "indian wedding accessories pouch"], colors: [], moq: 16, secondaryCategories: [], sellerId: "", sellerCode: "" } }],
+],
 };
 
 
