@@ -810,8 +810,8 @@ body {
     height: auto !important;
     min-height: 100vh !important;
     /* Ensure touch scrolling works reliably */
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch;
   }
 

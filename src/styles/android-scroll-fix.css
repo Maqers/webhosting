@@ -21,8 +21,8 @@
     height: 100% !important;
     width: 100% !important;
     position: relative !important;
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
     scroll-behavior: smooth !important;
   }
 
@@ -33,8 +33,8 @@
     height: auto !important;
     width: 100% !important;
     position: static !important; /* Critical: allows document to scroll on Android */
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch !important;
   }
 
@@ -47,8 +47,8 @@
     height: auto !important;
     width: 100% !important;
     position: relative !important;
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
   }
 
   /* Ensure all scrollable containers work */
@@ -64,8 +64,8 @@
   .section,
   main,
   article {
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
     overflow-y: visible !important;
     overflow-x: hidden !important;
     height: auto !important;
@@ -75,8 +75,8 @@
 
   /* Product detail: when image is NOT zoomed, ensure container never blocks page scroll. */
   .product-detail .main-image-container:not(.is-zoomed) {
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
   }
 }
 
@@ -138,8 +138,8 @@
     width: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    touch-action: pan-y !important;
-    -ms-touch-action: pan-y !important;
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
   }
 
   /* Even when mobile menu or sort modal is open, do NOT lock body scroll.

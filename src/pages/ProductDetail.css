@@ -371,13 +371,12 @@
   .product-detail { padding: var(--spacing-md); }
   .product-detail-title { font-size: clamp(1.125rem, 1.5rem, 1.75rem); }
   .product-detail-price { font-size: 1.5rem; }
+  .slider-btn { display: none; }
 }
 
 @media (max-width: 480px) {
   .product-detail { padding: var(--spacing-sm); }
-  .slider-btn { width: 2.25rem; height: 2.25rem; font-size: 1.25rem; }
-  .slider-prev { left: 0.25rem; }
-  .slider-next { right: 0.25rem; }
+  .slider-btn { display: none; }
 }
 
 /* ========== MOQ & Colours ========== */
