@@ -6,6 +6,7 @@
   left: auto !important;
   top: auto !important;
   z-index: 9000 !important;
+  will-change: transform;
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;

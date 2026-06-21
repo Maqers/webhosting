@@ -56,24 +56,26 @@ function AppContent() {
       <Navbar />
       <CartDrawer />
       <WishlistDrawer />
-      <Suspense fallback={<RouteLoadingFallback />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/category/:name" element={<Categories />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/faqs" element={<FAQs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/product/:slug" element={<ProductDetail />} />
-          <Route path="/admin" element={<AdminPortal />} />
-          <Route path="/maker/:sellerCode" element={<SellerPage />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/by-occasion" element={<ByOccasion />} />
-          <Route path="/by-product" element={<ByProduct />} />
-        </Routes>
-      </Suspense>
-      <Footer />
+      <main>
+        <Suspense fallback={<RouteLoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/category/:name" element={<Categories />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/faqs" element={<FAQs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/product/:slug" element={<ProductDetail />} />
+            <Route path="/admin" element={<AdminPortal />} />
+            <Route path="/maker/:sellerCode" element={<SellerPage />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/by-occasion" element={<ByOccasion />} />
+            <Route path="/by-product" element={<ByProduct />} />
+          </Routes>
+        </Suspense>
+        <Footer />
+      </main>
       {location.pathname !== '/admin' && <GiftAssistant />}
       <WhatsAppButton />
       <BottomNav />

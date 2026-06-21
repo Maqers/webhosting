@@ -1,19 +1,21 @@
 /**
- * Batch-compresses all images in /public/images in-place.
+ * Batch-compresses all images in /public/images in-place,
+ * and generates .webp sidecar files for browser-native modern format delivery.
  * - JPEG/JPG → quality 82, max 1400px on longest side
  * - PNG      → quality 80 (lossy), max 1400px on longest side
- * - WEBP     → skipped (already optimal)
+ * - WEBP     → skipped for compression; .webp sidecars always regenerated
  * Run with: node scripts/compress-images.js
  * Run with --dry-run to preview without writing anything.
  */
 
 import sharp from 'sharp'
-import { readdirSync, statSync, renameSync } from 'fs'
-import { join, extname, basename } from 'path'
+import { readdirSync, statSync, renameSync, existsSync } from 'fs'
+import { join, extname, basename, dirname } from 'path'
 
 const IMAGES_DIR = new URL('../public/images', import.meta.url).pathname
 const MAX_PX    = 1400
 const DRY_RUN   = process.argv.includes('--dry-run')
+const WEBP_ONLY = process.argv.includes('--webp-only')
 
 const SUPPORTED = new Set(['.jpg', '.jpeg', '.png'])
 
@@ -51,7 +53,6 @@ async function compressImage(filePath) {
 
     const after = statSync(tmp).size
 
-    // Only keep if we actually saved space (sharp can sometimes add bytes on tiny images)
     if (after < before) {
       if (!DRY_RUN) renameSync(tmp, filePath)
       else {
@@ -65,9 +66,34 @@ async function compressImage(filePath) {
       return { before, after: before, saved: 0 }
     }
   } catch (err) {
-    // Clean up tmp if it exists
     try { (await import('fs')).unlinkSync(tmp) } catch {}
     console.error(`  ✗ Error on ${basename(filePath)}: ${err.message}`)
+    return null
+  }
+}
+
+async function generateWebP(filePath) {
+  const ext     = extname(filePath).toLowerCase()
+  if (!SUPPORTED.has(ext)) return null
+
+  const webpPath = filePath.replace(/\.[^.]+$/, '.webp')
+  const before   = statSync(filePath).size
+
+  try {
+    const img = sharp(filePath).rotate()
+    const meta = await img.metadata()
+    const needsResize = (meta.width > MAX_PX || meta.height > MAX_PX)
+
+    let pipeline = needsResize
+      ? img.resize(MAX_PX, MAX_PX, { fit: 'inside', withoutEnlargement: true })
+      : img
+
+    await pipeline.webp({ quality: 82 }).toFile(webpPath)
+
+    const after = statSync(webpPath).size
+    return { before, after, saved: before - after, path: webpPath }
+  } catch (err) {
+    console.error(`  ✗ WebP error on ${basename(filePath)}: ${err.message}`)
     return null
   }
 }
@@ -79,38 +105,60 @@ async function run() {
 
   console.log(`\n🖼  Found ${files.length} images in /public/images`)
   if (DRY_RUN) console.log('   (dry-run — no files will be changed)\n')
-  else console.log('   Compressing in-place...\n')
+  else console.log('   Compressing in-place + generating .webp sidecars...\n')
 
   let totalBefore = 0
   let totalAfter  = 0
   let skipped     = 0
   let compressed  = 0
+  let webpGenerated = 0
+  let webpSaved   = 0
 
   for (const file of files) {
-    const result = await compressImage(file)
-    if (!result) { skipped++; continue }
+    if (!WEBP_ONLY) {
+      const result = await compressImage(file)
+      if (!result) { skipped++; continue }
 
-    totalBefore += result.before
-    totalAfter  += result.after
+      totalBefore += result.before
+      totalAfter  += result.after
 
-    if (result.saved > 0) {
-      compressed++
-      const pct = Math.round((result.saved / result.before) * 100)
-      console.log(`  ✓ ${basename(file).padEnd(55)} ${formatBytes(result.before).padStart(8)} → ${formatBytes(result.after).padStart(8)}  (-${pct}%)`)
-    } else {
-      skipped++
+      if (result.saved > 0) {
+        compressed++
+        const pct = Math.round((result.saved / result.before) * 100)
+        console.log(`  ✓ ${basename(file).padEnd(55)} ${formatBytes(result.before).padStart(8)} → ${formatBytes(result.after).padStart(8)}  (-${pct}%)`)
+      } else {
+        skipped++
+      }
+    }
+
+    if (!DRY_RUN) {
+      const webp = await generateWebP(file)
+      if (webp && webp.saved > 0) {
+        webpGenerated++
+        webpSaved += webp.saved
+        const pct = Math.round((webp.saved / webp.before) * 100)
+        console.log(`  🌐 ${basename(webp.path).padEnd(55)} ${formatBytes(webp.before).padStart(8)} → ${formatBytes(webp.after).padStart(8)}  (-${pct}%)`)
+      }
     }
   }
 
   const totalSaved = totalBefore - totalAfter
-  const totalPct   = totalBefore > 0 ? Math.round((totalSaved / totalBefore) * 100) : 0
 
-  console.log(`\n${'─'.repeat(80)}`)
-  console.log(`  Compressed : ${compressed} images`)
-  console.log(`  Unchanged  : ${skipped} images (already small / errors)`)
-  console.log(`  Before     : ${formatBytes(totalBefore)}`)
-  console.log(`  After      : ${formatBytes(totalAfter)}`)
-  console.log(`  Saved      : ${formatBytes(totalSaved)} (${totalPct}% smaller)`)
+  if (!WEBP_ONLY) {
+    const totalPct = totalBefore > 0 ? Math.round((totalSaved / totalBefore) * 100) : 0
+    console.log(`\n${'─'.repeat(80)}`)
+    console.log(`  Compressed : ${compressed} images`)
+    console.log(`  Unchanged  : ${skipped} images (already small / errors)`)
+    console.log(`  Before     : ${formatBytes(totalBefore)}`)
+    console.log(`  After      : ${formatBytes(totalAfter)}`)
+    console.log(`  Saved      : ${formatBytes(totalSaved)} (${totalPct}% smaller)`)
+  }
+
+  if (!DRY_RUN) {
+    console.log(`\n  WebP files : ${webpGenerated} generated`)
+    console.log(`  WebP saved : ${formatBytes(webpSaved)} over originals`)
+  }
+
   if (DRY_RUN) console.log('\n  Run without --dry-run to apply.')
   console.log()
 }

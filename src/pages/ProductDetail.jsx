@@ -541,7 +541,12 @@ const ProductDetail = () => {
               {recentlyViewed.map(p => (
                 <a key={p.id} href={`/product/${p.slug}`} className="rv-card">
                   <div className="rv-img">
-                    {p.images[0] && <img src={p.images[0]} alt={p.title} loading="lazy" />}
+                    {p.images[0] && (
+                      <picture>
+                        {p.images[0].startsWith('/images/') && <source srcSet={p.images[0].replace(/\.[^.]+$/, '.webp')} type="image/webp" />}
+                        <img src={p.images[0]} alt={p.title} loading="lazy" />
+                      </picture>
+                    )}
                   </div>
                   <p className="rv-title">{p.title}</p>
                   <p className="rv-price">₹{p.price.toLocaleString('en-IN')}</p>

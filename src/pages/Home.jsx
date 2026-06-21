@@ -110,8 +110,11 @@ const HOME_CAT_IMAGES = {
                 >
                   <div className="category-circle-img">
                     {img
-                      ? <img src={img} alt={cat.name} loading="eager" fetchPriority="high"
-                          onError={e => { e.target.style.display='none'; e.target.nextSibling && (e.target.nextSibling.style.display='flex') }} />
+                      ? <picture>
+                          {img.startsWith('/images/') && <source srcSet={img.replace(/\.[^.]+$/, '.webp')} type="image/webp" />}
+                          <img src={img} alt={cat.name} loading="eager" fetchPriority="high"
+                            onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling && (e.currentTarget.nextSibling.style.display='flex') }} />
+                        </picture>
                       : null
                     }
                     <span className="category-circle-fallback" style={{display:'none'}}>{cat.name[0]}</span>
@@ -231,13 +234,10 @@ export const FeaturedCard = ({ product, index }) => {
       className="feat-card"
       style={{ "--i": index % 12, ...(product.inStock === false ? { opacity: 0.45, filter: 'grayscale(80%)' } : {}) }}
       onClick={handleCardClick}
-      role="button"
-      tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
-      aria-label={product.title}
     >
       <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
-        <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading="lazy" />
+        <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading={index < 2 ? "eager" : "lazy"} priority={index < 2} />
         {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
         {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}

@@ -215,7 +215,10 @@ const Products = () => {
                       >
                         <div className="category-circle-img">
                           {img
-                            ? <img src={img} alt={cat.name} loading="lazy" onError={e => { e.target.style.display='none' }} />
+                            ? <picture>
+                                {img.startsWith('/images/') && <source srcSet={img.replace(/\.[^.]+$/, '.webp')} type="image/webp" />}
+                                <img src={img} alt={cat.name} loading="lazy" onError={e => { e.currentTarget.style.display='none' }} />
+                              </picture>
                             : <span style={{ fontSize: '1.2rem' }}>{cat.icon || '🎁'}</span>
                           }
                         </div>

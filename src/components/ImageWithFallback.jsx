@@ -198,9 +198,14 @@
 import { forwardRef } from 'react'
 import './ImageWithFallback.css'
 
-// Lightweight, hook-free image component to avoid invalid hook issues.
-// - If src is missing, renders nothing (lets layout decide).
-// - On error, hides the broken image element instead of crashing.
+// Derive the WebP sidecar path for local /images/ files (e.g. /images/foo.png → /images/foo.webp)
+function toWebPSrc(src) {
+  if (!src || !src.startsWith('/images/')) return null
+  return src.replace(/\.[^.]+$/, '.webp')
+}
+
+// Lightweight image component with WebP <picture> delivery for local images.
+// Falls back to original format if WebP sidecar is absent or browser unsupported.
 const ImageWithFallback = forwardRef(
   (
     {
@@ -216,12 +221,39 @@ const ImageWithFallback = forwardRef(
     },
     ref
   ) => {
-    // If there is no source, don't render anything
     if (!src) return null
 
     const handleError = (event) => {
-      // Hide the broken image but do not throw React errors
       event.currentTarget.style.display = 'none'
+    }
+
+    const effectiveLoading = priority ? 'eager' : loading
+    const effectiveFetchPriority = priority ? 'high' : undefined
+    const effectiveDecoding = priority ? 'sync' : 'async'
+    const imgStyle = { width: '100%', height: '100%', objectFit: 'cover', display: 'block', ...style }
+
+    const webpSrc = toWebPSrc(src)
+
+    if (webpSrc) {
+      return (
+        <picture>
+          <source srcSet={webpSrc} type="image/webp" />
+          <img
+            ref={ref}
+            src={src}
+            alt={alt}
+            className={className}
+            loading={effectiveLoading}
+            fetchPriority={effectiveFetchPriority}
+            decoding={effectiveDecoding}
+            sizes={sizes}
+            srcSet={srcSet}
+            onError={handleError}
+            style={imgStyle}
+            {...props}
+          />
+        </picture>
+      )
     }
 
     return (
@@ -230,19 +262,13 @@ const ImageWithFallback = forwardRef(
         src={src}
         alt={alt}
         className={className}
-        loading={priority ? 'eager' : loading}
-        fetchPriority={priority ? 'high' : undefined}
-        decoding={priority ? 'sync' : 'async'}
+        loading={effectiveLoading}
+        fetchPriority={effectiveFetchPriority}
+        decoding={effectiveDecoding}
         sizes={sizes}
         srcSet={srcSet}
         onError={handleError}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          display: 'block',
-          ...style,
-        }}
+        style={imgStyle}
         {...props}
       />
     )
