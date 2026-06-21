@@ -4,6 +4,7 @@ import Toast from '../components/Toast'
 import PhoneCard from '../components/PhoneCard'
 import { getAllPhones, getWhatsAppNumber, getEmail, getInstagramUsername } from '../data/contactInfo'
 import './Contact.css'
+import '../styles/contact-hero-fix.css'
 
 const Contact = () => {
   const contactPhones = useMemo(() => getAllPhones(), [])

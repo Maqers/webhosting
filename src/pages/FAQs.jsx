@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import SeoHead from '../components/SeoHead'
 import './FAQs.css'
+import '../styles/faq-hero-fix.css'
 
 const FAQs = () => {
   const [openIndex, setOpenIndex] = useState(null)

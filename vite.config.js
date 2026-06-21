@@ -1,8 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Makes the injected global CSS file non-render-blocking while preserving
+// the inline critical CSS in <head>. The page-loader overlay masks any FOUC.
+// Note: noscript fallback is omitted — this is a React SPA that requires JS.
+const asyncCssPlugin = {
+  name: 'async-global-css',
+  transformIndexHtml: {
+    order: 'post',
+    handler(html) {
+      return html.replace(
+        /<link rel="stylesheet" crossorigin href="(\/assets\/css\/[^"]*)"/g,
+        '<link rel="preload" as="style" crossorigin href="$1" onload="this.onload=null;this.rel=\'stylesheet\'"'
+      )
+    }
+  }
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), asyncCssPlugin],
   
   // Build optimizations
   build: {

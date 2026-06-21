@@ -37,11 +37,7 @@
 /* WhatsApp Button Visibility Fix - Ensure WhatsApp button shows on all pages */
 @import './styles/whatsapp-visibility-fix.css';
 
-/* FAQ Page Hero Fix - Fix expanded background on FAQ page */
-@import './styles/faq-hero-fix.css';
-
-/* Contact Page Hero Fix - Fix expanded background on Contact page */
-@import './styles/contact-hero-fix.css';
+/* faq-hero-fix and contact-hero-fix moved to FAQs.jsx and Contact.jsx respectively */
 
 /* iPhone All Hero Sections Fix - Comprehensive fix for all hero sections on iPhone */
 @import './styles/iphone-all-hero-fix.css';

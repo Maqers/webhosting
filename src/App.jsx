@@ -8,6 +8,7 @@ import PageLoader from './components/PageLoader'
 import CartDrawer from './components/CartDrawer'
 import WishlistDrawer from './components/WishlistDrawer'
 import BottomNav from './components/BottomNav'
+import ChunkErrorBoundary from './components/ChunkErrorBoundary'
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
 import { initScrollAnimations, cleanupScrollAnimations } from './utils/scrollAnimations'
@@ -57,6 +58,7 @@ function AppContent() {
       <CartDrawer />
       <WishlistDrawer />
       <main>
+        <ChunkErrorBoundary>
         <Suspense fallback={<RouteLoadingFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -74,6 +76,7 @@ function AppContent() {
             <Route path="/by-product" element={<ByProduct />} />
           </Routes>
         </Suspense>
+        </ChunkErrorBoundary>
         <Footer />
       </main>
       {location.pathname !== '/admin' && <GiftAssistant />}
