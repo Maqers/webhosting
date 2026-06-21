@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <style>
+    body { margin: 0; padding: 0; background: #f5ede4; font-family: Georgia, serif; }
+    .wrap { max-width: 560px; margin: 32px auto; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e8ddd5; }
+    .header { background: #760909; padding: 32px; text-align: center; }
+    .logo { color: #ffffff !important; font-size: 26px; font-weight: 700; letter-spacing: 2px; margin: 0; text-decoration: none !important; }
+    .tagline { color: rgba(255,255,255,0.6); font-size: 11px; margin: 5px 0 0; letter-spacing: 2.5px; text-transform: uppercase; }
+    .body { padding: 32px; }
+    .greeting { font-size: 20px; color: #1a1714; margin: 0 0 8px; font-weight: 700; }
+    .subtext { font-size: 14px; color: #666; line-height: 1.6; margin: 0 0 24px; }
+    .section-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px; font-weight: 700; }
+    .order-id-box { background: #f5ede4; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
+    .order-id { font-size: 18px; font-weight: 700; color: #760909; margin: 0; font-family: monospace; }
+    .items-box { border: 1px solid #eee; border-radius: 8px; padding: 16px 18px; margin-bottom: 24px; font-size: 13px; color: #444; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }
+    .totals { background: #fdf5f5; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
+    .address-box { background: #f5f3f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 13px; color: #444; line-height: 1.7; }
+    .payment-box { background: #fdf5f5; border: 1px solid #e8c0c0; border-radius: 8px; padding: 16px 18px; margin-bottom: 24px; font-size: 13px; color: #444; line-height: 1.7; }
+    .note { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 24px; }
+    .footer { background: #760909; padding: 20px 32px; text-align: center; }
+    .footer-text { font-size: 11px; color: rgba(255,255,255,0.5); margin: 0; line-height: 1.8; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="header">
+      <p class="logo"><span style="color:#ffffff;text-decoration:none;">maqers&#46;in</span></p>
+      <p class="tagline">India's Finest Artisan Gifts</p>
+    </div>
+
+    <div class="body">
+      <p class="greeting">Thank you, {{customer_name}}!</p>
+      <p class="subtext">Your order has been received.</p>
+
+      <p class="section-label">Order ID</p>
+      <div class="order-id-box">
+        <p class="order-id">{{order_id}}</p>
+      </div>
+
+      <p class="section-label">Items Ordered</p>
+      <div class="items-box">{{items_list}}</div>
+
+      <div class="totals">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+          <tr>
+            <td style="font-size:13px;color:#666;padding:3px 0;">Subtotal</td>
+            <td style="font-size:13px;color:#666;padding:3px 0;text-align:right;">{{subtotal}}</td>
+          </tr>
+          <tr>
+            <td style="font-size:13px;color:#666;padding:3px 0;">Delivery</td>
+            <td style="font-size:13px;color:#666;padding:3px 0;text-align:right;">{{delivery_fee}}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:0;"><div style="border-top:1px solid #f0d5d5;margin:8px 0 6px;"></div></td>
+          </tr>
+          <tr>
+            <td style="font-size:16px;font-weight:700;color:#1a1714;padding:2px 0;">Total</td>
+            <td style="font-size:16px;font-weight:700;color:#760909;padding:2px 0;text-align:right;">{{grand_total}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p class="section-label">Delivering To</p>
+      <div class="address-box">{{shipping_address}}</div>
+
+      <p class="section-label">Complete Your Payment</p>
+      <div class="payment-box">
+        If you haven't paid yet — please send <strong style="color:#760909;">{{grand_total}}</strong> to <strong style="color:#1a1714;font-family:monospace;">9650800399&#64;pthdfc</strong> via GPay, PhonePe, or Paytm. If already paid, please ignore.
+      </div>
+
+      <p class="note">For any questions, WhatsApp us at <a href="https://wa.me/919289955099" style="color:#760909;text-decoration:none;">+91 92899 55099</a>.</p>
+    </div>
+
+    <div class="footer">
+      <p class="footer-text">
+        <strong style="color:rgba(255,255,255,0.7);">maqers&#46;in</strong> &middot; Handcrafted gifts from India's finest makers<br>
+        This is an automated confirmation.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
