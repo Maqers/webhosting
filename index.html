@@ -15,9 +15,14 @@
   <link rel="dns-prefetch" href="https://www.google-analytics.com">
   <link rel="dns-prefetch" href="https://images.unsplash.com">
 
-  <!-- Preload LCP image: first featured product on homepage (Handcrafted Floral Basket) -->
-  <!-- Uses medium webp (22KB) which is what FeaturedCard renders for index 0 -->
+  <!-- Preload LCP candidates: first two featured products (both above fold on mobile) -->
+  <!-- Product 0: Handcrafted Floral Basket -->
   <link rel="preload" as="image" href="/images/med-remove-the-background-make-it-transparent.webp" type="image/webp" fetchpriority="high">
+  <!-- Product 1: Pink Crochet Flower Bouquet — actual LCP element on mobile per Lighthouse -->
+  <link rel="preload" as="image" href="/images/med-remove-the-background-the-hand-the-sleeve-and-the-.webp" type="image/webp" fetchpriority="high">
+
+  <!-- Preload EB Garamond 400 (regular) — prevents FOUT-driven CLS on Gift Finder button -->
+  <link rel="preload" as="font" href="https://fonts.gstatic.com/s/ebgaramond/v32/SlGUmQSNjdsmc35JDF1K5GR1SDk_YAPI.woff2" type="font/woff2" crossorigin>
 
   <!-- Prefetch for likely next page resources -->
   <link rel="prefetch" href="/products" as="document">
@@ -38,11 +43,22 @@
   <meta name="theme-color" content="#760909">
 
   <style>
+    /* Fallback font with size-adjust to minimise FOUT shift when EB Garamond loads */
+    @font-face {
+      font-family: 'EB Garamond Fallback';
+      src: local('Georgia'), local('Times New Roman');
+      font-weight: 400 700;
+      size-adjust: 106%;
+      ascent-override: 88%;
+      descent-override: 22%;
+      line-gap-override: 0%;
+    }
+
     /* Critical CSS to prevent FOUC */
     body {
       margin: 0;
       padding: 0;
-      font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+      font-family: 'EB Garamond', 'EB Garamond Fallback', 'Garamond', 'Times New Roman', serif;
       background: #F8F8F8;
       overflow-x: hidden;
     }
@@ -58,7 +74,10 @@
     /* CLS prevention: reserve space for sections before React renders */
     .hero-bright { min-height: 320px; }
     .category-circles-strip { min-height: 130px; }
-    .featured-section { min-height: 500px; }
+    /* 8 products in 2-column grid at 3:4 aspect ratio on mobile ≈ 1100px */
+    .featured-section { min-height: 1100px; }
+    @media (min-width: 481px) { .featured-section { min-height: 800px; } }
+    @media (min-width: 969px) { .featured-section { min-height: 600px; } }
 
     /* CLS prevention: fix image container dimensions before external CSS loads */
     .category-circle-img {
@@ -153,10 +172,10 @@
     }
 
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(loadAnalytics, { timeout: 4000 });
+      requestIdleCallback(loadAnalytics, { timeout: 8000 });
     } else {
       window.addEventListener('load', function () {
-        setTimeout(loadAnalytics, 1000);
+        setTimeout(loadAnalytics, 4000);
       });
     }
   </script>

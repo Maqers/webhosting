@@ -260,7 +260,12 @@ export const FeaturedCard = ({ product, index }) => {
           priority={index < 2}
           sizes="(max-width: 480px) calc(50vw - 16px), (max-width: 968px) calc(33vw - 12px), 240px"
         />
-        {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
+        {secondImage && (
+          <picture>
+            <source srcSet={medWebpSrc(secondImage)} type="image/webp" />
+            <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />
+          </picture>
+        )}
         {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">

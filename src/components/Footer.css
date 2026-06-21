@@ -2,8 +2,6 @@
   background: #5a0606;
   color: rgba(255,255,255,0.9);
   border-top: 1px solid rgba(255,255,255,0.1);
-  content-visibility: auto;
-  contain-intrinsic-size: 0 724px;
 }
 
 /* ── Main columns row ── */
