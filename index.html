@@ -15,6 +15,10 @@
   <link rel="dns-prefetch" href="https://www.google-analytics.com">
   <link rel="dns-prefetch" href="https://images.unsplash.com">
 
+  <!-- Preload LCP image: first featured product on homepage (Handcrafted Floral Basket) -->
+  <!-- Uses medium webp (22KB) which is what FeaturedCard renders for index 0 -->
+  <link rel="preload" as="image" href="/images/med-remove-the-background-make-it-transparent.webp" type="image/webp" fetchpriority="high">
+
   <!-- Prefetch for likely next page resources -->
   <link rel="prefetch" href="/products" as="document">
 
@@ -49,6 +53,35 @@
       /* iOS Safari fix */
       min-height: 100dvh;
       /* Dynamic viewport height */
+    }
+
+    /* CLS prevention: reserve space for sections before React renders */
+    .hero-bright { min-height: 320px; }
+    .category-circles-strip { min-height: 130px; }
+    .featured-section { min-height: 500px; }
+
+    /* CLS prevention: fix image container dimensions before external CSS loads */
+    .category-circle-img {
+      width: 82px;
+      height: 82px;
+      min-width: 82px;
+      min-height: 82px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .feat-img-zone {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
+    @media (max-width: 968px) {
+      .feat-img-zone { aspect-ratio: 4 / 5; }
+    }
+    @media (max-width: 480px) {
+      .feat-img-zone { aspect-ratio: 3 / 4; }
+      .category-circle-img { width: 70px; height: 70px; min-width: 70px; min-height: 70px; }
     }
 
     /* Loading overlay */

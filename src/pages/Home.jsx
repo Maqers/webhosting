@@ -11,21 +11,21 @@ import "./Home.css";
 const Home = () => {
   const popularProducts = useMemo(() => getPopularProducts(), []);
 
-// First product image per category for circles
+// Thumbnail images for category circles (168px webp, displayed at 82-84px @2x retina)
 const HOME_CAT_IMAGES = {
-  'Handbags':             '/images/photo-2026-05-12-09-25-50.jpg',
-  'Handmade-Accessories': '/images/remove-the-white-text-box-with-kl-53-from-the-imag.jpeg',
-  'Candles':              '/images/8.png',
-  'Florals':              '/images/remove-the-background-make-it-transparent.jpeg',
-  'Wedding-Gifts':        '/images/whatsapp-image-2026-04-17-at-15.22.22.jpeg',
-  'Kids-Accessories':     '/images/dsc_8211.jpg',
-  'Home-decor':           '/images/28.png',
-  'Handmade-Soaps':       '/images/56.png',
-  'Customised-Hampers':   '/images/48.png',
-  'Cosmetics':            '/images/whatsapp-image-2026-05-01-at-2.16.13-pm-(1).jpeg',
-  'resin-products':       '/images/29.png',
-  'Charm-accessories':    '/images/enchanted_charm_watch_2.png',
-  'Frames&Paintings':     '/images/17.png',
+  'Handbags':             '/images/thumb-photo-2026-05-12-09-25-50.webp',
+  'Handmade-Accessories': '/images/thumb-remove-the-white-text-box-with-kl-53-from-the-imag.webp',
+  'Candles':              '/images/thumb-8.webp',
+  'Florals':              '/images/thumb-remove-the-background-make-it-transparent.webp',
+  'Wedding-Gifts':        '/images/thumb-whatsapp-image-2026-04-17-at-15.22.22.webp',
+  'Kids-Accessories':     '/images/thumb-dsc_8211.webp',
+  'Home-decor':           '/images/thumb-28.webp',
+  'Handmade-Soaps':       '/images/thumb-56.webp',
+  'Customised-Hampers':   '/images/thumb-48.webp',
+  'Cosmetics':            '/images/thumb-whatsapp-image-2026-05-01-at-2.16.13-pm-(1).webp',
+  'resin-products':       '/images/thumb-29.webp',
+  'Charm-accessories':    '/images/thumb-enchanted_charm_watch_2.webp',
+  'Frames&Paintings':     '/images/thumb-17.webp',
 }
   const circlesRef = useRef(null);
 
@@ -98,8 +98,10 @@ const HOME_CAT_IMAGES = {
         <div className="category-circles-scroll" ref={circlesRef}>
           {getSortedCategories()
             .filter(c => c.id !== 'Oxidised-jewellery')
-            .map(cat => {
+            .map((cat, catIndex) => {
               const img = HOME_CAT_IMAGES[cat.id] || ''
+              // Only the first 5 circles are typically above the fold on mobile
+              const isAboveFold = catIndex < 5
               return (
                 <Link
                   key={cat.id}
@@ -110,11 +112,16 @@ const HOME_CAT_IMAGES = {
                 >
                   <div className="category-circle-img">
                     {img
-                      ? <picture>
-                          {img.startsWith('/images/') && <source srcSet={img.replace(/\.[^.]+$/, '.webp')} type="image/webp" />}
-                          <img src={img} alt={cat.name} loading="eager" fetchPriority="high"
-                            onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling && (e.currentTarget.nextSibling.style.display='flex') }} />
-                        </picture>
+                      ? <img
+                          src={img}
+                          alt={cat.name}
+                          width="82"
+                          height="82"
+                          loading={isAboveFold ? 'eager' : 'lazy'}
+                          fetchPriority="low"
+                          decoding="async"
+                          onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling && (e.currentTarget.nextSibling.style.display='flex') }}
+                        />
                       : null
                     }
                     <span className="category-circle-fallback" style={{display:'none'}}>{cat.name[0]}</span>
@@ -200,6 +207,13 @@ export const FeaturedCard = ({ product, index }) => {
   const secondImage = product.images[1] || null;
   const imgZoneRef = useRef(null);
 
+  // Derive medium webp path for optimised delivery (generated at build time for popular products)
+  const medWebpSrc = (src) => {
+    if (!src || !src.startsWith('/images/')) return undefined
+    const name = src.replace('/images/', '').replace(/\.[^.]+$/, '')
+    return `/images/med-${name}.webp`
+  };
+
 ;
 
   // Mobile: swap to second image when card scrolls into centre of viewport
@@ -237,7 +251,15 @@ export const FeaturedCard = ({ product, index }) => {
       onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
     >
       <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
-        <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading={index < 2 ? "eager" : "lazy"} priority={index < 2} />
+        <ImageWithFallback
+          src={product.images[0]}
+          webpSrc={medWebpSrc(product.images[0])}
+          alt={product.title}
+          className="feat-img"
+          loading={index < 2 ? "eager" : "lazy"}
+          priority={index < 2}
+          sizes="(max-width: 480px) calc(50vw - 16px), (max-width: 968px) calc(33vw - 12px), 240px"
+        />
         {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
         {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}

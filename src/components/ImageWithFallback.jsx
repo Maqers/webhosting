@@ -217,6 +217,7 @@ const ImageWithFallback = forwardRef(
       priority = false,
       sizes,
       srcSet,
+      webpSrc: webpSrcProp,
       ...props
     },
     ref
@@ -232,12 +233,13 @@ const ImageWithFallback = forwardRef(
     const effectiveDecoding = priority ? 'sync' : 'async'
     const imgStyle = { width: '100%', height: '100%', objectFit: 'cover', display: 'block', ...style }
 
-    const webpSrc = toWebPSrc(src)
+    // Use explicit webpSrc prop if provided, otherwise auto-derive from src path
+    const webpSrc = webpSrcProp || toWebPSrc(src)
 
     if (webpSrc) {
       return (
         <picture>
-          <source srcSet={webpSrc} type="image/webp" />
+          <source srcSet={webpSrc} type="image/webp" sizes={sizes} />
           <img
             ref={ref}
             src={src}

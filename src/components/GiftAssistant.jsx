@@ -224,7 +224,7 @@ export default function GiftAssistant() {
 
   return (
     <>
-      <button className="gift-assistant-btn" onClick={handleOpen} aria-label="Find the perfect gift" type="button">
+      <button className="gift-assistant-btn" onClick={handleOpen} aria-label="Gift Finder" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20" aria-hidden="true">
           <polyline points="20 12 20 22 4 22 4 12" />
           <rect x="2" y="7" width="20" height="5" />
