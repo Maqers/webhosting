@@ -45,9 +45,6 @@
 /* iOS Safari Comprehensive Fix - Production-ready fixes for all iPhone-specific issues */
 @import './styles/ios-safari-comprehensive-fix.css';
 
-/* iPhone Sort Modal & Product Rendering Fix - Fixes sort modal causing UI crashes on iPhone */
-@import './styles/iphone-sort-fix.css';
-
 /* iOS Safari Critical Fixes - Must be last to override other styles */
 @import './styles/ios-safari-fixes.css';
 

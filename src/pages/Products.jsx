@@ -143,8 +143,6 @@ const Products = () => {
 
   useEffect(() => {
     requestAnimationFrame(() => {
-      const productsGrid = document.querySelector('.products-grid')
-      if (productsGrid) void productsGrid.offsetHeight
       document.querySelectorAll('.feat-card').forEach(card => {
         card.style.visibility = 'visible'
         card.style.opacity = '1'

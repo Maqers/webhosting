@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SORT_TYPES, SORT_LABELS, DEFAULT_SORT, getSortOptions } from '../utils/sorting'
 import './ProductSort.css'
+import '../styles/iphone-sort-fix.css'
 
 const ProductSort = ({ onSortChange, className = '' }) => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -122,15 +123,10 @@ const ProductSort = ({ onSortChange, className = '' }) => {
           productsContent.style.position = 'relative'
         }
         
-        // Force scrolling to work by ensuring body is scrollable
-        requestAnimationFrame(() => {
-          // Verify scrolling is restored
-          document.body.style.overflow = 'auto'
-          document.body.style.overflowX = 'hidden'
-          document.body.style.overflowY = 'auto'
-          // Force reflow
-          void document.body.offsetHeight
-        })
+        // Restore scrolling
+        document.body.style.overflow = 'auto'
+        document.body.style.overflowX = 'hidden'
+        document.body.style.overflowY = 'auto'
       })
     } else {
       // For non-iPhone devices

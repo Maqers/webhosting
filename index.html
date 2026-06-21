@@ -149,17 +149,10 @@
   <!-- Deferred analytics: load after page is interactive to avoid blocking LCP/FID -->
   <script>
     function loadAnalytics() {
-      // Google tag (gtag.js)
-      var gtagScript = document.createElement('script');
-      gtagScript.async = true;
-      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-1KL5DY2692';
-      document.head.appendChild(gtagScript);
-
+      // GTM is the single loader for all analytics — it also loads GA4 internally.
+      // Loading a separate gtag.js would be a duplicate (GTM injects gtag/js?cx=c&gtm=… itself).
       window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', 'G-1KL5DY2692');
+      window.gtag = function() { dataLayer.push(arguments); };
 
       // Google Tag Manager
       (function (w, d, s, l, i) {
