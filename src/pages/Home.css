@@ -173,6 +173,9 @@
 .feat-card:hover { box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07); }
 @media (hover: none) { .feat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
 
+/* First 2 cards are LCP candidates — skip the opacity:0 animation so they paint immediately */
+.feat-card--no-anim { animation: none; opacity: 1; }
+
 .feat-img-zone {
   position: relative; width: 100%; aspect-ratio: 1 / 1;
   background: #f5ede4; overflow: hidden; flex-shrink: 0;

@@ -234,7 +234,7 @@ export const FeaturedCard = ({ product, index }) => {
           }, 250)
         } else {
           clearTimeout(timer)
-          el.classList.remove('mobile-swap')
+          requestAnimationFrame(() => { el.classList.remove('mobile-swap') })
         }
       },
       { threshold: 0.85 }
@@ -245,7 +245,7 @@ export const FeaturedCard = ({ product, index }) => {
 
   return (
     <article
-      className="feat-card"
+      className={`feat-card${index < 2 ? ' feat-card--no-anim' : ''}`}
       style={{ "--i": index % 12, ...(product.inStock === false ? { opacity: 0.45, filter: 'grayscale(80%)' } : {}) }}
       onClick={handleCardClick}
       onKeyDown={(e) => e.key === "Enter" && handleCardClick()}

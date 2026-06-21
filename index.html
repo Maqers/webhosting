@@ -71,10 +71,11 @@
       /* Dynamic viewport height */
     }
 
-    /* CLS prevention: reserve space for sections before React renders */
+    /* CLS prevention: floor heights so async CSS load doesn't collapse sections */
+    /* Home is now eagerly bundled so React renders in one shot — these just prevent FOUC */
     .hero-bright { min-height: 320px; }
     .category-circles-strip { min-height: 130px; }
-    /* 8 products in 2-column grid at 3:4 aspect ratio on mobile ≈ 1100px */
+    /* actual ≥1400px on mobile; floors prevent collapse during async CSS load */
     .featured-section { min-height: 1100px; }
     @media (min-width: 481px) { .featured-section { min-height: 800px; } }
     @media (min-width: 969px) { .featured-section { min-height: 600px; } }

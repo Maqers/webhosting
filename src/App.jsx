@@ -14,7 +14,7 @@ import { WishlistProvider } from './context/WishlistContext'
 import { initScrollAnimations, cleanupScrollAnimations } from './utils/scrollAnimations'
 import './App.css'
 
-const Home = lazy(() => import('./pages/Home'))
+import Home from './pages/Home'
 const Products = lazy(() => import('./pages/Products'))
 const Categories = lazy(() => import('./pages/Categories'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
@@ -45,7 +45,7 @@ function AppContent() {
 
   useEffect(() => {
     const observers = initScrollAnimations()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: 'instant' })
     return () => {
       cleanupScrollAnimations(observers)
     }

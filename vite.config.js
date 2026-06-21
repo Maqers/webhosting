@@ -36,12 +36,8 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
             return 'react-vendor';
           }
-          if (id.includes('/src/data/catalog')) {
-            return 'catalog-data';
-          }
-          if (id.includes('/src/data/searchIndex')) {
-            return 'search-index';
-          }
+          // catalog and searchIndex are kept in the main bundle (no separate chunk)
+          // to avoid a sequential waterfall: main-bundle → catalog-chunk → render
         },
         // Optimize chunk file names
         chunkFileNames: 'assets/js/[name]-[hash].js',
