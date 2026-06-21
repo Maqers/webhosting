@@ -36,6 +36,7 @@ const ProductDetail = () => {
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   const imageWrapRef = useRef(null)
   const imgRef = useRef(null)
+  const mobileStripRef = useRef(null)
 
   const whatsappNumber = getWhatsAppNumber()
   const { addItem } = useCart()
@@ -99,16 +100,19 @@ const ProductDetail = () => {
   const goPrev = useCallback(() => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1)), [images.length])
   const goNext = useCallback(() => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1)), [images.length])
 
-  const touchStartX = useRef(null)
-  const handleTouchStart = useCallback((e) => {
-    touchStartX.current = e.touches[0].clientX
-  }, [])
-  const handleTouchEnd = useCallback((e) => {
-    if (touchStartX.current === null || !hasMultiple) return
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (Math.abs(dx) > 50) dx < 0 ? goNext() : goPrev()
-    touchStartX.current = null
-  }, [hasMultiple, goNext, goPrev])
+  // Sync mobile scroll strip when selectedImage changes (e.g. thumbnail tap)
+  useEffect(() => {
+    const strip = mobileStripRef.current
+    if (!strip) return
+    strip.scrollTo({ left: selectedImage * strip.offsetWidth, behavior: 'smooth' })
+  }, [selectedImage])
+
+  const handleMobileScroll = useCallback(() => {
+    const strip = mobileStripRef.current
+    if (!strip) return
+    const idx = Math.round(strip.scrollLeft / strip.offsetWidth)
+    if (idx !== selectedImage) setSelectedImage(idx)
+  }, [selectedImage])
 
   const LENS_SIZE = 120
   const ZOOM = 2
@@ -264,10 +268,9 @@ const ProductDetail = () => {
               className="main-image-wrap"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
             >
-              <div className="main-image-container">
+              {/* Desktop: single image with lens zoom */}
+              <div className="main-image-container desktop-image-container">
                 <ImageWithFallback
                   ref={imgRef}
                   src={currentImage}
@@ -277,6 +280,34 @@ const ProductDetail = () => {
                   loading="eager"
                 />
               </div>
+              {/* Mobile: native scroll-snap strip */}
+              {hasMultiple ? (
+                <div
+                  ref={mobileStripRef}
+                  className="mobile-image-strip"
+                  onScroll={handleMobileScroll}
+                >
+                  {images.map((src, i) => (
+                    <div key={i} className="mobile-image-slide">
+                      <ImageWithFallback
+                        src={src}
+                        alt={`${product.title} ${i + 1}`}
+                        loading={i === 0 ? 'eager' : 'lazy'}
+                        className="main-image"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mobile-image-strip mobile-image-strip--single">
+                  <ImageWithFallback
+                    src={currentImage}
+                    alt={product.title}
+                    loading="eager"
+                    className="main-image"
+                  />
+                </div>
+              )}
               {hasMultiple && (
                 <>
                   <button type="button" className="slider-btn slider-prev" onClick={goPrev} aria-label="Previous image">‹</button>

@@ -140,6 +140,46 @@
   background: var(--bg-primary);
 }
 
+/* Mobile scroll-snap image strip */
+.mobile-image-strip {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-image-container {
+    display: none;
+  }
+
+  .mobile-image-strip {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    height: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .mobile-image-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-image-strip--single {
+    display: flex;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mobile-image-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+  }
+}
+
 /* Slider prev/next */
 .slider-btn {
   position: absolute;
