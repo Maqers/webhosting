@@ -94,7 +94,7 @@ const HOME_CAT_IMAGES = {
       <MarqueeBanner />
 
       {/* ── Scrollable category circles ── */}
-      <section className="category-circles-strip">
+      <div className="category-circles-strip">
         <div className="category-circles-scroll" ref={circlesRef}>
           {getSortedCategories()
             .filter(c => c.id !== 'Oxidised-jewellery')
@@ -132,7 +132,7 @@ const HOME_CAT_IMAGES = {
             })
           }
         </div>
-      </section>
+      </div>
 
       <section className="featured-section">
         <div className="container">

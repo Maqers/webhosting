@@ -115,6 +115,7 @@
   
   /* Horizontal scroll containers */
   .category-filters,
+  .category-circles-scroll,
   .sub-navbar-container,
   .products-grid,
   [style*="overflow-x: auto"],
