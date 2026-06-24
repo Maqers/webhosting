@@ -98,8 +98,8 @@
 
 @media (max-width: 768px) {
   .product-images-section {
-    flex-direction: column-reverse;
-    gap: var(--spacing-sm);
+    flex-direction: column;
+    gap: 0;
   }
 }
 
@@ -116,7 +116,9 @@
 @media (max-width: 768px) {
   .main-image-wrap {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: unset;
+    height: auto;
+    border-radius: 0;
   }
 }
 
@@ -140,9 +142,14 @@
   background: var(--bg-primary);
 }
 
-/* Mobile scroll-snap image strip */
-.mobile-image-strip {
+/* Mobile: single image display, natural aspect ratio */
+.mobile-single-image {
   display: none;
+}
+
+@keyframes pdp-img-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (max-width: 768px) {
@@ -150,33 +157,99 @@
     display: none;
   }
 
-  .mobile-image-strip {
+  .mobile-single-image {
+    display: block;
+    width: 100%;
+    touch-action: pan-y !important;
+  }
+
+  .mobile-single-image img,
+  .mobile-single-image picture {
+    touch-action: pan-y !important;
+    pointer-events: none;
+  }
+
+  .mobile-single-image picture {
+    display: block;
+    width: 100%;
+  }
+
+  /* Natural dimensions — no fixed height, no object-fit, no cropping, no letterbox */
+  .mobile-single-image .main-image {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: unset !important;
+    display: block !important;
+    animation: pdp-img-fade 0.18s ease;
+  }
+}
+
+/* ── Mobile image counter overlay ("1 / 3") ── */
+.image-counter {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .image-counter {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.42);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    z-index: 3;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+/* ── Mobile dot indicators (replaces thumbnail strip) ── */
+.mobile-dot-indicators {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-dot-indicators {
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    height: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0 6px;
   }
 
-  .mobile-image-strip::-webkit-scrollbar {
-    display: none;
-  }
-
-  .mobile-image-strip--single {
+  /* Button is a 44px tap target; visual dot lives in ::after */
+  .mobile-dot {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
     display: flex;
-    overflow-x: hidden;
-    width: 100%;
-    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
-  .mobile-image-slide {
-    flex: 0 0 100%;
-    width: 100%;
-    height: 100%;
-    scroll-snap-align: start;
+  .mobile-dot::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: #d8d0d0;
+    transition: width 0.22s ease, background 0.18s ease;
+    flex-shrink: 0;
+  }
+
+  .mobile-dot.active::after {
+    width: 20px;
+    background: var(--primary-color);
   }
 }
 
@@ -234,10 +307,7 @@
 
 @media (max-width: 768px) {
   .thumbnail-images {
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-height: unset;
-    justify-content: center;
+    display: none;
   }
 }
 
@@ -985,4 +1055,42 @@
 }
 .order-note-input:focus {
   border-color: #760909;
+}
+
+/* ── Mobile full-bleed image ────────────────────────────────────────────────
+   Zero out the side padding on the page + container so the image section
+   stretches edge-to-edge. Restore padding individually for text content.
+   These rules sit at the end of the file so they win the cascade.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .product-detail {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* !important needed to beat the index.css mobile container rule */
+  .product-detail > .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Restore side spacing for non-image elements */
+  .product-detail .back-button {
+    margin-left: 1rem;
+  }
+
+  .product-info-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .more-from-maker {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .reviews-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

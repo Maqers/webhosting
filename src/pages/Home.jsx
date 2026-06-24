@@ -207,14 +207,6 @@ export const FeaturedCard = ({ product, index }) => {
   const secondImage = product.images[1] || null;
   const imgZoneRef = useRef(null);
 
-  // Derive medium webp path for optimised delivery (generated at build time for popular products)
-  const medWebpSrc = (src) => {
-    if (!src || !src.startsWith('/images/')) return undefined
-    const name = src.replace('/images/', '').replace(/\.[^.]+$/, '')
-    return `/images/med-${name}.webp`
-  };
-
-;
 
   // Mobile: swap to second image when card scrolls into centre of viewport
   useEffect(() => {
@@ -253,7 +245,6 @@ export const FeaturedCard = ({ product, index }) => {
       <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
         <ImageWithFallback
           src={product.images[0]}
-          webpSrc={medWebpSrc(product.images[0])}
           alt={product.title}
           className="feat-img"
           loading={index < 2 ? "eager" : "lazy"}
@@ -262,7 +253,7 @@ export const FeaturedCard = ({ product, index }) => {
         />
         {secondImage && (
           <picture>
-            <source srcSet={medWebpSrc(secondImage)} type="image/webp" />
+            <source srcSet={secondImage.replace(/\.[^.]+$/, '.webp')} type="image/webp" />
             <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />
           </picture>
         )}

@@ -195,17 +195,17 @@
 
 
 
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
 import './ImageWithFallback.css'
 
-// Derive the WebP sidecar path for local /images/ files (e.g. /images/foo.png → /images/foo.webp)
 function toWebPSrc(src) {
   if (!src || !src.startsWith('/images/')) return null
   return src.replace(/\.[^.]+$/, '.webp')
 }
 
-// Lightweight image component with WebP <picture> delivery for local images.
-// Falls back to original format if WebP sidecar is absent or browser unsupported.
+// WebP <picture> delivery with automatic fallback to original format when the
+// webp sidecar 404s. Browsers select the <source> URL, not the <img src>, so a
+// missing webp never reaches the <img> fallback automatically — we handle it here.
 const ImageWithFallback = forwardRef(
   (
     {
@@ -222,10 +222,20 @@ const ImageWithFallback = forwardRef(
     },
     ref
   ) => {
+    const [webpFailed, setWebpFailed] = useState(false)
+
     if (!src) return null
 
+    const effectiveWebpSrc = webpSrcProp || toWebPSrc(src)
+    const useWebp = effectiveWebpSrc && !webpFailed
+
     const handleError = (event) => {
-      event.currentTarget.style.display = 'none'
+      if (useWebp) {
+        // webp 404'd — re-render without <picture> so the JPEG/PNG loads directly
+        setWebpFailed(true)
+      } else {
+        event.currentTarget.style.display = 'none'
+      }
     }
 
     const effectiveLoading = priority ? 'eager' : loading
@@ -233,13 +243,10 @@ const ImageWithFallback = forwardRef(
     const effectiveDecoding = priority ? 'sync' : 'async'
     const imgStyle = { width: '100%', height: '100%', objectFit: 'cover', display: 'block', ...style }
 
-    // Use explicit webpSrc prop if provided, otherwise auto-derive from src path
-    const webpSrc = webpSrcProp || toWebPSrc(src)
-
-    if (webpSrc) {
+    if (useWebp) {
       return (
         <picture>
-          <source srcSet={webpSrc} type="image/webp" sizes={sizes} />
+          <source srcSet={effectiveWebpSrc} type="image/webp" sizes={sizes} />
           <img
             ref={ref}
             src={src}

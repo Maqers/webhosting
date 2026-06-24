@@ -36,7 +36,9 @@ const ProductDetail = () => {
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   const imageWrapRef = useRef(null)
   const imgRef = useRef(null)
-  const mobileStripRef = useRef(null)
+  const mobileImgRef = useRef(null)
+  const touchStartXRef = useRef(0)
+  const touchStartYRef = useRef(0)
 
   const whatsappNumber = getWhatsAppNumber()
   const { addItem } = useCart()
@@ -100,19 +102,30 @@ const ProductDetail = () => {
   const goPrev = useCallback(() => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1)), [images.length])
   const goNext = useCallback(() => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1)), [images.length])
 
-  // Sync mobile scroll strip when selectedImage changes (e.g. thumbnail tap)
+  // Native (non-passive) touch listener so we can preventDefault on horizontal swipes,
+  // preventing the page from scrolling sideways while the user changes images.
   useEffect(() => {
-    const strip = mobileStripRef.current
-    if (!strip) return
-    strip.scrollTo({ left: selectedImage * strip.offsetWidth, behavior: 'smooth' })
-  }, [selectedImage])
-
-  const handleMobileScroll = useCallback(() => {
-    const strip = mobileStripRef.current
-    if (!strip) return
-    const idx = Math.round(strip.scrollLeft / strip.offsetWidth)
-    if (idx !== selectedImage) setSelectedImage(idx)
-  }, [selectedImage])
+    const el = mobileImgRef.current
+    if (!el) return
+    const onStart = (e) => {
+      touchStartXRef.current = e.touches[0].clientX
+      touchStartYRef.current = e.touches[0].clientY
+    }
+    const onEnd = (e) => {
+      const dx = touchStartXRef.current - e.changedTouches[0].clientX
+      const dy = touchStartYRef.current - e.changedTouches[0].clientY
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
+        e.preventDefault()
+        dx > 0 ? goNext() : goPrev()
+      }
+    }
+    el.addEventListener('touchstart', onStart, { passive: true })
+    el.addEventListener('touchend', onEnd, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchend', onEnd)
+    }
+  }, [goNext, goPrev])
 
   const LENS_SIZE = 120
   const ZOOM = 2
@@ -280,38 +293,25 @@ const ProductDetail = () => {
                   loading="eager"
                 />
               </div>
-              {/* Mobile: native scroll-snap strip */}
-              {hasMultiple ? (
-                <div
-                  ref={mobileStripRef}
-                  className="mobile-image-strip"
-                  onScroll={handleMobileScroll}
-                >
-                  {images.map((src, i) => (
-                    <div key={i} className="mobile-image-slide">
-                      <ImageWithFallback
-                        src={src}
-                        alt={`${product.title} ${i + 1}`}
-                        loading={i === 0 ? 'eager' : 'lazy'}
-                        className="main-image"
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="mobile-image-strip mobile-image-strip--single">
-                  <ImageWithFallback
-                    src={currentImage}
-                    alt={product.title}
-                    loading="eager"
-                    className="main-image"
-                  />
-                </div>
-              )}
+              {/* Mobile: single image, swipe to navigate */}
+              <div
+                ref={mobileImgRef}
+                className="mobile-single-image"
+              >
+                <ImageWithFallback
+                  key={selectedImage}
+                  src={images[selectedImage] || currentImage}
+                  alt={`${product.title}${hasMultiple ? ` ${selectedImage + 1}` : ''}`}
+                  loading="eager"
+                  className="main-image"
+                  style={{ objectFit: 'unset', width: '100%', height: 'auto' }}
+                />
+              </div>
               {hasMultiple && (
                 <>
                   <button type="button" className="slider-btn slider-prev" onClick={goPrev} aria-label="Previous image">‹</button>
                   <button type="button" className="slider-btn slider-next" onClick={goNext} aria-label="Next image">›</button>
+                  <div className="image-counter" aria-hidden>{selectedImage + 1} / {images.length}</div>
                 </>
               )}
               {lensVisible && currentImage && lensPos.w != null && (
@@ -328,6 +328,20 @@ const ProductDetail = () => {
                 />
               )}
             </div>
+            {/* Mobile-only: dot indicators replacing the thumbnail strip */}
+            {hasMultiple && (
+              <div className="mobile-dot-indicators">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`mobile-dot${selectedImage === i ? ' active' : ''}`}
+                    onClick={() => setSelectedImage(i)}
+                    aria-label={`View image ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
 
           </div>
 
