@@ -380,9 +380,8 @@
   -webkit-overflow-scrolling: touch;
   padding: 0.5rem 0 0.5rem 1rem;
   scrollbar-width: none;
-  touch-action: pan-x;
-  overscroll-behavior-x: none;
-  scroll-behavior: smooth;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
 }
 .category-circles-scroll::after {
   content: '';

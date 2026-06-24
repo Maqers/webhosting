@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useRef, useEffect } from "react";
+import { useMemo, useState, useCallback, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import ImageWithFallback from "../components/ImageWithFallback";
@@ -27,40 +27,6 @@ const HOME_CAT_IMAGES = {
   'Charm-accessories':    '/images/thumb-enchanted_charm_watch_2.webp',
   'Frames&Paintings':     '/images/thumb-17.webp',
 }
-  const circlesRef = useRef(null);
-
-  // Smooth horizontal scroll on iOS without page takeover
-  useEffect(() => {
-    const el = circlesRef.current;
-    if (!el) return;
-    let startX = 0, startScrollLeft = 0, startY = 0, isHorizontal = null;
-
-    const onTouchStart = (e) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      startScrollLeft = el.scrollLeft;
-      isHorizontal = null;
-    };
-    const onTouchMove = (e) => {
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-      if (isHorizontal === null && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
-        isHorizontal = Math.abs(dx) > Math.abs(dy);
-      }
-      if (isHorizontal) {
-        // Drive scroll manually so iOS doesn't grab it
-        el.scrollLeft = startScrollLeft - dx;
-        e.preventDefault();
-      }
-    };
-
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-    };
-  }, []);
 
   return (
     <div className="home">
@@ -95,7 +61,7 @@ const HOME_CAT_IMAGES = {
 
       {/* ── Scrollable category circles ── */}
       <div className="category-circles-strip">
-        <div className="category-circles-scroll" ref={circlesRef}>
+        <div className="category-circles-scroll">
           {getSortedCategories()
             .filter(c => c.id !== 'Oxidised-jewellery')
             .map((cat, catIndex) => {
