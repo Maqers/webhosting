@@ -44,19 +44,6 @@
   color: #f5ede4;
 }
 
-.hero-bright-em {
-  position: relative;
-  display: inline-block;
-}
-
-.hero-doodle-underline {
-  display: block;
-  width: 100%;
-  height: 0.5em;
-  margin-top: -0.15em;
-  overflow: visible;
-}
-
 .hero-bright-subtitle {
   font-family: var(--font-family-primary);
   font-size: clamp(0.95rem, 2vw, 1.05rem);
