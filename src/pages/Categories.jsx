@@ -278,7 +278,7 @@ const ProductCard = ({ product, index }) => {
           el.classList.remove('mobile-swap')
         }
       },
-      { threshold: 0.85 }
+      { threshold: 0, rootMargin: '-42% 0px -42% 0px' }
     )
     obs.observe(el)
     return () => { obs.disconnect(); clearTimeout(timer) }
