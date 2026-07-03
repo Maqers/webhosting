@@ -17,9 +17,9 @@ There are no tests or lint scripts configured.
 
 **Maqers** is a React + Vite SPA for an Indian handmade goods marketplace, deployed on Vercel. All routes are client-side; `vercel.json` rewrites everything to `index.html`.
 
-### Data layer — `src/data/catalog.js`
+### Data layer
 
-The entire product catalog lives in one static JS file. It exports:
+**`src/data/catalog.js`** — the entire product catalog. Exports:
 - `categories` — array of category objects (id, name, slug, icon, order, meta.keywords)
 - `productsByCategory` — object keyed by category id, each value an array of product objects
 
@@ -30,6 +30,12 @@ Products can appear in multiple categories via `meta.secondaryCategories`. The h
 > **Critical:** Do not shorten or replace catalog.js. The comment at the top of the file ("DO NOT replace this with any shortened version") is a real constraint — short descriptions break SEO and the AI gift assistant.
 
 Category `order` values must be unique integers and must be updated when adding/removing categories to prevent ordering bugs.
+
+**`src/data/occasionCatalog.js`** — display metadata for occasion groupings (name, emoji, description, order). Product IDs for each occasion come from `catalog.js`; this file is display-only.
+
+**`src/data/contactInfo.js`** — single source of truth for all business contact details (phone numbers, WhatsApp, email, Instagram). Import helpers like `getWhatsAppNumber()` instead of hardcoding values across components.
+
+**`src/config/emailjs.config.js`** — EmailJS credentials (serviceId, templateId, publicKey) used by the Contact page form. These are public-facing keys, not server secrets.
 
 ### Admin Portal — `src/pages/AdminPortal.jsx`
 
@@ -66,18 +72,21 @@ Client-side search with:
 
 ### Routing
 
-React Router v6. All pages are lazy-loaded (`React.lazy`). `scrollAnimations` are re-initialised on every route change via `useEffect` on `location.pathname`.
+React Router v6. All pages except `Home` are lazy-loaded (`React.lazy`), wrapped in `ChunkErrorBoundary` which handles chunk-load failures on stale deploys. `scrollAnimations` are re-initialised on every route change via `useEffect` on `location.pathname`. `GiftAssistant` is suppressed on `/admin`.
 
 Key routes:
 | Path | Component |
 |------|-----------|
-| `/` | Home |
+| `/` | Home (not lazy) |
 | `/products` | Products (all items, sortable/filterable) |
 | `/categories` | Categories |
 | `/category/:name` | Categories (filtered) |
 | `/product/:slug` | ProductDetail |
 | `/by-occasion` | ByOccasion |
 | `/by-product` | ByProduct |
+| `/about` | AboutUs |
+| `/faqs` | FAQs |
+| `/contact` | Contact (EmailJS form) |
 | `/maker/:sellerCode` | SellerPage (fetches from Supabase) |
 | `/admin` | AdminPortal |
 | `/checkout` | Checkout (WhatsApp-based order flow) |
@@ -85,6 +94,8 @@ Key routes:
 ### Styling
 
 Each component and page has a co-located `.css` file. Global overrides and mobile fixes live in `src/styles/` — many are platform-specific patches (iOS Safari, Android scroll, zoom prevention). Import order in `main.jsx` or `App.jsx` determines cascade.
+
+The `asyncCssPlugin` in `vite.config.js` rewrites injected global CSS `<link>` tags to `rel="preload"` so they are non-render-blocking. The `PageLoader` overlay masks any FOUC during hydration. The service worker (`public/sw.js`) is intentionally disabled (it clears all caches on activate) to avoid stale-CSS issues.
 
 ### Product images
 
