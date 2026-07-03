@@ -372,6 +372,7 @@
   .products-content { padding: 0.5rem 0 2rem !important; }
   .category-filters { gap: 0.625rem; padding: var(--spacing-xs) 0; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .filter-chip { padding: 0.6875rem 1.25rem; font-size: 0.875rem; min-height: 44px; }
+  .products-page { overflow-x: clip !important; }
 }
 
 @media (max-width: 480px) {

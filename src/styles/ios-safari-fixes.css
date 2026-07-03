@@ -232,12 +232,18 @@ html {
 /* Force full width on iOS to prevent horizontal scroll */
 @media (max-width: 767px) {
   html,
-  body,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    position: relative;
+  }
+  /* Use clip (not hidden) for #root/.App so overflow-y:visible isn't coerced to auto */
   #root,
   .App {
     width: 100% !important;
     max-width: 100% !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     position: relative;
   }
   

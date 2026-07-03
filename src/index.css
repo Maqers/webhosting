@@ -802,14 +802,23 @@ body {
    Ensures the page can always scroll vertically on small screens
    ============================================================================ */
 @media (max-width: 768px) {
-  html,
-  body {
-    /* Always allow vertical scrolling on mobile */
+  /* html IS the scroll container on mobile */
+  html {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     height: auto !important;
     min-height: 100vh !important;
-    /* Ensure touch scrolling works reliably */
+    touch-action: pan-y pinch-zoom !important;
+    -ms-touch-action: pan-y pinch-zoom !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* body must NOT be a scroll container — use clip so overflow-y:visible isn't coerced to auto */
+  body {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    min-height: 100% !important;
     touch-action: pan-y pinch-zoom !important;
     -ms-touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch;
@@ -817,7 +826,7 @@ body {
 
   #root,
   .App {
-    /* Ensure root containers don't block scroll */
+    overflow-x: clip !important;
     overflow-y: visible !important;
     min-height: 100vh !important;
     height: auto !important;

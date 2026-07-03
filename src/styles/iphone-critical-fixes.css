@@ -62,13 +62,19 @@
 @media (max-width: 767px) {
   /* Force no horizontal scroll on iPhone */
   html,
-  body,
-  #root,
-  .App {
+  body {
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: hidden !important;
     position: relative !important; /* DO NOT use fixed - breaks scrolling */
+  }
+  /* #root and .App: use clip not hidden so overflow-y:visible isn't coerced to auto */
+  #root,
+  .App {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+    position: relative !important;
   }
   
   /* All containers */
@@ -214,7 +220,8 @@
   }
   
   body {
-    overflow-x: hidden !important;
+    overflow-x: clip !important; /* clip keeps overflow-y:visible uncoerced */
+    overflow-y: visible !important;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain; /* Prevent bounce */
   }

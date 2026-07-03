@@ -9,6 +9,17 @@
   /* overflow-x removed — was breaking position:sticky on navbar */
 }
 
+/* Mobile: body must not be a scroll container — otherwise position:sticky breaks.
+   overflow-x:hidden coerces overflow-y:visible→auto, making body a scroll container
+   that intercepts sticky elements. Use clip: it clips horizontal overflow without
+   creating a scroll container (since overflow-y stays visible). */
+@media (max-width: 768px) {
+  body {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+}
+
 /* Hide floating buttons when cart or wishlist drawer is open */
 body:has(.cart-drawer.open) .gift-assistant-btn,
 body:has(.cart-drawer.open) .whatsapp-button,

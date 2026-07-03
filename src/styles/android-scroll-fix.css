@@ -27,8 +27,8 @@
   }
 
   body {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow-y: visible !important; /* html handles the scroll — body must not be a scroll container */
+    overflow-x: clip !important;
     min-height: 100% !important;
     height: auto !important;
     width: 100% !important;
@@ -42,7 +42,7 @@
   #root,
   .App {
     overflow-y: visible !important; /* Let body handle scroll */
-    overflow-x: hidden !important;
+    overflow-x: clip !important; /* clip prevents overflow-y:visible being coerced to auto */
     min-height: 100vh !important;
     height: auto !important;
     width: 100% !important;
@@ -67,7 +67,7 @@
     touch-action: pan-y pinch-zoom !important;
     -ms-touch-action: pan-y pinch-zoom !important;
     overflow-y: visible !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important; /* clip prevents overflow-y:visible being coerced to auto */
     height: auto !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -137,8 +137,8 @@
   body {
     position: static !important;
     width: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    overflow-x: clip !important;
     touch-action: pan-y pinch-zoom !important;
     -ms-touch-action: pan-y pinch-zoom !important;
   }
@@ -149,7 +149,7 @@
   body.sort-modal-open {
     position: static !important;
     width: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    overflow-x: clip !important;
   }
 }

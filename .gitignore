@@ -27,3 +27,4 @@ dist-ssr
 
 # Lighthouse reports
 lighthouse*.json
+maqers*.json

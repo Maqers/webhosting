@@ -144,14 +144,13 @@
   /* CRITICAL: Ensure scrolling is restored when modal is NOT open */
   body:not(.sort-modal-open) {
     position: static !important;
-    overflow: auto !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important; /* html handles scroll; body must not be a scroll container */
     height: auto !important;
     width: 100% !important;
     -webkit-overflow-scrolling: touch !important;
   }
-  
+
   html:not(.sort-modal-open) {
     overflow: auto !important;
     overflow-x: hidden !important;
@@ -167,14 +166,21 @@
     height: auto !important;
   }
   
-  /* Ensure the entire page is scrollable */
-  body:not(.sort-modal-open),
-  html:not(.sort-modal-open),
-  body:not(.sort-modal-open) #root,
-  body:not(.sort-modal-open) .App {
+  /* Ensure the entire page is scrollable (html is the scroll container, not body) */
+  html:not(.sort-modal-open) {
     overflow: auto !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    position: relative !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  /* #root and .App must NOT be scroll containers (use clip, not hidden, so overflow-y stays visible) */
+  body:not(.sort-modal-open) #root,
+  body:not(.sort-modal-open) .App {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
     height: auto !important;
     max-height: none !important;
     position: relative !important;
@@ -192,9 +198,8 @@
     isolation: isolate !important;
     position: relative !important;
     z-index: 0 !important;
-    /* Force rendering */
-    -webkit-transform: translateZ(0) !important;
-    transform: translateZ(0) !important;
+    /* NOTE: no transform here — transform on a parent breaks position:sticky children
+       by making the parent the sticky containing block instead of the viewport */
   }
   
   /* Products content should be above backdrop but below modal */
