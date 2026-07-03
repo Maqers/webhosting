@@ -49,8 +49,11 @@ export default defineConfig({
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
     
-    // Enable source maps for production debugging (optional - disable for smaller builds)
-    sourcemap: false,
+    // Hidden source maps: generated for PostHog error-tracking de-minification,
+    // but not referenced via //# sourceMappingURL so browsers won't fetch them.
+    // The postbuild step (see package.json) injects/uploads them, then deletes
+    // the .map files so they aren't published to dist/.
+    sourcemap: 'hidden',
     
     // Optimize CSS
     cssCodeSplit: true,

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
 import SeoHead from '../components/SeoHead'
+import { trackEvent } from '../utils/analytics'
+import posthog from 'posthog-js'
 import './Checkout.css'
 
 const UPI_ID = '9650800399@pthdfc'
@@ -49,6 +51,16 @@ export default function Checkout() {
     const handler = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handler)
     return () => window.removeEventListener('resize', handler)
+  }, [])
+
+  useEffect(() => {
+    if (items.length === 0) return
+    trackEvent('InitiateCheckout', {
+      value: total,
+      item_count: items.length,
+      product_ids: items.map(i => i.id),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [form, setForm] = useState({
@@ -147,6 +159,12 @@ export default function Checkout() {
     const oid = generateOrderId()
     setOrderId(oid)
 
+    posthog.identify(form.email || form.phone, {
+      name: form.name,
+      phone: form.phone,
+      ...(form.email && { email: form.email }),
+    })
+
     try {
       await sendEmail(oid, 'UPI — Customer will pay via UPI ID or QR scan. Verify before dispatching.')
     } catch (err) {
@@ -155,6 +173,13 @@ export default function Checkout() {
 
     await sendCustomerConfirmation(oid)
 
+    trackEvent('Purchase', {
+      order_id: oid,
+      value: grandTotal,
+      item_count: items.length,
+      product_ids: items.map(i => i.id),
+      payment_method: paymentMethod,
+    })
     clearCart()
     setOrderPlaced(true)
     setSubmitting(false)
@@ -215,6 +240,13 @@ export default function Checkout() {
       console.error('Email 2 failed:', err)
     }
     await sendCustomerConfirmation(pendingOrderId)
+    trackEvent('Purchase', {
+      order_id: pendingOrderId,
+      value: grandTotal,
+      item_count: items.length,
+      product_ids: items.map(i => i.id),
+      payment_method: 'upi',
+    })
     clearCart()
     setShowPaymentConfirm(false)
     setMobileUPIStep(null)

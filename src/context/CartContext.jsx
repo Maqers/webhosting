@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { trackEvent } from '../utils/analytics'
 
 const CartContext = createContext(null)
 
@@ -49,10 +50,20 @@ export function CartProvider({ children }) {
       }]
     })
     setIsOpen(true)
+    trackEvent('AddToCart', {
+      product_id: product.id,
+      title: product.title,
+      price: product.price,
+      category_id: product.categoryId,
+    })
   }, [])
 
   const removeItem = useCallback((key) => {
-    setItems(prev => prev.filter(i => i.key !== key))
+    setItems(prev => {
+      const removed = prev.find(i => i.key === key)
+      if (removed) trackEvent('RemoveFromCart', { product_id: removed.id, title: removed.title })
+      return prev.filter(i => i.key !== key)
+    })
   }, [])
 
   const updateQty = useCallback((key, qty) => {

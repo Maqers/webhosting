@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { searchProducts, highlightMatch } from '../utils/search'
 import { categories } from '../data/catalog'
 import ImageWithFallback from './ImageWithFallback'
+import { trackEvent } from '../utils/analytics'
 import './SearchBar.css'
 
 const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
@@ -54,6 +55,7 @@ const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
     if (!isValid(sq)) return
     const prods = searchProducts(sq, { limit: 50, minScore: 3 })
     const results = { products: prods, all: prods, totalResults: prods.length, hasResults: prods.length > 0, query: sq }
+    trackEvent('SearchPerformed', { query: sq, result_count: prods.length })
     navigate('/products', { state: { searchQuery: sq, searchResults: results }, replace: location.pathname === '/products' })
     setShowResults(false)
     if (onSearch) onSearch(results)

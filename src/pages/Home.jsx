@@ -6,10 +6,13 @@ import MarqueeBanner from '../components/Marqueebanner';
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import SeoHead from "../components/SeoHead";
+import { useMobileCenterSwap } from "../hooks/useMobileCenterSwap";
 import "./Home.css";
 
 const Home = () => {
   const popularProducts = useMemo(() => getPopularProducts(), []);
+  const featuredGridRef = useRef(null);
+  useMobileCenterSwap(featuredGridRef, '.feat-img-zone.has-second-img');
 
 // Thumbnail images for category circles (168px webp, displayed at 82-84px @2x retina)
 const HOME_CAT_IMAGES = {
@@ -142,7 +145,7 @@ const HOME_CAT_IMAGES = {
             </div>
             <Link to="/products" className="featured-view-all">View all →</Link>
           </div>
-          <div className="featured-grid">
+          <div className="featured-grid" ref={featuredGridRef}>
             {popularProducts.slice(0, 8).map((product, index) => (
               <FeaturedCard key={product.id} product={product} index={index} />
             ))}
@@ -206,34 +209,6 @@ export const FeaturedCard = ({ product, index }) => {
 
   const secondImage = product.images[1] || null;
   const imgZoneRef = useRef(null);
-
-
-  // Mobile: swap to second image when card scrolls into centre of viewport
-  useEffect(() => {
-    if (!secondImage || !imgZoneRef.current) return;
-    const el = imgZoneRef.current;
-    // Only run on touch devices
-    const isTouch = window.matchMedia('(hover: none) and (max-width: 768px)').matches
-    if (!isTouch) return
-    let timer = null
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timer = setTimeout(() => {
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => { el.classList.add('mobile-swap') })
-            })
-          }, 250)
-        } else {
-          clearTimeout(timer)
-          requestAnimationFrame(() => { el.classList.remove('mobile-swap') })
-        }
-      },
-      { threshold: 0, rootMargin: '-42% 0px -42% 0px' }
-    );
-    obs.observe(el);
-    return () => { obs.disconnect(); clearTimeout(timer); };
-  }, [secondImage]);
 
   return (
     <article

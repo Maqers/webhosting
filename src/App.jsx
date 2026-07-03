@@ -12,6 +12,7 @@ import ChunkErrorBoundary from './components/ChunkErrorBoundary'
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
 import { initScrollAnimations, cleanupScrollAnimations } from './utils/scrollAnimations'
+import { trackPageview } from './utils/analytics'
 import './App.css'
 
 import Home from './pages/Home'
@@ -46,6 +47,7 @@ function AppContent() {
   useEffect(() => {
     const observers = initScrollAnimations()
     window.scrollTo({ top: 0, behavior: 'instant' })
+    trackPageview(location.pathname)
     return () => {
       cleanupScrollAnimations(observers)
     }

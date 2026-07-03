@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { trackEvent } from '../utils/analytics'
 
 const WishlistContext = createContext(null)
 
@@ -18,7 +19,16 @@ export function WishlistProvider({ children }) {
   const toggleItem = useCallback((product) => {
     setItems(prev => {
       const exists = prev.find(i => i.id === product.id)
-      if (exists) return prev.filter(i => i.id !== product.id)
+      if (exists) {
+        trackEvent('RemoveFromWishlist', { product_id: product.id, title: product.title })
+        return prev.filter(i => i.id !== product.id)
+      }
+      trackEvent('AddToWishlist', {
+        product_id: product.id,
+        title: product.title,
+        price: product.price,
+        category_id: product.categoryId,
+      })
       return [...prev, {
         id: product.id,
         title: product.title,

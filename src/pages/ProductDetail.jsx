@@ -7,6 +7,8 @@ import { useWishlist } from '../context/WishlistContext'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { FeaturedCard } from './Home'
 import SeoHead from '../components/SeoHead'
+import { trackEvent } from '../utils/analytics'
+import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -82,12 +84,24 @@ const ProductDetail = () => {
     const all = getAllProducts()
     const recent = filtered.map(id => all.find(p => p.id === id)).filter(Boolean).slice(0, 6)
     setRecentlyViewed(recent)
+    trackEvent('ViewContent', {
+      product_id: product.id,
+      title: product.title,
+      price: product.price,
+      category_id: product.categoryId,
+    })
   }, [product?.id])
 
   const handleAddToCart = () => {
     addItem(product, selectedColor, selectedSize, selectedPersonalisation, orderNote)
   }
   const handleContactUs = () => {
+    trackEvent('ContactWhatsAppClicked', {
+      product_id: product.id,
+      title: product.title,
+      price: product.price,
+      category_id: product.categoryId,
+    })
     let message = `Hello! I want to buy ${product.title} — https://maqers.in/product/${product.slug}`
     if (selectedColor) message += ` Colour: ${selectedColor}.`
     if (selectedSize) message += ` Size: ${selectedSize}.`
@@ -243,6 +257,8 @@ const ProductDetail = () => {
     return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6), sellerCode: null }
   }
   const { products: moreProducts, sellerCode: makerCode } = getMoreFromMaker()
+  const moreProductsGridRef = useRef(null)
+  useMobileCenterSwap(moreProductsGridRef, '.feat-img-zone.has-second-img', [moreProducts.length])
 
   return (
     <div className="product-detail">
@@ -567,7 +583,7 @@ const ProductDetail = () => {
           {moreProducts.length > 0 && (
             <div className="more-from-maker">
               <h3 className="more-from-maker-title">More from this maker</h3>
-              <div className="more-from-maker-grid">
+              <div className="more-from-maker-grid" ref={moreProductsGridRef}>
                 {moreProducts.slice(0, 4).map((p, i) => (
                   <FeaturedCard key={p.id} product={p} index={i} />
                 ))}

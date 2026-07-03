@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { trackEvent } from '../utils/analytics'
 import './GiftAssistant.css'
 
 const CATEGORY_NAMES = {
@@ -99,6 +100,7 @@ export default function GiftAssistant() {
     setIsOpen(true)
     setResults(null)
     setError('')
+    trackEvent('GiftFinderOpened')
   }
 
   useEffect(() => {
@@ -125,6 +127,11 @@ export default function GiftAssistant() {
     setLoading(true)
     setError('')
     setResults(null)
+    trackEvent('GiftFinderSubmitted', {
+      recipient: recipient.label,
+      occasion: occasion.label,
+      budget: budget.label,
+    })
 
     try {
       // Dynamic import to keep catalog out of the initial bundle
@@ -279,7 +286,20 @@ export default function GiftAssistant() {
                         <span className="gift-result-title">{r.title}</span>
                         <span className="gift-result-price">₹{r.price}</span>
                         <p className="gift-result-reason">{r.reason}</p>
-                        <Link to={`/product/${r.slug}`} className="gift-result-link" onClick={handleClose}>
+                        <Link
+                          to={`/product/${r.slug}`}
+                          className="gift-result-link"
+                          onClick={() => {
+                            trackEvent('GiftRecommendationClicked', {
+                              product_id: r.id,
+                              title: r.title,
+                              price: r.price,
+                              recipient: recipient?.label,
+                              occasion: occasion?.label,
+                            })
+                            handleClose()
+                          }}
+                        >
                           View Product →
                         </Link>
                       </div>

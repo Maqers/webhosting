@@ -6,6 +6,7 @@ import ImageWithFallback from '../components/ImageWithFallback'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import SeoHead from '../components/SeoHead'
+import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import './Categories.css'
 
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
@@ -102,6 +103,9 @@ const Categories = () => {
     }, 50)
     return () => clearTimeout(timer)
   }, [selectedCategory])
+
+  const gridRef = useRef(null)
+  useMobileCenterSwap(gridRef, '.feat-img-zone.has-second-img', [selectedCategory, activeFilter, sortBy])
 
   const allCats = [...occasionCategories, ...SOURCE_CATS]
   const selectedCategoryObj = selectedCategory === 'All'
@@ -226,7 +230,7 @@ const Categories = () => {
               )}
 
               {categoryProducts.length > 0 ? (
-                <div className="products-grid">
+                <div className="products-grid" ref={gridRef}>
                   {categoryProducts.map((product, index) => (
                     <ProductCard key={product.id} product={product} index={index} />
                   ))}
@@ -255,34 +259,6 @@ const ProductCard = ({ product, index }) => {
   const [heartPop, setHeartPop] = useState(false)
   const imgZoneRef = useRef(null)
   const secondImage = product.images[1] || null
-
-
-
-  useEffect(() => {
-    if (!secondImage || !imgZoneRef.current) return
-    const el = imgZoneRef.current
-    // Only run on touch devices
-    const isTouch = window.matchMedia('(hover: none) and (max-width: 768px)').matches
-    if (!isTouch) return
-    let timer = null
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timer = setTimeout(() => {
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => { el.classList.add('mobile-swap') })
-            })
-          }, 250)
-        } else {
-          clearTimeout(timer)
-          el.classList.remove('mobile-swap')
-        }
-      },
-      { threshold: 0, rootMargin: '-42% 0px -42% 0px' }
-    )
-    obs.observe(el)
-    return () => { obs.disconnect(); clearTimeout(timer) }
-  }, [secondImage])
 
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation()

@@ -11,6 +11,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SORT_TYPES, SORT_LABELS, DEFAULT_SORT, getSortOptions } from '../utils/sorting'
+import { trackEvent } from '../utils/analytics'
 import './ProductSort.css'
 import '../styles/iphone-sort-fix.css'
 
@@ -44,6 +45,8 @@ const ProductSort = ({ onSortChange, className = '' }) => {
       newParams.set('sort', validSort)
     }
     setSearchParams(newParams, { replace: true })
+
+    trackEvent('ProductsSorted', { sort_by: validSort })
 
     // Notify parent
     if (onSortChange) {
