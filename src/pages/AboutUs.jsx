@@ -43,7 +43,7 @@ const AboutUs = () => {
               </div>
               <div className="founders-copy">
                 <p>
-                  We're Anandita and Kamya, sisters, co-founders, and two people who have spent an
+                  We're Anandita and Kamya, co-founders, and two people who have spent an
                   alarming number of nights scrolling Instagram at 1am adding things to a mental cart
                   that never actually checks out. That's basically the whole origin story.
                 </p>
