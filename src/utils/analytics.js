@@ -25,7 +25,24 @@ export function trackPageview(path) {
   posthog.capture('$pageview', { $current_url: window.location.href, path })
 }
 
+// Maps our PostHog event names to GA4's standard e-commerce event names so
+// GTM (container GTM-N885WBGL, see index.html) can build funnels from the
+// same call sites without a second set of tracking calls sprinkled around.
+const GA4_EVENT_MAP = {
+  ViewContent: 'view_item',
+  AddToCart: 'add_to_cart',
+  RemoveFromCart: 'remove_from_cart',
+  InitiateCheckout: 'begin_checkout',
+  Purchase: 'purchase',
+  ContactWhatsAppClicked: 'contact',
+}
+
 export function trackEvent(name, props = {}) {
-  if (!initialized) return
-  posthog.capture(name, props)
+  if (initialized) posthog.capture(name, props)
+
+  const ga4Name = GA4_EVENT_MAP[name]
+  if (ga4Name) {
+    window.dataLayer = window.dataLayer || []
+    window.dataLayer.push({ event: ga4Name, ...props })
+  }
 }
