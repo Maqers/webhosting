@@ -44,6 +44,19 @@
   color: #f5ede4;
 }
 
+.hero-bright-em {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-doodle-underline {
+  display: block;
+  width: 100%;
+  height: 0.5em;
+  margin-top: -0.15em;
+  overflow: visible;
+}
+
 .hero-bright-subtitle {
   font-family: var(--font-family-primary);
   font-size: clamp(0.95rem, 2vw, 1.05rem);
@@ -128,6 +141,7 @@
   margin-bottom: 2rem; flex-wrap: wrap; gap: 0.75rem;
 }
 .featured-header-left { display: flex; flex-direction: column; gap: 0.3rem; }
+.featured-sticker { align-self: flex-start; font-size: 0.9rem; padding: 0.25rem 0.7rem; }
 .featured-eyebrow {
   font-family: var(--font-family-primary); font-size: 0.78rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary-color);

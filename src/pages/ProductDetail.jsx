@@ -12,6 +12,19 @@ import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import './ProductDetail.css'
 import './Home.css'
 
+const PRODUCT_STICKERS = [
+  '👀 a fan favourite',
+  '🏃 tends to sell out',
+  '🫶 keeps getting reordered',
+]
+
+const hashToIndex = (id, len) => {
+  const str = String(id)
+  let hash = 0
+  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) % len
+  return Math.abs(hash) % len
+}
+
 const ProductDetail = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
@@ -379,6 +392,11 @@ const ProductDetail = () => {
             {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: product.description.split('\\n').join('<br/>') }} />
+            {product.popular && (
+              <span className="site-sticker product-detail-sticker">
+                {PRODUCT_STICKERS[hashToIndex(product.id, PRODUCT_STICKERS.length)]}
+              </span>
+            )}
 
             <div className="price-section">
               <span className="price-label">Price:</span>

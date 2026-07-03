@@ -396,6 +396,13 @@
   white-space: pre-line;
 }
 
+.product-detail-sticker {
+  align-self: flex-start;
+  margin-top: 0.85rem;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.8rem;
+}
+
 .price-section {
   display: flex;
   flex-wrap: wrap;

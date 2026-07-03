@@ -1,3 +1,6 @@
+/* Handwritten accent font used for small playful touches across the site */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap');
+
 /* Import mobile-first base styles - MUST be at the top before any other CSS rules */
 @import './styles/mobile-base.css';
 
@@ -114,6 +117,7 @@
   /* Typography - Garamond */
   --font-family-primary: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
   --font-family-heading: 'EB Garamond', 'Garamond', serif;
+  --font-family-accent: 'Caveat', 'EB Garamond', cursive;
   --font-size-xs: 0.75rem;
   /* 12px */
   --font-size-sm: 0.875rem;
@@ -894,4 +898,30 @@ li {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Shared "cute" accent utilities (handwritten stickers/kickers) ── */
+.site-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-family-accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  background: #fdf1e0;
+  border: 1.5px dashed var(--primary-color);
+  border-radius: 9999px;
+  padding: 0.3rem 0.9rem;
+  transform: rotate(-2deg);
+  white-space: nowrap;
+}
+
+.site-kicker {
+  display: inline-block;
+  font-family: var(--font-family-accent);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  transform: rotate(-3deg);
 }

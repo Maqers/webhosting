@@ -864,7 +864,137 @@
 }
 .seller-cta-btn:hover { background: #5a0707; transform: translateY(-2px); }
 
-/* ── Founders ── */
+/* ── Founders (photo section) ─────────────────────────────────── */
+.founders-section {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.founders-kicker {
+  display: block;
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: -0.25rem;
+}
+
+.founders-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.polaroid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 1rem 1rem 1.25rem;
+  box-shadow: 0 10px 30px rgba(26, 23, 20, 0.18), 0 2px 6px rgba(26, 23, 20, 0.1);
+  border-radius: 2px;
+  transform: rotate(-4deg);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  justify-self: center;
+}
+
+.polaroid:hover {
+  transform: rotate(-1deg) scale(1.03);
+}
+
+.polaroid img {
+  display: block;
+  width: 260px;
+  aspect-ratio: 13 / 16;
+  object-fit: cover;
+  border-radius: 1px;
+}
+
+.polaroid-caption {
+  text-align: center;
+  font-family: var(--font-family-accent);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #1a1714;
+  margin: 0.6rem 0 0;
+}
+
+.polaroid-tape {
+  position: absolute;
+  width: 70px;
+  height: 26px;
+  background: rgba(255, 226, 140, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  top: -12px;
+  z-index: 2;
+}
+
+.polaroid-tape-left {
+  left: -18px;
+  transform: rotate(-40deg);
+}
+
+.polaroid-tape-right {
+  right: -18px;
+  transform: rotate(40deg);
+}
+
+.founders-copy p {
+  text-align: left;
+  margin-left: 0;
+  margin-right: 0;
+  max-width: none;
+}
+
+.founders-stickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.founders-stickers .sticker {
+  font-size: 1.15rem;
+  padding: 0.4rem 1rem;
+}
+
+.founders-stickers .sticker:nth-child(2) { transform: rotate(1.5deg); }
+.founders-stickers .sticker:nth-child(3) { transform: rotate(-1deg); }
+
+@media (max-width: 768px) {
+  .founders-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .polaroid {
+    transform: rotate(-1.5deg);
+    margin: 0 auto;
+  }
+
+  .polaroid:hover,
+  .polaroid:active {
+    transform: rotate(0deg) scale(1.02);
+  }
+
+  .polaroid img {
+    width: 220px;
+    height: 270px;
+  }
+
+  .founders-copy p {
+    text-align: center;
+  }
+
+  .founders-stickers {
+    justify-content: center;
+  }
+}
+
+/* ── Founders (old unused block, kept for reference) ── */
 .founders-block {
   display: grid;
   grid-template-columns: 1fr 1fr;

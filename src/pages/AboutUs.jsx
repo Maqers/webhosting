@@ -30,6 +30,42 @@ const AboutUs = () => {
       <div className="container">
         <section className="about-content">
 
+          {/* ── FOUNDERS ───────────────────────────────────────── */}
+          <div className="about-section scroll-animate founders-section">
+            <span className="site-kicker founders-kicker">hi, it's us</span>
+            <h2>The two people who won't stop texting sellers</h2>
+            <div className="founders-layout">
+              <div className="polaroid">
+                <div className="polaroid-tape polaroid-tape-left"></div>
+                <div className="polaroid-tape polaroid-tape-right"></div>
+                <img src="/images/founders-anandita-kamya.jpg" alt="Anandita and Kamya, co-founders of Maqers" />
+                <p className="polaroid-caption">us, pretending we know what we're doing</p>
+              </div>
+              <div className="founders-copy">
+                <p>
+                  We're Anandita and Kamya, sisters, co-founders, and two people who have spent an
+                  alarming number of nights scrolling Instagram at 1am adding things to a mental cart
+                  that never actually checks out. That's basically the whole origin story.
+                </p>
+                <p>
+                  We got tired of DMing sellers and never hearing back, so we built the thing we wished
+                  existed. Now most of our day is deeply unglamorous: personally messaging sellers, asking
+                  annoying questions about packaging, and occasionally ordering off our own site just to
+                  make sure things actually arrive on time. They do. Mostly.
+                </p>
+                <p>
+                  We're not investors in blazers. We're two people who really like well-made things and
+                  get genuinely offended when a candle smells worse than the listing promised. If you have
+                  questions, complaints, or just want to tell us we picked a weird font, our WhatsApp is open.
+                </p>
+                <div className="founders-stickers">
+                  <span className="site-sticker sticker">🫡 personally vetted, by us, literally</span>
+                  <span className="site-sticker sticker">☕ running on chai and stubbornness</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* ── STAT BOXES ─────────────────────────────────────── */}
           <div className="about-section scroll-animate">
             <div className="about-stats-grid">

@@ -76,7 +76,13 @@ const HOME_CAT_IMAGES = {
       <section className="hero-bright">
         <div className="container hero-bright-inner">
           <h1 className="hero-bright-title">
-            Saw it on Instagram?<br /><em>Buy it here.</em>
+            Saw it on Instagram?<br />
+            <em className="hero-bright-em">
+              Buy it here.
+              <svg className="hero-doodle-underline" viewBox="0 0 220 20" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M4 12c20-10 40-10 60 0s40 10 60 0 40-10 60 0" fill="none" stroke="#f5ede4" strokeWidth="4" strokeLinecap="round" />
+              </svg>
+            </em>
           </h1>
           <p className="hero-bright-subtitle">
             The best independent Indian sellers, in one place.
@@ -142,6 +148,7 @@ const HOME_CAT_IMAGES = {
           <div className="featured-header">
             <div className="featured-header-left">
               <h2 className="featured-title">Most Loved Right Now</h2>
+              <span className="site-sticker featured-sticker">🔥 actually loved, not just labeled</span>
             </div>
             <Link to="/products" className="featured-view-all">View all →</Link>
           </div>
