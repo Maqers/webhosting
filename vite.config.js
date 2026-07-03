@@ -72,12 +72,38 @@ export default defineConfig({
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',
     },
+    // Mirrors the /ingest rewrites in vercel.json so PostHog capture works
+    // locally too (Vercel rewrites don't apply to the Vite dev server).
+    proxy: {
+      '/ingest/static': {
+        target: 'https://eu-assets.i.posthog.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ingest/, ''),
+      },
+      '/ingest': {
+        target: 'https://eu.i.posthog.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ingest/, ''),
+      },
+    },
   },
-  
+
   // Preview server optimizations
   preview: {
     headers: {
       'Cache-Control': 'public, max-age=31536000',
+    },
+    proxy: {
+      '/ingest/static': {
+        target: 'https://eu-assets.i.posthog.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ingest/, ''),
+      },
+      '/ingest': {
+        target: 'https://eu.i.posthog.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ingest/, ''),
+      },
     },
   },
 })
