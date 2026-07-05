@@ -19,7 +19,7 @@ export const occasionCategories = [
     slug: "for-your-best-friend",
     emoji: "🫂",
     order: 1,
-    description: "The one who knows too much. Gift them well — they deserve it, and frankly, you owe them."
+    description: "The one who knows too much. Gift them well, they deserve it, and frankly, you owe them."
   },
   {
     id: "for-your-girlfriend",
@@ -107,7 +107,7 @@ export const occasionCategories = [
     slug: "for-your-dad",
     emoji: "🫡",
     order: 12,
-    description: "The man of few words and zero gift opinions. Just get him something — he'll be quietly pleased."
+    description: "The man of few words and zero gift opinions. Just get him something, he'll be quietly pleased."
   },
   {
     id: "for-your-sister",

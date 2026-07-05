@@ -69,7 +69,7 @@ const HOME_CAT_IMAGES = {
     <div className="home">
       <SeoHead
         title="Curated Handcrafted Gifts from India"
-        description="Discover unique handmade gifts from India's best independent artisans — jewellery, candles, home decor, skincare and more. Curated for every person, every occasion."
+        description="Discover unique handmade gifts from India's best independent artisans: jewellery, candles, home decor, skincare and more. Curated for every person, every occasion."
         url="/"
       />
 
@@ -168,7 +168,7 @@ const HOME_CAT_IMAGES = {
           <div className="trust-divider" />
           <div className="trust-item">
             <span className="trust-icon" role="img" aria-label="chat">💬</span>
-            <div><strong>Order via WhatsApp</strong><span>No DM anxiety — we handle it</span></div>
+            <div><strong>Order via WhatsApp</strong><span>No DM anxiety, we handle it</span></div>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">

@@ -179,7 +179,7 @@ const Products = () => {
       : 'All Handcrafted Gifts'
   const seoDescription = searchQuery
     ? `Showing handmade gift results for "${searchQuery}" from India's finest independent artisans.`
-    : "Browse 190+ handpicked handmade gifts from India's best independent artisans — jewellery, candles, home decor, skincare, hampers and more."
+    : "Browse 190+ handpicked handmade gifts from India's best independent artisans: jewellery, candles, home decor, skincare, hampers and more."
 
   return (
     <div className="products-page">

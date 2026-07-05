@@ -15,7 +15,7 @@ const AboutUs = () => {
   return (
     <div className="about-us">
       <SeoHead
-        title="About Maqers — India's Curated Handmade Gifting Platform"
+        title="About Maqers: India's Curated Handmade Gifting Platform"
         description="Maqers connects gift buyers with India's finest independent artisans. Discover the story behind India's most thoughtful gifting destination."
         url="/about"
       />
@@ -96,14 +96,14 @@ const AboutUs = () => {
           <div className="about-section scroll-animate">
             <h2>Saw it on Instagram? Buy it here.</h2>
             <p>
-              You've been there. You're scrolling Instagram at midnight and you see it — a stunning hand-poured candle,
+              You've been there. You're scrolling Instagram at midnight and you see it: a stunning hand-poured candle,
               a crochet bouquet that looks like it's from a movie set, a custom name frame that would be perfect for
               your best friend's birthday. You hit save. You DM the seller. And then you wait. And wait. And maybe
               get a reply three days later asking for your address in a DM chain that somehow never leads to an actual purchase.
             </p>
             <p>
-              That's the gap Maqers fills. We spent months finding the best independent home businesses on Instagram —
-              the ones who actually make great things — and built the infrastructure around them that Instagram never had.
+              That's the gap Maqers fills. We spent months finding the best independent home businesses on Instagram,
+              the ones who actually make great things, and built the infrastructure around them that Instagram never had.
               Verified sellers. Real products. A proper checkout. No DM anxiety.
             </p>
             <p>
@@ -116,9 +116,9 @@ const AboutUs = () => {
           <div className="about-section scroll-animate">
             <h2>We're on both sides of this.</h2>
             <p>
-              Most sellers on Maqers are one or two-person operations — someone who turned a skill into a side hustle,
+              Most sellers on Maqers are one or two-person operations: someone who turned a skill into a side hustle,
               a student funding their own education through craft, a parent building something of their own from home.
-              They make genuinely beautiful things. The problem was never the product — it was discoverability and trust.
+              They make genuinely beautiful things. The problem was never the product, it was discoverability and trust.
             </p>
             <p>
               Maqers gives buyers a reason to trust them, and gives sellers the reach they couldn't build alone.
@@ -147,7 +147,7 @@ const AboutUs = () => {
                   </svg>
                 </div>
                 <h3>Instagram's Best, Here</h3>
-                <p>We bring hidden Instagram gems to one trusted place — no DM required.</p>
+                <p>We bring hidden Instagram gems to one trusted place, no DM required.</p>
               </div>
               <div className="feature-card scroll-animate">
                 <div className="feature-icon-wrapper">
@@ -179,7 +179,7 @@ const AboutUs = () => {
               <div className="seller-cta-text">
                 <h2>Have a home business? Start selling today.</h2>
                 <p>
-                  If you make something — jewellery, candles, baked goods, skincare, art, accessories — and you've
+                  If you make something (jewellery, candles, baked goods, skincare, art, accessories) and you've
                   been selling (or thinking about selling) through Instagram DMs, Maqers is built for you.
                 </p>
                 <p>
@@ -188,7 +188,7 @@ const AboutUs = () => {
                   You just make the thing.
                 </p>
                 <p>
-                  Whether you're a solo creator working from your bedroom or a small team with big ideas —
+                  Whether you're a solo creator working from your bedroom or a small team with big ideas,
                   list on Maqers and reach buyers who are already looking for exactly what you make.
                 </p>
                 <a href="/contact" className="seller-cta-btn">Apply to sell on Maqers →</a>
@@ -201,7 +201,7 @@ const AboutUs = () => {
             <div className="get-in-touch-content">
               <h2>Get in Touch</h2>
               <p>
-                Question about an order? Want to list your business on Maqers? We respond fast —
+                Question about an order? Want to list your business on Maqers? We respond fast:
                 reach us on WhatsApp or email and we'll actually respond.
               </p>
               <div className="quote-section scroll-animate">
@@ -210,7 +210,7 @@ const AboutUs = () => {
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                   </svg>
                   <p className="quote-text">"Saw it on Instagram? Buy it here."</p>
-                  <p className="quote-author">— Maqers</p>
+                  <p className="quote-author">Maqers</p>
                 </div>
               </div>
             </div>

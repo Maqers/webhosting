@@ -9,7 +9,7 @@ export default function ByOccasion() {
     <div className="by-page">
       <SeoHead
         title="Shop Gifts by Occasion"
-        description="Find the perfect handmade gift by occasion — birthdays, weddings, anniversaries, Diwali and more. Curated from India's finest artisans."
+        description="Find the perfect handmade gift by occasion: birthdays, weddings, anniversaries, Diwali and more. Curated from India's finest artisans."
         url="/by-occasion"
       />
       <div className="by-page-header">

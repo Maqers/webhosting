@@ -142,11 +142,11 @@ const Categories = () => {
   }, [rawCategoryProducts, activeFilter, sortBy])
 
   const seoTitle = selectedCategoryObj
-    ? `${selectedCategoryObj.name} — Handmade Gifts`
+    ? `${selectedCategoryObj.name}: Handmade Gifts`
     : 'Shop All Collections'
   const seoDescription = selectedCategoryObj
     ? `Browse handpicked ${selectedCategoryObj.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`
-    : 'Browse curated handmade gift collections from India\'s best independent artisans — by occasion or by product type.'
+    : 'Browse curated handmade gift collections from India\'s best independent artisans, by occasion or by product type.'
 
   return (
     <div className="categories-page">

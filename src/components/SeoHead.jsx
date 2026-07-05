@@ -3,9 +3,9 @@ import { Helmet } from 'react-helmet-async'
 const BASE_URL = 'https://maqers.in'
 const DEFAULT_IMAGE = `${BASE_URL}/images/logo.png`
 const SITE_NAME = 'Maqers'
-const DEFAULT_TITLE = 'Maqers — Curated Handcrafted Gifts from India'
+const DEFAULT_TITLE = 'Maqers: Curated Handcrafted Gifts from India'
 const DEFAULT_DESCRIPTION =
-  'Discover unique handmade gifts from India\u2019s best independent artisans \u2014 jewellery, candles, home decor, skincare and more. Curated for every person, every occasion.'
+  'Discover unique handmade gifts from India\u2019s best independent artisans: jewellery, candles, home decor, skincare and more. Curated for every person, every occasion.'
 
 /**
  * SeoHead — drop into any page to set title, description, Open Graph tags,

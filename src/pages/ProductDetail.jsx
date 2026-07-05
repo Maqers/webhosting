@@ -115,7 +115,7 @@ const ProductDetail = () => {
       price: product.price,
       category_id: product.categoryId,
     })
-    let message = `Hello! I want to buy ${product.title} — https://maqers.in/product/${product.slug}`
+    let message = `Hello! I want to buy ${product.title}: https://maqers.in/product/${product.slug}`
     if (selectedColor) message += ` Colour: ${selectedColor}.`
     if (selectedSize) message += ` Size: ${selectedSize}.`
     if (selectedPersonalisation.length > 0) message += ` Personalisation: ${selectedPersonalisation.join(', ')}.`
@@ -431,7 +431,7 @@ const ProductDetail = () => {
                       setSelectedImage(found.imageIndex);
                     }
                   }}>
-                  <option value="">— Choose a colour —</option>
+                  <option value="">Choose a colour</option>
                   {product.meta.colors.map((c, i) => {
                     const name = typeof c === "object" ? c.name : c;
                     return <option key={i} value={name}>{name}</option>;
@@ -446,12 +446,12 @@ const ProductDetail = () => {
                 <label className="colors-label" htmlFor="size-select">Select Size:</label>
                 <select id="size-select" className="colors-select" value={selectedSize}
                   onChange={e => setSelectedSize(e.target.value)}>
-                  <option value="">— Choose a size —</option>
+                  <option value="">Choose a size</option>
                   {product.meta.sizes.map((s, i) => {
                     const sizePrice = product.meta.sizePrices?.[s];
                     return (
                       <option key={i} value={s}>
-                        {s}{sizePrice ? ` — ₹${Number(sizePrice).toLocaleString("en-IN")}` : ""}
+                        {s}{sizePrice ? ` (₹${Number(sizePrice).toLocaleString("en-IN")})` : ""}
                       </option>
                     );
                   })}

@@ -97,7 +97,7 @@ export default function Checkout() {
       if (i.selectedSize) line += ` [${i.selectedSize}]`
       if (i.selectedPersonalisation?.length > 0) line += ` [${i.selectedPersonalisation.join(', ')}]`
       if (i.orderNote?.trim()) line += ` | Note: ${i.orderNote.trim()}`
-      line += ` — ₹${(i.price * i.qty).toLocaleString('en-IN')}`
+      line += ` (₹${(i.price * i.qty).toLocaleString('en-IN')})`
       return line
     }).join('\n')
 

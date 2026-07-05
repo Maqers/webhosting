@@ -74,8 +74,8 @@ const FAQs = () => {
   return (
     <div className="faqs">
       <SeoHead
-        title="FAQs — Orders, Shipping & Payments"
-        description="Common questions about ordering on Maqers — how to pay, delivery timelines, customisation options, and returns."
+        title="FAQs: Orders, Shipping & Payments"
+        description="Common questions about ordering on Maqers: how to pay, delivery timelines, customisation options, and returns."
         url="/faqs"
       />
       <div className="faqs-hero">

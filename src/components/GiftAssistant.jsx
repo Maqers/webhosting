@@ -251,7 +251,7 @@ export default function GiftAssistant() {
           <div className="gift-modal-header">
             <div>
               <h2 className="gift-modal-title">✨ AI Gift Finder</h2>
-              <p className="gift-modal-subtitle">3 quick questions — our AI picks what actually fits</p>
+              <p className="gift-modal-subtitle">3 quick questions, our AI picks what actually fits</p>
             </div>
             <button className="gift-modal-close" onClick={handleClose} aria-label="Close" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="18" height="18" aria-hidden="true">
@@ -272,7 +272,7 @@ export default function GiftAssistant() {
             {!loading && results && (
               <div className="gift-results">
                 <p className="gift-results-label">
-                  Great picks for <strong>{recipient.label}</strong> — <strong>{occasion.label}</strong>
+                  Great picks for <strong>{recipient.label}</strong>, <strong>{occasion.label}</strong>
                 </p>
                 <div className="gift-results-list">
                   {results.map(r => (

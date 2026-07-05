@@ -10,7 +10,7 @@ export default function ByProduct() {
     <div className="by-page">
       <SeoHead
         title="Shop Gifts by Category"
-        description="Browse handcrafted gifts by category — jewellery, candles, home decor, soaps, hampers and more. All from independent Indian artisans."
+        description="Browse handcrafted gifts by category: jewellery, candles, home decor, soaps, hampers and more. All from independent Indian artisans."
         url="/by-product"
       />
       <div className="by-page-header">
