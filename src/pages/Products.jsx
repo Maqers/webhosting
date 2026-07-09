@@ -155,8 +155,14 @@ const Products = () => {
   }, [sortBy, selectedCategories.length, filteredProducts.length])
 
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      sessionStorage.setItem('productsScrollY', window.scrollY)
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        sessionStorage.setItem('productsScrollY', window.scrollY)
+        ticking = false
+      })
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
