@@ -1,9 +1,14 @@
 import { useEffect } from 'react'
 
 // On touch grids, simulate desktop's :hover image-crossfade by activating
-// only the single row closest to the viewport's vertical center (scrollspy
+// only the row closest to the viewport's vertical center (scrollspy
 // pattern), instead of letting every card decide independently whether it's
 // "visible enough" — the latter causes many rows to swap at once on scroll.
+//
+// Uses IntersectionObserver against a thin band around the viewport's
+// vertical center instead of a scroll listener, so nothing runs
+// querySelectorAll/getBoundingClientRect on every scroll frame — that
+// per-frame layout work was what made the page scroll jerkily on mobile.
 export function useMobileCenterSwap(containerRef, zoneSelector = '.feat-img-zone.has-second-img', deps = []) {
   useEffect(() => {
     const container = containerRef.current
@@ -11,49 +16,40 @@ export function useMobileCenterSwap(containerRef, zoneSelector = '.feat-img-zone
     const isTouch = window.matchMedia('(hover: none) and (max-width: 768px)').matches
     if (!isTouch) return
 
-    let ticking = false
+    const intersecting = new Set()
     let activeEls = []
 
-    const update = () => {
-      ticking = false
-      const zones = container.querySelectorAll(zoneSelector)
-      if (!zones.length) return
-      const viewportCenter = window.innerHeight / 2
-      const candidates = []
-      zones.forEach((el) => {
-        const rect = el.getBoundingClientRect()
-        if (rect.bottom < 0 || rect.top > window.innerHeight) return
-        const elCenter = rect.top + rect.height / 2
-        candidates.push({ el, top: rect.top, dist: Math.abs(elCenter - viewportCenter) })
-      })
-      candidates.sort((a, b) => a.dist - b.dist)
-
-      const winners = new Set()
-      if (candidates[0] && candidates[0].dist < window.innerHeight * 0.35) {
-        // Include any other card in the same row as the closest one
-        candidates.forEach((c) => {
-          if (Math.abs(c.top - candidates[0].top) < 8) winners.add(c.el)
-        })
+    const applyWinners = () => {
+      if (intersecting.size === 0) {
+        activeEls.forEach((el) => el.classList.remove('mobile-swap'))
+        activeEls = []
+        return
       }
-
+      // All zones intersecting the thin center band are effectively "one row"
+      // (the band is narrow enough that two different rows rarely both hit it).
+      const winners = intersecting
       activeEls.forEach((el) => { if (!winners.has(el)) el.classList.remove('mobile-swap') })
       winners.forEach((el) => el.classList.add('mobile-swap'))
       activeEls = Array.from(winners)
     }
 
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true
-        requestAnimationFrame(update)
-      }
-    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) intersecting.add(entry.target)
+        else intersecting.delete(entry.target)
+      })
+      applyWinners()
+    }, {
+      // Shrink the observed viewport to a thin 10% band around vertical center
+      rootMargin: '-45% 0px -45% 0px',
+      threshold: 0,
+    })
 
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+    const zones = container.querySelectorAll(zoneSelector)
+    zones.forEach((el) => observer.observe(el))
+
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      observer.disconnect()
       activeEls.forEach((el) => el.classList.remove('mobile-swap'))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
