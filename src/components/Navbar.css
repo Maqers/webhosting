@@ -58,7 +58,6 @@
   height: var(--navbar-height-mobile);
   padding: 0 12px;
   box-sizing: border-box;
-  transition: height 0.2s ease;
 }
 .mobile-left  { display: flex; align-items: center; gap: 4px; flex: 1; }
 .mobile-right { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: flex-end; }
@@ -81,12 +80,14 @@
   .navbar-container   { height: var(--navbar-height-desktop); }
 }
 
-/* Scrolled shrink on mobile */
-@media (max-width: 968px) {
-  .navbar.scrolled .navbar-mobile-row { height: 48px; }
-  .navbar.scrolled .logo-text         { font-size: 1rem; }
-  .navbar.scrolled .navbar-icon-btn svg { width: 16px; height: 16px; }
-}
+/* Note: the navbar deliberately does NOT shrink height on scroll on mobile.
+   It used to (48px vs 56px), but pages with a second sticky element below
+   the navbar (e.g. Products' category-circles banner) must pin their own
+   `top` offset to the navbar's height, and a height that changes on scroll
+   meant that offset was either wrong (gap) or had to be kept in sync via a
+   CSS transition — which fights position:sticky's compositor-only fast path
+   and is what caused the visible jitter/shake while scrolling. Keeping the
+   navbar height constant removes the problem at the source. */
 
 /* ============================================================================
    LOGO

@@ -44,12 +44,6 @@
   z-index: 99;
   box-shadow: var(--shadow-sm);
   width: 100%;
-  transition: top 0.2s ease;
-}
-
-/* Navbar shrinks by 8px on scroll (mobile) — follow it so no gap opens up below it */
-@media (max-width: 968px) {
-  .navbar.scrolled ~ main .products-filters-section { top: 48px; }
 }
 
 .filters-wrapper {
