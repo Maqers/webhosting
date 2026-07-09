@@ -9,6 +9,8 @@ import CartDrawer from './components/CartDrawer'
 import WishlistDrawer from './components/WishlistDrawer'
 import BottomNav from './components/BottomNav'
 import ChunkErrorBoundary from './components/ChunkErrorBoundary'
+import LoginModal from './components/LoginModal'
+import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
 import { initScrollAnimations, cleanupScrollAnimations } from './utils/scrollAnimations'
@@ -27,6 +29,7 @@ const SellerPage = lazy(() => import('./pages/SellerPage'))
 const Checkout = lazy(() => import('./pages/Checkout'))
 const ByOccasion = lazy(() => import('./pages/ByOccasion'))
 const ByProduct = lazy(() => import('./pages/ByProduct'))
+const OrderHistory = lazy(() => import('./pages/OrderHistory'))
 
 const RouteLoadingFallback = () => (
   <div style={{
@@ -59,6 +62,7 @@ function AppContent() {
       <Navbar />
       <CartDrawer />
       <WishlistDrawer />
+      <LoginModal />
       <main>
         <ChunkErrorBoundary>
         <Suspense fallback={<RouteLoadingFallback />}>
@@ -76,6 +80,7 @@ function AppContent() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/by-occasion" element={<ByOccasion />} />
             <Route path="/by-product" element={<ByProduct />} />
+            <Route path="/orders" element={<OrderHistory />} />
           </Routes>
         </Suspense>
         </ChunkErrorBoundary>
@@ -96,13 +101,15 @@ function App() {
         v7_relativeSplatPath: true
       }}
     >
-      <CartProvider>
-        <WishlistProvider>
-          <div className="App">
-            <AppContent />
-          </div>
-        </WishlistProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <div className="App">
+              <AppContent />
+            </div>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   )
 }

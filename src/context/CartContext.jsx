@@ -1,7 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { trackEvent } from '../utils/analytics'
+import { useSupabaseSync } from '../hooks/useSupabaseSync'
 
 const CartContext = createContext(null)
+
+function mergeCarts(local, remote) {
+  const byKey = new Map(remote.map(i => [i.key, i]))
+  local.forEach(i => byKey.set(i.key, i)) // local wins on conflict, freshest device
+  return Array.from(byKey.values())
+}
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
@@ -15,6 +22,8 @@ export function CartProvider({ children }) {
   useEffect(() => {
     try { localStorage.setItem('maqers_cart', JSON.stringify(items)) } catch {}
   }, [items])
+
+  useSupabaseSync('cart', items, setItems, mergeCarts)
 
   const addItem = useCallback((product, selectedColor = '', selectedSize = '', selectedPersonalisation = [], orderNote = '') => {
     setItems(prev => {

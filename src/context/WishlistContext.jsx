@@ -1,7 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { trackEvent } from '../utils/analytics'
+import { useSupabaseSync } from '../hooks/useSupabaseSync'
 
 const WishlistContext = createContext(null)
+
+function mergeWishlists(local, remote) {
+  const byId = new Map(remote.map(i => [i.id, i]))
+  local.forEach(i => byId.set(i.id, i)) // local wins on conflict, freshest device
+  return Array.from(byId.values())
+}
 
 export function WishlistProvider({ children }) {
   const [items, setItems] = useState(() => {
@@ -15,6 +22,8 @@ export function WishlistProvider({ children }) {
   useEffect(() => {
     try { localStorage.setItem('maqers_wishlist', JSON.stringify(items)) } catch {}
   }, [items])
+
+  useSupabaseSync('wishlist', items, setItems, mergeWishlists)
 
   const toggleItem = useCallback((product) => {
     setItems(prev => {

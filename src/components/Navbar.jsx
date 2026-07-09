@@ -4,6 +4,7 @@ import EnhancedSearchBar from './EnhancedSearchBar'
 import { getSortedCategories } from '../data/catalog'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
+import { useAuth } from '../context/AuthContext'
 import './Navbar.css'
 
 // Product categories are derived directly from catalog.js — no manual sync needed.
@@ -139,6 +140,7 @@ const Navbar = () => {
 
   const { count, setIsOpen: setCartOpen } = useCart()
   const { count: wishlistCount, setIsOpen: setWishlistOpen } = useWishlist()
+  const { isLoggedIn, user, openLoginModal, logout } = useAuth()
 
   const menuItems = [    { path: '/',        label: 'Home'       },
     { path: '/about',   label: 'About'      },
@@ -147,6 +149,20 @@ const Navbar = () => {
   ]
 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
+  const accountRef = useRef(null)
+
+  useEffect(() => {
+    if (!accountMenuOpen) return
+    const fn = (e) => { if (accountRef.current && !accountRef.current.contains(e.target)) setAccountMenuOpen(false) }
+    document.addEventListener('mousedown', fn, true)
+    return () => document.removeEventListener('mousedown', fn, true)
+  }, [accountMenuOpen])
+
+  const handleAccountClick = () => {
+    if (isLoggedIn) setAccountMenuOpen(o => !o)
+    else openLoginModal()
+  }
 
   return (
     <>
@@ -275,6 +291,24 @@ const Navbar = () => {
                 ))}
               </div>
               <div className="navbar-icons">
+                <div className="navbar-account-wrap" ref={accountRef}>
+                  <button className="navbar-icon-btn" onClick={handleAccountClick} aria-label={isLoggedIn ? 'Account menu' : 'Log in'} type="button">
+                    <div className="navbar-cart-icon-wrap">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </div>
+                    <span className="navbar-icon-label">{isLoggedIn ? 'Account' : 'Login'}</span>
+                  </button>
+                  {accountMenuOpen && isLoggedIn && (
+                    <div className="navbar-account-dropdown">
+                      <p className="navbar-account-phone">{user?.phone}</p>
+                      <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Orders</Link>
+                      <button className="navbar-account-item navbar-account-logout" onClick={() => { logout(); setAccountMenuOpen(false) }} type="button">Log out</button>
+                    </div>
+                  )}
+                </div>
                 <button className="navbar-icon-btn" onClick={() => setWishlistOpen(true)} aria-label="Open wishlist" type="button">
                   <div className="navbar-cart-icon-wrap">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -361,6 +395,15 @@ const Navbar = () => {
             {menuItems.filter(i => i.path !== '/').map((item) => (
               <Link key={item.path} to={item.path} className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>{item.label}</Link>
             ))}
+
+            {isLoggedIn ? (
+              <>
+                <Link to="/orders" className={`mobile-menu-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Orders ({user?.phone})</Link>
+                <button className="mobile-menu-link" onClick={() => { logout(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Log out</button>
+              </>
+            ) : (
+              <button className="mobile-menu-link" onClick={() => { openLoginModal(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Login</button>
+            )}
           </div>
         </nav>
       </div>

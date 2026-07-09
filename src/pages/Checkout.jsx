@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
+import { supabaseRest } from '../config/supabaseConfig'
 import SeoHead from '../components/SeoHead'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
@@ -42,6 +44,7 @@ function AppIcon({ app }) {
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart()
+  const { user, isLoggedIn, accessToken } = useAuth()
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
   const grandTotal = total + deliveryFee
@@ -64,7 +67,7 @@ export default function Checkout() {
   }, [])
 
   const [form, setForm] = useState({
-    name: '', email: '', phone: '',
+    name: '', email: '', phone: user?.phone ? user.phone.replace(/^\+91/, '') : '',
     address: '', city: '', pincode: '', state: '',
   })
   const [paymentMethod, setPaymentMethod] = useState('upi')
@@ -150,6 +153,27 @@ export default function Checkout() {
     }
   }
 
+  const saveOrderToSupabase = async (oid) => {
+    if (!isLoggedIn || !user?.id) return
+    try {
+      await supabaseRest('orders', {
+        method: 'POST',
+        accessToken,
+        body: {
+          user_id: user.id,
+          order_ref: oid,
+          phone: form.phone,
+          items,
+          subtotal: total,
+          total: grandTotal,
+          status: 'placed',
+        },
+      })
+    } catch (err) {
+      console.error('Saving order to Supabase failed:', err)
+    }
+  }
+
   const handlePlaceOrder = async () => {
     setSubmitAttempted(true)
     if (!validate()) return
@@ -172,6 +196,7 @@ export default function Checkout() {
     }
 
     await sendCustomerConfirmation(oid)
+    await saveOrderToSupabase(oid)
 
     trackEvent('Purchase', {
       order_id: oid,
