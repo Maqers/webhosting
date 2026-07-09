@@ -39,11 +39,20 @@
   background: var(--bg-primary);
   padding: 0.3rem 0;
   border-bottom: 1px solid var(--border-light);
-  position: sticky;
-  top: var(--navbar-height-mobile, 64px);
-  z-index: 99;
   box-shadow: var(--shadow-sm);
   width: 100%;
+}
+
+/* Pinned state is applied via JS (IntersectionObserver), not CSS position:sticky.
+   Stacking two native position:sticky elements (this + the navbar above it)
+   triggers known iOS Safari rendering bugs that make this banner visibly
+   jitter while scrolling. `top` is set inline from the navbar's measured
+   height so it can never drift out of sync with it. */
+.products-filters-section--pinned {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 99;
 }
 
 .filters-wrapper {
@@ -358,7 +367,7 @@
 
 @media (min-width: 768px) and (max-width: 968px) {
   .products-hero { padding: var(--spacing-xl) 0; }
-  .products-filters-section { top: var(--navbar-height-tablet, 64px); padding: var(--spacing-md) 0; }
+  .products-filters-section { padding: var(--spacing-md) 0; }
   .filters-wrapper { gap: var(--spacing-lg); align-items: center; }
   .category-filters { gap: 0.75rem; }
   .filter-chip { padding: 0.75rem 1.375rem; font-size: 0.9375rem; min-height: 44px; }
@@ -377,7 +386,7 @@
 
 @media (max-width: 480px) {
   .products-hero { padding: 0.5rem 0 !important; }
-  .products-filters-section { top: var(--navbar-height-mobile, 64px); padding: 0.3rem 0 0.2rem !important; }
+  .products-filters-section { padding: 0.3rem 0 0.2rem !important; }
   .filters-wrapper { gap: 0.3rem !important; }
   .products-content { padding: 0.5rem 0 2rem !important; }
   .category-filters { gap: 0.5rem; }

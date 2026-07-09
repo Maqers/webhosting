@@ -299,9 +299,9 @@ button {
    ============================================================================ */
 
 @supports (-webkit-touch-callout: none) {
+  /* .products-filters-section intentionally excluded — pinned via JS now, see iphone-sort-fix.css */
   .navbar,
-  .sub-navbar,
-  .products-filters-section {
+  .sub-navbar {
     position: -webkit-sticky;
     position: sticky;
   }

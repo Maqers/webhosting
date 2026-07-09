@@ -115,6 +115,49 @@ const Products = () => {
 
   useEffect(() => { setVisibleCount(PAGE_SIZE) }, [sortBy, searchQuery])
 
+  // ── Pin the category-circles banner below the navbar via JS, not CSS
+  // position:sticky. Two stacked native sticky elements (navbar + this
+  // banner) trigger a well-known class of iOS Safari rendering bugs that
+  // make the banner visibly jitter while scrolling. Driving this with an
+  // IntersectionObserver + position:fixed sidesteps the browser's native
+  // sticky implementation entirely.
+  const sentinelRef = useRef(null)
+  const filtersSectionRef = useRef(null)
+  const [isPinned, setIsPinned] = useState(false)
+  const [navHeight, setNavHeight] = useState(0)
+  const [filtersHeight, setFiltersHeight] = useState(0)
+
+  useEffect(() => {
+    const navbarEl = document.querySelector('.navbar')
+    if (!navbarEl) return
+    const measure = () => setNavHeight(navbarEl.getBoundingClientRect().height)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(navbarEl)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const el = filtersSectionRef.current
+    if (!el) return
+    const measure = () => setFiltersHeight(el.getBoundingClientRect().height)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel || navHeight === 0) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsPinned(!entry.isIntersecting),
+      { rootMargin: `-${navHeight}px 0px 0px 0px`, threshold: 0 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [navHeight])
+
   const handleCategoryToggle = useCallback((categoryId) => {
     setSelectedCategories(prev => {
       if (categoryId === 'All') return []
@@ -189,7 +232,13 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <div className="products-filters-section">
+      <div ref={sentinelRef} aria-hidden="true" />
+      {isPinned && <div style={{ height: filtersHeight }} aria-hidden="true" />}
+      <div
+        ref={filtersSectionRef}
+        className={`products-filters-section${isPinned ? ' products-filters-section--pinned' : ''}`}
+        style={isPinned ? { top: navHeight } : undefined}
+      >
         <div className="container">
           <div className="filters-wrapper">
             <div className="category-circles-strip category-circles-strip--products">

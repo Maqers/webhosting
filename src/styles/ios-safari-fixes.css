@@ -323,10 +323,13 @@ html {
     }
   }
   
-  /* Fix sticky positioning on iOS */
+  /* Fix sticky positioning on iOS.
+     Note: .products-filters-section is intentionally excluded — it's now
+     pinned via JS (IntersectionObserver + position:fixed), not CSS sticky,
+     since stacking it as a second sticky element under the navbar caused
+     iOS-specific scroll jitter. */
   .navbar,
-  .sub-navbar,
-  .products-filters-section {
+  .sub-navbar {
     position: -webkit-sticky;
     position: sticky;
   }

@@ -212,16 +212,10 @@
     opacity: 1 !important;
   }
   
-  /* Filters section - ensure it's above products.
-     NOTE: do NOT add a transform here (translateZ(0) or otherwise) — iOS Safari
-     has a well-known bug where applying any transform to a position:sticky
-     element itself (not just a parent) makes it visibly jitter/flicker while
-     scrolling instead of staying pinned. That was previously here and was the
-     actual cause of the shaky category-circles banner on Products/Categories. */
-  .products-filters-section {
-    position: sticky !important;
-    z-index: 99 !important;
-  }
+  /* .products-filters-section no longer pinned via CSS position:sticky at all —
+     it's now driven by JS (IntersectionObserver + position:fixed) in Products.jsx,
+     specifically because stacking it as a second sticky element under the sticky
+     navbar caused iOS-only scroll jitter that no CSS-only fix fully resolved. */
 }
 
 /* ============================================================================
