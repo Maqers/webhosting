@@ -32,7 +32,12 @@
   margin: 0;
 }
 
-.storefront-grid {
+.storefront-grid.featured-grid {
+  /* Home.css sets min-height: 600px on .featured-grid to avoid layout shift when
+     there are many rows of products. A maker's storefront often has just one
+     short row, so that same min-height would stretch cards far taller than
+     their content, pushing the Add to Cart/Wishlist row down. Reset it here. */
+  min-height: 0;
   margin-top: 0;
 }
 
