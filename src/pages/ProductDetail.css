@@ -571,6 +571,13 @@
 }
 .more-from-maker-viewall:hover { opacity: 0.7; }
 
+.more-from-maker-empty {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
 .more-from-maker-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

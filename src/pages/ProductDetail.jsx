@@ -261,16 +261,22 @@ const ProductDetail = () => {
   }
 
   // ── More from this maker logic ─────────────────────────────────────────────
+  // A real sellerCode on this product always wins, even if this happens to be
+  // that maker's only catalog item right now — their storefront link is still
+  // valid and should still be offered. Only products with NO sellerCode at
+  // all fall back to a same-category recommendation, which is a genuinely
+  // different, unrelated-sellers grid and must never be mislabeled as "more
+  // from this maker".
   const getMoreFromMaker = () => {
     const allProds = getAllProducts().filter(p => p.id !== product.id && p.inStock)
     const sellerCode = product.meta?.sellerCode
     if (sellerCode) {
       const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode)
-      if (fromSeller.length > 0) return { products: fromSeller, sellerCode }
+      return { products: fromSeller, sellerCode, isMaker: true }
     }
-    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6), sellerCode: null }
+    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6), sellerCode: null, isMaker: false }
   }
-  const { products: moreProducts, sellerCode: makerCode } = getMoreFromMaker()
+  const { products: moreProducts, sellerCode: makerCode, isMaker } = getMoreFromMaker()
   const moreProductsGridRef = useRef(null)
   useMobileCenterSwap(moreProductsGridRef, '.feat-img-zone.has-second-img', [moreProducts.length])
 
@@ -610,20 +616,27 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {/* More from this maker — compact FeaturedCard grid */}
-          {moreProducts.length > 0 && (
+          {/* More from this maker — compact FeaturedCard grid. Only ever
+              labeled "this maker" when it's a real sellerCode match; the
+              same-category fallback (no sellerCode on this product at all)
+              is a different, unrelated-sellers grid and is labeled as such. */}
+          {(moreProducts.length > 0 || (isMaker && makerCode)) && (
             <div className="more-from-maker">
               <div className="more-from-maker-header">
-                <h3 className="more-from-maker-title">More from this maker</h3>
-                {makerCode && (
+                <h3 className="more-from-maker-title">{isMaker ? "More from this maker" : "You may also like"}</h3>
+                {isMaker && makerCode && (
                   <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">View all →</Link>
                 )}
               </div>
-              <div className="more-from-maker-grid" ref={moreProductsGridRef}>
-                {moreProducts.slice(0, 4).map((p, i) => (
-                  <FeaturedCard key={p.id} product={p} index={i} />
-                ))}
-              </div>
+              {moreProducts.length > 0 ? (
+                <div className="more-from-maker-grid" ref={moreProductsGridRef}>
+                  {moreProducts.slice(0, 4).map((p, i) => (
+                    <FeaturedCard key={p.id} product={p} index={i} />
+                  ))}
+                </div>
+              ) : (
+                <p className="more-from-maker-empty">This is currently their only listed product.</p>
+              )}
             </div>
           )}
         </div>

@@ -2557,6 +2557,22 @@ export default function AdminPortal() {
             {editingSeller && (
               <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
                 <h2 style={ts.cardTitle}>Edit: {editingSeller.business_name}</h2>
+                <label style={ts.label}>Seller URL <span style={ts.labelHint}>(share this on their story/QR code)</span></label>
+                {editingSeller.seller_code ? (
+                  <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+                    <input readOnly style={{ ...ts.input, flex: 1, marginTop: 0, background: "#faf7f5", color: "#888" }}
+                      value={`${window.location.origin}/maker/${editingSeller.seller_code}`}
+                      onFocus={e => e.target.select()} />
+                    <button type="button" style={{ ...ts.ghostBtn, flexShrink: 0 }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/maker/${editingSeller.seller_code}`);
+                        showToast("Seller URL copied!");
+                      }}>Copy</button>
+                    <a href={`/maker/${editingSeller.seller_code}`} target="_blank" rel="noreferrer" style={{ ...ts.ghostBtn, flexShrink: 0, textDecoration: "none", display: "flex", alignItems: "center" }}>↗ View</a>
+                  </div>
+                ) : (
+                  <p style={{ ...ts.labelHint, marginBottom: 16 }}>Set a seller code below to generate their storefront link.</p>
+                )}
                 <div style={ts.grid2}>
                   <div>
                     <label style={ts.label}>Business Name</label>
@@ -2699,6 +2715,10 @@ export default function AdminPortal() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
                 {sellers.map(seller => {
                   const sellerProducts = products.filter(p => (seller.product_ids||[]).includes(p.id));
+                  // The live site (storefront page + "more from this maker") reads
+                  // meta.sellerCode from catalog.js, not this Supabase record's
+                  // product_ids — the two can drift apart. Surface that gap here.
+                  const catalogLinkedCount = products.filter(p => p.meta?.sellerCode === seller.seller_code).length;
                   return (
                     <div key={seller.id} style={ts.catCard}>
                       <div style={ts.catCardTop}>
@@ -2717,6 +2737,10 @@ export default function AdminPortal() {
                       )}
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                         <span style={ts.flag}>{(seller.product_ids||[]).length} products</span>
+                        {catalogLinkedCount === 0
+                          ? <span style={{ ...ts.flag, background: "#feeeed", color: "#c00" }} title="No catalog products have this seller_code — their storefront link will be empty">⚠ 0 in catalog</span>
+                          : <span style={{ ...ts.flag, background: "#e8f5e8", color: "#2a7a2a" }}>{catalogLinkedCount} in catalog</span>
+                        }
                         <span style={{ ...ts.flag, background: "#f0f0f0", color: "#888" }}>
                           {(seller.kyc_documents||[]).length} doc(s)
                         </span>
