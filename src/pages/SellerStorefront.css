@@ -1,0 +1,49 @@
+.storefront-page {
+  min-height: 100vh;
+  background: var(--bg-secondary, #f5f3f0);
+  padding: 2rem 0 4rem;
+}
+
+.storefront-back {
+  display: inline-block;
+  color: var(--text-secondary, #888);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  transition: color 0.15s;
+}
+.storefront-back:hover { color: var(--text-primary, #1a1714); }
+
+.storefront-header {
+  margin-bottom: 2rem;
+}
+
+.storefront-title {
+  font-family: var(--font-family-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1714);
+  margin: 0 0 0.4rem;
+}
+
+.storefront-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #888);
+  margin: 0;
+}
+
+.storefront-grid {
+  margin-top: 0;
+}
+
+.storefront-empty {
+  text-align: center;
+  padding: 5rem 1rem;
+  color: var(--text-secondary, #888);
+}
+
+.storefront-empty h2 {
+  font-family: var(--font-family-heading);
+  color: var(--text-primary, #1a1714);
+  margin: 0 0 0.5rem;
+}

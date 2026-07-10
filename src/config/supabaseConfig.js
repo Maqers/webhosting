@@ -1,5 +1,5 @@
 // Shared Supabase project config, reused by AuthContext, Checkout, and OrderHistory.
-// Same public anon key already embedded in SellerPage.jsx / AdminPortal.jsx.
+// Same public anon key already embedded in AdminPortal.jsx.
 export const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co"
 export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0"
 
