@@ -18,33 +18,41 @@ export default function SellerPage() {
   useEffect(() => {
     async function load() {
       setLoading(true)
+      // Supabase only holds enrichment (business name, address, docs) for sellers
+      // who went through onboarding. Plenty of sellers only exist as a
+      // meta.sellerCode on their products in catalog.js, so a missing Supabase
+      // row must NOT 404 the page — the catalog is the real source of truth.
+      let sbSeller = null
       try {
         const res = await fetch(
           `${SUPABASE_URL}/rest/v1/sellers_db?seller_code=eq.${encodeURIComponent(sellerCode)}&select=*`,
           { headers: SB_HEADERS }
         )
         const data = await res.json()
-        if (!data || data.length === 0) { setNotFound(true); return }
-
-        const s = data[0]
-        setSeller(s)
-
-        // Source of truth is catalog.js meta.sellerCode — this keeps the seller
-        // page in sync with "More from this maker" on the product page, even if
-        // a product was linked/edited without going through the Supabase sync step.
-        const allProds = getAllProducts()
-        const bySellerCode = allProds.filter(p => p.meta?.sellerCode === s.seller_code)
-        if (bySellerCode.length > 0) {
-          setProducts(bySellerCode)
-        } else {
-          const productIds = s.product_ids || []
-          setProducts(productIds.map(id => allProds.find(p => p.id === id)).filter(Boolean))
-        }
+        if (data && data.length > 0) sbSeller = data[0]
       } catch {
-        setNotFound(true)
-      } finally {
-        setLoading(false)
+        // Supabase unreachable — fall through and rely on the catalog alone
       }
+
+      const allProds = getAllProducts()
+      const matchCode = sbSeller?.seller_code || sellerCode
+      const bySellerCode = allProds.filter(p => p.meta?.sellerCode === matchCode)
+
+      if (!sbSeller && bySellerCode.length === 0) {
+        setNotFound(true)
+        setLoading(false)
+        return
+      }
+
+      setSeller(sbSeller || { business_name: matchCode, seller_code: matchCode, owners: [], location: '', address: '', pincode: '', notes: '' })
+
+      if (bySellerCode.length > 0) {
+        setProducts(bySellerCode)
+      } else {
+        const productIds = sbSeller?.product_ids || []
+        setProducts(productIds.map(id => allProds.find(p => p.id === id)).filter(Boolean))
+      }
+      setLoading(false)
     }
     load()
   }, [sellerCode])
