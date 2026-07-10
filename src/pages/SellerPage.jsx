@@ -29,9 +29,15 @@ export default function SellerPage() {
         const s = data[0]
         setSeller(s)
 
-        const productIds = s.product_ids || []
-        if (productIds.length > 0) {
-          const allProds = getAllProducts()
+        // Source of truth is catalog.js meta.sellerCode — this keeps the seller
+        // page in sync with "More from this maker" on the product page, even if
+        // a product was linked/edited without going through the Supabase sync step.
+        const allProds = getAllProducts()
+        const bySellerCode = allProds.filter(p => p.meta?.sellerCode === s.seller_code)
+        if (bySellerCode.length > 0) {
+          setProducts(bySellerCode)
+        } else {
+          const productIds = s.product_ids || []
           setProducts(productIds.map(id => allProds.find(p => p.id === id)).filter(Boolean))
         }
       } catch {

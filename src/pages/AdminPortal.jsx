@@ -448,7 +448,7 @@ function buildEntry(id, product) {
 
   const sizePricesPart = sizePricesStr ? `, sizePrices: ${sizePricesStr}` : "";
   const reviewsPart = (product.reviews && product.reviews.length > 0)
-    ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}" }`).join(", ")}]`
+    ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}"${r.image ? `, image: "${sanitizeForJS(r.image)}"` : ""} }`).join(", ")}]`
     : "";
   return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
@@ -569,8 +569,9 @@ export default function AdminPortal() {
   const [editColorInput, setEditColorInput] = useState("");
   const [editColorImageIdx, setEditColorImageIdx] = useState(0);
   const [editSizeInput, setEditSizeInput] = useState("");
-  const [newReviewInput, setNewReviewInput] = useState({ name: "", rating: 5, text: "", date: "" });
-  const [editReviewInput, setEditReviewInput] = useState({ name: "", rating: 5, text: "", date: "" });
+  const [newReviewInput, setNewReviewInput] = useState({ name: "", rating: 5, text: "", date: "", photoFile: null });
+  const [editReviewInput, setEditReviewInput] = useState({ name: "", rating: 5, text: "", date: "", photoFile: null });
+  const [editReviewUploading, setEditReviewUploading] = useState(false);
   const [productQueue, setProductQueue] = useState([]); // batch add queue
   const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
@@ -654,6 +655,20 @@ export default function AdminPortal() {
   }
 
   function handleLogout() { sessionStorage.removeItem("maqers_admin_creds"); setCreds({}); setStep("login"); }
+
+  function extFromMime(mime) {
+    return (mime || "image/jpeg").split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+  }
+
+  function readReviewPhoto(file, setInput) {
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = ev => setInput(r => ({
+      ...r,
+      photoFile: { preview: ev.target.result, base64: ev.target.result.split(",")[1], mime: file.type },
+    }));
+    reader.readAsDataURL(file);
+  }
 
   function processFiles(files) {
     Array.from(files).filter(f => f.type.startsWith("image/")).forEach(file => {
@@ -751,7 +766,20 @@ export default function AdminPortal() {
       log("Updating catalog.js...");
       const { source, sha } = await fetchCatalog(creds);
       const newId = getNextId(source);
-      const fullProduct = { ...newProduct, price: Number(newProduct.price), images: imagePaths };
+      const reviews = [];
+      for (const rv of (newProduct.reviews || [])) {
+        const review = { name: rv.name, rating: rv.rating, text: rv.text, date: rv.date };
+        if (rv._photoFile) {
+          log("Uploading review photo...");
+          const fname = `review-${newId}-${Date.now()}.${extFromMime(rv._photoFile.mime)}`;
+          await ghPut(`public/images/${fname}`, rv._photoFile.base64, `Add review photo: ${fname}`, undefined, creds);
+          review.image = `/images/${fname}`;
+        } else if (rv.image) {
+          review.image = rv.image;
+        }
+        reviews.push(review);
+      }
+      const fullProduct = { ...newProduct, price: Number(newProduct.price), images: imagePaths, reviews };
       let updated = insertProductIntoSource(source, fullProduct, newId);
       for (const occ of (newProduct.occasions || [])) {
         updated = updated.replace(
@@ -928,6 +956,26 @@ export default function AdminPortal() {
       }]);
       reader.readAsDataURL(file);
     });
+  }
+
+  async function handleAddEditReview() {
+    if (!editReviewInput.name.trim()) return;
+    const review = { name: editReviewInput.name, rating: editReviewInput.rating, text: editReviewInput.text, date: editReviewInput.date };
+    if (editReviewInput.photoFile) {
+      setEditReviewUploading(true);
+      try {
+        const fname = `review-${editingProduct.id}-${Date.now()}.${extFromMime(editReviewInput.photoFile.mime)}`;
+        await ghPut(`public/images/${fname}`, editReviewInput.photoFile.base64, `Add review photo: ${fname}`, undefined, creds);
+        review.image = `/images/${fname}`;
+      } catch (err) {
+        showToast("Photo upload failed: " + err.message, "error");
+        setEditReviewUploading(false);
+        return;
+      }
+      setEditReviewUploading(false);
+    }
+    setEditingProduct(p => ({ ...p, reviews: [...(p.reviews||[]), review] }));
+    setEditReviewInput({ name: "", rating: 5, text: "", date: "", photoFile: null });
   }
 
   async function uploadEditImages() {
@@ -1466,14 +1514,25 @@ export default function AdminPortal() {
                           <input style={{ ...ts.input, width: 110, marginTop: 0 }} placeholder="Date" value={newReviewInput.date} onChange={e => setNewReviewInput(r => ({ ...r, date: e.target.value }))} />
                         </div>
                         <div style={{ display: "flex", gap: 8 }}>
+                          <input type="file" accept="image/*" id="new-review-photo-input" style={{ display: "none" }}
+                            onChange={e => { readReviewPhoto(e.target.files[0], setNewReviewInput); e.target.value = ""; }} />
+                          <label htmlFor="new-review-photo-input" title="Attach customer photo (optional)"
+                            style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 8, border: "1px dashed #d8c9c9", background: newReviewInput.photoFile ? `url(${newReviewInput.photoFile.preview}) center/cover` : "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+                            {!newReviewInput.photoFile && <span style={{ fontSize: 16, color: "#c9b8b8" }}>📷</span>}
+                            {newReviewInput.photoFile && (
+                              <span onClick={e => { e.preventDefault(); setNewReviewInput(r => ({ ...r, photoFile: null })); }}
+                                style={{ position: "absolute", top: -6, right: -6, width: 16, height: 16, borderRadius: "50%", background: "#1a1714", color: "#fff", fontSize: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>×</span>
+                            )}
+                          </label>
                           <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Review text (optional)" value={newReviewInput.text} onChange={e => setNewReviewInput(r => ({ ...r, text: e.target.value }))} />
                           <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                            onClick={() => { if (newReviewInput.name.trim()) { setNewProduct(p => ({ ...p, reviews: [...(p.reviews||[]), { ...newReviewInput }] })); setNewReviewInput({ name: "", rating: 5, text: "", date: "" }); } }}>+</button>
+                            onClick={() => { if (newReviewInput.name.trim()) { setNewProduct(p => ({ ...p, reviews: [...(p.reviews||[]), { name: newReviewInput.name, rating: newReviewInput.rating, text: newReviewInput.text, date: newReviewInput.date, _photoFile: newReviewInput.photoFile, image: newReviewInput.photoFile?.preview || "" }] })); setNewReviewInput({ name: "", rating: 5, text: "", date: "", photoFile: null }); } }}>+</button>
                         </div>
                         {(newProduct.reviews||[]).length > 0 && (
                           <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
                             {newProduct.reviews.map((r, i) => (
                               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                                {r.image ? <img src={r.image} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} /> : null}
                                 <span>{"★".repeat(r.rating)}</span>
                                 <span style={{ fontWeight: 600 }}>{r.name}</span>
                                 {r.text && <span style={{ color: "#888", flex: 1 }}>{r.text}</span>}
@@ -1944,14 +2003,25 @@ export default function AdminPortal() {
                               <input style={{ ...ts.input, width: 110, marginTop: 0 }} placeholder="Date" value={editReviewInput.date} onChange={e => setEditReviewInput(r => ({ ...r, date: e.target.value }))} />
                             </div>
                             <div style={{ display: "flex", gap: 8 }}>
+                              <input type="file" accept="image/*" id="edit-review-photo-input" style={{ display: "none" }}
+                                onChange={e => { readReviewPhoto(e.target.files[0], setEditReviewInput); e.target.value = ""; }} />
+                              <label htmlFor="edit-review-photo-input" title="Attach customer photo (optional)"
+                                style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 8, border: "1px dashed #d8c9c9", background: editReviewInput.photoFile ? `url(${editReviewInput.photoFile.preview}) center/cover` : "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+                                {!editReviewInput.photoFile && <span style={{ fontSize: 16, color: "#c9b8b8" }}>📷</span>}
+                                {editReviewInput.photoFile && (
+                                  <span onClick={e => { e.preventDefault(); setEditReviewInput(r => ({ ...r, photoFile: null })); }}
+                                    style={{ position: "absolute", top: -6, right: -6, width: 16, height: 16, borderRadius: "50%", background: "#1a1714", color: "#fff", fontSize: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>×</span>
+                                )}
+                              </label>
                               <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Review text (optional)" value={editReviewInput.text} onChange={e => setEditReviewInput(r => ({ ...r, text: e.target.value }))} />
-                              <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                                onClick={() => { if (editReviewInput.name.trim()) { setEditingProduct(p => ({ ...p, reviews: [...(p.reviews||[]), { ...editReviewInput }] })); setEditReviewInput({ name: "", rating: 5, text: "", date: "" }); } }}>+</button>
+                              <button type="button" disabled={editReviewUploading} style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0, opacity: editReviewUploading ? 0.6 : 1 }}
+                                onClick={handleAddEditReview}>{editReviewUploading ? "…" : "+"}</button>
                             </div>
                             {(editingProduct.reviews||[]).length > 0 && (
                               <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
                                 {editingProduct.reviews.map((r, i) => (
                                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                                    {r.image ? <img src={r.image} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} /> : null}
                                     <span>{"★".repeat(r.rating)}</span>
                                     <span style={{ fontWeight: 600 }}>{r.name}</span>
                                     {r.text && <span style={{ color: "#888", flex: 1 }}>{r.text}</span>}

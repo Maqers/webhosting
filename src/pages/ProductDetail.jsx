@@ -88,6 +88,7 @@ const ProductDetail = () => {
 
   // ── Track recently viewed ──────────────────────────────────────────────────
   const [recentlyViewed, setRecentlyViewed] = useState([])
+  const [reviewPhotoLightbox, setReviewPhotoLightbox] = useState(null)
   useEffect(() => {
     if (!product) return
     const KEY = 'maqers_recently_viewed'
@@ -591,16 +592,33 @@ const ProductDetail = () => {
                         {r.date && <span className="review-date">{r.date}</span>}
                       </div>
                       {r.text && <p className="review-text">{r.text}</p>}
+                      {r.image && (
+                        <button type="button" className="review-photo-thumb" onClick={() => setReviewPhotoLightbox(r.image)} aria-label="View customer photo">
+                          <img src={r.image} alt={`Photo from ${r.name}`} loading="lazy" />
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
           </div>
           )}
 
+          {reviewPhotoLightbox && (
+            <div className="review-photo-lightbox" onClick={() => setReviewPhotoLightbox(null)}>
+              <img src={reviewPhotoLightbox} alt="Customer review" onClick={e => e.stopPropagation()} />
+              <button type="button" className="review-photo-lightbox-close" onClick={() => setReviewPhotoLightbox(null)} aria-label="Close">×</button>
+            </div>
+          )}
+
           {/* More from this maker — compact FeaturedCard grid */}
           {moreProducts.length > 0 && (
             <div className="more-from-maker">
-              <h3 className="more-from-maker-title">More from this maker</h3>
+              <div className="more-from-maker-header">
+                <h3 className="more-from-maker-title">More from this maker</h3>
+                {makerCode && (
+                  <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">View all →</Link>
+                )}
+              </div>
               <div className="more-from-maker-grid" ref={moreProductsGridRef}>
                 {moreProducts.slice(0, 4).map((p, i) => (
                   <FeaturedCard key={p.id} product={p} index={i} />
