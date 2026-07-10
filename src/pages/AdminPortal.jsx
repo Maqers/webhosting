@@ -573,6 +573,7 @@ export default function AdminPortal() {
   const [editReviewInput, setEditReviewInput] = useState({ name: "", rating: 5, text: "", date: "", photoFile: null });
   const [editReviewUploading, setEditReviewUploading] = useState(false);
   const [linkAudit, setLinkAudit] = useState(null);
+  const [viewingSeller, setViewingSeller] = useState(null);
   const [productQueue, setProductQueue] = useState([]); // batch add queue
   const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
@@ -2666,6 +2667,95 @@ export default function AdminPortal() {
               </div>
             )}
 
+            {/* Seller Detail View — internal-only, full business info + product
+                grid with IDs, no cart/wishlist. Distinct from the public
+                /maker/:sellerCode storefront (SellerStorefront.jsx), which is
+                shoppable and shows no business info at all. */}
+            {viewingSeller && (() => {
+              const catalogProducts = products.filter(p => p.sellerCode === viewingSeller.seller_code);
+              const detailProducts = catalogProducts.length > 0
+                ? catalogProducts
+                : products.filter(p => (viewingSeller.product_ids || []).includes(p.id));
+              return (
+                <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+                    <div>
+                      <h2 style={ts.cardTitle}>{viewingSeller.business_name}</h2>
+                      <span style={{ fontSize: 12, color: "#c8a96e", fontWeight: 700, fontFamily: "monospace" }}>{viewingSeller.seller_code}</span>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {viewingSeller.seller_code && (
+                        <a href={`/maker/${viewingSeller.seller_code}`} target="_blank" rel="noreferrer" style={{ ...ts.ghostBtn, textDecoration: "none" }}>↗ Public storefront</a>
+                      )}
+                      <button style={ts.ghostBtn} onClick={() => setViewingSeller(null)}>✕ Close</button>
+                    </div>
+                  </div>
+
+                  <div style={{ ...ts.grid2, marginTop: 16 }}>
+                    <div>
+                      <label style={ts.label}>Owner(s)</label>
+                      <p style={{ margin: "2px 0 0", fontSize: 14 }}>{(viewingSeller.owners || []).length > 0 ? viewingSeller.owners.join(", ") : "—"}</p>
+                    </div>
+                    <div>
+                      <label style={ts.label}>City</label>
+                      <p style={{ margin: "2px 0 0", fontSize: 14 }}>{viewingSeller.location || "—"}</p>
+                    </div>
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <label style={ts.label}>Address</label>
+                      <p style={{ margin: "2px 0 0", fontSize: 14 }}>{viewingSeller.address || "—"}</p>
+                    </div>
+                    <div>
+                      <label style={ts.label}>Pincode</label>
+                      <p style={{ margin: "2px 0 0", fontSize: 14 }}>{viewingSeller.pincode || "—"}</p>
+                    </div>
+                    <div>
+                      <label style={ts.label}>GST</label>
+                      <p style={{ margin: "2px 0 0", fontSize: 14 }}>{viewingSeller.gst_registered ? (viewingSeller.gst_number || "Registered") : "Not registered"}</p>
+                    </div>
+                    {(viewingSeller.hsn_codes || []).length > 0 && (
+                      <div>
+                        <label style={ts.label}>HSN Codes</label>
+                        <p style={{ margin: "2px 0 0", fontSize: 14 }}>{viewingSeller.hsn_codes.join(", ")}</p>
+                      </div>
+                    )}
+                    <div>
+                      <label style={ts.label}>Delivery / Commission</label>
+                      <p style={{ margin: "2px 0 0", fontSize: 14 }}>{viewingSeller.delivery_handled_by === "maqers" ? "Maqers ships" : "Seller ships"} · {viewingSeller.commission_pct ?? 10}%</p>
+                    </div>
+                    {viewingSeller.notes && (
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={ts.label}>Notes</label>
+                        <p style={{ margin: "2px 0 0", fontSize: 14, fontStyle: "italic", color: "#888" }}>{viewingSeller.notes}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ marginTop: 20, borderTop: "1px solid #eee", paddingTop: 16 }}>
+                    <h3 style={{ ...ts.cardTitle, marginBottom: 12 }}>Products <span style={{ fontWeight: 400, color: "#888" }}>({detailProducts.length})</span></h3>
+                    {detailProducts.length === 0 ? (
+                      <p style={{ color: "#aaa", fontSize: 13 }}>No products linked yet.</p>
+                    ) : (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
+                        {detailProducts.map(p => (
+                          <div key={p.id} style={{ border: "1px solid #eee", borderRadius: 8, overflow: "hidden", background: "#fff" }}>
+                            <div style={{ width: "100%", aspectRatio: "1", background: "#f5f3f0" }}>
+                              <img src={p.images?.[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+                            </div>
+                            <div style={{ padding: "8px 10px" }}>
+                              <p style={{ margin: "0 0 2px", fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.5 }}>{p.categoryId}</p>
+                              <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>{p.title}</p>
+                              <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#760909" }}>₹{Number(p.price).toLocaleString("en-IN")}</p>
+                              <p style={{ margin: 0, fontSize: 10, color: "#bbb", fontFamily: "monospace" }}>ID {p.id}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Edit Seller Form */}
             {editingSeller && (
               <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
@@ -2837,7 +2927,7 @@ export default function AdminPortal() {
                       <div style={ts.catCardTop}>
                         <span style={{ fontSize: 13, fontWeight: 700, color: "#c8a96e", fontFamily: "monospace" }}>{seller.seller_code || seller.id}</span>
                         <div style={{ display: "flex", gap: 6 }}>
-                          <a href={`/maker/${seller.seller_code || seller.id}`} target="_blank" rel="noreferrer" style={{ ...ts.editBtn, textDecoration: "none" }}>↗ View</a>
+                          <button style={ts.editBtn} onClick={() => setViewingSeller(seller)}>View</button>
                           <button style={ts.editBtn} onClick={() => { setEditingSeller({ ...seller }); setKycFiles([]); }}>Edit</button>
                         </div>
                       </div>
