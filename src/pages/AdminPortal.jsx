@@ -792,7 +792,7 @@ export default function AdminPortal() {
       // Link product to seller in Supabase and store seller_code
       if (newProduct.sellerId) {
         try {
-          await handleLinkProductToSeller(newProduct.sellerId, newId);
+          await handleLinkProductToSeller(newProduct.sellerId, newId, { syncCatalog: false });
         } catch {}
       }
       loadCatalogData(updated, sha);
@@ -827,7 +827,7 @@ export default function AdminPortal() {
             (_, open, content, close) => { const t = content.trimEnd(); return `${open}${t}${t.endsWith(",") ? " " : ", "}${currentId}${close}`; }
           );
         }
-        if (qp.sellerId) { try { await handleLinkProductToSeller(qp.sellerId, currentId); } catch {} }
+        if (qp.sellerId) { try { await handleLinkProductToSeller(qp.sellerId, currentId, { syncCatalog: false }); } catch {} }
         log(`Queued "${qp.title}" as ID ${currentId}`);
         currentId++;
       }
@@ -1168,15 +1168,40 @@ export default function AdminPortal() {
     finally { setPublishing(false); setKycUploading(false); }
   }
 
-  async function handleLinkProductToSeller(sellerId, productId) {
+  // `syncCatalog: false` is only for the two call sites right after a brand
+  // new product is committed (its sellerId/sellerCode are already written
+  // into catalog.js as part of that same commit) — everywhere else this must
+  // stay true. Without it, this only ever updated Supabase's product_ids,
+  // which the live site (storefront page, "more from this maker") never
+  // reads — the product page reads meta.sellerCode from catalog.js, so a
+  // product linked here would show as linked in admin but nowhere on the
+  // actual site. That drift is what was reported as "keeps breaking".
+  async function handleLinkProductToSeller(sellerId, productId, { syncCatalog = true } = {}) {
     const seller = sellers.find(s => s.id === sellerId);
     if (!seller) return;
     const current = seller.product_ids || [];
-    const updated = current.includes(productId) ? current.filter(id => id !== productId) : [...current, productId];
+    const isLinking = !current.includes(productId);
+    const updated = isLinking ? [...current, productId] : current.filter(id => id !== productId);
     try {
+      if (syncCatalog) {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          if (isLinking && product.sellerCode && product.sellerCode !== seller.seller_code) {
+            const proceed = window.confirm(
+              `"${product.title}" is currently linked to seller code "${product.sellerCode}" in the catalog. Reassign it to "${seller.seller_code}"?`
+            );
+            if (!proceed) return;
+          }
+          const { source, sha } = await fetchCatalog(creds);
+          const patched = { ...product, sellerId: isLinking ? seller.id : "", sellerCode: isLinking ? (seller.seller_code || "") : "" };
+          const newSource = updateProductInSource(source, patched);
+          await commitCatalog(newSource, sha, `${isLinking ? "Link" : "Unlink"} product ${productId} ${isLinking ? "to" : "from"} seller ${seller.seller_code || sellerId} in catalog`, creds);
+          setProducts(prev => prev.map(p => p.id === productId ? patched : p));
+        }
+      }
       await sbUpdateSeller(sellerId, { product_ids: updated });
       await loadSellers();
-      showToast("Seller products updated!");
+      showToast(syncCatalog ? "Linked and catalog updated — live in ~45s" : "Seller products updated!");
     } catch (err) { showToast(err.message, "error"); }
   }
 
@@ -2718,7 +2743,7 @@ export default function AdminPortal() {
                   // The live site (storefront page + "more from this maker") reads
                   // meta.sellerCode from catalog.js, not this Supabase record's
                   // product_ids — the two can drift apart. Surface that gap here.
-                  const catalogLinkedCount = products.filter(p => p.meta?.sellerCode === seller.seller_code).length;
+                  const catalogLinkedCount = products.filter(p => p.sellerCode === seller.seller_code).length;
                   return (
                     <div key={seller.id} style={ts.catCard}>
                       <div style={ts.catCardTop}>
