@@ -194,114 +194,70 @@ function parseProducts(source) {
       keywords: [], colors: [], sizes: [],
     });
   }
-  // Parse keywords separately
-  const kwRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{\s*keywords:\s*\[([^\]]*)\]/g;
-  let km;
-  while ((km = kwRegex.exec(source)) !== null) {
-    const id = parseInt(km[1]);
-    const kws = km[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
-    const p = products.find(p => p.id === id);
-    if (p) p.keywords = kws;
-  }
-  // Parse colors (new format: [{name, imageIndex}])
-  const colRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*colors:\s*\[([^\]]*)\]/g;
-  let cl;
-  while ((cl = colRegex.exec(source)) !== null) {
-    const id = parseInt(cl[1]);
-    const p = products.find(p => p.id === id);
-    if (!p) continue;
-    const raw = cl[2].trim();
-    if (!raw) { p.colors = []; continue; }
-    // Try object format first: { name: "Red", imageIndex: 0 }
-    if (raw.includes("name:")) {
-      const objRegex = /\{\s*name:\s*"([^"]+)",\s*imageIndex:\s*(\d+)\s*\}/g;
-      const cols = [];
-      let om;
-      while ((om = objRegex.exec(raw)) !== null) {
-        cols.push({ name: om[1], imageIndex: parseInt(om[2]) });
-      }
-      p.colors = cols;
-    } else {
-      // Legacy string format
-      p.colors = raw.split(",").map(s => ({ name: s.trim().replace(/^"|"$/g, ""), imageIndex: 0 })).filter(c => c.name);
-    }
-  }
-  // Parse sizes
-  const szRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*sizes:\s*\[([^\]]*)\]/g;
-  let sz;
-  while ((sz = szRegex.exec(source)) !== null) {
-    const id = parseInt(sz[1]);
-    const sizes = sz[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
-    const p = products.find(p => p.id === id);
-    if (p) p.sizes = sizes;
-  }
-  // Parse sizePrices (e.g. sizePrices: { "Small": 499, "Large": 699 })
-  const spRegex = /id:\s*(\d+)[\s\S]*?sizePrices:\s*(\{[^}]+\})/g;
-  let sp;
-  while ((sp = spRegex.exec(source)) !== null) {
-    const id = parseInt(sp[1]);
-    const p = products.find(p => p.id === id);
-    if (p) {
-      try {
-        p.sizePrices = JSON.parse(sp[2].replace(/(['"])?([a-zA-Z0-9_ ]+)(['"])?:/g, '"$2":'));
-      } catch {
-        // malformed — skip
+  // Every secondary meta field below is parsed from each product's own
+  // brace-bounded entry text (via getEntryRange), never scanned across the
+  // whole file. The previous approach used a `[^}]*` guard from "meta: {" to
+  // each field name — which silently stops at the FIRST `}` it sees. Any
+  // product with object-format colors or a sizePrices object (both contain a
+  // `}` before reaching later fields like sizes, moq, delivery_time,
+  // secondaryCategories, sellerId, or sellerCode) would have all of those
+  // later fields quietly parsed as empty, even though the file had the real
+  // value — and re-saving from that stale-empty state wiped the real data.
+  for (const p of products) {
+    const range = getEntryRange(source, p.id);
+    if (!range) continue;
+    const entry = source.slice(range.start, range.end);
+
+    const kw = entry.match(/keywords:\s*\[([^\]]*)\]/);
+    if (kw) p.keywords = kw[1].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+
+    const col = entry.match(/colors:\s*\[([^\]]*)\]/);
+    if (col) {
+      const raw = col[1].trim();
+      if (!raw) {
+        p.colors = [];
+      } else if (raw.includes("name:")) {
+        // Object format: { name: "Red", imageIndex: 0 }
+        const objRegex = /\{\s*name:\s*"([^"]+)",\s*imageIndex:\s*(\d+)\s*\}/g;
+        const cols = [];
+        let om;
+        while ((om = objRegex.exec(raw)) !== null) cols.push({ name: om[1], imageIndex: parseInt(om[2]) });
+        p.colors = cols;
+      } else {
+        // Legacy string format
+        p.colors = raw.split(",").map(s => ({ name: s.trim().replace(/^"|"$/g, ""), imageIndex: 0 })).filter(c => c.name);
       }
     }
-  }
-  // Parse reviews array
-  const revRegex = /id:\s*(\d+)[\s\S]*?reviews:\s*\[([^\]]*)\]/g;
-  let rv;
-  while ((rv = revRegex.exec(source)) !== null) {
-    const id = parseInt(rv[1]);
-    const p = products.find(p => p.id === id);
-    if (!p || !rv[2].trim()) continue;
-    try {
-      const safe = rv[2].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":');
-      p.reviews = JSON.parse(`[${safe}]`);
-    } catch {
-      // malformed — skip
+
+    const sz = entry.match(/sizes:\s*\[([^\]]*)\]/);
+    if (sz) p.sizes = sz[1].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+
+    const sp = entry.match(/sizePrices:\s*(\{[^}]*\})/);
+    if (sp) {
+      try { p.sizePrices = JSON.parse(sp[1].replace(/(['"])?([a-zA-Z0-9_ ]+)(['"])?:/g, '"$2":')); }
+      catch { /* malformed — skip */ }
     }
-  }
-  // Parse moq
-  const moqRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*moq:\s*(\d+)/g;
-  let mq;
-  while ((mq = moqRegex.exec(source)) !== null) {
-    const id = parseInt(mq[1]);
-    const p = products.find(p => p.id === id);
-    if (p) p.moq = parseInt(mq[2]) || 0;
-  }
-  // Parse delivery_time
-  const dtRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*delivery_time:\s*"([^"]*)"/g;
-  let dt;
-  while ((dt = dtRegex.exec(source)) !== null) {
-    const id = parseInt(dt[1]);
-    const p = products.find(p => p.id === id);
-    if (p) p.delivery_time = dt[2];
-  }
-  // Parse secondaryCategories
-  const scRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*secondaryCategories:\s*\[([^\]]*)\]/g;
-  let sc;
-  while ((sc = scRegex.exec(source)) !== null) {
-    const id = parseInt(sc[1]);
-    const cats = sc[2].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
-    const p = products.find(p => p.id === id);
-    if (p) p.secondaryCategories = cats;
-  }
-  // Parse sellerId and sellerCode
-  const sellerIdRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*sellerId:\s*"([^"]*)"/g;
-  let si;
-  while ((si = sellerIdRegex.exec(source)) !== null) {
-    const id = parseInt(si[1]);
-    const p = products.find(p => p.id === id);
-    if (p) p.sellerId = si[2];
-  }
-  const sellerCodeRegex = /id:\s*(\d+)[\s\S]*?meta:\s*\{[^}]*sellerCode:\s*"([^"]*)"/g;
-  let sco;
-  while ((sco = sellerCodeRegex.exec(source)) !== null) {
-    const id = parseInt(sco[1]);
-    const p = products.find(p => p.id === id);
-    if (p) p.sellerCode = sco[2];
+
+    const rv = entry.match(/reviews:\s*\[([^\]]*)\]/);
+    if (rv && rv[1].trim()) {
+      try { p.reviews = JSON.parse(`[${rv[1].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":')}]`); }
+      catch { /* malformed — skip */ }
+    }
+
+    const mq = entry.match(/moq:\s*(\d+)/);
+    if (mq) p.moq = parseInt(mq[1]) || 0;
+
+    const dt = entry.match(/delivery_time:\s*"([^"]*)"/);
+    if (dt) p.delivery_time = dt[1];
+
+    const sc = entry.match(/secondaryCategories:\s*\[([^\]]*)\]/);
+    if (sc) p.secondaryCategories = sc[1].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+
+    const si = entry.match(/sellerId:\s*"([^"]*)"/);
+    if (si) p.sellerId = si[1];
+
+    const sco = entry.match(/sellerCode:\s*"([^"]*)"/);
+    if (sco) p.sellerCode = sco[1];
   }
   return products;
 }
