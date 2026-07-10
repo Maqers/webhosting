@@ -572,6 +572,7 @@ export default function AdminPortal() {
   const [newReviewInput, setNewReviewInput] = useState({ name: "", rating: 5, text: "", date: "", photoFile: null });
   const [editReviewInput, setEditReviewInput] = useState({ name: "", rating: 5, text: "", date: "", photoFile: null });
   const [editReviewUploading, setEditReviewUploading] = useState(false);
+  const [linkAudit, setLinkAudit] = useState(null);
   const [productQueue, setProductQueue] = useState([]); // batch add queue
   const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
@@ -1203,6 +1204,59 @@ export default function AdminPortal() {
       await loadSellers();
       showToast(syncCatalog ? "Linked and catalog updated — live in ~45s" : "Seller products updated!");
     } catch (err) { showToast(err.message, "error"); }
+  }
+
+  // Supabase's sellers_db.product_ids has always been the real record of what
+  // was actually clicked "link" on, even during the period handleLinkProductToSeller
+  // only wrote there and never touched catalog.js — so it's the source to
+  // recover from. Finds every (seller, product) pair where Supabase says
+  // they're linked but catalog.js's meta.sellerCode disagrees.
+  function runLinkAudit() {
+    const mismatches = [];
+    for (const seller of sellers) {
+      for (const pid of (seller.product_ids || [])) {
+        const product = products.find(p => p.id === pid);
+        if (!product) continue; // product_ids references an id no longer in catalog
+        if (product.sellerCode !== (seller.seller_code || "")) {
+          mismatches.push({
+            key: `${seller.id}-${pid}`,
+            sellerId: seller.id,
+            sellerCode: seller.seller_code,
+            sellerName: seller.business_name,
+            productId: pid,
+            productTitle: product.title,
+            currentSellerCode: product.sellerCode || "(none)",
+            checked: true,
+          });
+        }
+      }
+    }
+    setLinkAudit(mismatches);
+  }
+
+  async function applyLinkAudit() {
+    const toApply = (linkAudit || []).filter(m => m.checked);
+    if (!toApply.length) return;
+    setPublishing(true); setPublishLog([]);
+    const log = msg => setPublishLog(prev => [...prev, msg]);
+    try {
+      const { source, sha } = await fetchCatalog(creds);
+      let updated = source;
+      for (const m of toApply) {
+        const product = products.find(p => p.id === m.productId);
+        const seller = sellers.find(s => s.id === m.sellerId);
+        if (!product || !seller) continue;
+        const patched = { ...product, sellerId: seller.id, sellerCode: seller.seller_code || "" };
+        updated = updateProductInSource(updated, patched);
+        log(`Linked "${product.title}" (ID ${product.id}) -> ${seller.seller_code}`);
+      }
+      await commitCatalog(updated, sha, `Reconcile ${toApply.length} seller-product link(s) from Supabase into catalog`, creds);
+      log(`Done. ${toApply.length} product(s) updated — live in ~45s.`);
+      await refreshCatalog();
+      setLinkAudit(null);
+      showToast(`${toApply.length} link(s) synced to catalog!`);
+    } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
+    finally { setPublishing(false); }
   }
 
   async function handleDeleteKYC(seller, path) {
@@ -2470,6 +2524,40 @@ export default function AdminPortal() {
                 </button>
                 <button style={ts.primaryBtn} onClick={() => setShowAddSeller(s => !s)}>+ Add Seller</button>
               </div>
+            </div>
+
+            {/* Seller <-> Catalog Link Audit — recovers links from before the
+                linking bug fix, where Supabase's product_ids was updated but
+                catalog.js's meta.sellerCode never was. */}
+            <div style={{ ...ts.card, marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+                <div>
+                  <h3 style={ts.cardTitle}>Seller ↔ Catalog Link Audit</h3>
+                  <p style={{ ...ts.labelHint, marginTop: 4 }}>Finds products Supabase says are linked to a seller that catalog.js doesn't reflect yet.</p>
+                </div>
+                <button style={ts.ghostBtn} onClick={runLinkAudit}>🔍 Check for unsynced links</button>
+              </div>
+              {linkAudit && (
+                linkAudit.length === 0 ? (
+                  <p style={{ color: "#2a7a2a", marginTop: 12, fontSize: 13 }}>✓ Everything is in sync — no mismatches found.</p>
+                ) : (
+                  <div style={{ marginTop: 12 }}>
+                    <p style={{ fontSize: 13, color: "#888", marginBottom: 8 }}>{linkAudit.length} mismatch(es) found — review before applying:</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 300, overflowY: "auto" }}>
+                      {linkAudit.map((m, i) => (
+                        <label key={m.key} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, background: "#faf7f5", padding: "8px 10px", borderRadius: 6, border: "1px solid #ede0e0" }}>
+                          <input type="checkbox" checked={m.checked}
+                            onChange={() => setLinkAudit(prev => prev.map((x, j) => j === i ? { ...x, checked: !x.checked } : x))} />
+                          <span><strong>{m.productTitle}</strong> (ID {m.productId}) — catalog has "{m.currentSellerCode}", Supabase says it belongs to <strong>{m.sellerCode}</strong> ({m.sellerName})</span>
+                        </label>
+                      ))}
+                    </div>
+                    <button style={{ ...ts.primaryBtn, marginTop: 12 }} onClick={applyLinkAudit} disabled={publishing || !linkAudit.some(m => m.checked)}>
+                      {publishing ? "Applying..." : `Apply ${linkAudit.filter(m => m.checked).length} change(s) to catalog`}
+                    </button>
+                  </div>
+                )
+              )}
             </div>
 
             {/* Add Seller Form */}
