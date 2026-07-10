@@ -341,7 +341,10 @@
 /* Desktop Styles (> 968px) */
 @media (min-width: 969px) {
   .sub-navbar {
-    top: var(--navbar-height-desktop, 120px); /* Match desktop navbar height */
+    /* Desktop navbar is no longer sticky (scrolls away with the page), so
+       this sticky sub-navbar has nothing above it to offset for once it's
+       scrolled past that point — pin it flush to the top instead. */
+    top: 0;
   }
 
   .sub-navbar-container {

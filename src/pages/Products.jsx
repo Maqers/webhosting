@@ -150,8 +150,13 @@ const Products = () => {
   useEffect(() => {
     const sentinel = sentinelRef.current
     if (!sentinel || navHeight === 0) return
+    // Desktop navbar is not sticky (position: static), so there's nothing
+    // fixed at the top for this banner to pin itself below there — doing so
+    // would offset it by navHeight into a blank gap where the navbar used to
+    // be before it scrolled away. Only pin on mobile, where the navbar stays
+    // sticky.
     const observer = new IntersectionObserver(
-      ([entry]) => setIsPinned(!entry.isIntersecting),
+      ([entry]) => setIsPinned(window.innerWidth >= 969 ? false : !entry.isIntersecting),
       { rootMargin: `-${navHeight}px 0px 0px 0px`, threshold: 0 }
     )
     observer.observe(sentinel)
