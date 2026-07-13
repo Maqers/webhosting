@@ -1,33 +1,25 @@
 import SeoHead from '../components/SeoHead'
 import { getWhatsAppNumber } from '../data/contactInfo'
-import './ShippingReturns.css'
+import './PolicyPage.css'
 
-const ShippingReturns = () => {
+const Policies = () => {
   return (
     <div className="policy-page">
       <SeoHead
-        title="Shipping & Returns Policy"
-        description="Maqers shipping timelines and our returns, exchange, and damaged-product policy."
-        url="/shipping-returns"
+        title="Returns & Refund Policy"
+        description="Maqers returns, exchange, and damaged-product policy."
+        url="/policies"
       />
 
       <div className="policy-hero">
         <div className="container">
-          <h1 className="policy-title">Shipping & Returns</h1>
+          <h1 className="policy-title">Policies</h1>
           <p className="policy-subtitle">Please read this before placing your order</p>
         </div>
       </div>
 
       <div className="container">
         <section className="policy-content">
-
-          <div className="policy-section">
-            <h2>Shipping</h2>
-            <p>Every product on Maqers is handmade, and many are made specially for you only after your order is placed. Because of this, dispatch and delivery timelines vary by product and seller, the estimated delivery window is shown on each product page.</p>
-            <ul>
-              <li>Once a package is handed over to our courier partner, we are not liable for delays caused by the courier.</li>
-            </ul>
-          </div>
 
           <div className="policy-section">
             <h2>Returns & Exchanges</h2>
@@ -60,4 +52,4 @@ const ShippingReturns = () => {
   )
 }
 
-export default ShippingReturns
+export default Policies

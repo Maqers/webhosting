@@ -17,9 +17,10 @@ const Footer = () => {
 
         <div className="footer-col">
           <h4 className="footer-col-title">Quick Links</h4>
-          <Link to="/faqs"    className="footer-link">FAQs</Link>
-          <Link to="/shipping-returns" className="footer-link">Shipping</Link>
-          <Link to="/contact" className="footer-link">Contact Us</Link>
+          <Link to="/faqs"     className="footer-link">FAQs</Link>
+          <Link to="/shipping" className="footer-link">Shipping</Link>
+          <Link to="/policies" className="footer-link">Policies</Link>
+          <Link to="/contact"  className="footer-link">Contact Us</Link>
         </div>
 
         <div className="footer-col footer-col--logo">

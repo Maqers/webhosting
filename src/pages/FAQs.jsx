@@ -30,7 +30,7 @@ const FAQs = () => {
     },
     {
       question: "What is your return policy?",
-      answer: "We do not offer returns or exchanges, as every product is handcrafted to order by an independent artisan. If your order arrives damaged, defective, or different from what you ordered, record an unedited unboxing video and share it with us on WhatsApp within 48 hours of delivery. Once our team reviews it and confirms the issue, we will book a reverse pickup (RTO) and initiate your return. See our Shipping & Returns page for the full policy."
+      answer: "We do not offer returns or exchanges, as every product is handcrafted to order by an independent artisan. If your order arrives damaged, defective, or different from what you ordered, record an unedited unboxing video and share it with us on WhatsApp within 48 hours of delivery. Once our team reviews it and confirms the issue, we will book a reverse pickup (RTO) and initiate your return. See our Policies page for the full policy."
     },
     {
       question: "Are the sellers on Maqers verified?",
