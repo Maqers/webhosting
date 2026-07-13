@@ -18,6 +18,7 @@ const Footer = () => {
         <div className="footer-col">
           <h4 className="footer-col-title">Quick Links</h4>
           <Link to="/faqs"    className="footer-link">FAQs</Link>
+          <Link to="/shipping-returns" className="footer-link">Shipping & Returns</Link>
           <Link to="/contact" className="footer-link">Contact Us</Link>
         </div>
 

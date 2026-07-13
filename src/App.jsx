@@ -23,6 +23,7 @@ const Categories = lazy(() => import('./pages/Categories'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const FAQs = lazy(() => import('./pages/FAQs'))
+const ShippingReturns = lazy(() => import('./pages/ShippingReturns'))
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 const SellerStorefront = lazy(() => import('./pages/SellerStorefront'))
@@ -73,6 +74,7 @@ function AppContent() {
             <Route path="/category/:name" element={<Categories />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/faqs" element={<FAQs />} />
+            <Route path="/shipping-returns" element={<ShippingReturns />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/admin" element={<AdminPortal />} />

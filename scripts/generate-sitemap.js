@@ -45,6 +45,7 @@ const staticPages = [
   { url: '/about',       priority: '0.5', changefreq: 'monthly' },
   { url: '/contact',     priority: '0.5', changefreq: 'monthly' },
   { url: '/faqs',        priority: '0.5', changefreq: 'monthly' },
+  { url: '/shipping-returns', priority: '0.4', changefreq: 'monthly' },
 ]
 
 const categoryPages = categoryIds.map(id => ({
