@@ -25,9 +25,7 @@ const ShippingReturns = () => {
             <h2>Shipping</h2>
             <p>Every product on Maqers is handmade, and many are made specially for you only after your order is placed. Because of this, dispatch and delivery timelines vary by product and seller, the estimated delivery window is shown on each product page.</p>
             <ul>
-              <li>Order prioritisation and expedited fulfilment requests are handled on a case by case basis and cannot be guaranteed for a specific date.</li>
               <li>Once a package is handed over to our courier partner, we are not liable for delays caused by the courier.</li>
-              <li>You will receive tracking details on WhatsApp once your order is shipped.</li>
             </ul>
           </div>
 
