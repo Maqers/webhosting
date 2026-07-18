@@ -445,7 +445,10 @@ function insertProductIntoSource(source, product, id) {
   }
 
   // Insert new entry before the closing ]
-  return source.slice(0, closingIdx) + ",\n" + entry + "\n  " + source.slice(closingIdx);
+  // `entry` already ends with its own trailing comma (see buildEntry), so no
+  // extra separator comma is added here — doing so previously created a
+  // double-comma / array-elision bug ("},," ) whenever a product was inserted.
+  return source.slice(0, closingIdx) + "\n" + entry + "\n  " + source.slice(closingIdx);
 }
 
 function insertCategoryIntoSource(source, cat, order) {
