@@ -18,6 +18,10 @@
       "destination": "/assets/$1"
     },
     {
+      "source": "/images/(.*)",
+      "destination": "/images/$1"
+    },
+    {
       "source": "/ingest/static/(.*)",
       "destination": "https://eu-assets.i.posthog.com/static/$1"
     },
