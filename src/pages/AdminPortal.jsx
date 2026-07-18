@@ -649,6 +649,12 @@ export default function AdminPortal() {
   // photos (often 4-8MB) never get committed to the repo uncompressed.
   // PNGs stay PNG (need alpha-transparency support); everything else
   // becomes JPEG, matching what compress-images does server-side.
+  //
+  // Also renders a .webp variant from the same canvas — ImageWithFallback
+  // always requests "<name>.webp" first, and without one every upload
+  // pays a wasted request before falling back to the real image on
+  // first load (webpBase64 is null if the browser can't encode webp,
+  // e.g. old Safari; the caller just skips uploading the sidecar then).
   function compressProductImage(base64, mimeType, maxDim = 1400, quality = 0.82) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -666,11 +672,17 @@ export default function AdminPortal() {
         ctx.drawImage(img, 0, 0, width, height);
         const outMime = mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
         const dataUrl = canvas.toDataURL(outMime, quality);
-        resolve({ base64: dataUrl.split(',')[1], mimeType: outMime });
+        const webpDataUrl = canvas.toDataURL('image/webp', quality);
+        const webpBase64 = webpDataUrl.startsWith('data:image/webp') ? webpDataUrl.split(',')[1] : null;
+        resolve({ base64: dataUrl.split(',')[1], mimeType: outMime, webpBase64 });
       };
       img.onerror = reject;
       img.src = `data:${mimeType};base64,${base64}`;
     });
+  }
+
+  function toWebpName(name) {
+    return name.replace(/\.[^.]+$/, '.webp');
   }
 
   function processFiles(files) {
@@ -678,8 +690,9 @@ export default function AdminPortal() {
       const reader = new FileReader();
       reader.onload = async ev => {
         const rawBase64 = ev.target.result.split(",")[1];
-        const { base64, mimeType } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type }));
-        setImageFiles(prev => [...prev, { file, preview: ev.target.result, name: uniqueImageName(file.name), base64, mime: mimeType }]);
+        const { base64, mimeType, webpBase64 } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type, webpBase64: null }));
+        const name = uniqueImageName(file.name);
+        setImageFiles(prev => [...prev, { file, preview: ev.target.result, name, base64, mime: mimeType, webpBase64, webpName: toWebpName(name) }]);
       };
       reader.readAsDataURL(file);
     });
@@ -779,6 +792,9 @@ export default function AdminPortal() {
         let sha; try { const ex = await ghGet(`public/images/${img.name}`, creds); sha = ex.sha; } catch {}
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         imagePaths.push(`/images/${img.name}`);
+        if (img.webpBase64) {
+          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, undefined, creds);
+        }
       }
       log("Updating catalog.js...");
       const { source, sha } = await fetchCatalog(creds);
@@ -835,6 +851,9 @@ export default function AdminPortal() {
           let imgSha; try { const ex = await ghGet(`public/images/${img.name}`, creds); imgSha = ex.sha; } catch {}
           await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, imgSha, creds);
           imagePaths.push(`/images/${img.name}`);
+          if (img.webpBase64) {
+            await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, undefined, creds);
+          }
         }
         const fullProduct = { ...qp, price: Number(qp.price), images: imagePaths };
         source = insertProductIntoSource(source, fullProduct, currentId);
@@ -967,12 +986,15 @@ export default function AdminPortal() {
       const reader = new FileReader();
       reader.onload = async ev => {
         const rawBase64 = ev.target.result.split(",")[1];
-        const { base64, mimeType } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type }));
+        const { base64, mimeType, webpBase64 } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type, webpBase64: null }));
+        const name = uniqueImageName(file.name);
         setEditImageFiles(prev => [...prev, {
           preview: ev.target.result,
-          name: uniqueImageName(file.name),
+          name,
           base64,
           mime: mimeType,
+          webpBase64,
+          webpName: toWebpName(name),
         }]);
       };
       reader.readAsDataURL(file);
@@ -1008,6 +1030,9 @@ export default function AdminPortal() {
         let sha; try { const ex = await ghGet(`public/images/${img.name}`, creds); sha = ex.sha; } catch {}
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         newPaths.push(`/images/${img.name}`);
+        if (img.webpBase64) {
+          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, undefined, creds);
+        }
       }
       setEditingProduct(p => ({ ...p, images: [...p.images, ...newPaths] }));
       setEditImageFiles([]);
