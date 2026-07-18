@@ -644,17 +644,12 @@ export default function AdminPortal() {
     return `${uniqueId}-${base}${ext}`;
   }
 
-  function processFiles(files) {
-    Array.from(files).filter(f => f.type.startsWith("image/")).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = ev => setImageFiles(prev => [...prev, { file, preview: ev.target.result, name: uniqueImageName(file.name), base64: ev.target.result.split(",")[1], mime: file.type }]);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  const onDrop = useCallback(e => { e.preventDefault(); setDragOver(false); processFiles(e.dataTransfer.files); }, []);
-
-  function resizeImageForAI(base64, mimeType, maxDim = 1600, quality = 0.82) {
+  // Resizes to the site's standard product-photo ceiling (matches
+  // npm run compress-images: 1400px max side, quality 82) so raw camera
+  // photos (often 4-8MB) never get committed to the repo uncompressed.
+  // PNGs stay PNG (need alpha-transparency support); everything else
+  // becomes JPEG, matching what compress-images does server-side.
+  function compressProductImage(base64, mimeType, maxDim = 1400, quality = 0.82) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
@@ -669,12 +664,31 @@ export default function AdminPortal() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-        resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg' });
+        const outMime = mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
+        const dataUrl = canvas.toDataURL(outMime, quality);
+        resolve({ base64: dataUrl.split(',')[1], mimeType: outMime });
       };
       img.onerror = reject;
       img.src = `data:${mimeType};base64,${base64}`;
     });
+  }
+
+  function processFiles(files) {
+    Array.from(files).filter(f => f.type.startsWith("image/")).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = async ev => {
+        const rawBase64 = ev.target.result.split(",")[1];
+        const { base64, mimeType } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type }));
+        setImageFiles(prev => [...prev, { file, preview: ev.target.result, name: uniqueImageName(file.name), base64, mime: mimeType }]);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const onDrop = useCallback(e => { e.preventDefault(); setDragOver(false); processFiles(e.dataTransfer.files); }, []);
+
+  function resizeImageForAI(base64, mimeType, maxDim = 1600, quality = 0.82) {
+    return compressProductImage(base64, mimeType, maxDim, quality).then(r => ({ base64: r.base64, mimeType: r.mimeType === 'image/png' ? 'image/png' : 'image/jpeg' }));
   }
 
   async function runAiGenerate({ imageBase64, mimeType, imageUrl, extraDetails, onResult, onError, setGenerating }) {
@@ -951,12 +965,16 @@ export default function AdminPortal() {
   function processEditFiles(files) {
     Array.from(files).filter(f => f.type.startsWith("image/")).forEach(file => {
       const reader = new FileReader();
-      reader.onload = ev => setEditImageFiles(prev => [...prev, {
-        preview: ev.target.result,
-        name: uniqueImageName(file.name),
-        base64: ev.target.result.split(",")[1],
-        mime: file.type,
-      }]);
+      reader.onload = async ev => {
+        const rawBase64 = ev.target.result.split(",")[1];
+        const { base64, mimeType } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type }));
+        setEditImageFiles(prev => [...prev, {
+          preview: ev.target.result,
+          name: uniqueImageName(file.name),
+          base64,
+          mime: mimeType,
+        }]);
+      };
       reader.readAsDataURL(file);
     });
   }
