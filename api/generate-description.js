@@ -52,6 +52,12 @@ Formatting rules:
 - NO em dashes (use commas or colons instead).
 - Weave in natural SEO keywords (material, occasion, product type).
 
+Opening line rules (this is where generic AI copy fails, so follow closely):
+- NEVER start with "Elevate", "Indulge", "Unleash", "Discover", "Introducing", "Step into", "Immerse yourself", or any other stock marketing verb aimed at the shopper. These are banned as the first word.
+- Do not open with "Whether you're..." or "Perfect for..." either — save occasion-fit for later in the copy.
+- Instead, open with something concrete and specific to THIS image: a visual detail (a colour, a texture, a shape, a technique), a sensory detail, or a small, vivid scene the product belongs in. Ground it in what you actually see in the photo, not a generic category description.
+- Read your opening line back and ask: could this exact sentence be reused for a completely different product just by swapping the noun? If yes, rewrite it.
+
 Return ONLY a valid JSON object in exactly this format:
 {
   "title": "Specific product name, 4–7 words, title case",
