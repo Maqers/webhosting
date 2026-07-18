@@ -631,10 +631,23 @@ export default function AdminPortal() {
     reader.readAsDataURL(file);
   }
 
+  // Prefixes a short unique id onto the filename so it can never collide with
+  // an existing (or later-uploaded) file — including across extensions, since
+  // the site's WebP <picture> lookup derives its path by stripping the
+  // extension (e.g. "28.png" and "28.jpeg" both resolve to "28.webp").
+  function uniqueImageName(originalName) {
+    const clean = originalName.toLowerCase().replace(/\s+/g, "-");
+    const dot = clean.lastIndexOf(".");
+    const base = dot > 0 ? clean.slice(0, dot) : clean;
+    const ext = dot > 0 ? clean.slice(dot) : "";
+    const uniqueId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+    return `${uniqueId}-${base}${ext}`;
+  }
+
   function processFiles(files) {
     Array.from(files).filter(f => f.type.startsWith("image/")).forEach(file => {
       const reader = new FileReader();
-      reader.onload = ev => setImageFiles(prev => [...prev, { file, preview: ev.target.result, name: file.name.toLowerCase().replace(/\s+/g, "-"), base64: ev.target.result.split(",")[1], mime: file.type }]);
+      reader.onload = ev => setImageFiles(prev => [...prev, { file, preview: ev.target.result, name: uniqueImageName(file.name), base64: ev.target.result.split(",")[1], mime: file.type }]);
       reader.readAsDataURL(file);
     });
   }
@@ -940,7 +953,7 @@ export default function AdminPortal() {
       const reader = new FileReader();
       reader.onload = ev => setEditImageFiles(prev => [...prev, {
         preview: ev.target.result,
-        name: file.name.toLowerCase().replace(/\s+/g, "-"),
+        name: uniqueImageName(file.name),
         base64: ev.target.result.split(",")[1],
         mime: file.type,
       }]);
