@@ -638,19 +638,48 @@ export default function AdminPortal() {
 
   const onDrop = useCallback(e => { e.preventDefault(); setDragOver(false); processFiles(e.dataTransfer.files); }, []);
 
+  function resizeImageForAI(base64, mimeType, maxDim = 1600, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg' });
+      };
+      img.onerror = reject;
+      img.src = `data:${mimeType};base64,${base64}`;
+    });
+  }
+
   async function runAiGenerate({ imageBase64, mimeType, imageUrl, extraDetails, onResult, onError, setGenerating }) {
     setGenerating(true);
     onError('');
     try {
-      const body = imageBase64
-        ? { imageBase64, mimeType, extraDetails }
-        : { imageUrl, extraDetails };
+      let body;
+      if (imageBase64) {
+        const resized = await resizeImageForAI(imageBase64, mimeType).catch(() => ({ base64: imageBase64, mimeType }));
+        body = { imageBase64: resized.base64, mimeType: resized.mimeType, extraDetails };
+      } else {
+        body = { imageUrl, extraDetails };
+      }
       const res = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      const result = await res.json();
+      const text = await res.text();
+      let result;
+      try { result = JSON.parse(text); } catch { throw new Error(res.ok ? 'Unexpected response from server.' : `Server error (${res.status}). Try a smaller image.`); }
       if (!res.ok) throw new Error(result.error || 'Generation failed');
       onResult(result);
     } catch (err) {
