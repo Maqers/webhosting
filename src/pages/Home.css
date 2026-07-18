@@ -204,8 +204,8 @@
 @media (hover: none) {
   .feat-img-zone.has-second-img:hover .feat-img { opacity: 1 !important; transform: none !important; }
   .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 0 !important; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img { opacity: 0; }
-  .feat-img-zone.has-second-img.mobile-swap .feat-img-hover { opacity: 1; }
+  /* Hover-crossfade is a desktop-only affordance; touch grids show a
+     single static image and reveal the rest on the product detail page. */
 }
 
 .feat-badge-popular {
