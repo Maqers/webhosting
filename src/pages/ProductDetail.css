@@ -856,6 +856,13 @@
   display: block;
 }
 
+@media (max-width: 480px) {
+  .review-photo-thumb {
+    width: 110px;
+    height: 110px;
+  }
+}
+
 .review-photo-lightbox {
   position: fixed;
   inset: 0;
