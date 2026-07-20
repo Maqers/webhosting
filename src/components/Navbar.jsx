@@ -291,24 +291,26 @@ const Navbar = () => {
                 ))}
               </div>
               <div className="navbar-icons">
-                <div className="navbar-account-wrap" ref={accountRef}>
-                  <button className="navbar-icon-btn" onClick={handleAccountClick} aria-label={isLoggedIn ? 'Account menu' : 'Log in'} type="button">
-                    <div className="navbar-cart-icon-wrap">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                      </svg>
-                    </div>
-                    <span className="navbar-icon-label">{isLoggedIn ? 'Account' : 'Login'}</span>
-                  </button>
-                  {accountMenuOpen && isLoggedIn && (
-                    <div className="navbar-account-dropdown">
-                      <p className="navbar-account-phone">{user?.phone}</p>
-                      <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Orders</Link>
-                      <button className="navbar-account-item navbar-account-logout" onClick={() => { logout(); setAccountMenuOpen(false) }} type="button">Log out</button>
-                    </div>
-                  )}
-                </div>
+                {isLoggedIn && (
+                  <div className="navbar-account-wrap" ref={accountRef}>
+                    <button className="navbar-icon-btn" onClick={handleAccountClick} aria-label="Account menu" type="button">
+                      <div className="navbar-cart-icon-wrap">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                      </div>
+                      <span className="navbar-icon-label">Account</span>
+                    </button>
+                    {accountMenuOpen && (
+                      <div className="navbar-account-dropdown">
+                        <p className="navbar-account-phone">{user?.phone}</p>
+                        <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Orders</Link>
+                        <button className="navbar-account-item navbar-account-logout" onClick={() => { logout(); setAccountMenuOpen(false) }} type="button">Log out</button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <button className="navbar-icon-btn" onClick={() => setWishlistOpen(true)} aria-label="Open wishlist" type="button">
                   <div className="navbar-cart-icon-wrap">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -396,13 +398,11 @@ const Navbar = () => {
               <Link key={item.path} to={item.path} className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>{item.label}</Link>
             ))}
 
-            {isLoggedIn ? (
+            {isLoggedIn && (
               <>
                 <Link to="/orders" className={`mobile-menu-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Orders ({user?.phone})</Link>
                 <button className="mobile-menu-link" onClick={() => { logout(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Log out</button>
               </>
-            ) : (
-              <button className="mobile-menu-link" onClick={() => { openLoginModal(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Login</button>
             )}
           </div>
         </nav>
