@@ -624,10 +624,11 @@ export default function AdminPortal() {
   function readReviewPhoto(file, setInput) {
     if (!file || !file.type.startsWith("image/")) return;
     const reader = new FileReader();
-    reader.onload = ev => setInput(r => ({
-      ...r,
-      photoFile: { preview: ev.target.result, base64: ev.target.result.split(",")[1], mime: file.type },
-    }));
+    reader.onload = async ev => {
+      const rawBase64 = ev.target.result.split(",")[1];
+      const { base64, mimeType } = await compressProductImage(rawBase64, file.type).catch(() => ({ base64: rawBase64, mimeType: file.type }));
+      setInput(r => ({ ...r, photoFile: { preview: ev.target.result, base64, mime: mimeType } }));
+    };
     reader.readAsDataURL(file);
   }
 
