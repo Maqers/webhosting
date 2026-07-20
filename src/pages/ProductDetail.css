@@ -538,6 +538,21 @@
   border-color: var(--primary-color);
 }
 
+.required-asterisk {
+  color: #d92d20;
+}
+
+.select-error {
+  border-color: #d92d20 !important;
+}
+
+.selection-error-note {
+  color: #d92d20;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
 /* ========== More from this maker ========== */
 .more-from-maker {
   margin-top: 2.5rem;

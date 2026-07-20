@@ -190,12 +190,18 @@ export const FeaturedCard = ({ product, index }) => {
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [heartPop, setHeartPop] = useState(false);
 
+  const needsOptions = (product.meta?.colors?.length > 0) || (product.meta?.sizes?.length > 0);
+
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation();
+    if (needsOptions) {
+      navigate(`/product/${product.slug}`);
+      return;
+    }
     addItem(product);
     setAddedFeedback(true);
     setTimeout(() => setAddedFeedback(false), 1400);
-  }, [product, addItem]);
+  }, [product, addItem, needsOptions, navigate]);
 
   const handleWishlist = useCallback((e) => {
     e.preventDefault(); e.stopPropagation();
@@ -258,7 +264,7 @@ export const FeaturedCard = ({ product, index }) => {
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            {product.inStock === false ? <span>Out of Stock</span> : addedFeedback ? <span>Added!</span> : <span>Add to Cart</span>}
+            {product.inStock === false ? <span>Out of Stock</span> : addedFeedback ? <span>Added!</span> : needsOptions ? <span>Select Options</span> : <span>Add to Cart</span>}
           </button>
           <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button" aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}>
             <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

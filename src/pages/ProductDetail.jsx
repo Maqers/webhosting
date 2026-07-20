@@ -48,6 +48,7 @@ const ProductDetail = () => {
   const [lensVisible, setLensVisible] = useState(false)
   const [selectedPersonalisation, setSelectedPersonalisation] = useState([])
   const [orderNote, setOrderNote] = useState("")
+  const [selectionError, setSelectionError] = useState("")
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   const imageWrapRef = useRef(null)
   const imgRef = useRef(null)
@@ -89,6 +90,7 @@ const ProductDetail = () => {
   // ── Track recently viewed ──────────────────────────────────────────────────
   const [recentlyViewed, setRecentlyViewed] = useState([])
   const [reviewPhotoLightbox, setReviewPhotoLightbox] = useState(null)
+  const [productImageLightbox, setProductImageLightbox] = useState(false)
   useEffect(() => {
     if (!product) return
     const KEY = 'maqers_recently_viewed'
@@ -106,7 +108,19 @@ const ProductDetail = () => {
     })
   }, [product?.id])
 
+  const needsColor = product?.meta?.colors && product.meta.colors.length > 0
+  const needsSize = product?.meta?.sizes && product.meta.sizes.length > 0
+
   const handleAddToCart = () => {
+    if (needsColor && !selectedColor) {
+      setSelectionError('Please select a colour before adding to cart.')
+      return
+    }
+    if (needsSize && !selectedSize) {
+      setSelectionError('Please select a size before adding to cart.')
+      return
+    }
+    setSelectionError("")
     addItem(product, selectedColor, selectedSize, selectedPersonalisation, orderNote)
   }
   const handleContactUs = () => {
@@ -319,7 +333,11 @@ const ProductDetail = () => {
               onMouseLeave={handleMouseLeave}
             >
               {/* Desktop: single image with lens zoom */}
-              <div className="main-image-container desktop-image-container">
+              <div
+                className="main-image-container desktop-image-container"
+                onClick={() => setProductImageLightbox(true)}
+                style={{ cursor: 'zoom-in' }}
+              >
                 <ImageWithFallback
                   ref={imgRef}
                   src={currentImage}
@@ -333,6 +351,7 @@ const ProductDetail = () => {
               <div
                 ref={mobileImgRef}
                 className="mobile-single-image"
+                onClick={() => setProductImageLightbox(true)}
               >
                 <ImageWithFallback
                   key={selectedImage}
@@ -427,10 +446,11 @@ const ProductDetail = () => {
             {/* Colour dropdown — switches image */}
             {product.meta?.colors && product.meta.colors.length > 0 && (
               <div className="product-colors">
-                <label className="colors-label" htmlFor="color-select">Select Colour:</label>
-                <select id="color-select" className="colors-select" value={selectedColor}
+                <label className="colors-label" htmlFor="color-select">Select Colour: <span className="required-asterisk">*</span></label>
+                <select id="color-select" className={`colors-select ${selectionError && !selectedColor ? 'select-error' : ''}`} value={selectedColor}
                   onChange={e => {
                     setSelectedColor(e.target.value);
+                    setSelectionError("");
                     const found = product.meta.colors.find(c =>
                       (typeof c === "object" ? c.name : c) === e.target.value
                     );
@@ -450,9 +470,9 @@ const ProductDetail = () => {
             {/* Size dropdown — shows per-size price if available */}
             {product.meta?.sizes && product.meta.sizes.length > 0 && (
               <div className="product-colors">
-                <label className="colors-label" htmlFor="size-select">Select Size:</label>
-                <select id="size-select" className="colors-select" value={selectedSize}
-                  onChange={e => setSelectedSize(e.target.value)}>
+                <label className="colors-label" htmlFor="size-select">Select Size: <span className="required-asterisk">*</span></label>
+                <select id="size-select" className={`colors-select ${selectionError && !selectedSize ? 'select-error' : ''}`} value={selectedSize}
+                  onChange={e => { setSelectedSize(e.target.value); setSelectionError(""); }}>
                   <option value="">Choose a size</option>
                   {product.meta.sizes.map((s, i) => {
                     const sizePrice = product.meta.sizePrices?.[s];
@@ -521,6 +541,7 @@ const ProductDetail = () => {
                   {wishlisted ? '♥ Wishlisted' : '♡ Wishlist'}
                 </button>
               </div>
+              {selectionError && <p className="selection-error-note">{selectionError}</p>}
             </div>
 
             {/* Delivery timeline — below actions */}
@@ -614,6 +635,13 @@ const ProductDetail = () => {
                   ))}
                 </div>
           </div>
+          )}
+
+          {productImageLightbox && (
+            <div className="review-photo-lightbox" onClick={() => setProductImageLightbox(false)}>
+              <img src={currentImage} alt={product.title} onClick={e => e.stopPropagation()} />
+              <button type="button" className="review-photo-lightbox-close" onClick={() => setProductImageLightbox(false)} aria-label="Close">×</button>
+            </div>
           )}
 
           {reviewPhotoLightbox && (

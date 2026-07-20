@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { getAllProducts } from '../data/catalog'
@@ -6,15 +7,21 @@ import './WishlistDrawer.css'
 export default function WishlistDrawer() {
   const { items, toggleItem, isOpen, setIsOpen } = useWishlist()
   const { addItem } = useCart()
+  const navigate = useNavigate()
 
   const allProducts = getAllProducts()
 
   const handleMoveToCart = (item) => {
     const product = allProducts.find(p => p.id === item.id)
-    if (product) {
-      addItem(product)
-      toggleItem(item)
+    if (!product) return
+    const needsOptions = (product.meta?.colors?.length > 0) || (product.meta?.sizes?.length > 0)
+    if (needsOptions) {
+      setIsOpen(false)
+      navigate(`/product/${product.slug}`)
+      return
     }
+    addItem(product)
+    toggleItem(item)
   }
 
   return (

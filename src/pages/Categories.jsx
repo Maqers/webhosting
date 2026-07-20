@@ -260,12 +260,18 @@ const ProductCard = ({ product, index }) => {
   const imgZoneRef = useRef(null)
   const secondImage = product.images[1] || null
 
+  const needsOptions = (product.meta?.colors?.length > 0) || (product.meta?.sizes?.length > 0)
+
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation()
+    if (needsOptions) {
+      navigate(`/product/${product.slug}`, { state: { from: location.pathname } })
+      return
+    }
     addItem(product)
     setAddedFeedback(true)
     setTimeout(() => setAddedFeedback(false), 1400)
-  }, [product, addItem])
+  }, [product, addItem, needsOptions, navigate, location])
 
   const handleWishlist = useCallback((e) => {
     e.preventDefault(); e.stopPropagation()
@@ -316,7 +322,7 @@ const ProductCard = ({ product, index }) => {
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            {product.inStock === false ? "Out of Stock" : addedFeedback ? "Added!" : "Add to Cart"}
+            {product.inStock === false ? "Out of Stock" : addedFeedback ? "Added!" : needsOptions ? "Select Options" : "Add to Cart"}
           </button>
           <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button">
             <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
