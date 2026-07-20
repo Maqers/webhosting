@@ -801,7 +801,7 @@
   padding: 0.9rem 1rem;
   /* !important needed: a global mobile-overflow-prevention rule forces
      `div { max-width: 100% !important }` sitewide (text-breaking-fix.css) */
-  max-width: 340px !important;
+  max-width: 250px !important;
 }
 
 .review-card-top {
