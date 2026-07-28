@@ -40,12 +40,14 @@ export function CartProvider({ children }) {
         const idx = opts.indexOf(opt)
         return sum + (idx !== -1 && prices[idx] ? Number(prices[idx]) : 0)
       }, 0)
+      const sizePrice = product.meta?.sizePrices?.[selectedSize]
+      const basePrice = sizePrice != null ? Number(sizePrice) : product.price
       return [...prev, {
         key,
         id: product.id,
         title: product.title,
-        price: product.price + personalisationExtra,
-        basePrice: product.price,
+        price: basePrice + personalisationExtra,
+        basePrice,
         personalisationExtra,
         image: product.images?.[0] || '',
         categoryId: product.categoryId,

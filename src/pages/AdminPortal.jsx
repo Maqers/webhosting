@@ -230,7 +230,7 @@ function parseProducts(source) {
     }
 
     const sz = entry.match(/sizes:\s*\[([^\]]*)\]/);
-    if (sz) p.sizes = sz[1].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+    if (sz) p.sizes = sz[1].split(",").map(s => s.trim().replace(/^"|"$/g, "").replace(/\\"/g, '"').replace(/\\\\/g, "\\")).filter(Boolean);
 
     const sp = entry.match(/sizePrices:\s*(\{[^}]*\})/);
     if (sp) {
