@@ -569,7 +569,7 @@ export default function AdminPortal() {
 
   // ── Inline seller creation (used inside add-product & edit forms) ────────────
   const [showInlineAddSeller, setShowInlineAddSeller] = useState(false);
-  const [inlineNewSeller, setInlineNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
+  const [inlineNewSeller, setInlineNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", phone: "", email: "" });
   const [inlineOwnerInput, setInlineOwnerInput] = useState("");
 
   // ── Seller state ────────────────────────────────────────────────────────────
@@ -577,7 +577,7 @@ export default function AdminPortal() {
   const [sellersLoading, setSellersLoading] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [showAddSeller, setShowAddSeller] = useState(false);
-  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [], delivery_handled_by: "seller", commission_pct: 10 });
+  const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", phone: "", email: "", gst_registered: false, gst_number: "", hsn_codes: [], delivery_handled_by: "seller", commission_pct: 10 });
   const [newOwnerInput, setNewOwnerInput] = useState("");
   const [kycFiles, setKycFiles] = useState([]);
   const [kycUploading, setKycUploading] = useState(false);
@@ -1116,7 +1116,7 @@ export default function AdminPortal() {
   }
 
   const filteredProducts = products.filter(p => {
-    const matchText = !productFilter || p.title.toLowerCase().includes(productFilter.toLowerCase()) || p.description.toLowerCase().includes(productFilter.toLowerCase());
+    const matchText = !productFilter || p.title.toLowerCase().includes(productFilter.toLowerCase()) || p.description.toLowerCase().includes(productFilter.toLowerCase()) || String(p.id) === productFilter.trim();
     return matchText && (productFilterCat === "all" || p.categoryId === productFilterCat);
   });
 
@@ -1148,11 +1148,11 @@ export default function AdminPortal() {
       const nextNum = 1001 + samePrefix.length;
       const sellerCode = `${prefix}${nextNum}`;
       const id = sellerCode.toLowerCase();
-      const seller = { id, seller_code: sellerCode, business_name: inlineNewSeller.business_name, owners: inlineNewSeller.owners.length > 0 ? inlineNewSeller.owners : (inlineOwnerInput ? [inlineOwnerInput] : []), location: inlineNewSeller.location, address: inlineNewSeller.address || "", pincode: inlineNewSeller.pincode || "", notes: inlineNewSeller.notes || "", gst_registered: false, gst_number: "", hsn_codes: [], product_ids: [], kyc_documents: [] };
+      const seller = { id, seller_code: sellerCode, business_name: inlineNewSeller.business_name, owners: inlineNewSeller.owners.length > 0 ? inlineNewSeller.owners : (inlineOwnerInput ? [inlineOwnerInput] : []), location: inlineNewSeller.location, address: inlineNewSeller.address || "", pincode: inlineNewSeller.pincode || "", notes: inlineNewSeller.notes || "", phone: inlineNewSeller.phone || "", email: inlineNewSeller.email || "", gst_registered: false, gst_number: "", hsn_codes: [], product_ids: [], kyc_documents: [] };
       await sbCreateSeller(seller);
       const updated = await sbGetSellers();
       setSellers(updated);
-      setInlineNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "" });
+      setInlineNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", phone: "", email: "" });
       setInlineOwnerInput(""); setShowInlineAddSeller(false);
       showToast(`Seller "${inlineNewSeller.business_name}" created!`);
       if (onCreated) onCreated(id, sellerCode);
@@ -1186,10 +1186,10 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, address: newSeller.address || "", pincode: newSeller.pincode, notes: newSeller.notes, gst_registered: newSeller.gst_registered || false, gst_number: newSeller.gst_number || "", hsn_codes: newSeller.hsn_codes || [], delivery_handled_by: newSeller.delivery_handled_by || "seller", commission_pct: Number(newSeller.commission_pct) || 10, product_ids: [], kyc_documents: kycPaths };
+      const seller = { id, seller_code: sellerCode, business_name: newSeller.business_name, owners: newSeller.owners.length > 0 ? newSeller.owners : (newOwnerInput ? [newOwnerInput] : []), location: newSeller.location, address: newSeller.address || "", pincode: newSeller.pincode, notes: newSeller.notes, phone: newSeller.phone || "", email: newSeller.email || "", gst_registered: newSeller.gst_registered || false, gst_number: newSeller.gst_number || "", hsn_codes: newSeller.hsn_codes || [], delivery_handled_by: newSeller.delivery_handled_by || "seller", commission_pct: Number(newSeller.commission_pct) || 10, product_ids: [], kyc_documents: kycPaths };
       await sbCreateSeller(seller);
       await loadSellers();
-      setNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", gst_registered: false, gst_number: "", hsn_codes: [] });
+      setNewSeller({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", phone: "", email: "", gst_registered: false, gst_number: "", hsn_codes: [] });
       setKycFiles([]); setNewOwnerInput(""); setShowAddSeller(false);
       showToast(`Seller "${newSeller.business_name}" created! ID: ${sellerCode}`);
     } catch (err) { showToast(err.message, "error"); }
@@ -1208,7 +1208,7 @@ export default function AdminPortal() {
         }
         setKycUploading(false);
       }
-      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, gst_registered: editingSeller.gst_registered || false, gst_number: editingSeller.gst_number || "", hsn_codes: editingSeller.hsn_codes || [], delivery_handled_by: editingSeller.delivery_handled_by || "seller", commission_pct: Number(editingSeller.commission_pct) || 10, kyc_documents: kycPaths });
+      await sbUpdateSeller(editingSeller.id, { business_name: editingSeller.business_name, owners: editingSeller.owners, location: editingSeller.location, address: editingSeller.address || "", pincode: editingSeller.pincode || "", notes: editingSeller.notes, phone: editingSeller.phone || "", email: editingSeller.email || "", gst_registered: editingSeller.gst_registered || false, gst_number: editingSeller.gst_number || "", hsn_codes: editingSeller.hsn_codes || [], delivery_handled_by: editingSeller.delivery_handled_by || "seller", commission_pct: Number(editingSeller.commission_pct) || 10, kyc_documents: kycPaths });
       await loadSellers();
       setEditingSeller(null); setKycFiles([]);
       showToast("Seller updated!");
@@ -1690,6 +1690,10 @@ export default function AdminPortal() {
                             onChange={e => setInlineOwnerInput(e.target.value)} />
                           <input style={{ ...ts.input, marginTop: 6 }} placeholder="Location (city)" value={inlineNewSeller.location}
                             onChange={e => setInlineNewSeller(s => ({ ...s, location: e.target.value }))} />
+                          <input style={{ ...ts.input, marginTop: 6 }} placeholder="Mobile number" value={inlineNewSeller.phone}
+                            onChange={e => setInlineNewSeller(s => ({ ...s, phone: e.target.value }))} />
+                          <input style={{ ...ts.input, marginTop: 6 }} placeholder="Email ID" type="email" value={inlineNewSeller.email}
+                            onChange={e => setInlineNewSeller(s => ({ ...s, email: e.target.value }))} />
                           <button type="button" style={{ ...ts.primaryBtn, marginTop: 8, padding: "8px 16px" }}
                             onClick={() => handleInlineCreateSeller((id, code) => {
                               setNewProduct(p => ({ ...p, sellerId: id, sellerCode: code }));
@@ -1856,7 +1860,7 @@ export default function AdminPortal() {
             </div>
 
             <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-              <input style={{ ...ts.input, flex: 1, margin: 0 }} placeholder="Search products..." value={productFilter} onChange={e => setProductFilter(e.target.value)} />
+              <input style={{ ...ts.input, flex: 1, margin: 0 }} placeholder="Search products by name or ID..." value={productFilter} onChange={e => setProductFilter(e.target.value)} />
               <select style={{ ...ts.input, width: 200, margin: 0 }} value={productFilterCat} onChange={e => setProductFilterCat(e.target.value)}>
                 <option value="all">All Categories</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -2642,6 +2646,12 @@ export default function AdminPortal() {
                     <label style={ts.label}>Pincode <span style={ts.labelHint}>(for delivery estimation)</span></label>
                     <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
                       value={newSeller.pincode} onChange={e => setNewSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
+                    <label style={ts.label}>Mobile Number</label>
+                    <input style={ts.input} placeholder="e.g. 9876543210" value={newSeller.phone}
+                      onChange={e => setNewSeller(s => ({ ...s, phone: e.target.value }))} />
+                    <label style={ts.label}>Email ID</label>
+                    <input style={ts.input} type="email" placeholder="e.g. seller@example.com" value={newSeller.email}
+                      onChange={e => setNewSeller(s => ({ ...s, email: e.target.value }))} />
                     <label style={ts.label}>GST Registered?</label>
                     <div style={{ display: "flex", gap: 12, margin: "4px 0 8px" }}>
                       {["Yes", "No"].map(opt => (
@@ -2855,6 +2865,12 @@ export default function AdminPortal() {
                     <input style={ts.input} placeholder="e.g. 400001" maxLength={6}
                       value={editingSeller.pincode || ""}
                       onChange={e => setEditingSeller(s => ({ ...s, pincode: e.target.value.replace(/\D/g, '') }))} />
+                    <label style={ts.label}>Mobile Number</label>
+                    <input style={ts.input} placeholder="e.g. 9876543210" value={editingSeller.phone || ""}
+                      onChange={e => setEditingSeller(s => ({ ...s, phone: e.target.value }))} />
+                    <label style={ts.label}>Email ID</label>
+                    <input style={ts.input} type="email" placeholder="e.g. seller@example.com" value={editingSeller.email || ""}
+                      onChange={e => setEditingSeller(s => ({ ...s, email: e.target.value }))} />
                     <label style={ts.label}>GST Registered?</label>
                     <div style={{ display: "flex", gap: 12, margin: "4px 0 8px" }}>
                       {["Yes", "No"].map(opt => (
@@ -2979,6 +2995,7 @@ export default function AdminPortal() {
                       </div>
                       <div style={ts.catCardName}>{seller.business_name}</div>
                       {seller.location && <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>📍 {seller.location}</div>}
+                      {seller.phone && <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>📞 {seller.phone}</div>}
                       {(seller.owners||[]).length > 0 && (
                         <div style={{ fontSize: 12, color: "#888", marginBottom: 8 }}>
                           👤 {seller.owners.join(", ")}
