@@ -502,6 +502,11 @@
   font-family: var(--font-family-primary); font-size: 1.05rem; font-weight: 700;
   color: var(--primary-color); margin: 0.15rem 0 0.5rem;
 }
+.feat-price-original {
+  font-weight: 400; font-size: 0.9rem; color: #aaa;
+  text-decoration: line-through; margin-right: 6px;
+}
+.feat-price-current { font-weight: 700; color: var(--primary-color); }
 .feat-actions { display: flex; gap: 0.5rem; margin-top: auto; }
 .feat-add-btn {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem;

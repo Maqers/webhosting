@@ -247,6 +247,9 @@ function parseProducts(source) {
     const mq = entry.match(/moq:\s*(\d+)/);
     if (mq) p.moq = parseInt(mq[1]) || 0;
 
+    const op = entry.match(/originalPrice:\s*(\d+(?:\.\d+)?)/);
+    if (op) p.originalPrice = Number(op[1]);
+
     const dt = entry.match(/delivery_time:\s*"([^"]*)"/);
     if (dt) p.delivery_time = dt[1];
 
@@ -403,10 +406,12 @@ function buildEntry(id, product) {
   }
 
   const sizePricesPart = sizePricesStr ? `, sizePrices: ${sizePricesStr}` : "";
+  const originalPriceNum = Number(product.originalPrice) || 0;
+  const originalPricePart = originalPriceNum > basePrice ? `, originalPrice: ${originalPriceNum}` : "";
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}"${r.image ? `, image: "${sanitizeForJS(r.image)}"` : ""} }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -498,7 +503,14 @@ function ProductCard({ product, categories }) {
       <div style={ts.productCardBody}>
         <p style={ts.productCardCat}>{cat?.name || product.categoryId}</p>
         <p style={ts.productCardTitle}>{product.title}</p>
-        <p style={ts.productCardPrice}>&#8377;{product.price}</p>
+        {Number(product.originalPrice) > Number(product.price) ? (
+          <p style={ts.productCardPrice}>
+            <span style={{ textDecoration: "line-through", color: "#aaa", fontWeight: 400, marginRight: 6 }}>&#8377;{product.originalPrice}</span>
+            &#8377;{product.price}
+          </p>
+        ) : (
+          <p style={ts.productCardPrice}>&#8377;{product.price}</p>
+        )}
       </div>
     </div>
   );
@@ -521,7 +533,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -831,7 +843,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -1507,6 +1519,9 @@ export default function AdminPortal() {
                       <label style={ts.label}>Price (Rs.) *</label>
                       <input style={ts.input} type="number" placeholder="499" value={newProduct.price}
                         onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))} />
+                      <label style={ts.label}>Original Price (Rs.) <span style={ts.labelHint}>(optional — shown crossed out if higher than price)</span></label>
+                      <input style={ts.input} type="number" placeholder="e.g. 999" value={newProduct.originalPrice}
+                        onChange={e => setNewProduct(p => ({ ...p, originalPrice: e.target.value }))} />
                       <label style={ts.label}>Description *</label>
                       <textarea style={{ ...ts.input, height: 100, resize: "vertical" }}
                         placeholder="Keep it punchy. Line breaks are stripped automatically before saving."
@@ -1763,7 +1778,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -1992,6 +2007,8 @@ export default function AdminPortal() {
                           </div>
                           <label style={ts.label}>Price (Rs.)</label>
                           <input style={ts.input} type="number" value={editingProduct.price} onChange={e => setEditingProduct(p => ({ ...p, price: Number(e.target.value) }))} />
+                          <label style={ts.label}>Original Price (Rs.) <span style={ts.labelHint}>(optional — shown crossed out if higher than price)</span></label>
+                          <input style={ts.input} type="number" placeholder="e.g. 999" value={editingProduct.originalPrice || ""} onChange={e => setEditingProduct(p => ({ ...p, originalPrice: e.target.value }))} />
                           <label style={ts.label}>Description</label>
                           <textarea style={{ ...ts.input, height: 100, resize: "vertical" }} value={editingProduct.description}
                             onChange={e => setEditingProduct(p => ({ ...p, description: e.target.value }))} />

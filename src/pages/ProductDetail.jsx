@@ -530,6 +530,11 @@ const ProductDetail = () => {
                     : `₹${product.price.toLocaleString("en-IN")} onwards`
                   }
                 </span>
+              ) : product.meta?.originalPrice > product.price ? (
+                <>
+                  <span className="product-detail-price-original">₹{product.meta.originalPrice.toLocaleString("en-IN")}</span>
+                  <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
+                </>
               ) : (
                 <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
               )}
