@@ -15,6 +15,7 @@ const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
 const EMAILJS_TEMPLATE_CUSTOMER = 'template_cp8gsrc' // ← replace with your EmailJS template ID
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
+const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq9f1nTqbOf8ZXbOI1bvk_uIa6jwUjvYshdvOFNAUcqlYbM8U8_pVAvQYxZxhI/exec'
 
 function getDeliveryFee(subtotal) {
   return 0
@@ -153,6 +154,24 @@ export default function Checkout() {
     }
   }
 
+  const logOrderToSheet = async (oid) => {
+    try {
+      const productIds = [...new Set(items.map(i => i.id))]
+      await fetch(ORDER_SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          orderNumber: oid,
+          customerName: form.name,
+          revenueAmount: grandTotal,
+          productIds: `ID ${productIds.join(', ')}`,
+        }),
+      })
+    } catch (err) {
+      console.error('Logging order to sheet failed:', err)
+    }
+  }
+
   const saveOrderToSupabase = async (oid) => {
     if (!isLoggedIn || !user?.id) return
     try {
@@ -197,6 +216,7 @@ export default function Checkout() {
 
     await sendCustomerConfirmation(oid)
     await saveOrderToSupabase(oid)
+    await logOrderToSheet(oid)
 
     trackEvent('Purchase', {
       order_id: oid,
