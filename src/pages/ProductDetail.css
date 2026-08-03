@@ -805,7 +805,8 @@
 
 .reviews-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
