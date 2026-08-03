@@ -91,6 +91,103 @@ const ProductDetail = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([])
   const [reviewPhotoLightbox, setReviewPhotoLightbox] = useState(null)
   const [productImageLightbox, setProductImageLightbox] = useState(false)
+  const [lightboxZoom, setLightboxZoom] = useState(1)
+  const [lightboxPos, setLightboxPos] = useState({ x: 0, y: 0 })
+  const lightboxDragRef = useRef({ dragging: false, startX: 0, startY: 0, origX: 0, origY: 0 })
+  const lightboxPinchRef = useRef({ active: false, startDist: 0, startZoom: 1 })
+
+  const MIN_ZOOM = 1
+  const MAX_ZOOM = 4
+
+  const closeProductLightbox = useCallback(() => {
+    setProductImageLightbox(false)
+    setLightboxZoom(1)
+    setLightboxPos({ x: 0, y: 0 })
+  }, [])
+
+  const clampZoom = (z) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z))
+
+  const handleLightboxWheel = useCallback((e) => {
+    e.preventDefault()
+    setLightboxZoom(prev => {
+      const next = clampZoom(prev - e.deltaY * 0.0018)
+      if (next <= MIN_ZOOM) setLightboxPos({ x: 0, y: 0 })
+      return next
+    })
+  }, [])
+
+  const handleLightboxDoubleClick = useCallback(() => {
+    setLightboxZoom(prev => {
+      if (prev > MIN_ZOOM) {
+        setLightboxPos({ x: 0, y: 0 })
+        return MIN_ZOOM
+      }
+      return 2.5
+    })
+  }, [])
+
+  const handleLightboxMouseDown = useCallback((e) => {
+    if (lightboxZoom <= MIN_ZOOM) return
+    lightboxDragRef.current = {
+      dragging: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: lightboxPos.x,
+      origY: lightboxPos.y,
+    }
+  }, [lightboxZoom, lightboxPos])
+
+  const handleLightboxMouseMove = useCallback((e) => {
+    if (!lightboxDragRef.current.dragging) return
+    const { startX, startY, origX, origY } = lightboxDragRef.current
+    setLightboxPos({ x: origX + (e.clientX - startX), y: origY + (e.clientY - startY) })
+  }, [])
+
+  const handleLightboxMouseUp = useCallback(() => {
+    lightboxDragRef.current.dragging = false
+  }, [])
+
+  const getTouchDist = (touches) => {
+    const [a, b] = touches
+    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
+  }
+
+  const handleLightboxTouchStart = useCallback((e) => {
+    if (e.touches.length === 2) {
+      lightboxPinchRef.current = {
+        active: true,
+        startDist: getTouchDist(e.touches),
+        startZoom: lightboxZoom,
+      }
+    } else if (e.touches.length === 1 && lightboxZoom > MIN_ZOOM) {
+      lightboxDragRef.current = {
+        dragging: true,
+        startX: e.touches[0].clientX,
+        startY: e.touches[0].clientY,
+        origX: lightboxPos.x,
+        origY: lightboxPos.y,
+      }
+    }
+  }, [lightboxZoom, lightboxPos])
+
+  const handleLightboxTouchMove = useCallback((e) => {
+    if (e.touches.length === 2 && lightboxPinchRef.current.active) {
+      e.preventDefault()
+      const dist = getTouchDist(e.touches)
+      const next = clampZoom(lightboxPinchRef.current.startZoom * (dist / lightboxPinchRef.current.startDist))
+      setLightboxZoom(next)
+      if (next <= MIN_ZOOM) setLightboxPos({ x: 0, y: 0 })
+    } else if (e.touches.length === 1 && lightboxDragRef.current.dragging) {
+      e.preventDefault()
+      const { startX, startY, origX, origY } = lightboxDragRef.current
+      setLightboxPos({ x: origX + (e.touches[0].clientX - startX), y: origY + (e.touches[0].clientY - startY) })
+    }
+  }, [])
+
+  const handleLightboxTouchEnd = useCallback((e) => {
+    if (e.touches.length < 2) lightboxPinchRef.current.active = false
+    if (e.touches.length === 0) lightboxDragRef.current.dragging = false
+  }, [])
   useEffect(() => {
     if (!product) return
     const KEY = 'maqers_recently_viewed'
@@ -638,9 +735,35 @@ const ProductDetail = () => {
           )}
 
           {productImageLightbox && (
-            <div className="review-photo-lightbox" onClick={() => setProductImageLightbox(false)}>
-              <img src={currentImage} alt={product.title} onClick={e => e.stopPropagation()} />
-              <button type="button" className="review-photo-lightbox-close" onClick={() => setProductImageLightbox(false)} aria-label="Close">×</button>
+            <div
+              className="review-photo-lightbox product-image-lightbox"
+              onClick={closeProductLightbox}
+              onWheel={handleLightboxWheel}
+              onMouseMove={handleLightboxMouseMove}
+              onMouseUp={handleLightboxMouseUp}
+              onTouchMove={handleLightboxTouchMove}
+              onTouchEnd={handleLightboxTouchEnd}
+            >
+              <img
+                src={currentImage}
+                alt={product.title}
+                draggable={false}
+                onClick={e => e.stopPropagation()}
+                onDoubleClick={e => { e.stopPropagation(); handleLightboxDoubleClick() }}
+                onMouseDown={e => { e.stopPropagation(); handleLightboxMouseDown(e) }}
+                onTouchStart={e => { e.stopPropagation(); handleLightboxTouchStart(e) }}
+                style={{
+                  transform: `translate(${lightboxPos.x}px, ${lightboxPos.y}px) scale(${lightboxZoom})`,
+                  cursor: lightboxZoom > MIN_ZOOM ? 'grab' : 'zoom-in',
+                  transition: lightboxDragRef.current.dragging ? 'none' : 'transform 0.15s ease-out',
+                }}
+              />
+              <div className="lightbox-zoom-controls" onClick={e => e.stopPropagation()}>
+                <button type="button" onClick={() => setLightboxZoom(z => clampZoom(z - 0.5))} aria-label="Zoom out">−</button>
+                <button type="button" onClick={() => { setLightboxZoom(1); setLightboxPos({ x: 0, y: 0 }) }} aria-label="Reset zoom">{Math.round(lightboxZoom * 100)}%</button>
+                <button type="button" onClick={() => setLightboxZoom(z => clampZoom(z + 0.5))} aria-label="Zoom in">+</button>
+              </div>
+              <button type="button" className="review-photo-lightbox-close" onClick={closeProductLightbox} aria-label="Close">×</button>
             </div>
           )}
 

@@ -780,6 +780,7 @@ export default function AdminPortal() {
     if (!newProduct.description.trim()) return setFormError("Description required.");
     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
+    if (!newProduct.sellerId) return setFormError("Select a seller before adding this product.");
     setProductStep("preview");
   }
 
@@ -1667,8 +1668,8 @@ export default function AdminPortal() {
                           </div>
                         )}
                       </div>
-                      <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
-                      <select style={ts.input} value={newProduct.sellerId || ""}
+                      <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(required)</span></label>
+                      <select style={ts.input} required value={newProduct.sellerId || ""}
                         onChange={e => {
                           const sel = sellers.find(s => s.id === e.target.value);
                           setNewProduct(p => ({ ...p, sellerId: e.target.value, sellerCode: sel?.seller_code || "" }));

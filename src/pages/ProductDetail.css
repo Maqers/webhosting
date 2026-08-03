@@ -891,6 +891,7 @@
   z-index: 1000;
   padding: 2rem;
   cursor: zoom-out;
+  overflow: hidden;
 }
 
 .review-photo-lightbox img {
@@ -899,6 +900,41 @@
   border-radius: 12px;
   object-fit: contain;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.product-image-lightbox img {
+  max-width: min(90vw, 700px);
+  touch-action: none;
+  user-select: none;
+}
+
+.lightbox-zoom-controls {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.35rem;
+}
+
+.lightbox-zoom-controls button {
+  min-width: 40px;
+  height: 36px;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.lightbox-zoom-controls button:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .review-photo-lightbox-close {
