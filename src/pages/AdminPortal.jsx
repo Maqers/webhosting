@@ -1116,7 +1116,9 @@ export default function AdminPortal() {
   }
 
   const filteredProducts = products.filter(p => {
-    const matchText = !productFilter || p.title.toLowerCase().includes(productFilter.toLowerCase()) || p.description.toLowerCase().includes(productFilter.toLowerCase()) || String(p.id) === productFilter.trim();
+    const idQuery = productFilter.trim().match(/^#?\s*(?:id\s*:?\s*)?(\d+)$/i);
+    const matchId = idQuery && Number(idQuery[1]) === p.id;
+    const matchText = !productFilter || matchId || p.title.toLowerCase().includes(productFilter.toLowerCase()) || p.description.toLowerCase().includes(productFilter.toLowerCase());
     return matchText && (productFilterCat === "all" || p.categoryId === productFilterCat);
   });
 
