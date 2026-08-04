@@ -7,6 +7,7 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import SeoHead from '../components/SeoHead'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
+import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
 import './Categories.css'
 
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
@@ -135,10 +136,10 @@ const Categories = () => {
       })
     }
     // Apply sort
-    if (sortBy === 'price-asc') return [...products].sort((a,b) => a.price - b.price)
-    if (sortBy === 'price-desc') return [...products].sort((a,b) => b.price - a.price)
-    if (sortBy === 'name') return [...products].sort((a,b) => a.title.localeCompare(b.title))
-    return products
+    if (sortBy === 'price-asc') products = [...products].sort((a,b) => a.price - b.price)
+    else if (sortBy === 'price-desc') products = [...products].sort((a,b) => b.price - a.price)
+    else if (sortBy === 'name') products = [...products].sort((a,b) => a.title.localeCompare(b.title))
+    return expandProductsByColor(products)
   }, [rawCategoryProducts, activeFilter, sortBy])
 
   const seoTitle = selectedCategoryObj
@@ -232,7 +233,7 @@ const Categories = () => {
               {categoryProducts.length > 0 ? (
                 <div className="products-grid" ref={gridRef}>
                   {categoryProducts.map((product, index) => (
-                    <ProductCard key={product.id} product={product} index={index} />
+                    <ProductCard key={product._variantKey || product.id} product={product} index={index} />
                   ))}
                 </div>
               ) : (
@@ -265,7 +266,7 @@ const ProductCard = ({ product, index }) => {
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation()
     if (needsOptions) {
-      navigate(`/product/${product.slug}`, { state: { from: location.pathname } })
+      navigate(`/product/${product.slug}${productLinkQuery(product)}`, { state: { from: location.pathname } })
       return
     }
     addItem(product)
@@ -281,8 +282,8 @@ const ProductCard = ({ product, index }) => {
   }, [product, toggleItem])
 
   const handleCardClick = useCallback(() => {
-    navigate(`/product/${product.slug}`, { state: { from: location.pathname } })
-  }, [product.slug, navigate, location])
+    navigate(`/product/${product.slug}${productLinkQuery(product)}`, { state: { from: location.pathname } })
+  }, [product, navigate, location])
 
   return (
     <article

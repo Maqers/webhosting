@@ -9,6 +9,7 @@ import { FeaturedCard } from './Home'
 import SeoHead from '../components/SeoHead'
 import { trackEvent } from '../utils/analytics'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
+import { expandProductsByColor } from '../utils/productVariants'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -60,6 +61,23 @@ const ProductDetail = () => {
   const { addItem } = useCart()
   const { toggleItem, isWishlisted } = useWishlist()
   const wishlisted = isWishlisted(product?.id)
+
+  // Deep-link support for colour variant cards (?color=Red) — cards on the
+  // listing grids link straight to the matching colour instead of the
+  // default first image. Runs on slug/search change too, not just mount,
+  // since navigating between two /product/:slug pages doesn't remount this.
+  useEffect(() => {
+    const colorParam = new URLSearchParams(location.search).get('color')
+    const colors = product?.meta?.colors
+    const found = colorParam && colors?.find(c => (typeof c === 'object' ? c.name : c) === colorParam)
+    if (found) {
+      setSelectedColor(colorParam)
+      if (typeof found === 'object' && Number.isInteger(found.imageIndex)) setSelectedImage(found.imageIndex)
+    } else {
+      setSelectedColor("")
+      setSelectedImage(0)
+    }
+  }, [slug, location.search, product])
 
   // ── Delivery timeline ─────────────────────────────────────────────────────
   const deliveryTimeline = useMemo(() => {
@@ -383,9 +401,9 @@ const ProductDetail = () => {
     const sellerCode = product.meta?.sellerCode
     if (sellerCode) {
       const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode)
-      return { products: fromSeller, sellerCode, isMaker: true }
+      return { products: expandProductsByColor(fromSeller), sellerCode, isMaker: true }
     }
-    return { products: allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6), sellerCode: null, isMaker: false }
+    return { products: expandProductsByColor(allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6)), sellerCode: null, isMaker: false }
   }
   const { products: moreProducts, sellerCode: makerCode, isMaker } = getMoreFromMaker()
   const moreProductsGridRef = useRef(null)
@@ -794,7 +812,7 @@ const ProductDetail = () => {
               {moreProducts.length > 0 ? (
                 <div className="more-from-maker-grid" ref={moreProductsGridRef}>
                   {moreProducts.slice(0, 4).map((p, i) => (
-                    <FeaturedCard key={p.id} product={p} index={i} />
+                    <FeaturedCard key={p._variantKey || p.id} product={p} index={i} />
                   ))}
                 </div>
               ) : (

@@ -4,6 +4,7 @@ import { getAllProducts } from '../data/catalog'
 import SeoHead from '../components/SeoHead'
 import { FeaturedCard } from './Home'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
+import { expandProductsByColor } from '../utils/productVariants'
 import './SellerStorefront.css'
 import './Home.css'
 
@@ -11,7 +12,7 @@ export default function SellerStorefront() {
   const { sellerCode } = useParams()
 
   const products = useMemo(
-    () => getAllProducts().filter(p => p.meta?.sellerCode === sellerCode),
+    () => expandProductsByColor(getAllProducts().filter(p => p.meta?.sellerCode === sellerCode)),
     [sellerCode]
   )
 
@@ -49,7 +50,7 @@ export default function SellerStorefront() {
 
         <div className="storefront-grid featured-grid" ref={gridRef}>
           {products.map((product, index) => (
-            <FeaturedCard key={product.id} product={product} index={index} />
+            <FeaturedCard key={product._variantKey || product.id} product={product} index={index} />
           ))}
         </div>
       </div>

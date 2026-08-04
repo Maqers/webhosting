@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
+import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
 import { useCart } from "../context/CartContext";
@@ -10,7 +11,7 @@ import { useMobileCenterSwap } from "../hooks/useMobileCenterSwap";
 import "./Home.css";
 
 const Home = () => {
-  const popularProducts = useMemo(() => getPopularProducts(), []);
+  const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()), []);
   const featuredGridRef = useRef(null);
   useMobileCenterSwap(featuredGridRef, '.feat-img-zone.has-second-img');
 
@@ -148,7 +149,7 @@ const HOME_CAT_IMAGES = {
           </div>
           <div className="featured-grid" ref={featuredGridRef}>
             {popularProducts.slice(0, 8).map((product, index) => (
-              <FeaturedCard key={product.id} product={product} index={index} />
+              <FeaturedCard key={product._variantKey || product.id} product={product} index={index} />
             ))}
           </div>
         </div>
@@ -195,7 +196,7 @@ export const FeaturedCard = ({ product, index }) => {
   const handleAddToCart = useCallback((e) => {
     e.preventDefault(); e.stopPropagation();
     if (needsOptions) {
-      navigate(`/product/${product.slug}`);
+      navigate(`/product/${product.slug}${productLinkQuery(product)}`);
       return;
     }
     addItem(product);
@@ -211,8 +212,8 @@ export const FeaturedCard = ({ product, index }) => {
   }, [product, toggleItem]);
 
   const handleCardClick = useCallback(() => {
-    navigate(`/product/${product.slug}`);
-  }, [product.slug, navigate]);
+    navigate(`/product/${product.slug}${productLinkQuery(product)}`);
+  }, [product, navigate]);
 
   const secondImage = product.images[1] || null;
   const imgZoneRef = useRef(null);

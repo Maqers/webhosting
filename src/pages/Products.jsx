@@ -9,6 +9,7 @@ import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
+import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
 import './Products.css'
 
 let cachedCategories = null
@@ -104,7 +105,7 @@ const Products = () => {
       relevanceScores
     })
 
-    return filtered
+    return expandProductsByColor(filtered)
   }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
@@ -318,7 +319,7 @@ const Products = () => {
               <div className="products-grid" ref={gridRef}>
                 {visibleProducts.map((product, index) => (
                   <ProductCard
-                    key={product.id}
+                    key={product._variantKey || product.id}
                     product={product}
                     index={index}
                     categoryMap={categoryMap}
@@ -388,7 +389,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
       const params = selectedCategories.length > 0
         ? `?category=${selectedCategories[0]}`
         : location.search
-      navigate(`/product/${product.slug}`, { state: { from: location.pathname + params } })
+      navigate(`/product/${product.slug}${productLinkQuery(product)}`, { state: { from: location.pathname + params } })
       return
     }
     addItem(product)
@@ -408,8 +409,8 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
     const params = selectedCategories.length > 0
       ? `?category=${selectedCategories[0]}`
       : location.search
-    navigate(`/product/${product.slug}`, { state: { from: location.pathname + params } })
-  }, [product.slug, navigate, location, selectedCategories])
+    navigate(`/product/${product.slug}${productLinkQuery(product)}`, { state: { from: location.pathname + params } })
+  }, [product, navigate, location, selectedCategories])
 
   return (
     <article
