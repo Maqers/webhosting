@@ -540,6 +540,18 @@ function updateOccasionCatalogEntry(source, id, updated) {
   return r;
 }
 
+// Rewrites each occasion's `order:` field to match its position in
+// `orderedIds` — the nav bar, /by-occasion, and the Categories page all sort
+// by this field at render time, so this is the one write that actually
+// changes what order occasions show up in on the site.
+function updateOccasionOrderInSource(source, orderedIds) {
+  let r = source;
+  orderedIds.forEach((id, idx) => {
+    r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?order:\\s*)\\d+`), `$1${idx}`);
+  });
+  return r;
+}
+
 // ─── Toast ────────────────────────────────────────────────────────────────────
 
 function Toast({ message, type, onClose }) {
@@ -629,6 +641,7 @@ export default function AdminPortal() {
   const [showAddOccasion, setShowAddOccasion] = useState(false);
   const [newOccasion, setNewOccasion] = useState({ name: "", emoji: "", description: "" });
   const [editingOccasion, setEditingOccasion] = useState(null);
+  const [occasionOrderDirty, setOccasionOrderDirty] = useState(false);
 
   // ── Drag-and-drop reorder state ──────────────────────────────────────────────
   const [draggingId, setDraggingId] = useState(null);
@@ -1242,6 +1255,31 @@ export default function AdminPortal() {
       setOccasionCatalogEntries(parseOccasionCatalogEntries(updated));
       setEditingOccasion(null);
       showToast("Occasion saved!");
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  function moveOccasion(id, direction) {
+    setOccasionCatalogEntries(prev => {
+      const idx = prev.findIndex(o => o.id === id);
+      const swapIdx = idx + direction;
+      if (idx === -1 || swapIdx < 0 || swapIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+      return next;
+    });
+    setOccasionOrderDirty(true);
+  }
+
+  async function handleSaveOccasionOrder() {
+    setPublishing(true);
+    try {
+      const { source, sha } = await fetchOccasionCatalog(creds);
+      const updated = updateOccasionOrderInSource(source, occasionCatalogEntries.map(o => o.id));
+      await commitOccasionCatalog(updated, sha, "Reorder occasions", creds);
+      setOccasionCatalogEntries(parseOccasionCatalogEntries(updated));
+      setOccasionOrderDirty(false);
+      showToast("Occasion order saved — live in ~45s");
     } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
@@ -2647,13 +2685,19 @@ export default function AdminPortal() {
               <h1 style={ts.pageTitle}>Occasion Map</h1>
               <div style={{ display: "flex", gap: 10 }}>
                 <button style={ts.ghostBtn} onClick={() => setShowAddOccasion(s => !s)}>+ Add Occasion</button>
+                {occasionOrderDirty && (
+                  <button style={ts.primaryBtn} onClick={handleSaveOccasionOrder} disabled={publishing}>
+                    {publishing ? "Saving..." : "Save Occasion Order"}
+                  </button>
+                )}
                 <button style={ts.primaryBtn} onClick={handleSaveOccasions} disabled={publishing}>
                   {publishing ? "Saving..." : "Save All"}
                 </button>
               </div>
             </div>
             <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
-              Toggle products in each occasion. Use ↑↓ to reorder. Hit Save All when done.
+              Use the ▲▼ on each occasion card to reorder them in the nav bar and Shop by Occasion page — hit "Save Occasion Order" once you're happy.
+              Within a card, toggle which products belong to it and drag them to reorder — hit "Save All" for those.
             </p>
 
             {showAddOccasion && (
@@ -2711,7 +2755,7 @@ export default function AdminPortal() {
               </div>
             )}
 
-            {occasionCatalogEntries.map(occ => {
+            {occasionCatalogEntries.map((occ, occIdx) => {
               const currentIds = occasionEdits[occ.id] || [];
               const selectedProducts = currentIds.map(id => products.find(p => p.id === id)).filter(Boolean);
               return (
@@ -2720,6 +2764,12 @@ export default function AdminPortal() {
                     <h2 style={{ ...ts.cardTitle, margin: 0 }}>{occ.emoji ? `${occ.emoji} ` : ""}{occ.name}</h2>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       <span style={ts.flag}>{currentIds.length} products</span>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        <button type="button" style={{ ...ts.editBtn, padding: "1px 8px", fontSize: 10, lineHeight: 1.4, opacity: occIdx === 0 ? 0.35 : 1 }}
+                          disabled={occIdx === 0} onClick={() => moveOccasion(occ.id, -1)} aria-label="Move up">▲</button>
+                        <button type="button" style={{ ...ts.editBtn, padding: "1px 8px", fontSize: 10, lineHeight: 1.4, opacity: occIdx === occasionCatalogEntries.length - 1 ? 0.35 : 1 }}
+                          disabled={occIdx === occasionCatalogEntries.length - 1} onClick={() => moveOccasion(occ.id, 1)} aria-label="Move down">▼</button>
+                      </div>
                       <button style={ts.editBtn} onClick={() => setEditingOccasion({ ...occ })}>Edit</button>
                     </div>
                   </div>

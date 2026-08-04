@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
-import { occasionCategories } from '../data/occasionCatalog'
+import { occasionCategories as OCCASION_CATEGORIES_RAW } from '../data/occasionCatalog'
 import { occasionProductMap } from '../data/catalog'
 import SeoHead from '../components/SeoHead'
 import './ByOccasion.css'
+
+const occasionCategories = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
 
 export default function ByOccasion() {
   return (

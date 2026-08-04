@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
-import { occasionCategories, getOccasionProducts } from '../data/occasionCatalog'
+import { occasionCategories as OCCASION_CATEGORIES_RAW, getOccasionProducts } from '../data/occasionCatalog'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -10,6 +10,7 @@ import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
 import './Categories.css'
 
+const occasionCategories = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
 
 // Smart sub-filters per category — curated from real product tags
