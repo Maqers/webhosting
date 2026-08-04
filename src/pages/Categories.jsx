@@ -259,7 +259,7 @@ const ProductCard = ({ product, index }) => {
   const [addedFeedback, setAddedFeedback] = useState(false)
   const [heartPop, setHeartPop] = useState(false)
   const imgZoneRef = useRef(null)
-  const secondImage = product.images[1] || null
+  const secondImage = product._variantColor ? null : (product.images[1] || null)
 
   const needsOptions = (product.meta?.colors?.length > 0) || (product.meta?.sizes?.length > 0)
 

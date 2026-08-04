@@ -215,7 +215,7 @@ export const FeaturedCard = ({ product, index }) => {
     navigate(`/product/${product.slug}${productLinkQuery(product)}`);
   }, [product, navigate]);
 
-  const secondImage = product.images[1] || null;
+  const secondImage = product._variantColor ? null : (product.images[1] || null);
   const imgZoneRef = useRef(null);
 
   return (
