@@ -137,6 +137,17 @@ async function commitCatalog2(source, sha, message, creds) {
   return ghPut("src/data/catalog.js", encoded, message, sha, creds);
 }
 
+async function fetchOccasionCatalog(creds) {
+  const file = await ghGet("src/data/occasionCatalog.js", creds);
+  const source = decodeURIComponent(escape(atob(file.content.replace(/\n/g, ""))));
+  return { source, sha: file.sha };
+}
+
+async function commitOccasionCatalog(source, sha, message, creds) {
+  const encoded = btoa(unescape(encodeURIComponent(source)));
+  return ghPut("src/data/occasionCatalog.js", encoded, message, sha, creds);
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function slugify(text) {
@@ -483,6 +494,52 @@ function updateOccasionMapInSource(source, occasionMap) {
   return updated;
 }
 
+// Adds an empty product-id array for a brand new occasion key in catalog.js's
+// occasionProductMap — mirrors addCategoryProductBlock's role for categories.
+function addOccasionMapKey(source, occasionId) {
+  return source.replace(
+    /(export const occasionProductMap = \{)/,
+    `$1\n  '${occasionId}': [],`
+  );
+}
+
+// ─── occasionCatalog.js parsers/serializers ────────────────────────────────────
+// occasionCatalog.js is a SEPARATE file from catalog.js: it holds the display
+// metadata (name, emoji, description, order) for each occasion. catalog.js's
+// occasionProductMap only holds which product IDs belong to each occasion —
+// the /by-occasion page renders strictly off occasionCatalog.js's list, so an
+// occasion only shows on the site once it exists in BOTH files.
+
+function parseOccasionCatalogEntries(source) {
+  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*emoji:\s*"([^"]*)",\s*order:\s*(\d+),\s*description:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+  const results = [];
+  let m;
+  while ((m = regex.exec(source)) !== null) {
+    results.push({ id: m[1], name: m[2], slug: m[3], emoji: m[4], order: parseInt(m[5]), description: m[6].replace(/\\"/g, '"') });
+  }
+  return results.sort((a, b) => a.order - b.order);
+}
+
+function insertOccasionCatalogEntry(source, occ, order) {
+  const entry = `  {
+    id: "${occ.id}",
+    name: "${sanitizeForJS(occ.name)}",
+    slug: "${occ.id}",
+    emoji: "${occ.emoji || ""}",
+    order: ${order},
+    description: "${sanitizeForJS(occ.description || "")}"
+  },`;
+  return source.replace(/(export const occasionCategories = \[)([\s\S]*?)(\n\])/m, (_, open, content, close) => `${open}${content}\n${entry}${close}`);
+}
+
+function updateOccasionCatalogEntry(source, id, updated) {
+  let r = source;
+  r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?name:\\s*)"[^"]*"`), `$1"${sanitizeForJS(updated.name)}"`);
+  r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?emoji:\\s*)"[^"]*"`), `$1"${updated.emoji || ""}"`);
+  r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?description:\\s*)"[^"]*"`), `$1"${sanitizeForJS(updated.description || "")}"`);
+  return r;
+}
+
 // ─── Toast ────────────────────────────────────────────────────────────────────
 
 function Toast({ message, type, onClose }) {
@@ -568,6 +625,10 @@ export default function AdminPortal() {
   const [newCategory, setNewCategory] = useState({ name: "", description: "", icon: "gift" });
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [occasionEdits, setOccasionEdits] = useState({});
+  const [occasionCatalogEntries, setOccasionCatalogEntries] = useState([]);
+  const [showAddOccasion, setShowAddOccasion] = useState(false);
+  const [newOccasion, setNewOccasion] = useState({ name: "", emoji: "", description: "" });
+  const [editingOccasion, setEditingOccasion] = useState(null);
 
   // ── Drag-and-drop reorder state ──────────────────────────────────────────────
   const [draggingId, setDraggingId] = useState(null);
@@ -604,18 +665,26 @@ export default function AdminPortal() {
       const c = { token: loginForm.token, owner: loginForm.owner, repo: loginForm.repo, branch: loginForm.branch };
       const { source, sha } = await fetchCatalog(c);
       sessionStorage.setItem("maqers_admin_creds", JSON.stringify(c));
-      setCreds(c); loadCatalogData(source, sha); setStep("app");
+      setCreds(c); loadCatalogData(source, sha, c); setStep("app");
     } catch { setLoginError("Could not connect. Check your token, owner, repo, and branch."); }
     finally { setLoginLoading(false); }
   }
 
-  function loadCatalogData(source, sha) {
+  async function loadOccasionCatalogData(credsOverride) {
+    try {
+      const { source } = await fetchOccasionCatalog(credsOverride || creds);
+      setOccasionCatalogEntries(parseOccasionCatalogEntries(source));
+    } catch (err) { console.error("Failed to load occasionCatalog.js:", err); }
+  }
+
+  function loadCatalogData(source, sha, credsOverride) {
     setProducts(parseProducts(source));
     setCategories(parseCategories(source));
     const oMap = parseOccasionMap(source);
     setOccasionMap(oMap);
     setOccasionCategories(parseOccasionCategories(source));
     setOccasionEdits(JSON.parse(JSON.stringify(oMap)));
+    loadOccasionCatalogData(credsOverride);
     // Load sellers so they're available everywhere
     loadSellers();
   }
@@ -992,6 +1061,7 @@ export default function AdminPortal() {
   function handleStageProductEdit(edited) {
     setPendingChanges(prev => ({ ...prev, [edited.id]: edited }));
     setEditingProduct(null); setEditImageFiles([]);
+    if (viewingSeller) { setProductFilter(""); setActiveTab("sellers"); }
     showToast("Staged — hit Publish All to save.", "info");
   }
 
@@ -1123,6 +1193,49 @@ export default function AdminPortal() {
       const updated = updateOccasionMapInSource(source, occasionEdits);
       await commitCatalog(updated, sha, "Update occasion product map", creds);
       loadCatalogData(updated, sha); showToast("Occasion map saved!");
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  // Creating an occasion touches two separate files — occasionCatalog.js
+  // (display metadata the /by-occasion page actually renders off) and
+  // catalog.js's occasionProductMap (which product IDs belong to it) — since
+  // the GitHub Contents API can't commit to both atomically, this does two
+  // sequential commits. If the second one fails, the occasion will exist in
+  // occasionCatalog.js but not yet have a product-id bucket; re-running Save
+  // (or just adding a product to it from the Occasions tab) fixes it.
+  async function handleAddOccasion() {
+    if (!newOccasion.name.trim()) return showToast("Occasion name required.", "error");
+    const id = slugify(newOccasion.name);
+    if (occasionCatalogEntries.some(o => o.id === id)) return showToast("An occasion with this name already exists.", "error");
+    setPublishing(true);
+    try {
+      const { source: occSource, sha: occSha } = await fetchOccasionCatalog(creds);
+      const maxOrder = Math.max(...parseOccasionCatalogEntries(occSource).map(o => o.order), -1);
+      const updatedOccSource = insertOccasionCatalogEntry(occSource, { ...newOccasion, id }, maxOrder + 1);
+      await commitOccasionCatalog(updatedOccSource, occSha, `Add occasion: ${newOccasion.name}`, creds);
+
+      const { source, sha } = await fetchCatalog(creds);
+      const updated = addOccasionMapKey(source, id);
+      await commitCatalog(updated, sha, `Add occasion product bucket: ${id}`, creds);
+
+      loadCatalogData(updated, sha);
+      setNewOccasion({ name: "", emoji: "", description: "" });
+      setShowAddOccasion(false);
+      showToast(`Occasion "${newOccasion.name}" added!`);
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  async function handleSaveOccasionMeta() {
+    setPublishing(true);
+    try {
+      const { source, sha } = await fetchOccasionCatalog(creds);
+      const updated = updateOccasionCatalogEntry(source, editingOccasion.id, editingOccasion);
+      await commitOccasionCatalog(updated, sha, `Edit occasion: ${editingOccasion.name}`, creds);
+      setOccasionCatalogEntries(parseOccasionCatalogEntries(updated));
+      setEditingOccasion(null);
+      showToast("Occasion saved!");
     } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
@@ -1723,7 +1836,7 @@ export default function AdminPortal() {
                     <div style={ts.card}>
                       <h2 style={ts.cardTitle}>Occasion Categories</h2>
                       <div style={ts.chipGrid}>
-                        {occasionCategories.map(occ => (
+                        {(occasionCatalogEntries.length > 0 ? occasionCatalogEntries : occasionCategories).map(occ => (
                           <button type="button" key={occ.id}
                             onClick={() => setNewProduct(p => ({
                               ...p,
@@ -1825,7 +1938,7 @@ export default function AdminPortal() {
                       ["Delivery Time", newProduct.delivery_time || "none"],
                       ["MOQ", newProduct.moq || "none"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
-                      ["Occasions", newProduct.occasions.map(o => occasionCategories.find(oc => oc.id === o)?.name).filter(Boolean).join(", ") || "None"],
+                      ["Occasions", newProduct.occasions.map(o => (occasionCatalogEntries.find(oc => oc.id === o) || occasionCategories.find(oc => oc.id === o))?.name).filter(Boolean).join(", ") || "None"],
                       ["Images", imageFiles.map(f => f.name).join(", ")],
                     ].map(([label, val]) => (
                       <div key={label} style={{ marginBottom: 10 }}>
@@ -2500,22 +2613,85 @@ export default function AdminPortal() {
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <h1 style={ts.pageTitle}>Occasion Map</h1>
-              <button style={ts.primaryBtn} onClick={handleSaveOccasions} disabled={publishing}>
-                {publishing ? "Saving..." : "Save All"}
-              </button>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button style={ts.ghostBtn} onClick={() => setShowAddOccasion(s => !s)}>+ Add Occasion</button>
+                <button style={ts.primaryBtn} onClick={handleSaveOccasions} disabled={publishing}>
+                  {publishing ? "Saving..." : "Save All"}
+                </button>
+              </div>
             </div>
             <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
               Toggle products in each occasion. Use ↑↓ to reorder. Hit Save All when done.
             </p>
-            {occasionCategories.map(occ => {
+
+            {showAddOccasion && (
+              <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
+                <h2 style={ts.cardTitle}>New Occasion</h2>
+                <div style={ts.grid2}>
+                  <div>
+                    <label style={ts.label}>Name *</label>
+                    <input style={ts.input} placeholder="e.g. For Your Roommate" value={newOccasion.name}
+                      onChange={e => setNewOccasion(o => ({ ...o, name: e.target.value }))} />
+                    <label style={ts.label}>Emoji</label>
+                    <input style={ts.input} placeholder="e.g. 🏠" value={newOccasion.emoji}
+                      onChange={e => setNewOccasion(o => ({ ...o, emoji: e.target.value }))} />
+                    <label style={ts.label}>Description</label>
+                    <textarea style={{ ...ts.input, height: 70, resize: "vertical" }} placeholder="Short, playful blurb shown on the By Occasion page..."
+                      value={newOccasion.description} onChange={e => setNewOccasion(o => ({ ...o, description: e.target.value }))} />
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ textAlign: "center", color: "#aaa" }}>
+                      <div style={{ fontSize: 36, marginBottom: 8 }}>{newOccasion.emoji || "🎁"}</div>
+                      <p style={{ fontSize: 13, margin: 0 }}>ID: <strong style={{ color: "#333" }}>{slugify(newOccasion.name || "occasion-name")}</strong></p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                  <button style={ts.ghostBtn} onClick={() => setShowAddOccasion(false)}>Cancel</button>
+                  <button style={ts.primaryBtn} onClick={handleAddOccasion} disabled={publishing}>{publishing ? "Adding..." : "Add Occasion"}</button>
+                </div>
+              </div>
+            )}
+
+            {editingOccasion && (
+              <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
+                <h2 style={ts.cardTitle}>Edit: {editingOccasion.name}</h2>
+                <div style={ts.grid2}>
+                  <div>
+                    <label style={ts.label}>Name</label>
+                    <input style={ts.input} value={editingOccasion.name} onChange={e => setEditingOccasion(o => ({ ...o, name: e.target.value }))} />
+                    <label style={ts.label}>Emoji</label>
+                    <input style={ts.input} value={editingOccasion.emoji} onChange={e => setEditingOccasion(o => ({ ...o, emoji: e.target.value }))} />
+                    <label style={ts.label}>Description</label>
+                    <textarea style={{ ...ts.input, height: 70, resize: "vertical" }} value={editingOccasion.description}
+                      onChange={e => setEditingOccasion(o => ({ ...o, description: e.target.value }))} />
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ textAlign: "center", color: "#888" }}>
+                      <p style={{ fontSize: 13 }}>ID (fixed): <strong style={{ color: "#333" }}>{editingOccasion.id}</strong></p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                  <button style={ts.ghostBtn} onClick={() => setEditingOccasion(null)}>Cancel</button>
+                  <button style={ts.primaryBtn} onClick={handleSaveOccasionMeta} disabled={publishing}>{publishing ? "Saving..." : "Save Changes"}</button>
+                </div>
+              </div>
+            )}
+
+            {occasionCatalogEntries.map(occ => {
               const currentIds = occasionEdits[occ.id] || [];
               const selectedProducts = currentIds.map(id => products.find(p => p.id === id)).filter(Boolean);
               return (
                 <div key={occ.id} style={{ ...ts.card, marginBottom: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <h2 style={{ ...ts.cardTitle, margin: 0 }}>{occ.name}</h2>
-                    <span style={ts.flag}>{currentIds.length} products</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <h2 style={{ ...ts.cardTitle, margin: 0 }}>{occ.emoji ? `${occ.emoji} ` : ""}{occ.name}</h2>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <span style={ts.flag}>{currentIds.length} products</span>
+                      <button style={ts.editBtn} onClick={() => setEditingOccasion({ ...occ })}>Edit</button>
+                    </div>
                   </div>
+                  {occ.description && <p style={{ fontSize: 12, color: "#999", margin: "0 0 12px" }}>{occ.description}</p>}
 
                   {/* Ordered list with ↑↓ reorder */}
                   {selectedProducts.length > 0 && (
@@ -2588,7 +2764,15 @@ export default function AdminPortal() {
                 <h1 style={ts.pageTitle}>Sellers / Makers</h1>
                 <p style={{ margin: 0, fontSize: 12, color: "#888" }}>Internal only — not shown on site</p>
               </div>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                {Object.keys(pendingChanges).length > 0 && (
+                  <>
+                    <span style={{ fontSize: 12, color: "#c8a96e" }}>{Object.keys(pendingChanges).length} unsaved product change(s)</span>
+                    <button style={ts.primaryBtn} onClick={handlePublishAllChanges} disabled={publishing}>
+                      {publishing ? "Publishing..." : `Publish All (${Object.keys(pendingChanges).length})`}
+                    </button>
+                  </>
+                )}
                 <button style={ts.ghostBtn} onClick={loadSellers} disabled={sellersLoading}>
                   {sellersLoading ? "Loading..." : "↺ Refresh"}
                 </button>
@@ -2748,9 +2932,10 @@ export default function AdminPortal() {
                 shoppable and shows no business info at all. */}
             {viewingSeller && (() => {
               const catalogProducts = products.filter(p => p.sellerCode === viewingSeller.seller_code);
-              const detailProducts = catalogProducts.length > 0
+              const rawDetailProducts = catalogProducts.length > 0
                 ? catalogProducts
                 : products.filter(p => (viewingSeller.product_ids || []).includes(p.id));
+              const detailProducts = rawDetailProducts.map(p => pendingChanges[p.id] ? { ...p, ...pendingChanges[p.id] } : p);
               return (
                 <div style={{ ...ts.card, border: "2px solid #c8a96e", marginBottom: 24 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
@@ -2812,7 +2997,7 @@ export default function AdminPortal() {
                     ) : (
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
                         {detailProducts.map(p => (
-                          <div key={p.id} style={{ border: "1px solid #eee", borderRadius: 8, overflow: "hidden", background: "#fff" }}>
+                          <div key={p.id} style={{ border: pendingChanges[p.id] ? "1px solid #c8a96e" : "1px solid #eee", borderRadius: 8, overflow: "hidden", background: pendingChanges[p.id] ? "#fffbf3" : "#fff" }}>
                             <div style={{ width: "100%", aspectRatio: "1", background: "#f5f3f0" }}>
                               <img src={p.images?.[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
                             </div>
@@ -2820,7 +3005,14 @@ export default function AdminPortal() {
                               <p style={{ margin: "0 0 2px", fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.5 }}>{p.categoryId}</p>
                               <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>{p.title}</p>
                               <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#760909" }}>₹{Number(p.price).toLocaleString("en-IN")}</p>
-                              <p style={{ margin: 0, fontSize: 10, color: "#bbb", fontFamily: "monospace" }}>ID {p.id}</p>
+                              <p style={{ margin: "0 0 6px", fontSize: 10, color: "#bbb", fontFamily: "monospace" }}>ID {p.id}{pendingChanges[p.id] ? " · unsaved" : ""}</p>
+                              <button type="button" style={{ ...ts.editBtn, width: "100%" }}
+                                onClick={() => {
+                                  setProductFilter(String(p.id));
+                                  setProductFilterCat("all");
+                                  setEditingProduct({ ...p });
+                                  setActiveTab("products");
+                                }}>Edit</button>
                             </div>
                           </div>
                         ))}
