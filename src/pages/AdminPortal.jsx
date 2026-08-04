@@ -1869,15 +1869,41 @@ export default function AdminPortal() {
                         <p style={ts.dropzoneHint}>First image = primary thumbnail</p>
                       </div>
                       {imageFiles.length > 0 && (
-                        <div style={ts.thumbGrid}>
-                          {imageFiles.map((img, i) => (
-                            <div key={i} style={ts.thumb}>
-                              <img src={img.preview} alt="" style={ts.thumbImg} />
-                              {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
-                              <button type="button" onClick={() => setImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
-                            </div>
-                          ))}
-                        </div>
+                        <>
+                          <p style={ts.fieldHint}>Drag to reorder · × to remove</p>
+                          <div style={ts.thumbGrid}>
+                            {imageFiles.map((img, i) => (
+                              <div key={img.name + i} style={{ ...ts.thumb, cursor: "grab" }}
+                                draggable
+                                onDragStart={e => e.dataTransfer.setData("imgIdx", String(i))}
+                                onDragOver={e => e.preventDefault()}
+                                onDrop={e => {
+                                  e.preventDefault();
+                                  const from = parseInt(e.dataTransfer.getData("imgIdx"));
+                                  if (isNaN(from) || from === i) return;
+                                  setImageFiles(prev => {
+                                    const files = [...prev];
+                                    const [moved] = files.splice(from, 1);
+                                    files.splice(i, 0, moved);
+                                    return files;
+                                  });
+                                  setNewProduct(p => ({
+                                    ...p,
+                                    colors: (p.colors || []).map(c => {
+                                      if (typeof c !== "object") return c;
+                                      if (c.imageIndex === from) return { ...c, imageIndex: i };
+                                      if (c.imageIndex === i) return { ...c, imageIndex: from };
+                                      return c;
+                                    }),
+                                  }));
+                                }}>
+                                <img src={img.preview} alt="" style={ts.thumbImg} />
+                                {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
+                                <button type="button" onClick={() => setImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
+                              </div>
+                            ))}
+                          </div>
+                        </>
                       )}
                     </div>
                     {newProduct.title && (
