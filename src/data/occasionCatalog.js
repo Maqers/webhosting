@@ -173,6 +173,14 @@ export const occasionCategories = [
     order: 19,
     description: "When you need a gift but the occasion is too specific to explain to a search bar."
   },
+  {
+    id: "rakshabandhan",
+    name: "Rakshabandhan",
+    slug: "rakshabandhan",
+    emoji: "🧿",
+    order: 20,
+    description: "For your naughty sibling"
+  },
 ]
 
 /**
