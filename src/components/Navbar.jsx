@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import EnhancedSearchBar from './EnhancedSearchBar'
 import { getSortedCategories } from '../data/catalog'
+import { occasionCategories as OCCASION_CATEGORIES } from '../data/occasionCatalog'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
@@ -9,31 +10,10 @@ import './Navbar.css'
 
 // Product categories are derived directly from catalog.js — no manual sync needed.
 // getSortedCategories() is the single source of truth.
-// Occasion categories remain here since they are managed via occasionCatalog.js
-
-const OCCASION_CATEGORIES = [
-  { id: 'shaadi-fever',          name: 'Shaadi Fever',             slug: 'shaadi-fever',            emoji: '💍' },
-  { id: 'for-your-best-friend',  name: 'For Your Best Friend',     slug: 'for-your-best-friend',    emoji: '🫂' },
-  { id: 'for-your-girlfriend',   name: 'For Your Girlfriend',      slug: 'for-your-girlfriend',     emoji: '💕' },
-  { id: 'for-your-boyfriend',    name: 'For Your Boyfriend',       slug: 'for-your-boyfriend',      emoji: '🫶' },
-  { id: 'situationship',         name: 'For Your Situationship',   slug: 'situationship',           emoji: '🫠' },
-  { id: 'self-love-kits',        name: 'Self-Love Kits',           slug: 'self-love-kits',          emoji: '🌸' },
-  { id: 'breakup-hampers',       name: 'Breakup Hampers',          slug: 'breakup-hampers',         emoji: '💔' },
-  { id: 'birthday',              name: 'Birthday Gifts',           slug: 'birthday',                emoji: '🎂' },
-  { id: 'late-night-cravings',   name: 'Midnight Crisis Gifts',    slug: 'late-night-cravings',     emoji: '🌙' },
-  { id: 'the-main-character',    name: 'Main Character Energy',    slug: 'the-main-character',      emoji: '✨' },
-  { id: 'for-your-work-friend',  name: 'For Your Work Friend',     slug: 'for-your-work-friend',    emoji: '☕' },
-  { id: 'for-your-mom',          name: 'For Your Mom',             slug: 'for-your-mom',            emoji: '🌷' },
-  { id: 'for-your-dad',          name: 'For Your Dad',             slug: 'for-your-dad',            emoji: '🫡' },
-  { id: 'for-your-sister',       name: 'For Your Sister',          slug: 'for-your-sister',         emoji: '👯' },
-  { id: 'for-your-brother',      name: 'For Your Brother',         slug: 'for-your-brother',        emoji: '🤜' },
-  { id: 'for-children',          name: 'For Children',             slug: 'for-children',            emoji: '🧸' },
-  { id: 'the-host-gift',         name: 'The Host Gift',            slug: 'the-host-gift',           emoji: '🥂' },
-  { id: 'housewarming',          name: 'Housewarming',             slug: 'housewarming',            emoji: '🏡' },
-  { id: 'bachelor-party',        name: 'Bachelor Party',           slug: 'bachelor-party',          emoji: '🎉' },
-  { id: 'godh-bharai',           name: 'Godh Bharai / Baby Shower',slug: 'godh-bharai',             emoji: '🍼' },
-  { id: 'occasion-gifts',        name: 'Occasion Gifts',           slug: 'occasion-gifts',          emoji: '🎁' },
-]
+// Occasion categories are imported directly from occasionCatalog.js — previously
+// this was a separately maintained hardcoded copy that silently drifted out of
+// sync with occasions added/edited via the admin portal (that's why a newly
+// added occasion showed on /by-occasion but not here).
 
 // IDs to exclude from the navbar product dropdown (internal/legacy categories)
 const EXCLUDED_CATEGORY_IDS = ['Oxidised-jewellery', 'cosmetics']
