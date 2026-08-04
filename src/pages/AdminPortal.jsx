@@ -639,6 +639,7 @@ export default function AdminPortal() {
   const [openCats, setOpenCats] = useState({});
   const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
   const editFormRef = useRef(null);
+  const sellerPanelRef = useRef(null);
 
   // ── Inline seller creation (used inside add-product & edit forms) ────────────
   const [showInlineAddSeller, setShowInlineAddSeller] = useState(false);
@@ -649,6 +650,11 @@ export default function AdminPortal() {
   const [sellers, setSellers] = useState([]);
   const [sellersLoading, setSellersLoading] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
+  useEffect(() => {
+    if (viewingSeller || editingSeller) {
+      sellerPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [viewingSeller, editingSeller]);
   const [showAddSeller, setShowAddSeller] = useState(false);
   const [newSeller, setNewSeller] = useState({ business_name: "", owners: [], location: "", address: "", pincode: "", notes: "", phone: "", email: "", gst_registered: false, gst_number: "", hsn_codes: [], delivery_handled_by: "seller", commission_pct: 10 });
   const [newOwnerInput, setNewOwnerInput] = useState("");
@@ -2929,7 +2935,11 @@ export default function AdminPortal() {
             {/* Seller Detail View — internal-only, full business info + product
                 grid with IDs, no cart/wishlist. Distinct from the public
                 /maker/:sellerCode storefront (SellerStorefront.jsx), which is
-                shoppable and shows no business info at all. */}
+                shoppable and shows no business info at all.
+                Wrapped + ref'd so View/Edit (clicked from anywhere in a long
+                seller grid) scrolls the panel into view instead of leaving
+                the admin to scroll all the way up to find it. */}
+            <div ref={sellerPanelRef}>
             {viewingSeller && (() => {
               const catalogProducts = products.filter(p => p.sellerCode === viewingSeller.seller_code);
               const rawDetailProducts = catalogProducts.length > 0
@@ -3181,6 +3191,7 @@ export default function AdminPortal() {
                 </div>
               </div>
             )}
+            </div>
 
             {/* Sellers List */}
             {sellersLoading ? (
