@@ -83,7 +83,6 @@ const HOME_CAT_IMAGES = {
         <div className="container hero-bright-inner">
           {showRakhiBanner ? (
             <>
-              <img src="/images/rakhi-motif-2026.png" alt="" className="hero-rakhi-motif" aria-hidden="true" width="235" height="235" />
               <p className="hero-bright-eyebrow">Maqers wishes you</p>
               <h1 className="hero-bright-title">Happy Rakshabandhan</h1>
               <p className="hero-bright-subtitle">
