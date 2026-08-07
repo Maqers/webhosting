@@ -30,9 +30,17 @@
 }
 
 .hero-bright--rakhi {
-  background-image: linear-gradient(rgba(60,4,4,0.55), rgba(60,4,4,0.55)), url('/images/rakhi-banner-2026.jpg');
-  background-size: cover;
-  background-position: center;
+  /* Sampled directly from the banner graphic's own red so the motif image
+     below blends in with no visible edge/seam. */
+  background: #6d0000;
+}
+
+.hero-rakhi-motif {
+  width: clamp(90px, 18vw, 150px);
+  height: auto;
+  margin-bottom: 0.25rem;
+  -webkit-mask-image: radial-gradient(circle, black 55%, transparent 78%);
+  mask-image: radial-gradient(circle, black 55%, transparent 78%);
 }
 
 .hero-bright-eyebrow {
