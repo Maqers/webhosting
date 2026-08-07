@@ -29,6 +29,21 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+.hero-bright--rakhi {
+  background-image: linear-gradient(rgba(60,4,4,0.55), rgba(60,4,4,0.55)), url('/images/rakhi-banner-2026.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-bright-eyebrow {
+  font-family: var(--font-family-primary);
+  font-size: clamp(0.85rem, 1.6vw, 0.95rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+}
+
 .hero-bright-title {
   font-family: var(--font-family-heading);
   font-size: clamp(2.4rem, 5vw, 3.6rem);

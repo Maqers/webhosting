@@ -10,6 +10,11 @@ import SeoHead from "../components/SeoHead";
 import { useMobileCenterSwap } from "../hooks/useMobileCenterSwap";
 import "./Home.css";
 
+// Raksha Bandhan 2026 falls on Aug 28 — this banner auto-hides itself the day
+// after, reverting to the normal hero with no code change needed next year.
+const RAKHI_BANNER_EXPIRES = new Date("2026-08-29T00:00:00+05:30");
+const showRakhiBanner = new Date() < RAKHI_BANNER_EXPIRES;
+
 const Home = () => {
   const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()), []);
   const featuredGridRef = useRef(null);
@@ -74,24 +79,47 @@ const HOME_CAT_IMAGES = {
         url="/"
       />
 
-      <section className="hero-bright">
+      <section className={`hero-bright${showRakhiBanner ? ' hero-bright--rakhi' : ''}`}>
         <div className="container hero-bright-inner">
-          <h1 className="hero-bright-title">
-            Saw it on Instagram?<br /><em>Buy it here.</em>
-          </h1>
-          <p className="hero-bright-subtitle">
-            The best independent Indian sellers, in one place.
-          </p>
-          <div className="hero-bright-actions">
-            <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
-            <button
-              className="hero-bright-btn-secondary"
-              onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
-              type="button"
-            >
-              ✨ Find the Perfect Gift
-            </button>
-          </div>
+          {showRakhiBanner ? (
+            <>
+              <p className="hero-bright-eyebrow">Maqers wishes you</p>
+              <h1 className="hero-bright-title">Happy Rakshabandhan</h1>
+              <p className="hero-bright-subtitle">
+                All handcrafted, handmade, customised.
+              </p>
+              <div className="hero-bright-actions">
+                <Link to="/category/rakshabandhan" className="hero-bright-btn-primary">Shop Rakhi Gifts</Link>
+                <Link to="/products" className="hero-bright-btn-secondary">Shop All Gifts</Link>
+                <button
+                  className="hero-bright-btn-secondary"
+                  onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
+                  type="button"
+                >
+                  ✨ Find the Perfect Gift
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="hero-bright-title">
+                Saw it on Instagram?<br /><em>Buy it here.</em>
+              </h1>
+              <p className="hero-bright-subtitle">
+                The best independent Indian sellers, in one place.
+              </p>
+              <div className="hero-bright-actions">
+                <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
+                <button
+                  className="hero-bright-btn-secondary"
+                  onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
+                  type="button"
+                >
+                  ✨ Find the Perfect Gift
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
