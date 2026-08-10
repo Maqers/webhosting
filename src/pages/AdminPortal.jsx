@@ -895,7 +895,8 @@ export default function AdminPortal() {
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         imagePaths.push(`/images/${img.name}`);
         if (img.webpBase64) {
-          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, undefined, creds);
+          let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
+          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
         }
       }
       log("Updating catalog.js...");
@@ -907,7 +908,8 @@ export default function AdminPortal() {
         if (rv._photoFile) {
           log("Uploading review photo...");
           const fname = `review-${newId}-${Date.now()}.${extFromMime(rv._photoFile.mime)}`;
-          await ghPut(`public/images/${fname}`, rv._photoFile.base64, `Add review photo: ${fname}`, undefined, creds);
+          let rvSha; try { const ex = await ghGet(`public/images/${fname}`, creds); rvSha = ex.sha; } catch {}
+          await ghPut(`public/images/${fname}`, rv._photoFile.base64, `Add review photo: ${fname}`, rvSha, creds);
           review.image = `/images/${fname}`;
         } else if (rv.image) {
           review.image = rv.image;
@@ -954,7 +956,8 @@ export default function AdminPortal() {
           await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, imgSha, creds);
           imagePaths.push(`/images/${img.name}`);
           if (img.webpBase64) {
-            await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, undefined, creds);
+            let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
+            await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
           }
         }
         const fullProduct = { ...qp, price: Number(qp.price), images: imagePaths };
@@ -1111,7 +1114,8 @@ export default function AdminPortal() {
       setEditReviewUploading(true);
       try {
         const fname = `review-${editingProduct.id}-${Date.now()}.${extFromMime(editReviewInput.photoFile.mime)}`;
-        await ghPut(`public/images/${fname}`, editReviewInput.photoFile.base64, `Add review photo: ${fname}`, undefined, creds);
+        let rvSha; try { const ex = await ghGet(`public/images/${fname}`, creds); rvSha = ex.sha; } catch {}
+        await ghPut(`public/images/${fname}`, editReviewInput.photoFile.base64, `Add review photo: ${fname}`, rvSha, creds);
         review.image = `/images/${fname}`;
       } catch (err) {
         showToast("Photo upload failed: " + err.message, "error");
@@ -1134,7 +1138,8 @@ export default function AdminPortal() {
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         newPaths.push(`/images/${img.name}`);
         if (img.webpBase64) {
-          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, undefined, creds);
+          let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
+          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
         }
       }
       setEditingProduct(p => ({ ...p, images: [...p.images, ...newPaths] }));
