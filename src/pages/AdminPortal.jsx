@@ -16,8 +16,32 @@ const ICON_OPTIONS = ["home","gift","fashion","jewelry","kitchen","art","wedding
 
 // ─── GitHub API ───────────────────────────────────────────────────────────────
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// GitHub's Contents API secondary-rate-limits rapid sequential writes to the
+// same repo (their docs explicitly warn about this for Contents API usage).
+// Publishing several products/images back-to-back easily trips it — this
+// used to surface as a raw 403 that just failed the whole operation, forcing
+// a manual retry that immediately re-triggered the same rapid-fire pattern.
+// Now it backs off and retries automatically instead of failing outright.
+async function githubFetchWithRetry(url, options, attempt = 0) {
+  const res = await fetch(url, options);
+  if ((res.status === 403 || res.status === 429) && attempt < 4) {
+    const bodyText = await res.text();
+    const retryAfter = res.headers.get("Retry-After");
+    const isRateLimit = retryAfter || /rate limit|abuse/i.test(bodyText);
+    if (isRateLimit) {
+      const waitMs = retryAfter ? Number(retryAfter) * 1000 : Math.min(1500 * 2 ** attempt, 15000);
+      await sleep(waitMs);
+      return githubFetchWithRetry(url, options, attempt + 1);
+    }
+    throw new Error(`GitHub request failed (${res.status}): ${bodyText}`);
+  }
+  return res;
+}
+
 async function ghGet(path, creds) {
-  const res = await fetch(
+  const res = await githubFetchWithRetry(
     `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}?ref=${creds.branch}&t=${Date.now()}`,
     { headers: { Authorization: `Bearer ${creds.token}`, Accept: "application/vnd.github+json" } }
   );
@@ -26,7 +50,7 @@ async function ghGet(path, creds) {
 }
 
 async function ghPut(path, content, message, sha, creds) {
-  const res = await fetch(
+  const res = await githubFetchWithRetry(
     `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}`,
     {
       method: "PUT",
@@ -652,6 +676,11 @@ export default function AdminPortal() {
   const [openCats, setOpenCats] = useState({});
   const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
   const editFormRef = useRef(null);
+  // Synchronous guard against double-submit — `disabled={publishing}` only
+  // takes effect after a re-render, leaving a brief window where a fast
+  // double-click fires the handler twice before React disables the button.
+  // A ref updates immediately, closing that window.
+  const publishInFlightRef = useRef(false);
   const sellerPanelRef = useRef(null);
 
   // ── Inline seller creation (used inside add-product & edit forms) ────────────
@@ -885,6 +914,8 @@ export default function AdminPortal() {
   }
 
   async function handlePublishProduct() {
+    if (publishInFlightRef.current) return;
+    publishInFlightRef.current = true;
     setPublishing(true); setPublishLog([]);
     const log = msg => setPublishLog(prev => [...prev, msg]);
     try {
@@ -895,9 +926,11 @@ export default function AdminPortal() {
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         imagePaths.push(`/images/${img.name}`);
         if (img.webpBase64) {
+          await sleep(350);
           let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
           await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
         }
+        await sleep(350);
       }
       log("Updating catalog.js...");
       const { source, sha } = await fetchCatalog(creds);
@@ -938,11 +971,12 @@ export default function AdminPortal() {
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
-    finally { setPublishing(false); }
+    finally { setPublishing(false); publishInFlightRef.current = false; }
   }
 
   async function handlePublishQueue() {
-    if (!productQueue.length) return;
+    if (!productQueue.length || publishInFlightRef.current) return;
+    publishInFlightRef.current = true;
     setPublishing(true); setPublishLog([]);
     const log = msg => setPublishLog(prev => [...prev, msg]);
     try {
@@ -956,9 +990,11 @@ export default function AdminPortal() {
           await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, imgSha, creds);
           imagePaths.push(`/images/${img.name}`);
           if (img.webpBase64) {
+            await sleep(350);
             let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
             await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
           }
+          await sleep(350);
         }
         const fullProduct = { ...qp, price: Number(qp.price), images: imagePaths };
         source = insertProductIntoSource(source, fullProduct, currentId);
@@ -981,7 +1017,7 @@ export default function AdminPortal() {
       showToast(`${productQueue.length} products published!`);
       setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
-    finally { setPublishing(false); }
+    finally { setPublishing(false); publishInFlightRef.current = false; }
   }
 
   async function handleDeleteProduct(product) {
@@ -1129,7 +1165,8 @@ export default function AdminPortal() {
   }
 
   async function uploadEditImages() {
-    if (!editImageFiles.length) return;
+    if (!editImageFiles.length || publishInFlightRef.current) return;
+    publishInFlightRef.current = true;
     setPublishing(true);
     try {
       const newPaths = [];
@@ -1138,15 +1175,17 @@ export default function AdminPortal() {
         await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
         newPaths.push(`/images/${img.name}`);
         if (img.webpBase64) {
+          await sleep(350);
           let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
           await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
         }
+        await sleep(350);
       }
       setEditingProduct(p => ({ ...p, images: [...p.images, ...newPaths] }));
       setEditImageFiles([]);
       showToast(`${newPaths.length} image(s) uploaded and added.`);
     } catch (err) { showToast(err.message, "error"); }
-    finally { setPublishing(false); }
+    finally { setPublishing(false); publishInFlightRef.current = false; }
   }
 
   async function handlePublishAllChanges() {
