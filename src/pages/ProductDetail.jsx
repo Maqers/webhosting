@@ -26,6 +26,22 @@ const hashToIndex = (id, len) => {
   return Math.abs(hash) % len
 }
 
+// Descriptions are stored as plain strings with a lightweight markup
+// convention the admin portal's formatting toolbar writes: **bold**,
+// __underline__, and literal \n for line breaks. Escape first so any stray
+// angle brackets in pasted text can't break the markup, then apply the
+// formatting on top of the escaped text.
+const formatDescriptionHtml = (text) => {
+  const escaped = (text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  return escaped
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<u>$1</u>')
+    .split('\\n').join('<br/>')
+}
+
 const ProductDetail = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
@@ -532,7 +548,7 @@ const ProductDetail = () => {
 
             {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
-            <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: product.description.split('\\n').join('<br/>') }} />
+            <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
             {product.popular && (
               <span className="site-sticker product-detail-sticker">
                 {PRODUCT_STICKERS[hashToIndex(product.id, PRODUCT_STICKERS.length)]}

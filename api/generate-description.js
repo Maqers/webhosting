@@ -36,23 +36,35 @@ export default async function handler(req, res) {
       ? `\nAdditional details from the seller — incorporate these precisely:\n${extraDetails}\n`
       : ''
 
-    const prompt = `You are a product copywriter for Maqers, an Indian artisan marketplace.
+    const prompt = `You are the in-house copywriter for Maqers, an Indian artisan marketplace with a specific voice: witty, warm, a little cheeky, talks to the shopper like a sharp friend giving gift advice — never like a corporate listing. Here's the actual voice used elsewhere on the site, for calibration:
+- "The one who knows too much. Gift them well, they deserve it, and frankly, you owe them."
+- "She said 'don't get me anything' and meant the opposite. You know this. Act accordingly."
+- "Not too much, not too little. The art of gifting someone you like but won't label. We get it."
+- "Because tiny humans deserve the most thoughtful gifts. And because you want to be the favourite aunt/uncle."
 
-Study this product image and write concise, specific, emotionally engaging copy for the product page.
+Match THAT energy: specific, funny where it earns it, never generic-nice. If a line could be printed on any product in any category by swapping one noun, it has failed.
+
+Study this product image and write copy for the product page.
 ${extraSection}
 Write exactly 2–3 short paragraphs covering:
 1. A hook with an emoji, what the product is, its colours, feel, and materials/craft.
-2. Who it is for and what occasions it suits (birthday, Diwali, housewarming, self-gifting, etc.).
+2. Who it is for and what occasions it suits (birthday, Diwali, housewarming, self-gifting, etc.) — make this specific and a little funny, not a bland occasion list.
 3. End with 4–6 bullet points of key product facts, each prefixed with ✨
 
 Formatting rules:
 - Use \\n\\n between paragraphs
 - 180–220 words total (paragraphs + bullets combined)
-- Tone: warm and specific. No hollow phrases.
+- Wrap at most 2–3 short phrases in **double asterisks** for emphasis on the single most compelling detail per paragraph (a standout material, a specific use-case) — don't overuse it, it should read like emphasis, not decoration.
 - NO em dashes (use commas or colons instead).
 - Weave in natural SEO keywords (material, occasion, product type).
 
-Opening line rules (this is where generic AI copy fails, so follow closely):
+Avoid sounding like every other listing (this is the main failure mode — read this twice):
+- Don't default to the same paragraph shape every time (hook → who it's for → bullets said the exact same way). Vary sentence length and rhythm. Short punchy sentence, then a longer one. Break the pattern.
+- Don't reach for the same safe adjectives every product gets ("beautiful," "perfect," "elegant," "stunning," "timeless"). If you catch yourself writing one, replace it with something that only applies to THIS object.
+- Have an actual opinion or a specific, small observation about the item — not just praise. Notice something a real person would notice.
+- No hollow phrases, no filler sentences that exist just to hit the word count.
+
+Opening line rules (this is where generic AI copy fails hardest, so follow closely):
 - NEVER start with "Elevate", "Indulge", "Unleash", "Discover", "Introducing", "Step into", "Immerse yourself", or any other stock marketing verb aimed at the shopper. These are banned as the first word.
 - Do not open with "Whether you're..." or "Perfect for..." either — save occasion-fit for later in the copy.
 - Instead, open with something concrete and specific to THIS image: a visual detail (a colour, a texture, a shape, a technique), a sensory detail, or a small, vivid scene the product belongs in. Ground it in what you actually see in the photo, not a generic category description.
@@ -86,7 +98,9 @@ Additional rules:
           },
         ],
         max_tokens: 700,
-        temperature: 0.75,
+        temperature: 0.9,
+        frequency_penalty: 0.4,
+        presence_penalty: 0.3,
         response_format: { type: 'json_object' },
       }),
     })

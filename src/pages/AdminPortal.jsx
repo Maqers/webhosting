@@ -178,6 +178,41 @@ function slugify(text) {
   return (text || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+// ─── Description formatting toolbar helpers ────────────────────────────────────
+// Descriptions are stored as plain strings (see sanitizeForJS below), so
+// formatting is a lightweight markup convention — **bold**, __underline__, and
+// ✨-prefixed bullet lines — that ProductDetail.jsx parses back into real HTML
+// at render time. Works directly on the textarea's own selection, since these
+// forms are controlled inputs (state, not the DOM, is the source of truth).
+function wrapDescSelection(ref, value, setValue, marker) {
+  const el = ref.current;
+  if (!el) return;
+  const start = el.selectionStart, end = el.selectionEnd;
+  const selected = value.slice(start, end);
+  const newText = value.slice(0, start) + marker + selected + marker + value.slice(end);
+  setValue(newText);
+  requestAnimationFrame(() => {
+    el.focus();
+    const pos = selected ? end + marker.length * 2 : start + marker.length;
+    el.setSelectionRange(pos, pos);
+  });
+}
+
+function insertDescBullet(ref, value, setValue) {
+  const el = ref.current;
+  if (!el) return;
+  const start = el.selectionStart;
+  const before = value.slice(0, start);
+  const insertion = (before.length > 0 && !before.endsWith("\n") ? "\n" : "") + "✨ ";
+  const newText = before + insertion + value.slice(start);
+  setValue(newText);
+  requestAnimationFrame(() => {
+    el.focus();
+    const pos = start + insertion.length;
+    el.setSelectionRange(pos, pos);
+  });
+}
+
 /**
  * sanitizeForJS — THE KEY FIX
  * Strips newlines, tabs, and escapes quotes/backslashes before writing
@@ -676,6 +711,8 @@ export default function AdminPortal() {
   const [openCats, setOpenCats] = useState({});
   const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
   const editFormRef = useRef(null);
+  const newDescRef = useRef(null);
+  const editDescRef = useRef(null);
   // Synchronous guard against double-submit — `disabled={publishing}` only
   // takes effect after a re-render, leaving a brief window where a fast
   // double-click fires the handler twice before React disables the button.
@@ -1431,6 +1468,36 @@ export default function AdminPortal() {
     finally { setPublishing(false); setKycUploading(false); }
   }
 
+  // Deleting a seller also unlinks their products in catalog.js (clears
+  // sellerId/sellerCode) rather than leaving those products pointing at a
+  // seller_code that no longer exists in Supabase — the same class of
+  // Supabase/catalog.js drift the Link Audit tool above exists to catch.
+  async function handleDeleteSeller(seller) {
+    const linked = products.filter(p => p.sellerCode === seller.seller_code);
+    const confirmMsg = linked.length > 0
+      ? `"${seller.business_name}" has ${linked.length} product(s) linked in the catalog. Deleting this seller will remove them from the seller list AND unlink those products (they'll show with no seller assigned). This cannot be undone. Continue?`
+      : `Delete seller "${seller.business_name}"? This cannot be undone.`;
+    if (!window.confirm(confirmMsg)) return;
+    setPublishing(true);
+    try {
+      if (linked.length > 0) {
+        const { source, sha } = await fetchCatalog(creds);
+        let updated = source;
+        for (const p of linked) {
+          updated = updateProductInSource(updated, { ...p, sellerId: "", sellerCode: "" });
+        }
+        await commitCatalog(updated, sha, `Unlink ${linked.length} product(s) from deleted seller ${seller.seller_code}`, creds);
+        loadCatalogData(updated, sha);
+      }
+      await sbDeleteSeller(seller.id);
+      await loadSellers();
+      if (viewingSeller?.id === seller.id) setViewingSeller(null);
+      if (editingSeller?.id === seller.id) setEditingSeller(null);
+      showToast(`Seller "${seller.business_name}" deleted.`);
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
   // `syncCatalog: false` is only for the two call sites right after a brand
   // new product is committed (its sellerId/sellerCode are already written
   // into catalog.js as part of that same commit) — everywhere else this must
@@ -1724,10 +1791,24 @@ export default function AdminPortal() {
                       <input style={ts.input} type="number" placeholder="e.g. 999" value={newProduct.originalPrice}
                         onChange={e => setNewProduct(p => ({ ...p, originalPrice: e.target.value }))} />
                       <label style={ts.label}>Description *</label>
-                      <textarea style={{ ...ts.input, height: 100, resize: "vertical" }}
-                        placeholder="Keep it punchy. Line breaks are stripped automatically before saving."
+                      <div style={ts.descToolbar}>
+                        <button type="button" style={ts.descToolbarBtn} title="Bold"
+                          onClick={() => wrapDescSelection(newDescRef, newProduct.description, v => setNewProduct(p => ({ ...p, description: v })), "**")}>
+                          <strong>B</strong>
+                        </button>
+                        <button type="button" style={ts.descToolbarBtn} title="Underline"
+                          onClick={() => wrapDescSelection(newDescRef, newProduct.description, v => setNewProduct(p => ({ ...p, description: v })), "__")}>
+                          <u>U</u>
+                        </button>
+                        <button type="button" style={ts.descToolbarBtn} title="Add bullet point"
+                          onClick={() => insertDescBullet(newDescRef, newProduct.description, v => setNewProduct(p => ({ ...p, description: v })))}>
+                          ✨ Bullet
+                        </button>
+                      </div>
+                      <textarea ref={newDescRef} style={{ ...ts.input, height: 100, resize: "vertical", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: 0 }}
+                        placeholder="Keep it punchy. Select text and hit Bold/Underline, or use Bullet to add a line."
                         value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} />
-                      <p style={ts.fieldHint}>Line breaks are automatically removed to prevent build errors.</p>
+                      <p style={ts.fieldHint}>Line breaks become paragraph breaks. **bold** and __underline__ render as real formatting on the product page.</p>
                       <label style={ts.label}>Tags (comma-separated)</label>
                       <input style={ts.input} placeholder="candle, soy, gift" value={newProduct.tags}
                         onChange={e => setNewProduct(p => ({ ...p, tags: e.target.value }))} />
@@ -2044,7 +2125,7 @@ export default function AdminPortal() {
                       ["Title", newProduct.title],
                       ["Category", categories.find(c => c.id === newProduct.categoryId)?.name],
                       ["Price", `Rs.${newProduct.price}`],
-                      ["Description", newProduct.description.replace(/\r?\n/g, " ")],
+                      ["Description", newProduct.description.replace(/\r?\n/g, " ").replace(/\*\*/g, "").replace(/__/g, "")],
                       ["Tags", newProduct.tags || "none"],
                       ["Keywords", newProduct.keywords || "none"],
                       ["Colours", (newProduct.colors||[]).map(c => typeof c === "object" ? c.name : c).join(", ") || "none"],
@@ -2237,9 +2318,23 @@ export default function AdminPortal() {
                           <label style={ts.label}>Original Price (Rs.) <span style={ts.labelHint}>(optional — shown crossed out if higher than price)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 999" value={editingProduct.originalPrice || ""} onChange={e => setEditingProduct(p => ({ ...p, originalPrice: e.target.value }))} />
                           <label style={ts.label}>Description</label>
-                          <textarea style={{ ...ts.input, height: 100, resize: "vertical" }} value={editingProduct.description}
+                          <div style={ts.descToolbar}>
+                            <button type="button" style={ts.descToolbarBtn} title="Bold"
+                              onClick={() => wrapDescSelection(editDescRef, editingProduct.description, v => setEditingProduct(p => ({ ...p, description: v })), "**")}>
+                              <strong>B</strong>
+                            </button>
+                            <button type="button" style={ts.descToolbarBtn} title="Underline"
+                              onClick={() => wrapDescSelection(editDescRef, editingProduct.description, v => setEditingProduct(p => ({ ...p, description: v })), "__")}>
+                              <u>U</u>
+                            </button>
+                            <button type="button" style={ts.descToolbarBtn} title="Add bullet point"
+                              onClick={() => insertDescBullet(editDescRef, editingProduct.description, v => setEditingProduct(p => ({ ...p, description: v })))}>
+                              ✨ Bullet
+                            </button>
+                          </div>
+                          <textarea ref={editDescRef} style={{ ...ts.input, height: 100, resize: "vertical", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: 0 }} value={editingProduct.description}
                             onChange={e => setEditingProduct(p => ({ ...p, description: e.target.value }))} />
-                          <p style={ts.fieldHint}>Line breaks removed before saving.</p>
+                          <p style={ts.fieldHint}>Line breaks become paragraph breaks. **bold** and __underline__ render as real formatting on the product page.</p>
                           <label style={ts.label}>Tags (comma-separated)</label>
                           <input style={ts.input} value={editingProduct.tags.join(", ")}
                             onChange={e => setEditingProduct(p => ({ ...p, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) }))} />
@@ -3303,11 +3398,16 @@ export default function AdminPortal() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                  <button style={ts.ghostBtn} onClick={() => { setEditingSeller(null); setKycFiles([]); }}>Cancel</button>
-                  <button style={ts.primaryBtn} onClick={handleUpdateSeller} disabled={publishing || kycUploading}>
-                    {kycUploading ? "Uploading..." : publishing ? "Saving..." : "Save Changes"}
+                <div style={{ display: "flex", gap: 12, marginTop: 16, justifyContent: "space-between" }}>
+                  <button style={{ ...ts.ghostBtn, color: "#c00", borderColor: "#e8b8b8" }} onClick={() => handleDeleteSeller(editingSeller)} disabled={publishing}>
+                    Delete Seller
                   </button>
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <button style={ts.ghostBtn} onClick={() => { setEditingSeller(null); setKycFiles([]); }}>Cancel</button>
+                    <button style={ts.primaryBtn} onClick={handleUpdateSeller} disabled={publishing || kycUploading}>
+                      {kycUploading ? "Uploading..." : publishing ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -3333,6 +3433,7 @@ export default function AdminPortal() {
                         <div style={{ display: "flex", gap: 6 }}>
                           <button style={ts.editBtn} onClick={() => setViewingSeller(seller)}>View</button>
                           <button style={ts.editBtn} onClick={() => { setEditingSeller({ ...seller }); setKycFiles([]); }}>Edit</button>
+                          <button style={{ ...ts.editBtn, color: "#c00", borderColor: "#e8b8b8" }} onClick={() => handleDeleteSeller(seller)}>Delete</button>
                         </div>
                       </div>
                       <div style={ts.catCardName}>{seller.business_name}</div>
@@ -3415,6 +3516,8 @@ const ts = {
   fieldHint: { fontSize: 11, color: "#bbb", margin: "3px 0 0", fontStyle: "italic" },
   errorText: { color: "#c00", fontSize: 12, marginTop: 6, padding: "8px 12px", background: "#fff0f0", borderRadius: 6 },
   input: { width: "100%", padding: "9px 11px", border: "1px solid #ddd", borderRadius: 7, fontSize: 13, color: "#222", background: "#fafaf9", outline: "none", boxSizing: "border-box", fontFamily: "Georgia, serif", marginTop: 2 },
+  descToolbar: { display: "flex", gap: 4, marginTop: 2, border: "1px solid #ddd", borderBottom: "none", borderTopLeftRadius: 7, borderTopRightRadius: 7, background: "#f3f1ee", padding: 4 },
+  descToolbarBtn: { padding: "4px 10px", fontSize: 12, border: "1px solid #ddd", borderRadius: 5, background: "#fff", color: "#444", cursor: "pointer" },
   primaryBtn: { background: "#1a1a18", color: "#c8a96e", border: "none", borderRadius: 8, padding: "11px 22px", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", fontWeight: 600 },
   ghostBtn: { background: "none", color: "#444", border: "1px solid #ddd", borderRadius: 8, padding: "11px 22px", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif" },
   editBtn: { background: "#f5f0e8", color: "#a07840", border: "1px solid #e8d9b8", borderRadius: 6, padding: "5px 12px", fontSize: 12, cursor: "pointer", fontFamily: "Georgia, serif" },
