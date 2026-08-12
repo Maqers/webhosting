@@ -10,7 +10,7 @@ export const occasionCategories = [
     name: "Shaadi Fever",
     slug: "shaadi-fever",
     emoji: "💍",
-    order: 0,
+    order: 1,
     description: "Because someone you know is getting married and you need to show up with something better than an envelope."
   },
   {
@@ -18,7 +18,7 @@ export const occasionCategories = [
     name: "For Your Best Friend",
     slug: "for-your-best-friend",
     emoji: "🫂",
-    order: 1,
+    order: 2,
     description: "The one who knows too much. Gift them well, they deserve it, and frankly, you owe them."
   },
   {
@@ -26,7 +26,7 @@ export const occasionCategories = [
     name: "For Your Girlfriend",
     slug: "for-your-girlfriend",
     emoji: "💕",
-    order: 2,
+    order: 3,
     description: "She said 'don't get me anything' and meant the opposite. You know this. Act accordingly."
   },
   {
@@ -34,7 +34,7 @@ export const occasionCategories = [
     name: "For Your Boyfriend",
     slug: "for-your-boyfriend",
     emoji: "🫶",
-    order: 3,
+    order: 4,
     description: "He's low-maintenance, but that doesn't mean you have to be. Surprise him. He'll remember it forever."
   },
   {
@@ -42,7 +42,7 @@ export const occasionCategories = [
     name: "For Your Situationship",
     slug: "situationship",
     emoji: "🫠",
-    order: 4,
+    order: 5,
     description: "Not too much, not too little. The art of gifting someone you like but won't label. We get it."
   },
   {
@@ -50,7 +50,7 @@ export const occasionCategories = [
     name: "Self-Love Kits",
     slug: "self-love-kits",
     emoji: "🌸",
-    order: 5,
+    order: 6,
     description: "Treat yourself. You've been doing the most. You deserve something pretty and completely unnecessary."
   },
   {
@@ -58,7 +58,7 @@ export const occasionCategories = [
     name: "Breakup Hampers",
     slug: "breakup-hampers",
     emoji: "💔",
-    order: 6,
+    order: 7,
     description: "For when it's over. Send your friend something that says 'I love you more than he did anyway.'"
   },
   {
@@ -66,7 +66,7 @@ export const occasionCategories = [
     name: "Birthday Gifts",
     slug: "birthday",
     emoji: "🎂",
-    order: 7,
+    order: 8,
     description: "Because 'happy birthday' in a text is not a gift. Show up properly."
   },
   {
@@ -74,7 +74,7 @@ export const occasionCategories = [
     name: "Midnight Crisis Gifts",
     slug: "late-night-cravings",
     emoji: "🌙",
-    order: 8,
+    order: 9,
     description: "It's 1am, you just remembered someone's birthday is tomorrow. We've got you. No judgment."
   },
   {
@@ -82,7 +82,7 @@ export const occasionCategories = [
     name: "Main Character Energy",
     slug: "the-main-character",
     emoji: "✨",
-    order: 9,
+    order: 10,
     description: "For the friend who walks into a room like a movie protagonist. They deserve gifts that match the energy."
   },
   {
@@ -90,7 +90,7 @@ export const occasionCategories = [
     name: "For Your Work Friend",
     slug: "for-your-work-friend",
     emoji: "☕",
-    order: 10,
+    order: 11,
     description: "The colleague who makes Monday bearable. Not your bestie, not your boss. The in-between one."
   },
   {
@@ -98,7 +98,7 @@ export const occasionCategories = [
     name: "For Your Mom",
     slug: "for-your-mom",
     emoji: "🌷",
-    order: 11,
+    order: 12,
     description: "She's done everything. A gift won't make you even, but it's a good start."
   },
   {
@@ -106,7 +106,7 @@ export const occasionCategories = [
     name: "For Your Dad",
     slug: "for-your-dad",
     emoji: "🫡",
-    order: 12,
+    order: 13,
     description: "The man of few words and zero gift opinions. Just get him something, he'll be quietly pleased."
   },
   {
@@ -114,7 +114,7 @@ export const occasionCategories = [
     name: "For Your Sister",
     slug: "for-your-sister",
     emoji: "👯",
-    order: 13,
+    order: 14,
     description: "She's borrowed your stuff for years. Time to give her something that's actually hers."
   },
   {
@@ -122,7 +122,7 @@ export const occasionCategories = [
     name: "For Your Brother",
     slug: "for-your-brother",
     emoji: "🤜",
-    order: 14,
+    order: 16,
     description: "He'll say he doesn't want anything. Get him something anyway. Watch him pretend not to love it."
   },
   {
@@ -130,7 +130,7 @@ export const occasionCategories = [
     name: "For children",
     slug: "for-children",
     emoji: "🧸",
-    order: 13,
+    order: 15,
     description: "Because tiny humans deserve the most thoughtful gifts. And because you want to be the favourite aunt/uncle."
   },
   {
@@ -138,7 +138,7 @@ export const occasionCategories = [
     name: "The Host Gift",
     slug: "the-host-gift",
     emoji: "🥂",
-    order: 15,
+    order: 17,
     description: "You were fed, watered, and housed. The least you can do is show up with something nice."
   },
   {
@@ -146,7 +146,7 @@ export const occasionCategories = [
     name: "Housewarming",
     slug: "housewarming",
     emoji: "🏡",
-    order: 16,
+    order: 18,
     description: "New house, new chapter, new excuse to buy something beautiful for someone's home."
   },
   {
@@ -154,7 +154,7 @@ export const occasionCategories = [
     name: "Bachelor Party",
     slug: "bachelor-party",
     emoji: "🎉",
-    order: 17,
+    order: 19,
     description: "Last night of freedom. Make it memorable with gifts that are actually worth keeping."
   },
   {
@@ -162,7 +162,7 @@ export const occasionCategories = [
     name: "Godh Bharai / Baby Shower",
     slug: "godh-bharai",
     emoji: "🍼",
-    order: 18,
+    order: 20,
     description: "A new life is coming. Gift something that celebrates the mama, not just the baby."
   },
   {
@@ -170,7 +170,7 @@ export const occasionCategories = [
     name: "Occasion Gifts",
     slug: "occasion-gifts",
     emoji: "🎁",
-    order: 19,
+    order: 21,
     description: "When you need a gift but the occasion is too specific to explain to a search bar."
   },
   {
@@ -178,7 +178,7 @@ export const occasionCategories = [
     name: "Rakshabandhan",
     slug: "rakshabandhan",
     emoji: "🧿",
-    order: 20,
+    order: 0,
     description: "For your naughty sibling"
   },
 ]
