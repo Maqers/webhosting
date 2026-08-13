@@ -417,8 +417,8 @@
   color: var(--primary-color);
 }
 .product-detail-price-original {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: clamp(1.2rem, 1.5vw + 1rem, 1.75rem);
+  font-weight: 600;
   color: var(--text-tertiary);
   text-decoration: line-through;
 }

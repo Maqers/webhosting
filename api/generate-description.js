@@ -48,18 +48,20 @@ Study this product image and write copy for the product page.
 ${extraSection}
 Write exactly 2–3 short paragraphs covering:
 1. A hook with an emoji, what the product is, its colours, feel, and materials/craft.
-2. Who it is for and what occasions it suits (birthday, Diwali, housewarming, self-gifting, etc.) — make this specific and a little funny, not a bland occasion list.
-3. End with 4–6 bullet points of key product facts, each prefixed with ✨
+2. Who it is for and what occasions it suits — make this specific and a little funny, not a bland occasion list.
+3. End with 4–6 bullet points of key product facts, each prefixed with ✨ followed by exactly one space, nothing else in front of the bullets (no header line like "What's inside:" — go straight from the second paragraph into the ✨ lines).
 
 Formatting rules:
-- Use \\n\\n between paragraphs
+- Use \\n\\n between paragraphs, and between the last paragraph and the bullet block
 - 180–220 words total (paragraphs + bullets combined)
 - Wrap at most 2–3 short phrases in **double asterisks** for emphasis on the single most compelling detail per paragraph (a standout material, a specific use-case) — don't overuse it, it should read like emphasis, not decoration.
-- NO em dashes (use commas or colons instead).
+- Use straight, single, plain quote marks only if quoting something — never double them up ("" is always wrong, use ").
+- NO em dashes, anywhere, ever (use a comma, colon, or period instead). This rule gets broken more than any other — check your output for the — character before finishing and remove every instance.
 - Weave in natural SEO keywords (material, occasion, product type).
 
 Avoid sounding like every other listing (this is the main failure mode — read this twice):
 - Don't default to the same paragraph shape every time (hook → who it's for → bullets said the exact same way). Vary sentence length and rhythm. Short punchy sentence, then a longer one. Break the pattern.
+- Banned as a set, don't use this exact occasion combo or close paraphrases of it: "birthdays, Diwali celebrations, housewarmings, or self-gifting." That exact list has been used on nearly every product so far and instantly reads as templated. Pick ONE or TWO occasions that genuinely fit this specific item and commit to those, or invent a more specific scenario instead of listing occasions at all.
 - Don't reach for the same safe adjectives every product gets ("beautiful," "perfect," "elegant," "stunning," "timeless"). If you catch yourself writing one, replace it with something that only applies to THIS object.
 - Have an actual opinion or a specific, small observation about the item — not just praise. Notice something a real person would notice.
 - No hollow phrases, no filler sentences that exist just to hit the word count.
@@ -114,9 +116,19 @@ Additional rules:
     const raw = data.choices?.[0]?.message?.content || ''
     const parsed = JSON.parse(raw)
 
+    // Hard backstop, not just a prompt request — the model doesn't reliably
+    // follow the em-dash and doubled-quote rules on its own (both showed up
+    // in production output despite the prompt explicitly banning them), so
+    // enforce them here instead of trusting compliance.
+    const cleanDescription = (parsed.description || '')
+      .replace(/[—–]/g, ', ')
+      .replace(/,\s*,/g, ',')
+      .replace(/""+/g, '"')
+      .replace(/✨(?=\S)/g, '✨ ')
+
     return res.status(200).json({
-      title: parsed.title || '',
-      description: parsed.description || '',
+      title: (parsed.title || '').replace(/[—–]/g, ', ').replace(/""+/g, '"'),
+      description: cleanDescription,
       tags: Array.isArray(parsed.tags) ? parsed.tags : [],
       keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
     })
