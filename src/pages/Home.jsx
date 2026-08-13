@@ -86,7 +86,7 @@ const HOME_CAT_IMAGES = {
               <p className="hero-bright-eyebrow">Maqers wishes you</p>
               <h1 className="hero-bright-title">Happy Rakshabandhan</h1>
               <p className="hero-bright-subtitle">
-                All handcrafted, handmade, customised.
+                Handcrafted and customisable, made just for your sibling.
               </p>
               <div className="hero-bright-actions">
                 <Link to="/category/rakshabandhan" className="hero-bright-btn-primary">Shop Rakhi Gifts</Link>
