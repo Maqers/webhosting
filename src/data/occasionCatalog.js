@@ -185,7 +185,7 @@ export const occasionCategories = [
     id: "anniversary",
     name: "Anniversary",
     slug: "anniversary",
-    emoji: "",
+    emoji: "💖",
     order: 1,
     description: "Because Every Love Story Deserves to Be Celebrated"
   },
