@@ -45,7 +45,12 @@ button.whatsapp-button:hover, .whatsapp-button:hover {
   transform: translateY(-3px) scale(1.02) translateZ(0) !important;
 }
 button.whatsapp-button.active, .whatsapp-button.active {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  /* The popup has its own close (X) button in its header — the floating
+     round button staying fixed in place while open just sits on top of the
+     popup's own content (it overlaps the bottom-sheet layout on mobile,
+     covering the action button / help text), so hide it entirely while
+     open instead of leaving a redundant, overlapping second close control. */
+  display: none !important;
 }
 .whatsapp-button svg, .whatsapp-button .whatsapp-icon {
   width: 28px !important; height: 28px !important;
