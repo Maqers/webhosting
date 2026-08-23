@@ -33,7 +33,7 @@ const Footer = () => {
           <a href="mailto:maqers.in@gmail.com"                            className="footer-link">Email: maqers.in@gmail.com</a>
           <a href="tel:+917973981938"                                      className="footer-link">Call: +91 79739 81938</a>
           <a href="https://wa.me/919289955099" target="_blank" rel="noopener noreferrer" className="footer-link">WhatsApp: +91 92899 55099</a>
-          <p className="footer-link">Working Hours: Mon–Fri, 10 AM–11 PM</p>
+          <p className="footer-link">Working Hours: Everyday, 10 AM–11 PM</p>
         </div>
 
         <div className="footer-col">
