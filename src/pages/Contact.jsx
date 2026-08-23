@@ -103,6 +103,13 @@ const Contact = () => {
             </a>
 
           </div>
+
+          <p style={{ marginTop: '2rem', fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+            Seller? Call or text us at{' '}
+            <a href="tel:+917973981938" style={{ color: 'var(--primary-color)', fontWeight: 600, textDecoration: 'none' }}>
+              +91 79739 81938
+            </a>
+          </p>
         </div>
       </div>
 
