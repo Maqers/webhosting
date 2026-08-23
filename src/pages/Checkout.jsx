@@ -85,7 +85,15 @@ export default function Checkout() {
   const validate = () => {
     const e = {}
     if (!form.name.trim()) e.name = 'Required'
-    if (!form.phone.trim() || !/^\d{10}$/.test(form.phone.replace(/\s/g, ''))) e.phone = 'Valid 10-digit number required'
+    {
+      const cleanPhone = form.phone.trim().replace(/[\s-]/g, '')
+      // Plain 10-digit Indian mobile (existing default), or a + country code
+      // followed by 8-14 digits for customers giving an international
+      // contact number (e.g. NRIs) — this only affects who we can reach for
+      // order confirmation, payment/delivery are unaffected either way.
+      const isValidPhone = /^\d{10}$/.test(cleanPhone) || /^\+[1-9]\d{7,14}$/.test(cleanPhone)
+      if (!form.phone.trim() || !isValidPhone) e.phone = 'Enter a valid number (10 digits, or +countrycode for international)'
+    }
     if (!form.address.trim()) e.address = 'Required'
     if (!form.city.trim()) e.city = 'Required'
     if (!form.pincode.trim() || !/^\d{6}$/.test(form.pincode)) e.pincode = 'Valid 6-digit PIN required'
@@ -347,7 +355,7 @@ export default function Checkout() {
               </div>
               <div className="checkout-field" style={{ marginBottom: 0 }}>
                 <label>PHONE NUMBER *</label>
-                <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="Enter your phone number" />
+                <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="10-digit number, or +countrycode if outside India" />
                 {errors.phone && <span className="checkout-error">{errors.phone}</span>}
               </div>
             </div>
