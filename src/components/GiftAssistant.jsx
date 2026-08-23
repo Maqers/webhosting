@@ -325,9 +325,14 @@ export default function GiftAssistant() {
                     </div>
                   ))}
                 </div>
-                <button className="gift-try-again" onClick={handleReset} type="button">
-                  Try different options
-                </button>
+                <div className="gift-results-actions">
+                  <button className="gift-try-again gift-try-again--secondary" onClick={handleFind} type="button" disabled={loading}>
+                    ↻ Get new picks
+                  </button>
+                  <button className="gift-try-again" onClick={handleReset} type="button">
+                    Try different options
+                  </button>
+                </div>
               </div>
             )}
 
@@ -358,7 +363,7 @@ export default function GiftAssistant() {
                       <button
                         key={o.label}
                         type="button"
-                        className={`gift-chip${occasion?.label === o.label ? ' selected' : ''}`}
+                        className={`gift-chip${occasion?.label === o.label ? ' selected' : ''}${o.label === 'Rakhi' ? ' gift-chip--rainbow' : ''}`}
                         onClick={() => setOccasion(o)}
                       >
                         {o.label}
