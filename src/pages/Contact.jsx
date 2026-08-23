@@ -54,15 +54,17 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="contact-card-title">Phone</h3>
+              <p className="contact-card-sub" style={{ margin: '0 0 0.4rem' }}>
+                If you're a seller, call/WhatsApp at{' '}
+                <a href={`tel:${contactPhones[0].full}`} style={{ color: 'var(--primary-color)', fontWeight: 600, textDecoration: 'none' }}>
+                  {contactPhones[0].display}
+                </a>
+              </p>
               <p className="contact-card-sub">
-                {contactPhones.map((phone, i) => (
-                  <span key={phone.type}>
-                    {i > 0 && <span style={{ margin: '0 0.35rem', opacity: 0.4 }}>·</span>}
-                    <a href={`tel:${phone.full}`} style={{ color: 'var(--primary-color)', fontWeight: 600, textDecoration: 'none', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                      {phone.display}
-                    </a>
-                  </span>
-                ))}
+                If you're a buyer, call/WhatsApp at{' '}
+                <a href={`tel:${contactPhones[1].full}`} style={{ color: 'var(--primary-color)', fontWeight: 600, textDecoration: 'none' }}>
+                  {contactPhones[1].display}
+                </a>
               </p>
             </div>
 
@@ -103,13 +105,6 @@ const Contact = () => {
             </a>
 
           </div>
-
-          <p style={{ marginTop: '2rem', fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
-            Seller? Call or text us at{' '}
-            <a href="tel:+917973981938" style={{ color: 'var(--primary-color)', fontWeight: 600, textDecoration: 'none' }}>
-              +91 79739 81938
-            </a>
-          </p>
         </div>
       </div>
 
