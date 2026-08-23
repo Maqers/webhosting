@@ -163,6 +163,12 @@
   margin: 0;
 }
 
+.gift-question-hint {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #8a7a7a;
+}
+
 .gift-chips {
   display: flex;
   flex-wrap: wrap;

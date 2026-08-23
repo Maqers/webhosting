@@ -68,13 +68,16 @@ export default function GiftAssistant() {
   const [isOpen, setIsOpen]       = useState(false)
   const [recipient, setRecipient] = useState(null)   // full object { label, recipientKey }
   const [occasion, setOccasion]   = useState(null)   // full object { label, occasionKey }
-  const [budget, setBudget]       = useState(null)
+  const [budgets, setBudgets]     = useState([]) // multi-select — array of BUDGETS entries
   const [loading, setLoading]     = useState(false)
   const [results, setResults]     = useState(null)
   const [error, setError]         = useState('')
   const modalRef = useRef(null)
 
-  const canFind = recipient && occasion && budget
+  const canFind = recipient && occasion && budgets.length > 0
+  const toggleBudget = (b) => setBudgets(prev =>
+    prev.some(x => x.label === b.label) ? prev.filter(x => x.label !== b.label) : [...prev, b]
+  )
 
   useEffect(() => {
     if (!isOpen) return
@@ -121,7 +124,7 @@ export default function GiftAssistant() {
     setError('')
     setRecipient(null)
     setOccasion(null)
-    setBudget(null)
+    setBudgets([])
   }
 
   const handleFind = async () => {
@@ -129,10 +132,11 @@ export default function GiftAssistant() {
     setLoading(true)
     setError('')
     setResults(null)
+    const budgetLabel = budgets.map(b => b.label).join(', ')
     trackEvent('GiftFinderSubmitted', {
       recipient: recipient.label,
       occasion: occasion.label,
-      budget: budget.label,
+      budget: budgetLabel,
     })
 
     try {
@@ -144,21 +148,34 @@ export default function GiftAssistant() {
       const occasionLabel    = occasion.label
       const categoryPriority = OCCASION_CATEGORY_PRIORITY[occasionLabel] || null
 
-      // Step 1: Start from the recipient's curated list
-      const curatedIds = recipientKey ? (occasionProductMap[recipientKey] || null) : null
+      // Step 1: Start from the union of the recipient's curated list AND the
+      // occasion's curated list. Previously this only used the recipient's
+      // list — the occasion was only applied afterward as a category-priority
+      // sort bias, so an occasion-specific product (e.g. a Rakhi hamper) that
+      // hadn't ALSO been separately tagged under the chosen recipient never
+      // even entered the candidate pool, no matter how well it fit.
+      const recipientIds = recipientKey ? (occasionProductMap[recipientKey] || null) : null
+      const occasionIds  = occasion.occasionKey ? (occasionProductMap[occasion.occasionKey] || null) : null
+      const curatedIds = recipientIds && occasionIds
+        ? [...new Set([...recipientIds, ...occasionIds])]
+        : (recipientIds || occasionIds || null)
       let pool = curatedIds
         ? allProducts.filter(p => curatedIds.includes(p.id))
         : allProducts
 
-      // Step 2: Apply budget filter
-      const relaxedMin = budget.min * 0.8
-      const relaxedMax = budget.max === 99999 ? 99999 : budget.max * 1.2
-      let budgetPool = pool.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+      // Step 2: Apply budget filter — matches if price falls in ANY of the
+      // selected ranges (a union, not a single min/max span), so picking
+      // "Under ₹300" + "Above ₹1,500" doesn't accidentally also pull in the
+      // ₹300-1,500 middle that wasn't selected.
+      const inAnyBudget = (price) => budgets.some(b => price >= b.min && price <= b.max)
+      const relaxedMin = Math.min(...budgets.map(b => b.min)) * 0.8
+      const relaxedMax = Math.max(...budgets.map(b => b.max === 99999 ? 99999 : b.max * 1.2))
+      let budgetPool = pool.filter(p => p.inStock && inAnyBudget(p.price))
       if (budgetPool.length < 5) {
         budgetPool = pool.filter(p => p.inStock && p.price >= relaxedMin && p.price <= relaxedMax)
       }
       if (budgetPool.length < 5) {
-        budgetPool = allProducts.filter(p => p.inStock && p.price >= budget.min && p.price <= budget.max)
+        budgetPool = allProducts.filter(p => p.inStock && inAnyBudget(p.price))
       }
 
       // Step 3: Sort by occasion category priority — done in code, not left to the model.
@@ -202,7 +219,7 @@ export default function GiftAssistant() {
         body: JSON.stringify({
           recipient: recipient.label,
           occasion: occasion.label,
-          budget: budget.label,
+          budget: budgetLabel,
           products,
         }),
       })
@@ -228,7 +245,7 @@ export default function GiftAssistant() {
     setError('')
     setRecipient(null)
     setOccasion(null)
-    setBudget(null)
+    setBudgets([])
   }
 
   return (
@@ -351,14 +368,14 @@ export default function GiftAssistant() {
                 </div>
 
                 <div className="gift-question-section">
-                  <p className="gift-question-label">What's your budget?</p>
+                  <p className="gift-question-label">What's your budget? <span className="gift-question-hint">(pick one or more)</span></p>
                   <div className="gift-chips">
                     {BUDGETS.map(b => (
                       <button
                         key={b.label}
                         type="button"
-                        className={`gift-chip${budget?.label === b.label ? ' selected' : ''}`}
-                        onClick={() => setBudget(b)}
+                        className={`gift-chip${budgets.some(x => x.label === b.label) ? ' selected' : ''}`}
+                        onClick={() => toggleBudget(b)}
                       >
                         {b.label}
                       </button>
