@@ -40,15 +40,6 @@
 }
 a.footer-link:hover { color: #fff; }
 
-.footer-seller-line {
-  display: block;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255,255,255,0.15);
-  font-weight: 600;
-  color: #fff !important;
-}
-
 .footer-hours {
   font-size: 1rem;
   color: rgba(255,255,255,0.85);

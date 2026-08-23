@@ -34,7 +34,6 @@ const Footer = () => {
           <a href="tel:+917973981938"                                      className="footer-link">Call: +91 79739 81938</a>
           <a href="https://wa.me/919289955099" target="_blank" rel="noopener noreferrer" className="footer-link">WhatsApp: +91 92899 55099</a>
           <p className="footer-link">Working Hours: Mon–Fri, 11 AM–8 PM</p>
-          <a href="tel:+917973981938" className="footer-link footer-seller-line">Seller? Call/text us at +91 79739 81938</a>
         </div>
 
         <div className="footer-col">
