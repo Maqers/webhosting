@@ -1,0 +1,11 @@
+/* Removes the native up/down spinner arrows on number inputs (price, MOQ,
+   commission %, etc.) — they invite accidental scroll/click price changes
+   and aren't needed here. */
+.admin-portal input[type="number"]::-webkit-inner-spin-button,
+.admin-portal input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.admin-portal input[type="number"] {
+  -moz-appearance: textfield;
+}

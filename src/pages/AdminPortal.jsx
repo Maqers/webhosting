@@ -8,6 +8,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
+import "./AdminPortal.css";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -1665,7 +1666,7 @@ export default function AdminPortal() {
   // ─── APP ──────────────────────────────────────────────────────────────────────
 
   return (
-    <div style={ts.shell}>
+    <div className="admin-portal" style={ts.shell}>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div style={ts.sidebar}>
