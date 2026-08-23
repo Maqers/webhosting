@@ -394,6 +394,24 @@ function parseOccasionCategories(source) {
 function updateProductInSource(source, product) {
   const range = getEntryRange(source, product.id);
   if (!range) throw new Error(`Product ID ${product.id} not found in catalog`);
+
+  // getProductsByCategory() on the live site reads productsByCategory[id]
+  // positionally — it does NOT filter by each product's own categoryId
+  // field. So if categoryId changed but we only rewrite the field text in
+  // place, the product stays physically nested under its OLD category's
+  // array: /category/old-slug keeps showing it, /category/new-slug never
+  // does, no matter what the edit form said. Only physically move the
+  // entry when the category actually changed — moving on every edit would
+  // instead silently reshuffle it to the end of the array, breaking any
+  // manual ordering set via the By Category reorder tab.
+  const oldEntryText = source.slice(range.start, range.end);
+  const oldCategoryId = oldEntryText.match(/categoryId:\s*"([^"]+)"/)?.[1];
+
+  if (oldCategoryId && oldCategoryId !== product.categoryId) {
+    const withoutOld = source.slice(0, range.start) + source.slice(range.end);
+    return insertProductIntoSource(withoutOld, product, product.id);
+  }
+
   const newEntry = buildEntry(product.id, product);
   return source.slice(0, range.start) + newEntry + source.slice(range.end);
 }
@@ -1100,6 +1118,16 @@ export default function AdminPortal() {
         source = beforeMap + mapSection;
       }
       await commitCatalog(source, sha, `Delete product: ${product.title} (ID ${product.id})`, creds);
+      // Also drop this product from whichever seller has it in their Supabase
+      // product_ids — otherwise that array keeps a dangling reference to an
+      // id that no longer exists in the catalog at all.
+      if (product.sellerCode) {
+        const seller = sellers.find(s => s.seller_code === product.sellerCode);
+        if (seller && (seller.product_ids || []).includes(product.id)) {
+          try { await sbUpdateSeller(seller.id, { product_ids: seller.product_ids.filter(pid => pid !== product.id) }); }
+          catch { /* non-fatal — the catalog deletion already succeeded */ }
+        }
+      }
       loadCatalogData(source, sha);
       showToast(`"${product.title}" deleted.`);
     } catch (err) { showToast(err.message, "error"); }
