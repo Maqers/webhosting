@@ -656,10 +656,10 @@
 /* ── New compact contact card row ── */
 .contact-cards-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
   text-align: left;
-  align-items: start;
+  align-items: stretch;
 }
 
 .contact-card-block {
@@ -671,6 +671,8 @@
   text-decoration: none;
   color: inherit;
   transition: box-shadow 0.2s, border-color 0.2s;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .contact-card-link:hover {
@@ -712,7 +714,8 @@
     gap: 1rem;
   }
 
-  /* Phone card spans full width since it has 2 sub-cards */
+  /* Phone card spans full width — it has more content (seller + buyer lines)
+     than Email/Instagram, so it gets its own row */
   .contact-cards-row > .contact-card-block:first-child {
     grid-column: 1 / -1;
   }
