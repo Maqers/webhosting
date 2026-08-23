@@ -320,6 +320,17 @@ function parseProducts(source) {
     const op = entry.match(/originalPrice:\s*(\d+(?:\.\d+)?)/);
     if (op) p.originalPrice = Number(op[1]);
 
+    // Without these two, editingProduct.personalisation_options was always
+    // empty (the meta.* fallback in the edit form never had anything real to
+    // fall back to either, since this parser never nests a real `meta`
+    // object) — so opening Edit showed no personalisation options even when
+    // the product had some, and saving any other change silently wiped them.
+    const po = entry.match(/personalisation_options:\s*\[([^\]]*)\]/);
+    if (po) p.personalisation_options = po[1].split(",").map(s => s.trim().replace(/^"|"$/g, "").replace(/\\"/g, '"').replace(/\\\\/g, "\\")).filter(Boolean);
+
+    const pp = entry.match(/personalisation_prices:\s*\[([^\]]*)\]/);
+    if (pp) p.personalisation_prices = pp[1].split(",").map(s => Number(s.trim())).filter(n => !isNaN(n));
+
     const dt = entry.match(/delivery_time:\s*"([^"]*)"/);
     if (dt) p.delivery_time = dt[1];
 
@@ -661,7 +672,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -1003,7 +1014,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -2017,6 +2028,17 @@ export default function AdminPortal() {
                         ))}
                       </div>
                     </div>
+                    <div style={ts.card}>
+                      <h2 style={ts.cardTitle}>Flags</h2>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {["inStock", "popular", "featured"].map(flag => (
+                          <label key={flag} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, color: "#333" }}>
+                            <input type="checkbox" checked={!!newProduct[flag]} onChange={() => setNewProduct(p => ({ ...p, [flag]: !p[flag] }))} />
+                            <span style={{ textTransform: "capitalize" }}>{flag}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <div style={ts.card}>
@@ -2072,7 +2094,7 @@ export default function AdminPortal() {
                     {newProduct.title && (
                       <div style={ts.card}>
                         <h2 style={ts.cardTitle}>Live Preview</h2>
-                        <ProductCard product={{ ...newProduct, id: 0, price: Number(newProduct.price) || 0, images: imageFiles.map(f => f.preview), popular: false, featured: false, inStock: true }} categories={categories} />
+                        <ProductCard product={{ ...newProduct, id: 0, price: Number(newProduct.price) || 0, images: imageFiles.map(f => f.preview) }} categories={categories} />
                       </div>
                     )}
                   </div>
@@ -2086,7 +2108,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
