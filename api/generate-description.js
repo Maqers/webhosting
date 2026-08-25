@@ -99,7 +99,11 @@ Additional rules:
             content: [imageContent, { type: 'text', text: prompt }],
           },
         ],
-        max_tokens: 700,
+        // The JSON response has to hold title + a 180-220 word description +
+        // up to 8 tags + up to 8 keywords, all within this budget. 700 was
+        // tight enough that a longer description could squeeze out (or
+        // truncate) the tags/keywords arrays that come after it in the JSON.
+        max_tokens: 1100,
         temperature: 0.9,
         frequency_penalty: 0.4,
         presence_penalty: 0.3,
@@ -113,8 +117,17 @@ Additional rules:
     }
 
     const data = await openaiRes.json()
+    const finishReason = data.choices?.[0]?.finish_reason
     const raw = data.choices?.[0]?.message?.content || ''
-    const parsed = JSON.parse(raw)
+    let parsed
+    try {
+      parsed = JSON.parse(raw)
+    } catch (parseErr) {
+      if (finishReason === 'length') {
+        return res.status(502).json({ error: 'The AI response got cut off before finishing (ran out of room) — try again, or shorten "Additional details" if you filled that in.' })
+      }
+      throw parseErr
+    }
 
     // Hard backstop, not just a prompt request — the model doesn't reliably
     // follow the em-dash and doubled-quote rules on its own (both showed up
