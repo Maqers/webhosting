@@ -14,6 +14,7 @@ const WHATSAPP_NUMBER = '919289955099'
 const EMAILJS_SERVICE = 'service_ckd0lmj'
 const EMAILJS_TEMPLATE = 'template_e2n002e'
 const EMAILJS_TEMPLATE_CUSTOMER = 'template_cp8gsrc' // ← replace with your EmailJS template ID
+const EMAILJS_TEMPLATE_SELLER = 'template_REPLACE_ME' // ← create a new EmailJS template for this, see notes
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
 const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq9f1nTqbOf8ZXbOI1bvk_uIa6jwUjvYshdvOFNAUcqlYbM8U8_pVAvQYxZxhI/exec'
 
@@ -180,6 +181,57 @@ export default function Checkout() {
     }
   }
 
+  // Splits the order by seller and emails each seller only their own line
+  // items — not the whole order. Products with no sellerCode (unassigned)
+  // are silently skipped here; they still show up in the ops email/sheet
+  // for manual follow-up. A seller with no email on file is also skipped
+  // (nothing to send to) rather than erroring the whole checkout.
+  const notifySellers = async (oid) => {
+    try {
+      const sellerCodes = [...new Set(items.filter(i => i.sellerCode).map(i => i.sellerCode))]
+      if (!sellerCodes.length) return
+
+      const filter = sellerCodes.map(c => encodeURIComponent(`"${c}"`)).join(',')
+      const sellers = await supabaseRest(
+        `sellers_db?select=seller_code,business_name,email,phone&seller_code=in.(${filter})`
+      )
+
+      for (const seller of sellers) {
+        if (!seller.email) continue
+        const sellerItems = items.filter(i => i.sellerCode === seller.seller_code)
+        const itemsText = sellerItems.map(i => {
+          let line = `• ${i.title} (ID ${i.id}) x${i.qty}`
+          if (i.selectedColor) line += ` [${i.selectedColor}]`
+          if (i.selectedSize) line += ` [${i.selectedSize}]`
+          if (i.selectedPersonalisation?.length > 0) line += ` [${i.selectedPersonalisation.join(', ')}]`
+          return line
+        }).join('\n')
+        const sellerTotal = sellerItems.reduce((sum, i) => sum + i.price * i.qty, 0)
+
+        try {
+          await emailjs.send(
+            EMAILJS_SERVICE,
+            EMAILJS_TEMPLATE_SELLER,
+            {
+              seller_name: seller.business_name,
+              order_id: oid,
+              items_list: itemsText,
+              items_total: `₹${sellerTotal.toLocaleString('en-IN')}`,
+              customer_name: form.name,
+              customer_phone: form.phone,
+              shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+            },
+            EMAILJS_PUBLIC_KEY
+          )
+        } catch (err) {
+          console.error(`Seller notification failed for ${seller.seller_code}:`, err)
+        }
+      }
+    } catch (err) {
+      console.error('notifySellers failed:', err)
+    }
+  }
+
   const saveOrderToSupabase = async (oid) => {
     if (!isLoggedIn || !user?.id) return
     try {
@@ -225,6 +277,7 @@ export default function Checkout() {
     await sendCustomerConfirmation(oid)
     await saveOrderToSupabase(oid)
     await logOrderToSheet(oid)
+    await notifySellers(oid)
 
     trackEvent('Purchase', {
       order_id: oid,
