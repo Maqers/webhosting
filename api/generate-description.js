@@ -103,7 +103,9 @@ Additional rules:
         // up to 8 tags + up to 8 keywords, all within this budget. 700 was
         // tight enough that a longer description could squeeze out (or
         // truncate) the tags/keywords arrays that come after it in the JSON.
-        max_tokens: 1100,
+        // Raised further since the model sometimes writes past the
+        // requested word count, still eating into the tags/keywords budget.
+        max_tokens: 1600,
         temperature: 0.9,
         frequency_penalty: 0.4,
         presence_penalty: 0.3,
@@ -139,11 +141,22 @@ Additional rules:
       .replace(/""+/g, '"')
       .replace(/✨(?=\S)/g, '✨ ')
 
+    const tags = Array.isArray(parsed.tags) ? parsed.tags : []
+    const keywords = Array.isArray(parsed.keywords) ? parsed.keywords : []
+
+    // The model occasionally omits tags/keywords (or returns them empty)
+    // while still producing valid JSON, so JSON.parse succeeds and this
+    // silently looked like a success with nothing to show for it. Treat
+    // that as a real, retryable failure instead of masking it.
+    if (tags.length === 0 || keywords.length === 0) {
+      return res.status(502).json({ error: 'The AI left out tags or keywords this time. Please click Generate again.' })
+    }
+
     return res.status(200).json({
       title: (parsed.title || '').replace(/[—–]/g, ', ').replace(/""+/g, '"'),
       description: cleanDescription,
-      tags: Array.isArray(parsed.tags) ? parsed.tags : [],
-      keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+      tags,
+      keywords,
     })
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' })
