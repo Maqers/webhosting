@@ -1943,6 +1943,13 @@ export default function AdminPortal() {
                       <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
                       <input style={ts.input} placeholder="e.g. 2–3 days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
+                      <div style={{ display: "flex", gap: 6, marginTop: 6, marginBottom: 4 }}>
+                        {["2-3 days", "3-4 days", "4-5 days"].map(opt => (
+                          <button key={opt} type="button"
+                            onClick={() => setNewProduct(p => ({ ...p, delivery_time: opt }))}
+                            style={newProduct.delivery_time === opt ? ts.chipActive : ts.chip}>{opt}</button>
+                        ))}
+                      </div>
                       <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(each shown as a checkbox on product page)</span></label>
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         {(newProduct.personalisation_options || []).map((opt, i) => (
@@ -2498,6 +2505,13 @@ export default function AdminPortal() {
                           <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
                           <input style={ts.input} placeholder="e.g. 2–3 days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
+                          <div style={{ display: "flex", gap: 6, marginTop: 6, marginBottom: 4 }}>
+                            {["2-3 days", "3-4 days", "4-5 days"].map(opt => (
+                              <button key={opt} type="button"
+                                onClick={() => setEditingProduct(p => ({ ...p, delivery_time: opt }))}
+                                style={(editingProduct.delivery_time || editingProduct.meta?.delivery_time) === opt ? ts.chipActive : ts.chip}>{opt}</button>
+                            ))}
+                          </div>
                           <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(each shown as a checkbox on product page)</span></label>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             {(editingProduct.personalisation_options || editingProduct.meta?.personalisation_options || []).map((opt, i) => {
