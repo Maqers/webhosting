@@ -1938,8 +1938,8 @@ export default function AdminPortal() {
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                       <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
                         onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
-                      <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
-                      <input style={ts.input} placeholder="e.g. 3–5 business days" value={newProduct.delivery_time || ""}
+                      <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
+                      <input style={ts.input} placeholder="e.g. 2–3 days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
                       <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(each shown as a checkbox on product page)</span></label>
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -2199,7 +2199,7 @@ export default function AdminPortal() {
                       ["Keywords", newProduct.keywords || "none"],
                       ["Colours", (newProduct.colors||[]).map(c => typeof c === "object" ? c.name : c).join(", ") || "none"],
                       ["Sizes", (newProduct.sizes||[]).join(", ") || "none"],
-                      ["Delivery Time", newProduct.delivery_time || "none"],
+                      ["Dispatch Time", newProduct.delivery_time || "none"],
                       ["MOQ", newProduct.moq || "none"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => (occasionCatalogEntries.find(oc => oc.id === o) || occasionCategories.find(oc => oc.id === o))?.name).filter(Boolean).join(", ") || "None"],
@@ -2491,8 +2491,8 @@ export default function AdminPortal() {
                           <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
-                          <label style={ts.label}>Delivery Time <span style={ts.labelHint}>(shown on product page)</span></label>
-                          <input style={ts.input} placeholder="e.g. 3–5 business days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
+                          <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
+                          <input style={ts.input} placeholder="e.g. 2–3 days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
                           <label style={ts.label}>Personalisation Options <span style={ts.labelHint}>(each shown as a checkbox on product page)</span></label>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
