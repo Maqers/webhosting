@@ -649,13 +649,14 @@ function Toast({ message, type, onClose }) {
   return <div style={{ ...ts.toast, background: bg }}>{message}</div>;
 }
 
-function ProductCard({ product, categories }) {
+function ProductCard({ product, categories, previewIndex = 0 }) {
   const cat = categories.find(c => c.id === product.categoryId);
+  const shownImage = product.images[previewIndex] || product.images[0];
   return (
     <div style={ts.productCard}>
       <div style={ts.productCardImg}>
-        {product.images[0]
-          ? <img src={product.images[0]} alt={product.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />
+        {shownImage
+          ? <img src={shownImage} alt={product.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />
           : <div style={{ color: "#ccc", fontSize: 10, textAlign: "center", paddingTop: 30 }}>No image</div>}
       </div>
       <div style={ts.productCardBody}>
@@ -706,6 +707,7 @@ export default function AdminPortal() {
   const [productQueue, setProductQueue] = useState([]); // batch add queue
   const [queueImageFiles, setQueueImageFiles] = useState({}); // { queueIndex: imageFiles[] }
   const [imageFiles, setImageFiles] = useState([]);
+  const [previewImgIndex, setPreviewImgIndex] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [formError, setFormError] = useState("");
   const [aiExtraDetails, setAiExtraDetails] = useState('');
@@ -1043,7 +1045,7 @@ export default function AdminPortal() {
       loadCatalogData(updated, sha);
       setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
-      setImageFiles([]); setProductStep("form");
+      setImageFiles([]); setPreviewImgIndex(0); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
     } catch (err) { log("Error: " + err.message); showToast(err.message, "error"); }
     finally { setPublishing(false); publishInFlightRef.current = false; }
@@ -2105,8 +2107,9 @@ export default function AdminPortal() {
                           <p style={ts.fieldHint}>Drag to reorder · × to remove</p>
                           <div style={ts.thumbGrid}>
                             {imageFiles.map((img, i) => (
-                              <div key={img.name + i} style={{ ...ts.thumb, cursor: "grab" }}
+                              <div key={img.name + i} style={{ ...ts.thumb, cursor: "pointer", outline: i === previewImgIndex ? "2px solid #c8a96e" : "none", outlineOffset: 2 }}
                                 draggable
+                                onClick={() => setPreviewImgIndex(i)}
                                 onDragStart={e => e.dataTransfer.setData("imgIdx", String(i))}
                                 onDragOver={e => e.preventDefault()}
                                 onDrop={e => {
@@ -2131,17 +2134,18 @@ export default function AdminPortal() {
                                 }}>
                                 <img src={img.preview} alt="" style={ts.thumbImg} />
                                 {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
-                                <button type="button" onClick={() => setImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>x</button>
+                                <button type="button" onClick={e => { e.stopPropagation(); setImageFiles(prev => prev.filter((_, j) => j !== i)); }} style={ts.removeBtn}>x</button>
                               </div>
                             ))}
                           </div>
+                          <p style={ts.fieldHint}>Click a picture to preview it below</p>
                         </>
                       )}
                     </div>
                     {newProduct.title && (
                       <div style={ts.card}>
                         <h2 style={ts.cardTitle}>Live Preview</h2>
-                        <ProductCard product={{ ...newProduct, id: 0, price: Number(newProduct.price) || 0, images: imageFiles.map(f => f.preview) }} categories={categories} />
+                        <ProductCard product={{ ...newProduct, id: 0, price: Number(newProduct.price) || 0, images: imageFiles.map(f => f.preview) }} previewIndex={Math.min(previewImgIndex, imageFiles.length - 1)} categories={categories} />
                       </div>
                     )}
                   </div>
@@ -2156,7 +2160,7 @@ export default function AdminPortal() {
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
                     setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
-                    setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]);
+                    setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]); setPreviewImgIndex(0);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
                   <button type="submit" style={ts.primaryBtn}>Preview & Publish This →</button>
