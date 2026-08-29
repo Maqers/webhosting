@@ -36,11 +36,11 @@ export default async function handler(req, res) {
       ? `\nAdditional details from the seller — incorporate these precisely:\n${extraDetails}\n`
       : ''
 
-    const prompt = `You are the in-house copywriter for Maqers, an Indian artisan marketplace with a specific voice: witty, warm, a little cheeky, talks to the shopper like a sharp friend giving gift advice — never like a corporate listing. Here's the actual voice used elsewhere on the site, for calibration:
-- "The one who knows too much. Gift them well, they deserve it, and frankly, you owe them."
-- "She said 'don't get me anything' and meant the opposite. You know this. Act accordingly."
-- "Not too much, not too little. The art of gifting someone you like but won't label. We get it."
-- "Because tiny humans deserve the most thoughtful gifts. And because you want to be the favourite aunt/uncle."
+    const prompt = `You are the in-house copywriter for Maqers, an Indian artisan marketplace with a specific voice: witty, warm, a little cheeky, talks to the shopper like a sharp friend giving gift advice — never like a corporate listing. Here's the actual voice used elsewhere on the site, for calibration (the surrounding quotation marks below are just how these examples are punctuated on the site, not a format to copy — do not start your own description with a quotation mark):
+The one who knows too much. Gift them well, they deserve it, and frankly, you owe them.
+She said 'don't get me anything' and meant the opposite. You know this. Act accordingly.
+Not too much, not too little. The art of gifting someone you like but won't label. We get it.
+Because tiny humans deserve the most thoughtful gifts. And because you want to be the favourite aunt/uncle.
 
 Match THAT energy: specific, funny where it earns it, never generic-nice. If a line could be printed on any product in any category by swapping one noun, it has failed.
 
@@ -69,6 +69,7 @@ Avoid sounding like every other listing (this is the main failure mode — read 
 Opening line rules (this is where generic AI copy fails hardest, so follow closely):
 - NEVER start with "Elevate", "Indulge", "Unleash", "Discover", "Introducing", "Step into", "Immerse yourself", or any other stock marketing verb aimed at the shopper. These are banned as the first word.
 - Do not open with "Whether you're..." or "Perfect for..." either — save occasion-fit for later in the copy.
+- Never start the description with a quotation mark (' or ") as the very first character.
 - Instead, open with something concrete and specific to THIS image: a visual detail (a colour, a texture, a shape, a technique), a sensory detail, or a small, vivid scene the product belongs in. Ground it in what you actually see in the photo, not a generic category description.
 - Read your opening line back and ask: could this exact sentence be reused for a completely different product just by swapping the noun? If yes, rewrite it.
 
@@ -159,6 +160,7 @@ Additional rules:
     // in production output despite the prompt explicitly banning them), so
     // enforce them here instead of trusting compliance.
     const cleanDescription = (parsed.description || '')
+      .replace(/^['"]+/, '')
       .replace(/[—–]/g, ', ')
       .replace(/,\s*,/g, ',')
       .replace(/""+/g, '"')
