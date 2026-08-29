@@ -929,7 +929,7 @@ export default function AdminPortal() {
     }
   }
 
-  function handleGenerateAI() {
+  function handleGenerateAI(mode = 'full') {
     const imgObj = imageFiles[0];
     if (!imgObj) { setAiError('Upload an image first.'); return; }
     runAiGenerate({
@@ -938,17 +938,21 @@ export default function AdminPortal() {
       extraDetails: aiExtraDetails.trim(),
       setGenerating: setAiGenerating,
       onError: setAiError,
-      onResult: r => setNewProduct(p => ({
-        ...p,
-        title: r.title || p.title,
-        description: r.description || p.description,
-        tags: r.tags?.join(', ') || p.tags,
-        keywords: r.keywords?.join(', ') || p.keywords,
-      })),
+      onResult: r => setNewProduct(p => (
+        mode === 'tags'
+          ? { ...p, tags: r.tags?.join(', ') || p.tags, keywords: r.keywords?.join(', ') || p.keywords }
+          : {
+              ...p,
+              title: r.title || p.title,
+              description: r.description || p.description,
+              tags: r.tags?.join(', ') || p.tags,
+              keywords: r.keywords?.join(', ') || p.keywords,
+            }
+      )),
     });
   }
 
-  function handleGenerateAIEdit() {
+  function handleGenerateAIEdit(mode = 'full') {
     const imgObj = editImageFiles[0] || null;
     const imageUrl = !imgObj ? (editingProduct?.images?.[0] || '') : '';
     if (!imgObj && !imageUrl) { setAiEditError('No image available for this product.'); return; }
@@ -959,13 +963,17 @@ export default function AdminPortal() {
       extraDetails: aiEditExtraDetails.trim(),
       setGenerating: setAiEditGenerating,
       onError: setAiEditError,
-      onResult: r => setEditingProduct(p => ({
-        ...p,
-        title: r.title || p.title,
-        description: r.description || p.description,
-        tags: r.tags?.length ? r.tags : p.tags,
-        keywords: r.keywords?.length ? r.keywords : p.keywords,
-      })),
+      onResult: r => setEditingProduct(p => (
+        mode === 'tags'
+          ? { ...p, tags: r.tags?.length ? r.tags : p.tags, keywords: r.keywords?.length ? r.keywords : p.keywords }
+          : {
+              ...p,
+              title: r.title || p.title,
+              description: r.description || p.description,
+              tags: r.tags?.length ? r.tags : p.tags,
+              keywords: r.keywords?.length ? r.keywords : p.keywords,
+            }
+      )),
     });
   }
 
@@ -1783,16 +1791,26 @@ export default function AdminPortal() {
                           value={aiExtraDetails}
                           onChange={e => setAiExtraDetails(e.target.value)}
                         />
-                        <button
-                          type="button"
-                          disabled={aiGenerating || imageFiles.length === 0}
-                          onClick={handleGenerateAI}
-                          style={{ ...ts.primaryBtn, opacity: aiGenerating || imageFiles.length === 0 ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
-                        >
-                          {aiGenerating
-                            ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid #c8a96e", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Generating…</>
-                            : <><span>✦</span>Generate title, description &amp; tags</>}
-                        </button>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <button
+                            type="button"
+                            disabled={aiGenerating || imageFiles.length === 0}
+                            onClick={() => handleGenerateAI('full')}
+                            style={{ ...ts.primaryBtn, opacity: aiGenerating || imageFiles.length === 0 ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
+                          >
+                            {aiGenerating
+                              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid #c8a96e", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Generating…</>
+                              : <><span>✦</span>Generate title, description &amp; tags</>}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={aiGenerating || imageFiles.length === 0}
+                            onClick={() => handleGenerateAI('tags')}
+                            style={{ ...ts.ghostBtn, opacity: aiGenerating || imageFiles.length === 0 ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
+                          >
+                            <span>↻</span>Regenerate tags &amp; keywords only
+                          </button>
+                        </div>
                         {imageFiles.length === 0 && !aiGenerating && (
                           <p style={{ ...ts.fieldHint, color: "#b07820", marginTop: 6 }}>Upload an image on the right first to enable AI generation.</p>
                         )}
@@ -2328,16 +2346,26 @@ export default function AdminPortal() {
                               value={aiEditExtraDetails}
                               onChange={e => setAiEditExtraDetails(e.target.value)}
                             />
-                            <button
-                              type="button"
-                              disabled={aiEditGenerating}
-                              onClick={handleGenerateAIEdit}
-                              style={{ ...ts.primaryBtn, opacity: aiEditGenerating ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
-                            >
-                              {aiEditGenerating
-                                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid #c8a96e", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Generating…</>
-                                : <><span>✦</span>Regenerate title, description &amp; tags</>}
-                            </button>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                              <button
+                                type="button"
+                                disabled={aiEditGenerating}
+                                onClick={() => handleGenerateAIEdit('full')}
+                                style={{ ...ts.primaryBtn, opacity: aiEditGenerating ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
+                              >
+                                {aiEditGenerating
+                                  ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid #c8a96e", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Generating…</>
+                                  : <><span>✦</span>Regenerate title, description &amp; tags</>}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={aiEditGenerating}
+                                onClick={() => handleGenerateAIEdit('tags')}
+                                style={{ ...ts.ghostBtn, opacity: aiEditGenerating ? 0.55 : 1, display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", fontSize: 12 }}
+                              >
+                                <span>↻</span>Regenerate tags &amp; keywords only
+                              </button>
+                            </div>
                             {aiEditError && <p style={{ ...ts.fieldHint, color: "#c00", marginTop: 6 }}>{aiEditError}</p>}
                             <p style={{ ...ts.fieldHint, marginTop: 6 }}>Uses the product's existing image (or a newly uploaded one if added below).</p>
                           </div>
