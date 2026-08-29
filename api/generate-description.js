@@ -109,7 +109,30 @@ Additional rules:
         temperature: 0.9,
         frequency_penalty: 0.4,
         presence_penalty: 0.3,
-        response_format: { type: 'json_object' },
+        // Strict JSON schema mode (not just json_object) makes OpenAI
+        // enforce these exact required fields at decode time, so the model
+        // can no longer silently omit tags/keywords the way it could
+        // under plain json_object mode. tags/keywords are listed before
+        // title/description so they're generated first, ahead of the
+        // longer, more variable-length description text.
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'product_copy',
+            strict: true,
+            schema: {
+              type: 'object',
+              properties: {
+                tags: { type: 'array', items: { type: 'string' } },
+                keywords: { type: 'array', items: { type: 'string' } },
+                title: { type: 'string' },
+                description: { type: 'string' },
+              },
+              required: ['tags', 'keywords', 'title', 'description'],
+              additionalProperties: false,
+            },
+          },
+        },
       }),
     })
 
