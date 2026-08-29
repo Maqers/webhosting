@@ -689,6 +689,20 @@ export default function AdminPortal() {
   const [occasionCategories, setOccasionCategories] = useState([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Chrome (and others) change a focused number input's value when the
+  // mouse wheel scrolls over it, so scrolling the page past a Price/MOQ
+  // field silently edits it. Blur any focused number input on wheel so
+  // the page just scrolls normally instead.
+  useEffect(() => {
+    const handleWheel = () => {
+      if (document.activeElement?.tagName === "INPUT" && document.activeElement.type === "number") {
+        document.activeElement.blur();
+      }
+    };
+    document.addEventListener("wheel", handleWheel, { passive: true });
+    return () => document.removeEventListener("wheel", handleWheel);
+  }, []);
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
