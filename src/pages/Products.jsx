@@ -10,7 +10,6 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
-import { getProductColors, getAllUsedColors } from '../utils/colorExtract'
 import './Products.css'
 
 let cachedCategories = null
@@ -57,7 +56,6 @@ const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
-  const [selectedColors, setSelectedColors] = useState([])
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
@@ -102,22 +100,13 @@ const Products = () => {
       });
     }
 
-    if (selectedColors.length > 0) {
-      filtered = filtered.filter(product => {
-        const productColors = getProductColors(product)
-        return selectedColors.some(c => productColors.includes(c))
-      })
-    }
-
     filtered = sortProducts(filtered, sortBy, {
       searchQuery: searchQuery || null,
       relevanceScores
     })
 
     return expandProductsByColor(filtered)
-  }, [selectedCategories, selectedColors, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
-
-  const usedColors = useMemo(() => getAllUsedColors(getAllProducts()), [])
+  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
   const visibleProducts = filteredProducts.slice(0, visibleCount)
@@ -194,11 +183,6 @@ const Products = () => {
     newParams.delete('page')
     setSearchParams(newParams, { replace: true })
   }, [searchParams, setSearchParams])
-
-  const handleColorToggle = useCallback((colorName) => {
-    setSelectedColors(prev => prev.includes(colorName) ? prev.filter(c => c !== colorName) : [...prev, colorName])
-    setVisibleCount(PAGE_SIZE)
-  }, [])
 
   // Restore category filter from URL param (e.g. when navigating back from product detail)
   useEffect(() => {
@@ -308,37 +292,6 @@ const Products = () => {
                 }
               </div>
             </div>
-            {usedColors.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0 2px', overflowX: 'auto' }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#888', flexShrink: 0 }}>Colour:</span>
-                {usedColors.map(opt => {
-                  const active = selectedColors.includes(opt.name)
-                  return (
-                    <button
-                      key={opt.name}
-                      type="button"
-                      onClick={() => handleColorToggle(opt.name)}
-                      title={opt.name}
-                      aria-label={opt.name}
-                      aria-pressed={active}
-                      style={{
-                        width: 30, height: 30, minWidth: 30, borderRadius: '50%',
-                        background: opt.swatch,
-                        border: active ? '3px solid #c8a96e' : '2px solid #e0dbd2',
-                        boxShadow: active ? '0 0 0 1px #c8a96e' : 'none',
-                        cursor: 'pointer', flexShrink: 0, padding: 0,
-                      }}
-                    />
-                  )
-                })}
-                {selectedColors.length > 0 && (
-                  <button type="button" onClick={() => setSelectedColors([])}
-                    style={{ fontSize: 12, color: '#999', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', flexShrink: 0 }}>
-                    Clear
-                  </button>
-                )}
-              </div>
-            )}
             <div className="filters-controls-row">
               <ProductSort onSortChange={() => { }} />
             </div>
