@@ -395,7 +395,7 @@ html {
    ============================================================================ */
 
 /* Fix iOS form styling */
-input,
+input:not([type="checkbox"]):not([type="radio"]),
 textarea,
 select {
   -webkit-appearance: none;
@@ -403,6 +403,16 @@ select {
   appearance: none;
   border-radius: var(--radius-md);
   background-color: var(--bg-primary);
+}
+
+/* Checkboxes/radios need their native appearance kept, otherwise
+   removing it with no replacement styling makes them render as an
+   invisible box matching the page background. */
+input[type="checkbox"],
+input[type="radio"] {
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  appearance: auto;
 }
 
 /* Fix iOS date/time pickers */
