@@ -1842,7 +1842,7 @@ export default function AdminPortal() {
                           );
                         })}
                       </div>
-                      <label style={ts.label}>Price (Rs.) *</label>
+                      <label style={ts.label}>Current Price (Rs.) *</label>
                       <input style={ts.input} type="number" placeholder="499" value={newProduct.price}
                         onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))} />
                       <label style={ts.label}>Original Price (Rs.) <span style={ts.labelHint}>(optional — shown crossed out if higher than price)</span></label>
@@ -2392,7 +2392,7 @@ export default function AdminPortal() {
                               );
                             })}
                           </div>
-                          <label style={ts.label}>Price (Rs.)</label>
+                          <label style={ts.label}>Current Price (Rs.)</label>
                           <input style={ts.input} type="number" value={editingProduct.price} onChange={e => setEditingProduct(p => ({ ...p, price: Number(e.target.value) }))} />
                           <label style={ts.label}>Original Price (Rs.) <span style={ts.labelHint}>(optional — shown crossed out if higher than price)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 999" value={editingProduct.originalPrice || ""} onChange={e => setEditingProduct(p => ({ ...p, originalPrice: e.target.value }))} />
