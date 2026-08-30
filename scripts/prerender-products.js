@@ -107,10 +107,13 @@ for (const product of products) {
   <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>`
 
+  const inStock = product.inStock !== false
   const fallbackContent = `<div id="root"><main>
     <h1>${escapeHtml(product.title)}</h1>
+    <p>by Maqers</p>
     <img src="${primaryImage}" alt="${escapeHtml(product.title)}" width="600">
     <p>₹${escapeHtml(product.price)}</p>
+    <p>${inStock ? 'In Stock' : 'Out of Stock'}</p>
     <p>${escapeHtml(plainDescription)}</p>
     ${categoryName ? `<p>Category: ${escapeHtml(categoryName)}</p>` : ''}
   </main></div>`
