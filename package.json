@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "node scripts/generate-sitemap.js && vite build && node scripts/prerender-products.js",
+        "build": "node scripts/generate-sitemap.js && node scripts/generate-merchant-feed.js && vite build && node scripts/prerender-products.js",
         "postbuild": "node --env-file-if-exists=.env scripts/upload-sourcemaps.js",
         "preview": "vite preview",
         "compress-images": "node scripts/compress-images.js"
