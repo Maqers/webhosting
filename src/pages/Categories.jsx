@@ -15,27 +15,23 @@ const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewelle
 
 // Smart sub-filters per category — curated from real product tags
 const CATEGORY_FILTERS = {
-  'Handbags':             ['Potli', 'Clutch', 'Tote Bag', 'Sling Bag', 'Backpack'],
-  'Candles':              ['Scented', 'Soy Wax', 'Luxury', 'Colourful', 'Reed Diffuser'],
+  'Handbags':             ['Potli', 'Coin Purse', 'Tote Bag', 'Sling Bag', 'Backpack'],
+  'Candles':              ['Soy Wax', 'Luxury', 'Colourful', 'Reed Diffuser'],
   'Florals':              ['Bouquet', 'Crochet', 'Keychain', 'Basket'],
   'Handmade-Accessories': ['Bangles', 'Watches', 'Earrings', 'Necklace', 'Bracelet'],
   'Kids-Accessories':     ['Hair Clips', 'Brooches', 'Plush Toys', 'Collars'],
-  'Wedding-Gifts':        ['Potli', 'Shagun Envelope', 'Decor', 'Return Gifts'],
   'Home-decor':           ['Wooden', 'Glass', 'Evil Eye', 'Dining'],
   'Customised-Hampers':   ['Anniversary', 'Luxury', 'Personalised', 'Photo Frame'],
-  'Handmade-Soaps':       ['Grape Soap', 'Decorative', 'Strawberry'],
-  'resin-products':       ['Clock', 'Keychain', 'Photo Frame', 'Nameplate', 'Flower'],
-  'Cosmetics':            ['Pouch', 'Personalised', 'Travel'],
+  'resin-products':       ['Clock', 'Keychain', 'Photo Frame', 'Nameplate'],
 }
 
 // Map filter label → tag keywords to match against
 const FILTER_KEYWORDS = {
   'Potli':           ['potli','potlis','pouch'],
-  'Clutch':          ['clutch'],
+  'Coin Purse':      ['coin purse'],
   'Tote Bag':        ['tote'],
   'Sling Bag':       ['sling'],
   'Backpack':        ['backpack','bagpack'],
-  'Scented':         ['scented','fragrance','aromatherapy'],
   'Soy Wax':         ['soy'],
   'Luxury':          ['luxury'],
   'Colourful':       ['color','colour','colorful','colourful'],
@@ -53,9 +49,6 @@ const FILTER_KEYWORDS = {
   'Brooches':        ['brooch','pin'],
   'Plush Toys':      ['teddy','bear','bunny','plush','crochet toy'],
   'Collars':         ['collar'],
-  'Shagun Envelope': ['shagun','envelope'],
-  'Decor':           ['decor','decoration'],
-  'Return Gifts':    ['return gift'],
   'Wooden':          ['wood','wooden','acacia','teak','mango wood'],
   'Glass':           ['glass'],
   'Evil Eye':        ['evil eye'],
@@ -63,14 +56,8 @@ const FILTER_KEYWORDS = {
   'Anniversary':     ['anniversary'],
   'Personalised':    ['personal','custom','customis'],
   'Photo Frame':     ['photo','frame'],
-  'Grape Soap':      ['grape'],
-  'Decorative':      ['decorative','aesthetic'],
-  'Strawberry':      ['strawberry'],
   'Clock':           ['clock'],
   'Nameplate':       ['nameplate','name plate'],
-  'Flower':          ['flower','floral'],
-  'Pouch':           ['pouch','makeup bag'],
-  'Travel':          ['travel'],
 }
 
 const Categories = () => {
