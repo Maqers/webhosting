@@ -50,7 +50,7 @@ const FILTER_KEYWORDS = {
   'Plush Toys':      ['teddy','bear','bunny','plush','crochet toy'],
   'Collars':         ['collar'],
   'Wooden':          ['wood','wooden','acacia','teak','mango wood'],
-  'Glass':           ['glass'],
+  'Glass':           ['glass','flute','champagne'],
   'Evil Eye':        ['evil eye'],
   'Dining':          ['dining','serving'],
   'Anniversary':     ['anniversary'],
