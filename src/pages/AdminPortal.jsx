@@ -332,6 +332,9 @@ function parseProducts(source) {
     const pp = entry.match(/personalisation_prices:\s*\[([^\]]*)\]/);
     if (pp) p.personalisation_prices = pp[1].split(",").map(s => Number(s.trim())).filter(n => !isNaN(n));
 
+    const sqp = entry.match(/sellerQuotedPrice:\s*([\d.]+)/);
+    if (sqp) p.sellerQuotedPrice = parseFloat(sqp[1]);
+
     const dt = entry.match(/delivery_time:\s*"([^"]*)"/);
     if (dt) p.delivery_time = dt[1];
 
@@ -497,6 +500,13 @@ function buildEntry(id, product) {
   const secCats = (product.secondaryCategories || []).map(c => `"${sanitizeForJS(c)}"`).join(", ");
   const sellerId = product.sellerId ? `"${sanitizeForJS(product.sellerId)}"` : '""';
   const sellerCode = product.sellerCode ? `"${sanitizeForJS(product.sellerCode)}"` : '""';
+  // Omitted entirely (rather than written as 0) when not set, so downstream
+  // consumers (e.g. the order-summary commission formula) can tell "seller
+  // hasn't quoted a price yet" apart from "quoted price is zero".
+  const sellerQuotedPriceNum = Number(product.sellerQuotedPrice);
+  const sellerQuotedPricePart = (product.sellerQuotedPrice !== "" && product.sellerQuotedPrice !== null && product.sellerQuotedPrice !== undefined && !isNaN(sellerQuotedPriceNum) && sellerQuotedPriceNum > 0)
+    ? `, sellerQuotedPrice: ${sellerQuotedPriceNum}`
+    : '';
 
   // If size-based pricing, auto-set product.price to the minimum size price
   let basePrice = Number(product.price);
@@ -511,7 +521,7 @@ function buildEntry(id, product) {
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}"${r.image ? `, image: "${sanitizeForJS(r.image)}"` : ""} }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -706,7 +716,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -831,6 +841,28 @@ export default function AdminPortal() {
 
   function extFromMime(mime) {
     return (mime || "image/jpeg").split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+  }
+
+  // Product photo filenames follow "<product-slug>-img-<n>.<ext>". The number
+  // reflects the order images were added in, NOT their position in the
+  // images array — dragging to reorder only reshuffles that array, so a
+  // file's name never changes just because it moved to a different slot.
+  function productImageName(slug, index, mime) {
+    return `${slug || "product"}-img-${index}.${extFromMime(mime)}`;
+  }
+
+  // Finds the next free "-img-N" number for a product by looking at the
+  // numbers already used in its current images, so newly added photos keep
+  // counting up instead of colliding with (or renaming) existing files.
+  function nextImageIndex(images, slug) {
+    const re = new RegExp(`-img-(\\d+)\\.[a-z0-9]+$`);
+    let max = 0;
+    for (const src of images || []) {
+      if (!src || !src.includes(`/${slug}-img-`)) continue;
+      const m = re.exec(src);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    }
+    return max + 1;
   }
 
   function readReviewPhoto(file, setInput) {
@@ -1011,15 +1043,19 @@ export default function AdminPortal() {
     const log = msg => setPublishLog(prev => [...prev, msg]);
     try {
       log("Uploading images...");
+      const slug = slugify(newProduct.title);
       const imagePaths = [];
-      for (const img of imageFiles) {
-        let sha; try { const ex = await ghGet(`public/images/${img.name}`, creds); sha = ex.sha; } catch {}
-        await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
-        imagePaths.push(`/images/${img.name}`);
+      for (let i = 0; i < imageFiles.length; i++) {
+        const img = imageFiles[i];
+        const name = productImageName(slug, i + 1, img.mime);
+        const webpName = toWebpName(name);
+        let sha; try { const ex = await ghGet(`public/images/${name}`, creds); sha = ex.sha; } catch {}
+        await ghPut(`public/images/${name}`, img.base64, `Add image: ${name}`, sha, creds);
+        imagePaths.push(`/images/${name}`);
         if (img.webpBase64) {
           await sleep(350);
-          let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
-          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
+          let webpSha; try { const ex = await ghGet(`public/images/${webpName}`, creds); webpSha = ex.sha; } catch {}
+          await ghPut(`public/images/${webpName}`, img.webpBase64, `Add image: ${webpName}`, webpSha, creds);
         }
         await sleep(350);
       }
@@ -1057,7 +1093,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] });
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setPreviewImgIndex(0); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -1075,15 +1111,19 @@ export default function AdminPortal() {
       let currentId = getNextId(source);
       for (const qp of productQueue) {
         log(`Uploading images for "${qp.title}"...`);
+        const qSlug = slugify(qp.title);
         const imagePaths = [];
-        for (const img of qp._imageFiles) {
-          let imgSha; try { const ex = await ghGet(`public/images/${img.name}`, creds); imgSha = ex.sha; } catch {}
-          await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, imgSha, creds);
-          imagePaths.push(`/images/${img.name}`);
+        for (let i = 0; i < qp._imageFiles.length; i++) {
+          const img = qp._imageFiles[i];
+          const name = productImageName(qSlug, i + 1, img.mime);
+          const webpName = toWebpName(name);
+          let imgSha; try { const ex = await ghGet(`public/images/${name}`, creds); imgSha = ex.sha; } catch {}
+          await ghPut(`public/images/${name}`, img.base64, `Add image: ${name}`, imgSha, creds);
+          imagePaths.push(`/images/${name}`);
           if (img.webpBase64) {
             await sleep(350);
-            let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
-            await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
+            let webpSha; try { const ex = await ghGet(`public/images/${webpName}`, creds); webpSha = ex.sha; } catch {}
+            await ghPut(`public/images/${webpName}`, img.webpBase64, `Add image: ${webpName}`, webpSha, creds);
           }
           await sleep(350);
         }
@@ -1270,15 +1310,20 @@ export default function AdminPortal() {
     publishInFlightRef.current = true;
     setPublishing(true);
     try {
+      const slug = slugify(editingProduct.title);
+      let nextIdx = nextImageIndex(editingProduct.images, slug);
       const newPaths = [];
       for (const img of editImageFiles) {
-        let sha; try { const ex = await ghGet(`public/images/${img.name}`, creds); sha = ex.sha; } catch {}
-        await ghPut(`public/images/${img.name}`, img.base64, `Add image: ${img.name}`, sha, creds);
-        newPaths.push(`/images/${img.name}`);
+        const name = productImageName(slug, nextIdx, img.mime);
+        const webpName = toWebpName(name);
+        nextIdx++;
+        let sha; try { const ex = await ghGet(`public/images/${name}`, creds); sha = ex.sha; } catch {}
+        await ghPut(`public/images/${name}`, img.base64, `Add image: ${name}`, sha, creds);
+        newPaths.push(`/images/${name}`);
         if (img.webpBase64) {
           await sleep(350);
-          let webpSha; try { const ex = await ghGet(`public/images/${img.webpName}`, creds); webpSha = ex.sha; } catch {}
-          await ghPut(`public/images/${img.webpName}`, img.webpBase64, `Add image: ${img.webpName}`, webpSha, creds);
+          let webpSha; try { const ex = await ghGet(`public/images/${webpName}`, creds); webpSha = ex.sha; } catch {}
+          await ghPut(`public/images/${webpName}`, img.webpBase64, `Add image: ${webpName}`, webpSha, creds);
         }
         await sleep(350);
       }
@@ -1954,6 +1999,9 @@ export default function AdminPortal() {
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                       <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
                         onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
+                      <label style={ts.label}>Seller Quoted Price (₹) <span style={ts.labelHint}>(optional — what the seller charges us, before our markup; used for the order summary sheet)</span></label>
+                      <input style={ts.input} type="number" min="0" placeholder="e.g. 650" value={newProduct.sellerQuotedPrice}
+                        onChange={e => setNewProduct(p => ({ ...p, sellerQuotedPrice: e.target.value }))} />
                       <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
                       <input style={ts.input} placeholder="e.g. 2–3 days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
@@ -2180,7 +2228,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", personalisation_options: [], personalisation_prices: [] });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] });
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]); setPreviewImgIndex(0);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -2226,6 +2274,7 @@ export default function AdminPortal() {
                       ["Sizes", (newProduct.sizes||[]).join(", ") || "none"],
                       ["Dispatch Time", newProduct.delivery_time || "none"],
                       ["MOQ", newProduct.moq || "none"],
+                      ["Seller Quoted Price", newProduct.sellerQuotedPrice ? `Rs.${newProduct.sellerQuotedPrice}` : "none"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => (occasionCatalogEntries.find(oc => oc.id === o) || occasionCategories.find(oc => oc.id === o))?.name).filter(Boolean).join(", ") || "None"],
                       ["Images", imageFiles.map(f => f.name).join(", ")],
@@ -2516,6 +2565,9 @@ export default function AdminPortal() {
                           <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />
+                          <label style={ts.label}>Seller Quoted Price (₹) <span style={ts.labelHint}>(optional — what the seller charges us, before our markup; used for the order summary sheet)</span></label>
+                          <input style={ts.input} type="number" min="0" placeholder="e.g. 650" value={editingProduct.sellerQuotedPrice ?? editingProduct.meta?.sellerQuotedPrice ?? ""}
+                            onChange={e => setEditingProduct(p => ({ ...p, sellerQuotedPrice: e.target.value }))} />
                           <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
                           <input style={ts.input} placeholder="e.g. 2–3 days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />
