@@ -21,7 +21,9 @@
   border-radius: 16px;
   padding: 2rem 1.75rem;
   width: 100%;
-  max-width: 380px;
+  /* !important needed: a global mobile-overflow-prevention rule forces
+     `* { max-width: 100% !important }` sitewide (text-breaking-fix.css) */
+  max-width: 380px !important;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   animation: loginModalIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }

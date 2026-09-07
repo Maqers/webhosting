@@ -4,7 +4,9 @@
   border-radius: 10px;
   padding: 1rem 1.1rem;
   margin-bottom: 1.25rem;
-  max-width: 420px;
+  /* !important needed: a global mobile-overflow-prevention rule forces
+     `* { max-width: 100% !important }` sitewide (text-breaking-fix.css) */
+  max-width: 420px !important;
 }
 
 .review-form-title {
