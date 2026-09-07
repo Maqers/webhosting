@@ -130,7 +130,14 @@
   border-color: var(--primary-color, #760909);
   background: #fdf5f0;
 }
-.checkout-address-option input[type="radio"] { margin-top: 3px; flex-shrink: 0; }
+.checkout-address-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  min-width: 16px;
+  margin: 3px 0 0;
+  flex-shrink: 0;
+}
 
 .checkout-address-option-label {
   display: block;
@@ -154,6 +161,14 @@
   color: var(--text-secondary, #666);
   margin-top: 0.75rem;
   cursor: pointer;
+}
+.checkout-save-address input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  min-width: 16px;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 /* Payment */
