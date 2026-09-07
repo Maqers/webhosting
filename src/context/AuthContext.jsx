@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { sendPhoneOtp, verifyPhoneOtp, refreshSession, logoutSession, getGoogleAuthUrl, getUserFromToken } from '../config/supabaseConfig'
+import { sendPhoneOtp, verifyPhoneOtp, refreshSession, logoutSession, getGoogleAuthUrl, getUserFromToken, updateUserProfile } from '../config/supabaseConfig'
 
 const AuthContext = createContext(null)
 const STORAGE_KEY = 'maqers_auth_session'
@@ -99,6 +99,13 @@ export function AuthProvider({ children }) {
     window.location.href = getGoogleAuthUrl(redirectTo)
   }, [])
 
+  const updateProfile = useCallback(async (fields) => {
+    if (!session?.access_token) throw new Error('Not logged in')
+    const updated = await updateUserProfile(session.access_token, fields)
+    persist({ ...session, user: updated })
+    return updated
+  }, [session, persist])
+
   const logout = useCallback(async () => {
     if (session?.access_token) await logoutSession(session.access_token)
     persist(null)
@@ -112,6 +119,7 @@ export function AuthProvider({ children }) {
     sendOtp,
     verifyOtp,
     loginWithGoogle,
+    updateProfile,
     logout,
     loginModalOpen,
     openLoginModal: () => setLoginModalOpen(true),

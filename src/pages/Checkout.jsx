@@ -46,7 +46,7 @@ function AppIcon({ app }) {
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart()
-  const { user, isLoggedIn, accessToken } = useAuth()
+  const { user, isLoggedIn, accessToken, updateProfile } = useAuth()
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
   const grandTotal = total + deliveryFee
@@ -82,6 +82,74 @@ export default function Checkout() {
   const [showQR, setShowQR] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  // ── Saved addresses (Profile page) ───────────────────────────────────────
+  // 'new' means the shopper is filling in a fresh address (default for
+  // guests and logged-in users with no saved addresses yet); otherwise it's
+  // the id of the selected saved address.
+  const savedAddresses = user?.user_metadata?.addresses || []
+  const [selectedAddressId, setSelectedAddressId] = useState('new')
+  const [saveNewAddress, setSaveNewAddress] = useState(true)
+  const [addressSaveError, setAddressSaveError] = useState('')
+
+  const applyAddress = (addr) => {
+    setForm(f => ({
+      ...f,
+      name: addr.name || f.name,
+      phone: addr.phone || f.phone,
+      address: addr.address || '',
+      city: addr.city || '',
+      state: addr.state || '',
+      pincode: addr.pincode || '',
+    }))
+  }
+
+  // Pre-fill account-level fields (name/email/phone) once, and default to
+  // the account's default saved address if there is one.
+  useEffect(() => {
+    if (!user) return
+    const meta = user.user_metadata || {}
+    setForm(f => ({
+      ...f,
+      name: f.name || meta.full_name || meta.name || '',
+      email: f.email || user.email || '',
+      phone: f.phone || (user.phone ? user.phone.replace(/^\+91/, '') : ''),
+    }))
+    const addrs = meta.addresses || []
+    const def = addrs.find(a => a.isDefault) || addrs[0]
+    if (def) { setSelectedAddressId(def.id); applyAddress(def) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
+  const handleSelectAddress = (id) => {
+    setSelectedAddressId(id)
+    setAddressSaveError('')
+    if (id === 'new') {
+      setForm(f => ({ ...f, address: '', city: '', state: '', pincode: '' }))
+      return
+    }
+    const addr = savedAddresses.find(a => a.id === id)
+    if (addr) applyAddress(addr)
+  }
+
+  // Saves a freshly-typed address to the profile after a successful order,
+  // so it's available to pick from next time — never overwrites an address
+  // the shopper picked from the list.
+  const persistNewAddressIfRequested = async () => {
+    if (!isLoggedIn || selectedAddressId !== 'new' || !saveNewAddress) return
+    if (!form.address.trim() || !form.city.trim() || !form.pincode.trim()) return
+    try {
+      const id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+      const next = [...savedAddresses, {
+        id, label: 'Home', name: form.name, phone: form.phone,
+        address: form.address, city: form.city, state: form.state, pincode: form.pincode,
+        isDefault: savedAddresses.length === 0,
+      }]
+      await updateProfile({ addresses: next })
+    } catch (err) {
+      setAddressSaveError('Order placed, but we could not save this address to your profile.')
+    }
+  }
 
   const validate = () => {
     const e = {}
@@ -276,6 +344,7 @@ export default function Checkout() {
 
     await sendCustomerConfirmation(oid)
     await saveOrderToSupabase(oid)
+    await persistNewAddressIfRequested()
     await logOrderToSheet(oid)
     await notifySellers(oid)
 
@@ -415,6 +484,37 @@ export default function Checkout() {
 
             <div className="checkout-section">
               <h2 className="checkout-section-title">SHIPPING ADDRESS</h2>
+
+              {isLoggedIn && savedAddresses.length > 0 && (
+                <div className="checkout-address-picker">
+                  {savedAddresses.map(addr => (
+                    <label key={addr.id} className={`checkout-address-option ${selectedAddressId === addr.id ? 'selected' : ''}`}>
+                      <input
+                        type="radio"
+                        name="checkout-address"
+                        checked={selectedAddressId === addr.id}
+                        onChange={() => handleSelectAddress(addr.id)}
+                      />
+                      <div>
+                        <span className="checkout-address-option-label">{addr.label || 'Address'}{addr.isDefault ? ' (Default)' : ''}</span>
+                        <p className="checkout-address-option-text">
+                          {addr.address}, {addr.city}, {addr.state} - {addr.pincode}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                  <label className={`checkout-address-option ${selectedAddressId === 'new' ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="checkout-address"
+                      checked={selectedAddressId === 'new'}
+                      onChange={() => handleSelectAddress('new')}
+                    />
+                    <span className="checkout-address-option-label">+ Use a new address</span>
+                  </label>
+                </div>
+              )}
+
               <div className="checkout-field">
                 <label>STREET ADDRESS *</label>
                 <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="House no, Street, Area" />
@@ -430,11 +530,19 @@ export default function Checkout() {
                 <input value={form.pincode} onChange={e => set('pincode', e.target.value)} placeholder="Enter your pin code" maxLength={6} />
                 {errors.pincode && <span className="checkout-error">{errors.pincode}</span>}
               </div>
-              <div className="checkout-field" style={{ marginBottom: 0 }}>
+              <div className="checkout-field" style={{ marginBottom: isLoggedIn && selectedAddressId === 'new' ? undefined : 0 }}>
                 <label>STATE *</label>
                 <input value={form.state} onChange={e => set('state', e.target.value)} placeholder="Enter your state" />
                 {errors.state && <span className="checkout-error">{errors.state}</span>}
               </div>
+
+              {isLoggedIn && selectedAddressId === 'new' && (
+                <label className="checkout-save-address">
+                  <input type="checkbox" checked={saveNewAddress} onChange={e => setSaveNewAddress(e.target.checked)} />
+                  Save this address to my profile for next time
+                </label>
+              )}
+              {addressSaveError && <p className="checkout-error" style={{ marginTop: 8 }}>{addressSaveError}</p>}
             </div>
 
             <div className="checkout-section">

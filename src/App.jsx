@@ -32,6 +32,7 @@ const Checkout = lazy(() => import('./pages/Checkout'))
 const ByOccasion = lazy(() => import('./pages/ByOccasion'))
 const ByProduct = lazy(() => import('./pages/ByProduct'))
 const OrderHistory = lazy(() => import('./pages/OrderHistory'))
+const Profile = lazy(() => import('./pages/Profile'))
 
 const RouteLoadingFallback = () => (
   <div style={{
@@ -85,6 +86,7 @@ function AppContent() {
             <Route path="/by-occasion" element={<ByOccasion />} />
             <Route path="/by-product" element={<ByProduct />} />
             <Route path="/orders" element={<OrderHistory />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </Suspense>
         </ChunkErrorBoundary>

@@ -72,6 +72,21 @@ export async function getUserFromToken(accessToken) {
   return res.json()
 }
 
+// GoTrue merges `data` into the user's existing user_metadata rather than
+// replacing it, so this only needs to send the fields that changed.
+export async function updateUserProfile(accessToken, data) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ data }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.msg || err.error_description || 'Could not update profile')
+  }
+  return res.json() // updated user object
+}
+
 // ── Review photo storage ────────────────────────────────────────────────────
 // Uploads into the public `review_photos` bucket (see reviewsApi.js / the
 // project README for the SQL that creates the bucket + its RLS policies).
