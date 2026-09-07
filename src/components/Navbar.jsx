@@ -286,6 +286,8 @@ const Navbar = () => {
                     <div className="navbar-account-dropdown">
                       <p className="navbar-account-phone">{user?.phone || user?.email}</p>
                       <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Orders</Link>
+                      <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>Write a Review</Link>
+                      <button className="navbar-account-item" onClick={() => { setWishlistOpen(true); setAccountMenuOpen(false) }} type="button">Wishlist</button>
                       <button className="navbar-account-item navbar-account-logout" onClick={() => { logout(); setAccountMenuOpen(false) }} type="button">Log out</button>
                     </div>
                   )}
@@ -380,6 +382,8 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link to="/orders" className={`mobile-menu-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Orders ({user?.phone || user?.email})</Link>
+                <Link to="/orders" className="mobile-menu-link" onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>Write a Review</Link>
+                <button className="mobile-menu-link" onClick={() => { setWishlistOpen(true); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Wishlist</button>
                 <button className="mobile-menu-link" onClick={() => { logout(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Log out</button>
               </>
             ) : (

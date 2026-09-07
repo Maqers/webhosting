@@ -4,6 +4,11 @@ import './LoginModal.css'
 
 const RESEND_SECONDS = 30
 
+// Supabase's Phone provider isn't configured yet (no SMS provider set up),
+// so phone/OTP login is hidden for now — flip this back on once that's
+// ready. Google is the only working login path until then.
+const PHONE_AUTH_ENABLED = false
+
 function friendlyError(err) {
   if (err?.message === 'Failed to fetch') return "Couldn't reach the login service. Please try again in a moment."
   return err?.message || 'Something went wrong. Please try again.'
@@ -103,35 +108,39 @@ export default function LoginModal() {
               </svg>
               Continue with Google
             </button>
-            <div className="login-modal-divider"><span>or</span></div>
-            <p className="login-modal-subtitle">We'll text you a one-time code, no password needed.</p>
-            <div className="login-modal-field">
-              <label htmlFor="login-phone">Phone number</label>
-              <div className="login-phone-input-wrap">
-                <span className="login-phone-prefix">+91</span>
-                <input
-                  id="login-phone"
-                  type="tel"
-                  inputMode="numeric"
-                  placeholder="98765 43210"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  maxLength={10}
-                  autoFocus
-                />
-              </div>
-            </div>
-            {error && <p className="login-modal-error">{error}</p>}
-            <button className="login-modal-submit" type="submit" disabled={submitting}>
-              {submitting ? 'Sending code...' : 'Send OTP'}
-            </button>
+            {PHONE_AUTH_ENABLED && (
+              <>
+                <div className="login-modal-divider"><span>or</span></div>
+                <p className="login-modal-subtitle">We'll text you a one-time code, no password needed.</p>
+                <div className="login-modal-field">
+                  <label htmlFor="login-phone">Phone number</label>
+                  <div className="login-phone-input-wrap">
+                    <span className="login-phone-prefix">+91</span>
+                    <input
+                      id="login-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="98765 43210"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                      maxLength={10}
+                      autoFocus
+                    />
+                  </div>
+                </div>
+                {error && <p className="login-modal-error">{error}</p>}
+                <button className="login-modal-submit" type="submit" disabled={submitting}>
+                  {submitting ? 'Sending code...' : 'Send OTP'}
+                </button>
+              </>
+            )}
             <button className="login-modal-guest" onClick={closeLoginModal} type="button">
               Continue as guest
             </button>
           </form>
         )}
 
-        {step === 'otp' && (
+        {PHONE_AUTH_ENABLED && step === 'otp' && (
           <form onSubmit={handleVerify}>
             <h2 className="login-modal-title">Enter the code</h2>
             <p className="login-modal-subtitle">Sent to {e164Phone}</p>

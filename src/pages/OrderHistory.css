@@ -97,6 +97,16 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .order-card-item-meta { font-size: 0.78rem; color: var(--text-tertiary); margin: 2px 0 0; }
+
+.order-card-review-link {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary-color, #760909);
+  margin-top: 4px;
+  text-decoration: none;
+}
+.order-card-review-link:hover { text-decoration: underline; }
 .order-card-item-price { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
 
 .order-card-total {

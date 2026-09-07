@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabaseRest } from '../config/supabaseConfig'
+import { getProductById } from '../data/catalog'
 import SeoHead from '../components/SeoHead'
 import './OrderHistory.css'
 
@@ -52,16 +54,22 @@ export default function OrderHistory() {
                   <span className={`order-card-status order-card-status--${order.status}`}>{order.status}</span>
                 </div>
                 <div className="order-card-items">
-                  {(order.items || []).map((item, i) => (
+                  {(order.items || []).map((item, i) => {
+                    const linkedProduct = getProductById(item.id)
+                    return (
                     <div className="order-card-item" key={i}>
                       {item.image && <img src={item.image} alt={item.title} />}
                       <div className="order-card-item-info">
                         <p className="order-card-item-title">{item.title}</p>
                         <p className="order-card-item-meta">x{item.qty}{item.selectedColor ? ` · ${item.selectedColor}` : ''}{item.selectedSize ? ` · ${item.selectedSize}` : ''}</p>
+                        {linkedProduct && (
+                          <Link to={`/product/${linkedProduct.slug}`} className="order-card-review-link">Write a review →</Link>
+                        )}
                       </div>
                       <p className="order-card-item-price">₹{(item.price * item.qty).toLocaleString('en-IN')}</p>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 <div className="order-card-total">
                   <span>Total</span>
