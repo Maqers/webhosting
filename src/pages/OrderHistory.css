@@ -94,7 +94,7 @@
 }
 .order-card-item a:hover img { opacity: 0.85; }
 .order-card-item-info { flex: 1; min-width: 0; }
-.order-card-item-title-link { text-decoration: none; }
+.order-card-item-title-link { display: block; text-decoration: none; }
 .order-card-item-title-link:hover .order-card-item-title { text-decoration: underline; }
 .order-card-item-title {
   font-size: 0.9rem; color: var(--text-primary); margin: 0;
