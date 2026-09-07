@@ -90,8 +90,12 @@
 }
 .order-card-item img {
   width: 44px; height: 44px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+  transition: opacity 0.15s;
 }
+.order-card-item a:hover img { opacity: 0.85; }
 .order-card-item-info { flex: 1; min-width: 0; }
+.order-card-item-title-link { text-decoration: none; }
+.order-card-item-title-link:hover .order-card-item-title { text-decoration: underline; }
 .order-card-item-title {
   font-size: 0.9rem; color: var(--text-primary); margin: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

@@ -58,9 +58,16 @@ export default function OrderHistory() {
                     const linkedProduct = getProductById(item.id)
                     return (
                     <div className="order-card-item" key={i}>
-                      {item.image && <img src={item.image} alt={item.title} />}
+                      {item.image && (
+                        linkedProduct
+                          ? <Link to={`/product/${linkedProduct.slug}`}><img src={item.image} alt={item.title} /></Link>
+                          : <img src={item.image} alt={item.title} />
+                      )}
                       <div className="order-card-item-info">
-                        <p className="order-card-item-title">{item.title}</p>
+                        {linkedProduct
+                          ? <Link to={`/product/${linkedProduct.slug}`} className="order-card-item-title-link"><p className="order-card-item-title">{item.title}</p></Link>
+                          : <p className="order-card-item-title">{item.title}</p>
+                        }
                         <p className="order-card-item-meta">x{item.qty}{item.selectedColor ? ` · ${item.selectedColor}` : ''}{item.selectedSize ? ` · ${item.selectedSize}` : ''}</p>
                         {linkedProduct && (
                           <Link to={`/product/${linkedProduct.slug}`} className="order-card-review-link">Write a review →</Link>
