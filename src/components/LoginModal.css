@@ -61,6 +61,41 @@
   margin: 0 0 1.5rem;
 }
 
+.login-modal-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  margin: 0.9rem 0;
+  background: #fff;
+  border: 1.5px solid #e0d5cd;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1714);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.login-modal-google:hover { background: #f5ede4; transform: translateY(-1px); }
+
+.login-modal-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-tertiary, #999);
+  font-size: 0.8rem;
+  margin: 1rem 0;
+}
+.login-modal-divider::before,
+.login-modal-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e0d5cd;
+}
+.login-modal-divider span { padding: 0 0.75rem; }
+
 .login-modal-field {
   margin-bottom: 1rem;
 }

@@ -4,12 +4,15 @@ import { getProductById, getProductBySlug, getCategoryByIdOrSlug, getAllProducts
 import { getWhatsAppNumber } from '../data/contactInfo'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
+import { useAuth } from '../context/AuthContext'
 import ImageWithFallback from '../components/ImageWithFallback'
+import ReviewForm from '../components/ReviewForm'
 import { FeaturedCard } from './Home'
 import SeoHead from '../components/SeoHead'
 import { trackEvent } from '../utils/analytics'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
+import { fetchProductReviews, hasPurchasedProduct, hasReviewedProduct } from '../utils/reviewsApi'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -77,6 +80,49 @@ const ProductDetail = () => {
   const { addItem } = useCart()
   const { toggleItem, isWishlisted } = useWishlist()
   const wishlisted = isWishlisted(product?.id)
+  const { isLoggedIn, user, accessToken } = useAuth()
+
+  // ── Customer reviews (Supabase) ─────────────────────────────────────────
+  // Merged at render time with the admin-seeded reviews baked into catalog.js.
+  const [customerReviews, setCustomerReviews] = useState([])
+  const [canReview, setCanReview] = useState(false)
+
+  useEffect(() => {
+    if (!product) return
+    let cancelled = false
+    fetchProductReviews(product.id).then(rows => { if (!cancelled) setCustomerReviews(rows) })
+    return () => { cancelled = true }
+  }, [product?.id])
+
+  useEffect(() => {
+    if (!product || !isLoggedIn || !user?.id) { setCanReview(false); return }
+    let cancelled = false
+    Promise.all([
+      hasPurchasedProduct(user.id, accessToken, product.id),
+      hasReviewedProduct(user.id, accessToken, product.id),
+    ]).then(([purchased, reviewed]) => {
+      if (!cancelled) setCanReview(purchased && !reviewed)
+    }).catch(() => { if (!cancelled) setCanReview(false) })
+    return () => { cancelled = true }
+  }, [product?.id, isLoggedIn, user?.id, accessToken])
+
+  const handleReviewSubmitted = useCallback(() => {
+    setCanReview(false)
+    if (product) fetchProductReviews(product.id).then(setCustomerReviews)
+  }, [product])
+
+  const allReviews = useMemo(() => {
+    const admin = (product?.meta?.reviews || []).map(r => ({
+      name: r.name, rating: r.rating, text: r.text, date: r.date || '',
+      images: r.image ? [r.image] : [],
+    }))
+    const customer = customerReviews.map(r => ({
+      name: r.name, rating: r.rating, text: r.text,
+      date: r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+      images: r.images || [],
+    }))
+    return [...customer, ...admin]
+  }, [product?.meta?.reviews, customerReviews])
 
   // Deep-link support for colour variant cards (?color=Red) — cards on the
   // listing grids link straight to the matching colour instead of the
@@ -726,27 +772,33 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* ── Customer Reviews — only shown if reviews exist ── */}
-          {product.meta?.reviews && product.meta.reviews.length > 0 && (
+          {/* ── Customer Reviews — shown if reviews exist, or the logged-in
+              buyer is eligible to write the first one ── */}
+          {(allReviews.length > 0 || canReview) && (
           <div className="reviews-section">
             <h3 className="reviews-title">Customer Reviews</h3>
+                {allReviews.length > 0 && (
                 <div className="reviews-summary">
                   <span className="reviews-avg">
-                    {(product.meta.reviews.reduce((s, r) => s + r.rating, 0) / product.meta.reviews.length).toFixed(1)}
+                    {(allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length).toFixed(1)}
                   </span>
                   <div className="reviews-stars-big">
                     {[1,2,3,4,5].map(n => (
                       <svg key={n} viewBox="0 0 24 24" width="20" height="20"
-                        fill={n <= Math.round(product.meta.reviews.reduce((s,r)=>s+r.rating,0)/product.meta.reviews.length) ? "var(--primary-color)" : "none"}
+                        fill={n <= Math.round(allReviews.reduce((s,r)=>s+r.rating,0)/allReviews.length) ? "var(--primary-color)" : "none"}
                         stroke="var(--primary-color)" strokeWidth="2">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                       </svg>
                     ))}
                   </div>
-                  <span className="reviews-count">({product.meta.reviews.length} review{product.meta.reviews.length !== 1 ? "s" : ""})</span>
+                  <span className="reviews-count">({allReviews.length} review{allReviews.length !== 1 ? "s" : ""})</span>
                 </div>
+                )}
+
+                {canReview && <ReviewForm productId={product.id} onSubmitted={handleReviewSubmitted} />}
+
                 <div className="reviews-list">
-                  {product.meta.reviews.map((r, i) => (
+                  {allReviews.map((r, i) => (
                     <div key={i} className="review-card">
                       <div className="review-card-top">
                         <div className="review-stars">
@@ -762,10 +814,14 @@ const ProductDetail = () => {
                         {r.date && <span className="review-date">{r.date}</span>}
                       </div>
                       {r.text && <p className="review-text">{r.text}</p>}
-                      {r.image && (
-                        <button type="button" className="review-photo-thumb" onClick={() => setReviewPhotoLightbox(r.image)} aria-label="View customer photo">
-                          <img src={r.image} alt={`Photo from ${r.name}`} loading="lazy" />
-                        </button>
+                      {r.images && r.images.length > 0 && (
+                        <div className="review-photo-thumb-row">
+                          {r.images.map((img, j) => (
+                            <button key={j} type="button" className="review-photo-thumb" onClick={() => setReviewPhotoLightbox(img)} aria-label="View customer photo">
+                              <img src={img} alt={`Photo from ${r.name}`} loading="lazy" />
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </div>
                   ))}

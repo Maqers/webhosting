@@ -1,0 +1,121 @@
+.review-form-card {
+  background: #faf7f5;
+  border: 1px solid #ede0e0;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.25rem;
+  max-width: 420px;
+}
+
+.review-form-title {
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1714;
+  margin: 0 0 0.7rem;
+}
+
+.review-form-stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.7rem;
+}
+
+.review-form-star {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.review-form-textarea {
+  width: 100%;
+  border: 1.5px solid #e0d5cd;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: var(--font-family-primary);
+  resize: vertical;
+  margin-bottom: 0.7rem;
+}
+
+.review-form-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.review-form-photo-thumb {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5d8d8;
+}
+
+.review-form-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.review-form-photo-thumb button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.review-form-photo-add {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed #d8c8c0;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  text-align: center;
+}
+.review-form-photo-add:hover { background: #f5ede4; }
+
+.review-form-error {
+  color: #b91c1c;
+  font-size: 0.82rem;
+  margin: 0 0 0.6rem;
+}
+
+.review-form-submit {
+  padding: 0.65rem 1.4rem;
+  background: var(--primary-color, #760909);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.review-form-submit:hover:not(:disabled) { background: #5a0707; transform: translateY(-1px); }
+.review-form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.review-form-done {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2a7a2a;
+  text-align: center;
+}

@@ -855,6 +855,12 @@
   margin: 0;
 }
 
+.review-photo-thumb-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .review-photo-thumb {
   display: block;
   width: 150px;

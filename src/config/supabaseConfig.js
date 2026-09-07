@@ -52,6 +52,41 @@ export async function logoutSession(accessToken) {
   } catch { /* best effort */ }
 }
 
+// ── Google OAuth (Supabase GoTrue implicit flow) ───────────────────────────
+// Requires a Google provider configured in the Supabase dashboard under
+// Authentication → Providers → Google (Client ID + Secret from Google Cloud
+// Console), with the Supabase callback URL added as an authorized redirect
+// URI on the Google OAuth client.
+export function getGoogleAuthUrl(redirectTo) {
+  return `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`
+}
+
+// GoTrue's implicit flow redirects back with the session in the URL hash
+// (#access_token=...) rather than as JSON, so once we have the token we
+// fetch the user record separately.
+export async function getUserFromToken(accessToken) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) return null
+  return res.json()
+}
+
+// ── Review photo storage ────────────────────────────────────────────────────
+// Uploads into the public `review_photos` bucket (see reviewsApi.js / the
+// project README for the SQL that creates the bucket + its RLS policies).
+export async function uploadReviewPhoto(file, accessToken) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/review_photos/${path}`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}`, 'Content-Type': file.type },
+    body: file,
+  })
+  if (!res.ok) throw new Error('Photo upload failed')
+  return `${SUPABASE_URL}/storage/v1/object/public/review_photos/${path}`
+}
+
 // Generic authenticated REST helper for Postgrest tables (orders, user_carts, ...)
 // Falls back to the anon key when no user session exists (RLS will reject writes).
 export async function supabaseRest(path, { method = 'GET', accessToken, body, headers = {} } = {}) {
