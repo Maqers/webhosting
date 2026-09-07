@@ -107,11 +107,44 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--primary-color, #760909);
-  margin-top: 4px;
   text-decoration: none;
 }
 .order-card-review-link:hover { text-decoration: underline; }
 .order-card-item-price { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+
+.order-card-item-block { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.order-card-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--bg-secondary, #faf8f5);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.order-card-rate-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.order-card-rate-stars { display: flex; gap: 2px; }
+.order-card-rate-stars button {
+  background: none;
+  border: none;
+  padding: 2px;
+  line-height: 0;
+  cursor: pointer;
+}
+.order-card-rate-stars button:disabled { cursor: wait; opacity: 0.6; }
+
+.order-card-rate-error {
+  font-size: 0.75rem;
+  color: #c00;
+}
 
 .order-card-total {
   display: flex;

@@ -12,7 +12,7 @@ import SeoHead from '../components/SeoHead'
 import { trackEvent } from '../utils/analytics'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
-import { fetchProductReviews, hasPurchasedProduct, hasReviewedProduct } from '../utils/reviewsApi'
+import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } from '../utils/reviewsApi'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -86,6 +86,10 @@ const ProductDetail = () => {
   // Merged at render time with the admin-seeded reviews baked into catalog.js.
   const [customerReviews, setCustomerReviews] = useState([])
   const [canReview, setCanReview] = useState(false)
+  // Set when the shopper already has a review here (e.g. a quick star
+  // rating given from My Orders) — the form then edits/completes it
+  // instead of blocking on "already reviewed".
+  const [existingReview, setExistingReview] = useState(null)
 
   useEffect(() => {
     if (!product) return
@@ -94,22 +98,28 @@ const ProductDetail = () => {
     return () => { cancelled = true }
   }, [product?.id])
 
-  useEffect(() => {
-    if (!product || !isLoggedIn || !user?.id) { setCanReview(false); return }
-    let cancelled = false
+  const refreshOwnReview = useCallback(() => {
+    if (!product || !isLoggedIn || !user?.id) { setCanReview(false); setExistingReview(null); return }
     Promise.all([
       hasPurchasedProduct(user.id, accessToken, product.id),
-      hasReviewedProduct(user.id, accessToken, product.id),
-    ]).then(([purchased, reviewed]) => {
-      if (!cancelled) setCanReview(purchased && !reviewed)
-    }).catch(() => { if (!cancelled) setCanReview(false) })
+      fetchUserReviewForProduct(user.id, accessToken, product.id),
+    ]).then(([purchased, review]) => {
+      setCanReview(purchased)
+      setExistingReview(review)
+    }).catch(() => { setCanReview(false); setExistingReview(null) })
+  }, [product, isLoggedIn, user?.id, accessToken])
+
+  useEffect(() => {
+    let cancelled = false
+    const run = () => { if (!cancelled) refreshOwnReview() }
+    run()
     return () => { cancelled = true }
-  }, [product?.id, isLoggedIn, user?.id, accessToken])
+  }, [refreshOwnReview])
 
   const handleReviewSubmitted = useCallback(() => {
-    setCanReview(false)
+    refreshOwnReview()
     if (product) fetchProductReviews(product.id).then(setCustomerReviews)
-  }, [product])
+  }, [product, refreshOwnReview])
 
   const allReviews = useMemo(() => {
     const admin = (product?.meta?.reviews || []).map(r => ({
@@ -795,7 +805,9 @@ const ProductDetail = () => {
                 </div>
                 )}
 
-                {canReview && <ReviewForm productId={product.id} onSubmitted={handleReviewSubmitted} />}
+                {canReview && (!existingReview || !existingReview.text) && (
+                  <ReviewForm productId={product.id} existingReview={existingReview} onSubmitted={handleReviewSubmitted} />
+                )}
 
                 <div className="reviews-list">
                   {allReviews.map((r, i) => (

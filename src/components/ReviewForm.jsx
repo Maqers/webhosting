@@ -5,21 +5,27 @@ import './ReviewForm.css'
 
 const MAX_PHOTOS = 4
 
-export default function ReviewForm({ productId, onSubmitted }) {
+// existingReview: a review the shopper already has for this product (e.g.
+// a quick star rating given from My Orders, with no text/photos yet) —
+// when present, this edits/completes that review instead of creating a
+// second one.
+export default function ReviewForm({ productId, existingReview, onSubmitted }) {
   const { user, accessToken } = useAuth()
-  const [rating, setRating] = useState(0)
+  const [rating, setRating] = useState(existingReview?.rating || 0)
   const [hoverRating, setHoverRating] = useState(0)
-  const [text, setText] = useState('')
+  const [text, setText] = useState(existingReview?.text || '')
   const [photos, setPhotos] = useState([]) // { file, preview }
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
 
+  const existingPhotoCount = existingReview?.images?.length || 0
+
   const handleFiles = (fileList) => {
-    const room = MAX_PHOTOS - photos.length
+    const room = MAX_PHOTOS - existingPhotoCount - photos.length
     Array.from(fileList).filter(f => f.type.startsWith('image/')).slice(0, room).forEach(file => {
       const reader = new FileReader()
-      reader.onload = (ev) => setPhotos(prev => prev.length >= MAX_PHOTOS ? prev : [...prev, { file, preview: ev.target.result }])
+      reader.onload = (ev) => setPhotos(prev => (prev.length + existingPhotoCount >= MAX_PHOTOS ? prev : [...prev, { file, preview: ev.target.result }]))
       reader.readAsDataURL(file)
     })
   }
@@ -32,6 +38,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
     setSubmitting(true)
     try {
       await submitReview({
+        reviewId: existingReview?.id,
         productId,
         userId: user.id,
         accessToken,
@@ -39,6 +46,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
         rating,
         text: text.trim(),
         photoFiles: photos.map(p => p.file),
+        existingImages: existingReview?.images || [],
       })
       setDone(true)
       onSubmitted?.()
@@ -55,7 +63,8 @@ export default function ReviewForm({ productId, onSubmitted }) {
 
   return (
     <form className="review-form-card" onSubmit={handleSubmit}>
-      <h4 className="review-form-title">Write a review</h4>
+      <h4 className="review-form-title">{existingReview ? 'Finish your review' : 'Write a review'}</h4>
+      {existingReview && <p className="review-form-subtitle">You rated this {existingReview.rating}★ — add a few words to publish it.</p>}
 
       <div className="review-form-stars" onMouseLeave={() => setHoverRating(0)}>
         {[1, 2, 3, 4, 5].map(n => (
@@ -85,13 +94,18 @@ export default function ReviewForm({ productId, onSubmitted }) {
       />
 
       <div className="review-form-photos">
+        {(existingReview?.images || []).map((src, i) => (
+          <div key={`existing-${i}`} className="review-form-photo-thumb">
+            <img src={src} alt="" />
+          </div>
+        ))}
         {photos.map((p, i) => (
           <div key={i} className="review-form-photo-thumb">
             <img src={p.preview} alt="" />
             <button type="button" onClick={() => setPhotos(prev => prev.filter((_, j) => j !== i))} aria-label="Remove photo">×</button>
           </div>
         ))}
-        {photos.length < MAX_PHOTOS && (
+        {existingPhotoCount + photos.length < MAX_PHOTOS && (
           <label className="review-form-photo-add">
             + Photo
             <input type="file" accept="image/*" multiple hidden onChange={e => handleFiles(e.target.files)} />
