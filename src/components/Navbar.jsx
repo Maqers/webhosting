@@ -122,6 +122,7 @@ const Navbar = () => {
   const { count, setIsOpen: setCartOpen } = useCart()
   const { count: wishlistCount, setIsOpen: setWishlistOpen } = useWishlist()
   const { isLoggedIn, user, openLoginModal, logout } = useAuth()
+  const accountDisplayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.phone || user?.email
 
   const menuItems = [    { path: '/',        label: 'Home'       },
     { path: '/about',   label: 'About'      },
@@ -284,7 +285,7 @@ const Navbar = () => {
                   </button>
                   {accountMenuOpen && isLoggedIn && (
                     <div className="navbar-account-dropdown">
-                      <p className="navbar-account-phone">{user?.phone || user?.email}</p>
+                      <p className="navbar-account-phone">{accountDisplayName}</p>
                       <Link to="/profile" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Profile</Link>
                       <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Orders</Link>
                       <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>Write a Review</Link>
@@ -383,7 +384,7 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link to="/profile" className={`mobile-menu-link ${isActive('/profile') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Profile</Link>
-                <Link to="/orders" className={`mobile-menu-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Orders ({user?.phone || user?.email})</Link>
+                <Link to="/orders" className={`mobile-menu-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Orders ({accountDisplayName})</Link>
                 <Link to="/orders" className="mobile-menu-link" onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>Write a Review</Link>
                 <button className="mobile-menu-link" onClick={() => { setWishlistOpen(true); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Wishlist</button>
                 <button className="mobile-menu-link" onClick={() => { logout(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Log out</button>
