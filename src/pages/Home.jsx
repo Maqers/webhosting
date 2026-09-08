@@ -4,6 +4,7 @@ import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
+import DiwaliSparkles from '../components/DiwaliSparkles';
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import SeoHead from "../components/SeoHead";
@@ -14,6 +15,14 @@ import "./Home.css";
 // after, reverting to the normal hero with no code change needed next year.
 const RAKHI_BANNER_EXPIRES = new Date("2026-08-29T00:00:00+05:30");
 const showRakhiBanner = new Date() < RAKHI_BANNER_EXPIRES;
+
+// Diwali 2026 runs Nov 6-10 (main day Nov 8) — starts showing ~3 weeks out
+// and auto-hides itself the day after the festival ends, same self-expiring
+// pattern as the Rakhi banner above.
+const DIWALI_BANNER_STARTS = new Date("2026-10-18T00:00:00+05:30");
+const DIWALI_BANNER_EXPIRES = new Date("2026-11-11T00:00:00+05:30");
+const now = new Date();
+const showDiwaliBanner = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
 
 const Home = () => {
   const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()), []);
@@ -79,7 +88,8 @@ const HOME_CAT_IMAGES = {
         url="/"
       />
 
-      <section className={`hero-bright${showRakhiBanner ? ' hero-bright--rakhi' : ''}`}>
+      <section className={`hero-bright${showRakhiBanner ? ' hero-bright--rakhi' : ''}${showDiwaliBanner ? ' hero-bright--diwali' : ''}`}>
+        {showDiwaliBanner && <DiwaliSparkles />}
         <div className="container hero-bright-inner">
           {showRakhiBanner ? (
             <>
@@ -91,6 +101,24 @@ const HOME_CAT_IMAGES = {
               <div className="hero-bright-actions">
                 <Link to="/category/rakshabandhan" className="hero-bright-btn-primary">Shop Rakhi Gifts</Link>
                 <Link to="/products" className="hero-bright-btn-secondary">Shop All Gifts</Link>
+                <button
+                  className="hero-bright-btn-secondary"
+                  onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
+                  type="button"
+                >
+                  ✨ Find the Perfect Gift
+                </button>
+              </div>
+            </>
+          ) : showDiwaliBanner ? (
+            <>
+              <p className="hero-bright-eyebrow">Maqers wishes you a</p>
+              <h1 className="hero-bright-title">Happy Diwali</h1>
+              <p className="hero-bright-subtitle">
+                Handcrafted gifts to light up someone's festival.
+              </p>
+              <div className="hero-bright-actions">
+                <Link to="/products" className="hero-bright-btn-primary">Shop Diwali Gifts</Link>
                 <button
                   className="hero-bright-btn-secondary"
                   onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}

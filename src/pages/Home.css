@@ -12,6 +12,8 @@
   background: #760909;
   padding: 3.5rem 0 3rem;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-bright-inner {
@@ -21,6 +23,8 @@
   gap: 1rem;
   max-width: 640px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
   animation: heroBrightIn 0.7s cubic-bezier(0.4,0,0.2,1) both;
 }
 
@@ -31,6 +35,15 @@
 
 .hero-bright--rakhi {
   background-image: linear-gradient(rgba(40,2,2,0.5), rgba(40,2,2,0.5)), url('/images/rakhi-hero-2026.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Add /images/diwali-hero-2026.jpg (same way rakhi-hero-2026.jpg was added)
+   for the festive background photo — falls back to a warm gold/red glow
+   gradient until that file exists. */
+.hero-bright--diwali {
+  background-image: linear-gradient(rgba(40,2,2,0.55), rgba(40,2,2,0.55)), url('/images/diwali-hero-2026.jpg'), radial-gradient(circle at 50% 30%, #a83a12, #760909 65%);
   background-size: cover;
   background-position: center;
 }

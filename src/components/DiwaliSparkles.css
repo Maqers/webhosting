@@ -1,0 +1,26 @@
+.diwali-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.diwali-sparkle {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.3) rotate(-15deg);
+  animation: diwaliSparklePop 1.6s ease-out both;
+  filter: drop-shadow(0 0 6px rgba(255, 200, 100, 0.6));
+}
+
+@keyframes diwaliSparklePop {
+  0%   { opacity: 0; transform: scale(0.2) rotate(-15deg); }
+  35%  { opacity: 1; transform: scale(1.15) rotate(5deg); }
+  55%  { opacity: 1; transform: scale(0.95) rotate(-3deg); }
+  100% { opacity: 0; transform: scale(0.85) rotate(0deg) translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diwali-sparkle { animation: none; opacity: 0; }
+}
