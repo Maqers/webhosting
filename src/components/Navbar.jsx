@@ -133,10 +133,15 @@ const Navbar = () => {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountRef = useRef(null)
+  const mobileAccountRef = useRef(null)
 
   useEffect(() => {
     if (!accountMenuOpen) return
-    const fn = (e) => { if (accountRef.current && !accountRef.current.contains(e.target)) setAccountMenuOpen(false) }
+    const fn = (e) => {
+      const inDesktop = accountRef.current?.contains(e.target)
+      const inMobile = mobileAccountRef.current?.contains(e.target)
+      if (!inDesktop && !inMobile) setAccountMenuOpen(false)
+    }
     document.addEventListener('mousedown', fn, true)
     return () => document.removeEventListener('mousedown', fn, true)
   }, [accountMenuOpen])
@@ -173,8 +178,26 @@ const Navbar = () => {
               <span className="logo-text">maqers.in</span>
             </Link>
 
-            {/* RIGHT: wishlist + cart */}
+            {/* RIGHT: account + wishlist + cart */}
             <div className="mobile-right">
+              <div className="navbar-account-wrap" ref={mobileAccountRef}>
+                <button className="navbar-icon-btn" onClick={handleAccountClick} aria-label={isLoggedIn ? 'Account menu' : 'Log in'} type="button">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </button>
+                {accountMenuOpen && isLoggedIn && (
+                  <div className="navbar-account-dropdown">
+                    <p className="navbar-account-phone">{accountDisplayName}</p>
+                    <Link to="/profile" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Profile</Link>
+                    <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>My Orders</Link>
+                    <Link to="/orders" className="navbar-account-item" onClick={() => setAccountMenuOpen(false)}>Write a Review</Link>
+                    <button className="navbar-account-item" onClick={() => { setWishlistOpen(true); setAccountMenuOpen(false) }} type="button">Wishlist</button>
+                    <button className="navbar-account-item navbar-account-logout" onClick={() => { logout(); setAccountMenuOpen(false) }} type="button">Log out</button>
+                  </div>
+                )}
+              </div>
               <button className="navbar-icon-btn" onClick={() => setWishlistOpen(true)} aria-label="Wishlist" type="button">
                 <div className="navbar-cart-icon-wrap">
                   <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -380,18 +403,6 @@ const Navbar = () => {
             {menuItems.filter(i => i.path !== '/').map((item) => (
               <Link key={item.path} to={item.path} className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>{item.label}</Link>
             ))}
-
-            {isLoggedIn ? (
-              <>
-                <Link to="/profile" className={`mobile-menu-link ${isActive('/profile') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Profile</Link>
-                <Link to="/orders" className={`mobile-menu-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>My Orders ({accountDisplayName})</Link>
-                <Link to="/orders" className="mobile-menu-link" onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>Write a Review</Link>
-                <button className="mobile-menu-link" onClick={() => { setWishlistOpen(true); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Wishlist</button>
-                <button className="mobile-menu-link" onClick={() => { logout(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Log out</button>
-              </>
-            ) : (
-              <button className="mobile-menu-link" onClick={() => { openLoginModal(); closeMenu() }} type="button" tabIndex={isOpen ? 0 : -1}>Login</button>
-            )}
           </div>
         </nav>
       </div>

@@ -97,13 +97,14 @@
 .hero-bright-btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); color: #fff !important; }
 
 @media (max-width: 768px) {
-  .hero-bright { padding: 2.5rem 0 2.25rem; }
+  .hero-bright { padding: 2.25rem 0 1.25rem; }
+  .hero-bright-inner { gap: 0.75rem; }
   .hero-bright-title { font-size: clamp(1.9rem, 7vw, 2.6rem); }
 }
 
 @media (max-width: 480px) {
-  .hero-bright { padding: 2rem 0 1.75rem; }
-  .hero-bright-actions { flex-direction: column; width: 100%; }
+  .hero-bright { padding: 1.75rem 0 1rem; }
+  .hero-bright-actions { flex-direction: column; width: 100%; margin-top: 0.2rem; }
   .hero-bright-btn-primary,
   .hero-bright-btn-secondary { justify-content: center; }
 }
