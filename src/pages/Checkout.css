@@ -45,6 +45,34 @@
   .checkout-right { order: -1; }
 }
 
+.checkout-guest-nudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: #fdf5f0;
+  border: 1px solid #f0dfd0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+}
+
+.checkout-guest-nudge button {
+  padding: 0.5rem 1.1rem;
+  background: var(--primary-color, #760909);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.checkout-guest-nudge button:hover { background: #5a0707; }
+
 /* Sections */
 .checkout-section {
   background: #fff;

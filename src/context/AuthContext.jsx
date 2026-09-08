@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { sendPhoneOtp, verifyPhoneOtp, refreshSession, logoutSession, getGoogleAuthUrl, getUserFromToken, updateUserProfile } from '../config/supabaseConfig'
+import { claimGuestOrders } from '../utils/guestOrders'
 
 const AuthContext = createContext(null)
 const STORAGE_KEY = 'maqers_auth_session'
@@ -29,6 +30,12 @@ export function AuthProvider({ children }) {
       if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
       else localStorage.removeItem(STORAGE_KEY)
     } catch { /* ignore */ }
+    // Any order placed as a guest (before this login) gets attached to the
+    // account the moment a session becomes active — covers OTP verify,
+    // Google redirect, and plain session rehydration on return visits.
+    if (next?.user?.id && next?.access_token) {
+      claimGuestOrders(next.user.id, next.access_token).catch(() => {})
+    }
   }, [])
 
   // Handle the redirect back from Google (GoTrue's implicit flow appends

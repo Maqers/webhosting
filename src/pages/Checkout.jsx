@@ -4,6 +4,7 @@ import emailjs from '@emailjs/browser'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { supabaseRest } from '../config/supabaseConfig'
+import { saveGuestOrder } from '../utils/guestOrders'
 import SeoHead from '../components/SeoHead'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
@@ -46,7 +47,7 @@ function AppIcon({ app }) {
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart()
-  const { user, isLoggedIn, accessToken, updateProfile } = useAuth()
+  const { user, isLoggedIn, accessToken, updateProfile, openLoginModal } = useAuth()
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
   const grandTotal = total + deliveryFee
@@ -301,21 +302,23 @@ export default function Checkout() {
   }
 
   const saveOrderToSupabase = async (oid) => {
-    if (!isLoggedIn || !user?.id) return
+    const body = {
+      order_ref: oid,
+      phone: form.phone,
+      items,
+      subtotal: total,
+      total: grandTotal,
+      status: 'placed',
+    }
+    // Guests aren't blocked from checking out, but their order shouldn't
+    // just vanish — remember it locally and it gets attached to their
+    // account automatically the moment they log in (even in a later visit).
+    if (!isLoggedIn || !user?.id) {
+      saveGuestOrder(body)
+      return
+    }
     try {
-      await supabaseRest('orders', {
-        method: 'POST',
-        accessToken,
-        body: {
-          user_id: user.id,
-          order_ref: oid,
-          phone: form.phone,
-          items,
-          subtotal: total,
-          total: grandTotal,
-          status: 'placed',
-        },
-      })
+      await supabaseRest('orders', { method: 'POST', accessToken, body: { ...body, user_id: user.id } })
     } catch (err) {
       console.error('Saving order to Supabase failed:', err)
     }
@@ -463,6 +466,13 @@ export default function Checkout() {
 
         <div className="checkout-grid">
           <div className="checkout-left">
+
+            {!isLoggedIn && (
+              <div className="checkout-guest-nudge">
+                <span>Log in to save this order to your account and track it later.</span>
+                <button type="button" onClick={openLoginModal}>Log In</button>
+              </div>
+            )}
 
             <div className="checkout-section">
               <h2 className="checkout-section-title">CONTACT INFORMATION</h2>
