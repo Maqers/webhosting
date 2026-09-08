@@ -75,6 +75,11 @@
     /* CLS prevention: floor heights so async CSS load doesn't collapse sections */
     /* Home is now eagerly bundled so React renders in one shot — these just prevent FOUC */
     .hero-bright { min-height: 320px; }
+    /* Mobile hero padding is much tighter than desktop's — without these, the
+       320px desktop-tuned floor above forces ~100px of dead space below the
+       actual (shorter) mobile content, since min-height doesn't shrink to fit. */
+    @media (max-width: 768px) { .hero-bright { min-height: 260px; } }
+    @media (max-width: 480px) { .hero-bright { min-height: 230px; } }
     .category-circles-strip { min-height: 130px; }
     /* actual ≥1400px on mobile; floors prevent collapse during async CSS load */
     .featured-section { min-height: 1100px; }
