@@ -35,6 +35,7 @@
 }
 
 @media (max-width: 768px) {
+  .marquee-banner { padding: 7px 0; }
   .marquee-item {
     font-size: 0.75rem;
     letter-spacing: 0.1em;
