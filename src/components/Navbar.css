@@ -65,7 +65,7 @@
   box-sizing: border-box;
 }
 .mobile-left  { display: flex; align-items: center; gap: 4px; flex: 1; }
-.mobile-right { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: flex-end; }
+.mobile-right { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: flex-end; margin-left: 10px; }
 .mobile-logo  { flex: 0 0 auto; }
 
 /* ── Desktop row: hidden on mobile ── */
