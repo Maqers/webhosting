@@ -52,7 +52,12 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  overflow: visible;
+  /* !important needed: some other mobile-fix rule was computing this to
+     `overflow: hidden auto`, clipping the account dropdown (an absolutely
+     positioned descendant) to the navbar's own ~56px row height instead of
+     letting it float over the page — showed up as the dropdown looking
+     trapped inside the navbar with its own internal scrollbar. */
+  overflow: visible !important;
 }
 
 /* ── Mobile row: [burger+search] [logo] [wishlist+cart] ── */
