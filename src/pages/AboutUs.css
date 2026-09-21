@@ -831,11 +831,11 @@
   overflow: visible;
 }
 
+/* `display: block` here stretched the sticker to the full 1000px column and
+   let it overlap the heading beneath. */
 .founders-kicker {
-  display: block;
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: -0.25rem;
+  display: inline-flex;
+  margin-bottom: 0.65rem;
 }
 
 .founders-layout {
@@ -870,11 +870,12 @@
 
 .polaroid-caption {
   text-align: center;
-  font-family: var(--font-family-accent);
-  font-size: 1.35rem;
+  font-family: var(--font-accent);
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #1a1714;
-  margin: 0.6rem 0 0;
+  color: var(--ink-soft);
+  margin: 0.6rem 0;
+  padding: 0 0.25rem;
 }
 
 
@@ -985,7 +986,10 @@
 }
 
 .about-section > p {
+  /* `margin-inline: 0` matters: an inherited auto margin centred the text
+     block, so paragraphs started 350px right of their own heading. */
   max-width: var(--measure);
+  margin-inline: 0;
   font-family: var(--font-ui);
   font-size: var(--text-base);
   line-height: 1.7;
@@ -1055,3 +1059,14 @@
 .quote-icon { width: 26px; height: 26px; color: var(--marigold); margin-bottom: 0.5rem; }
 .quote-text { color: var(--ink); }
 .quote-author { color: var(--ink-mute); font-family: var(--font-ui); font-size: var(--text-sm); }
+
+
+.founders-section > h2 {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+
+.about-section > h2,
+.about-content > .about-section > h2 { margin-inline: 0; }
+.founders-copy p { margin-inline: 0; }

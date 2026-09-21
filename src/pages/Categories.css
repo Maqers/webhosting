@@ -345,3 +345,8 @@
 .by-section-heading p {
   color: var(--ink-soft);
 }
+
+
+/* Every other page hero is left-aligned; this one was still centred. */
+.categories-hero { text-align: left; }
+.categories-hero .container > * { margin-inline: 0; }

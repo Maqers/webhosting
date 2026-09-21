@@ -376,8 +376,9 @@ export default function Checkout() {
 
   if (items.length === 0) return (
     <div className="checkout-empty">
-      <h2>Your cart is empty</h2>
-      <button onClick={() => navigate('/products')} className="checkout-success-btn">Browse Products</button>
+      <h2>Nothing in your cart yet</h2>
+      <p>Find something handmade worth sending. Most orders ship within a week.</p>
+      <button onClick={() => navigate('/products')} className="btn btn--primary">Browse gifts</button>
     </div>
   )
 
