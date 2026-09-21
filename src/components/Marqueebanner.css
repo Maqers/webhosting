@@ -1,5 +1,9 @@
+/* The band's text was being sliced mid-word at both edges. A mask fades the
+   ends instead, so items read as continuing rather than broken. */
 .marquee-banner {
-  background-color: #f5ede4;
+  background-color: var(--blush);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4rem, #000 calc(100% - 4rem), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 4rem, #000 calc(100% - 4rem), transparent);
   overflow: hidden;
   white-space: nowrap;
   padding: 12px 0;
@@ -25,12 +29,12 @@
   align-items: center;
   gap: 14px;
   padding: 0 28px;
-  font-family: 'EB Garamond', serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-weight: 700;
-  color: #1a1714;
+  font-weight: 600;
+  color: var(--ink-soft);
   flex-shrink: 0;
 }
 

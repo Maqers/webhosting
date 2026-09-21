@@ -7,24 +7,15 @@ import { useWishlist } from '../context/WishlistContext'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { FeaturedCard } from './Home'
 import SeoHead from '../components/SeoHead'
+import Sticker from '../components/Sticker'
 import { trackEvent } from '../utils/analytics'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
 import './ProductDetail.css'
 import './Home.css'
 
-const PRODUCT_STICKERS = [
-  '👀 a fan favourite',
-  '🏃 tends to sell out',
-  '🫶 keeps getting reordered',
-]
-
-const hashToIndex = (id, len) => {
-  const str = String(id)
-  let hash = 0
-  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) % len
-  return Math.abs(hash) % len
-}
+// The three hardcoded stickers that lived here moved to data/stickers.js,
+// which now holds 46 of them with conditions for when each one is allowed.
 
 // Descriptions are stored as plain strings with a lightweight markup
 // convention the admin portal's formatting toolbar writes: **bold**,
@@ -373,6 +364,27 @@ const ProductDetail = () => {
   )
   const handleMouseLeave = useCallback(() => setLensVisible(false), [])
 
+  // Real, per-product facts. Anything the catalogue does not have is simply
+  // not shown rather than padded out with generic copy. Declared above the
+  // `if (!product)` return so the hook runs on every render.
+  const productFacts = useMemo(() => {
+    if (!product) return []
+    const m = product.meta || {}
+    const facts = []
+    if (m.delivery_time) facts.push({ label: 'Made and shipped in', value: m.delivery_time })
+    if (m.moq > 1) facts.push({ label: 'Minimum order', value: `${m.moq} units` })
+    if (m.colors?.length > 1) {
+      facts.push({
+        label: 'Colours',
+        value: m.colors.map(c => (typeof c === 'object' ? c.name : c)).filter(Boolean).join(', '),
+      })
+    }
+    if (m.sizes?.length) facts.push({ label: 'Sizes', value: m.sizes.join(', ') })
+    const personalisation = (m.personalisation_options || []).filter(o => o && o.trim())
+    if (personalisation.length) facts.push({ label: 'Can be personalised', value: personalisation.join(', ') })
+    return facts
+  }, [product])
+
   if (!product) {
     return (
       <div className="product-not-found">
@@ -390,6 +402,9 @@ const ProductDetail = () => {
 
   const currentImage = images[selectedImage]
   const categoryName = product.category || (product.categoryId ? getCategoryByIdOrSlug(product.categoryId)?.name : '') || ''
+
+  // Real, per-product facts. Anything missing from the catalogue is simply
+  // not shown rather than being padded out with generic copy.
 
   // ── JSON-LD Product schema ─────────────────────────────────────────────────
   const BASE_URL = 'https://maqers.in'
@@ -602,17 +617,13 @@ const ProductDetail = () => {
               </p>
             )}
 
-            {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
-            {product.popular && (
-              <span className="site-sticker product-detail-sticker">
-                {PRODUCT_STICKERS[hashToIndex(product.id, PRODUCT_STICKERS.length)]}
-              </span>
-            )}
+            {/* density 1: there is only one product on this page, so it is not
+                competing with a grid of neighbours for attention. */}
+            <Sticker product={product} density={1} className="product-detail-sticker sticker--lg" />
 
             <div className="price-section">
-              <span className="price-label">Price:</span>
               {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
                 <span className="product-detail-price">
                   {selectedSize && product.meta.sizePrices[selectedSize]
@@ -767,19 +778,27 @@ const ProductDetail = () => {
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
-              <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy →</Link></p>
+              <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
             </div>
 
-            <div className="product-features">
-              <h3>Product Features</h3>
-              <ul>
-                <li>Premium quality materials</li>
-                <li>Handcrafted with attention to detail</li>
-                <li>Elegant royal design</li>
-                <li>Perfect for gifting</li>
-                <li>Authentic Indian home businesses & small businesses</li>
-              </ul>
-            </div>
+            {/* These five bullets used to be hardcoded and identical on every
+                product ("Elegant royal design" on a bar of soap), which reads
+                as filler on a site whose whole pitch is that a human checked
+                each listing. Built from the product's own metadata now, and
+                omitted when there is nothing to say. */}
+            {productFacts.length > 0 && (
+              <div className="product-features">
+                <h3>The details</h3>
+                <dl className="product-facts">
+                  {productFacts.map(fact => (
+                    <div className="product-fact" key={fact.label}>
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
           </div>
 
           {/* ── Customer Reviews — only shown if reviews exist ── */}
@@ -878,7 +897,7 @@ const ProductDetail = () => {
               <div className="more-from-maker-header">
                 <h3 className="more-from-maker-title">{isMaker ? "More from this maker" : "You may also like"}</h3>
                 {isMaker && makerCode && (
-                  <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">View all →</Link>
+                  <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">See everything</Link>
                 )}
               </div>
               {moreProducts.length > 0 ? (

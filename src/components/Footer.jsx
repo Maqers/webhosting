@@ -50,7 +50,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p className="footer-copy">Copyright {year} © maqers.in &nbsp;|&nbsp; Handcrafted with ❤️ in India</p>
+        <p className="footer-copy">&copy; {year} maqers.in &nbsp;|&nbsp; Made in India, by hand</p>
       </div>
     </footer>
   )

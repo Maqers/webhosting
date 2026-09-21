@@ -88,12 +88,21 @@
 }
 
 /* Left: vertical thumbnail strip + main image */
+/* The image column used to stop while the right column kept going, leaving
+   the whole lower-left of the page empty. Sticking it keeps the product in
+   view while the reader works down the details. */
 .product-images-section {
   display: flex;
   flex-direction: row;
   gap: 10px;
   min-width: 0;
   align-items: flex-start;
+  position: sticky;
+  top: calc(var(--navbar-height, 64px) + 1rem);
+}
+
+@media (max-width: 968px) {
+  .product-images-section { position: static; }
 }
 
 @media (max-width: 768px) {
@@ -1227,7 +1236,7 @@
 }
 .order-note-hint {
   font-weight: 400;
-  color: #888;
+  color: var(--ink-soft);
   font-size: 0.78rem;
 }
 .order-note-input {
@@ -1284,4 +1293,100 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+}
+
+/* ── Product facts ────────────────────────────────────────────────────────
+   Replaces five hardcoded bullets that were identical on every product. */
+.product-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.55rem 1.5rem;
+  margin: 0.75rem 0 0;
+}
+
+.product-facts dt {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+.product-facts dd {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  margin: 0;
+}
+
+.product-fact {
+  display: contents;
+}
+
+.product-detail-sticker {
+  margin: 0.85rem 0 0.25rem;
+}
+
+@media (max-width: 520px) {
+  .product-facts { grid-template-columns: 1fr; gap: 0.15rem; }
+  .product-facts dd { margin-bottom: 0.5rem; }
+}
+
+
+/* ── Actions ──────────────────────────────────────────────────────────────
+   Add to Cart and Wishlist were equal-width halves, giving a secondary action
+   the same visual weight as the primary one. */
+.product-action-buttons {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.42fr);
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+.product-action-buttons .add-to-cart-button,
+.product-action-buttons .add-to-wishlist-button {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.product-action-buttons .add-to-cart-button {
+  background: var(--maroon);
+  border: 1.5px solid var(--maroon);
+  color: #fff;
+}
+.product-action-buttons .add-to-cart-button:hover:not(:disabled) {
+  background: var(--maroon-deep);
+  border-color: var(--maroon-deep);
+}
+.product-action-buttons .add-to-cart-button:disabled {
+  background: var(--rule-strong);
+  border-color: var(--rule-strong);
+  color: var(--ink-mute);
+  cursor: not-allowed;
+}
+
+.product-action-buttons .add-to-wishlist-button {
+  background: transparent;
+  border: 1.5px solid var(--rule-strong);
+  color: var(--ink);
+}
+.product-action-buttons .add-to-wishlist-button:hover,
+.product-action-buttons .add-to-wishlist-button.wishlisted {
+  border-color: var(--maroon);
+  color: var(--maroon);
+}
+
+.product-action-buttons .out-of-stock-note {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 420px) {
+  .product-action-buttons { grid-template-columns: minmax(0, 1fr) auto; }
 }

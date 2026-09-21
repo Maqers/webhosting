@@ -418,3 +418,20 @@
     height: 68px;
   }
 }
+
+
+/* On phones this was a full "Gift Finder" pill sitting on top of the product
+   grid, and it stacked with the WhatsApp button. Icon only, and lifted clear
+   of the bottom navigation. */
+@media (max-width: 968px) {
+  .gift-assistant-btn {
+    bottom: calc(54px + env(safe-area-inset-bottom, 0px) + 84px) !important;
+    right: 16px !important;
+    width: 52px !important;
+    height: 52px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+  .gift-assistant-btn span { display: none !important; }
+}

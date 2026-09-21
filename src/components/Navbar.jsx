@@ -253,7 +253,7 @@ const Navbar = () => {
                               <span>{cat.name}</span>
                             </Link>
                           ))}
-                          <Link to="/categories" className="navbar-dropdown-view-all" onClick={() => setCategoriesOpen(false)}>View all →</Link>
+                          <Link to="/categories" className="navbar-dropdown-view-all" onClick={() => setCategoriesOpen(false)}>All categories</Link>
                         </div>
                       </div>
                     </div>

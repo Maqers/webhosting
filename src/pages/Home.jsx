@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
+import Sticker from "../components/Sticker";
 import MarqueeBanner from '../components/Marqueebanner';
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -17,6 +18,15 @@ const showRakhiBanner = new Date() < RAKHI_BANNER_EXPIRES;
 
 const Home = () => {
   const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()), []);
+  // Three real products carry the hero, so it changes as the catalogue does.
+  const heroPicks = useMemo(
+    () => getPopularProducts().filter(p => p.inStock !== false && p.images?.length).slice(0, 3),
+    []
+  );
+  const openGiftFinder = useCallback(
+    () => window.dispatchEvent(new Event('maqers:open-gift-finder')),
+    []
+  );
   const featuredGridRef = useRef(null);
   useMobileCenterSwap(featuredGridRef, '.feat-img-zone.has-second-img');
 
@@ -50,47 +60,63 @@ const HOME_CAT_IMAGES = {
         url="/"
       />
 
-      <section className={`hero-bright${showRakhiBanner ? ' hero-bright--rakhi' : ''}`}>
-        <div className="container hero-bright-inner">
-          {showRakhiBanner ? (
-            <>
-              <p className="hero-bright-eyebrow">Maqers wishes you</p>
-              <h1 className="hero-bright-title">Happy Rakshabandhan</h1>
-              <p className="hero-bright-subtitle">
-                Handcrafted and customisable, made just for your sibling.
-              </p>
-              <div className="hero-bright-actions">
-                <Link to="/category/rakshabandhan" className="hero-bright-btn-primary">Shop Rakhi Gifts</Link>
-                <Link to="/products" className="hero-bright-btn-secondary">Shop All Gifts</Link>
-                <button
-                  className="hero-bright-btn-secondary"
-                  onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
-                  type="button"
-                >
-                  ✨ Find the Perfect Gift
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h1 className="hero-bright-title">
-                Saw it on Instagram?<br /><em>Buy it here.</em>
-              </h1>
-              <p className="hero-bright-subtitle">
-                The best independent Indian sellers, in one place.
-              </p>
-              <div className="hero-bright-actions">
-                <Link to="/products" className="hero-bright-btn-primary">Shop All Gifts</Link>
-                <button
-                  className="hero-bright-btn-secondary"
-                  onClick={() => window.dispatchEvent(new Event('maqers:open-gift-finder'))}
-                  type="button"
-                >
-                  ✨ Find the Perfect Gift
-                </button>
-              </div>
-            </>
-          )}
+      {/* The hero used to be a flat maroon slab with two buttons on it, showing
+          none of the thing being sold. It now opens on the products, which are
+          the strongest asset here, and each one is a real link. */}
+      <section className={`hero${showRakhiBanner ? ' hero--rakhi' : ''}`}>
+        <div className="container hero-inner">
+          <div className="hero-copy">
+            {showRakhiBanner ? (
+              <>
+                <p className="hero-eyebrow">Rakshabandhan</p>
+                <h1 className="hero-title">Something she<br />will actually keep.</h1>
+                <p className="hero-lede">
+                  Handmade rakhi gifts from independent Indian sellers, customisable,
+                  and posted anywhere in the country.
+                </p>
+                <div className="hero-actions">
+                  <Link to="/category/rakshabandhan" className="btn btn--primary">Shop rakhi gifts</Link>
+                  <button className="btn btn--ghost" onClick={openGiftFinder} type="button">
+                    Help me choose
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="hero-title">Saw it on Instagram?<br />Buy it here.</h1>
+                <p className="hero-lede">
+                  Hundreds of independent Indian makers, each one personally vetted,
+                  in a single place with a checkout that actually works.
+                </p>
+                <div className="hero-actions">
+                  <Link to="/products" className="btn btn--primary">Shop all gifts</Link>
+                  <button className="btn btn--ghost" onClick={openGiftFinder} type="button">
+                    Help me choose
+                  </button>
+                </div>
+                <p className="hero-note">Free delivery over &#8377;499, anywhere in India.</p>
+              </>
+            )}
+          </div>
+
+          <div className="hero-collage" aria-hidden={heroPicks.length === 0}>
+            {heroPicks.map((product, i) => (
+              <Link
+                key={product.id}
+                to={`/product/${product.slug}`}
+                className={`hero-tile hero-tile--${i + 1}`}
+                aria-label={product.title}
+              >
+                <ImageWithFallback
+                  src={product.images[0]}
+                  alt={product.title}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  priority={i === 0}
+                  sizes="(max-width: 900px) 40vw, 300px"
+                />
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -141,10 +167,13 @@ const HOME_CAT_IMAGES = {
         <div className="container">
           <div className="featured-header">
             <div className="featured-header-left">
-              <h2 className="featured-title">Most Loved Right Now</h2>
-              <span className="site-sticker featured-sticker">🔥 actually loved, not just labeled</span>
+              <h2 className="featured-title">Most loved right now</h2>
+              <Sticker
+                sticker={{ id: 'featured', emoji: '🔥', text: 'actually loved, not just labelled' }}
+                className="featured-sticker"
+              />
             </div>
-            <Link to="/products" className="featured-view-all">View all →</Link>
+            <Link to="/products" className="featured-view-all">See everything</Link>
           </div>
           <div className="featured-grid" ref={featuredGridRef}>
             {popularProducts.slice(0, 8).map((product, index) => (
@@ -156,25 +185,39 @@ const HOME_CAT_IMAGES = {
 
       <section className="trust-bar">
         <div className="container trust-bar-inner">
-          <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="search">🔍</span>
-            <div><strong>Hand-picked sellers</strong><span>Every business vetted personally</span></div>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="gift">🎁</span>
-            <div><strong>Genuinely handmade</strong><span>No generic products, only real craft</span></div>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="chat">💬</span>
-            <div><strong>Order via WhatsApp</strong><span>No DM anxiety, we handle it</span></div>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-item">
-            <span className="trust-icon" role="img" aria-label="India flag">🇮🇳</span>
-            <div><strong>Support small</strong><span>Every rupee goes to an Indian home biz</span></div>
-          </div>
+          {[
+            {
+              title: 'Hand-picked sellers',
+              body: 'Every business vetted by us before it is listed',
+              icon: <><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></>,
+            },
+            {
+              title: 'Genuinely handmade',
+              body: 'Real craft from real makers, never mass produced',
+              icon: <><path d="M12 2l2.4 6.5L21 9.3l-5 4.3 1.5 6.4L12 16.8 6.5 20l1.5-6.4-5-4.3 6.6-.8z" /></>,
+            },
+            {
+              title: 'A checkout that works',
+              body: 'No DMs, no waiting three days for a reply',
+              icon: <><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></>,
+            },
+            {
+              title: 'Supporting small',
+              body: 'Every order goes to an independent Indian business',
+              icon: <><path d="M3 21h18" /><path d="M5 21V8l7-5 7 5v13" /><path d="M10 21v-6h4v6" /></>,
+            },
+          ].map(item => (
+            <div className="trust-item" key={item.title}>
+              <svg className="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {item.icon}
+              </svg>
+              <div>
+                <strong>{item.title}</strong>
+                <span>{item.body}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -239,7 +282,7 @@ export const FeaturedCard = ({ product, index }) => {
             <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />
           </picture>
         )}
-        {product.popular && <span className="feat-badge-popular">Popular</span>}
+        <Sticker product={product} className="sticker--on-card" />
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
           <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -269,19 +312,12 @@ export const FeaturedCard = ({ product, index }) => {
             type="button"
             aria-label="Add to cart"
             disabled={product.inStock === false}
-            style={product.inStock === false ? { background: '#aaa', cursor: 'not-allowed', pointerEvents: 'none' } : {}}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
             {product.inStock === false ? <span>Out of Stock</span> : addedFeedback ? <span>Added!</span> : needsOptions ? <span>Select Options</span> : <span>Add to Cart</span>}
-          </button>
-          <button className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`} onClick={handleWishlist} type="button" aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}>
-            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            {wishlisted ? <span>Saved</span> : <span>Wishlist</span>}
           </button>
         </div>
       </div>

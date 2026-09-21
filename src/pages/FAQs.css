@@ -7,8 +7,8 @@
 
 .faqs-hero {
   position: relative;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  background: var(--paper);
+  color: var(--ink);
   padding: 6rem 0 4rem;
   text-align: center;
   overflow: hidden;
@@ -62,7 +62,7 @@
 
 .faqs-title {
   font-family: var(--font-family-heading);
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
   font-weight: 700;
   margin-bottom: 1rem;
   line-height: 1.2;
@@ -70,7 +70,7 @@
   z-index: 3;
   letter-spacing: -0.02em;
   animation: fadeInUp 0.8s ease-out;
-  color: var(--text-on-primary); /* Explicit white text for readability */
+  color: var(--ink);
   visibility: visible;
   opacity: 1;
 }
@@ -94,7 +94,7 @@
   position: relative;
   z-index: 3;
   animation: fadeInUp 0.8s ease-out 0.2s both;
-  color: var(--text-on-primary); /* Explicit white text for readability */
+  color: var(--ink);
   visibility: visible;
 }
 
@@ -275,11 +275,11 @@
 }
 
 .faqs-contact {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  background: var(--paper);
   padding: 3rem 2.5rem;
   border-radius: var(--radius-xl);
   text-align: center;
-  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  color: var(--ink);
   box-shadow: 0 8px 32px rgba(118, 9, 9, 0.2);
   position: relative;
   overflow: hidden;
@@ -347,7 +347,7 @@
 .contact-icon {
   width: 32px;
   height: 32px;
-  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  color: var(--ink);
   stroke-width: 2.5;
 }
 
@@ -356,7 +356,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: var(--text-on-primary); /* Use CSS variable for consistency */
+  color: var(--ink);
   position: relative;
   z-index: 1;
 }
@@ -369,7 +369,7 @@
   line-height: 1.6;
   position: relative;
   z-index: 1;
-  color: var(--text-on-primary); /* Explicit white text for readability */
+  color: var(--ink);
 }
 
 .contact-link {

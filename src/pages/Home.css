@@ -5,160 +5,270 @@
 .home { flex: 1; background: var(--bg-secondary); min-height: 100vh; }
 
 /* ================================================================
-   HERO — centered, reddish
+   HERO — editorial split: copy left, real products right
    ================================================================ */
 
-.hero-bright {
-  background: #760909;
-  padding: 3.5rem 0 3rem;
-  text-align: center;
+.hero {
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  padding: clamp(1.75rem, 4vw, 3.25rem) 0 clamp(2rem, 4vw, 3.25rem);
+  overflow: hidden;
 }
 
-.hero-bright-inner {
-  display: flex;
-  flex-direction: column;
+.hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: 1rem;
-  max-width: 640px;
-  margin: 0 auto;
-  animation: heroBrightIn 0.7s cubic-bezier(0.4,0,0.2,1) both;
+  gap: clamp(1.5rem, 5vw, 4rem);
 }
 
-@keyframes heroBrightIn {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+.hero-copy {
+  max-width: 30rem;
 }
 
-.hero-bright--rakhi {
-  background-image: linear-gradient(rgba(40,2,2,0.5), rgba(40,2,2,0.5)), url('/images/rakhi-hero-2026.jpg');
+.hero-eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--maroon);
+  margin: 0 0 0.5rem;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5.2vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.hero-lede {
+  font-family: var(--font-ui);
+  font-size: var(--text-lg);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 1rem 0 0;
+  max-width: 34ch;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 1.75rem;
+}
+
+.hero-note {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+  margin: 1rem 0 0;
+}
+
+/* ── Collage ─────────────────────────────────────────────────────────────
+   Three photographs at different sizes and slight angles, the way things get
+   laid out on a table to be photographed. Sizes are set in aspect-ratio so
+   nothing reflows once the images load. */
+
+.hero-collage {
+  position: relative;
+  aspect-ratio: 1 / 0.78;
+  min-height: 260px;
+  max-height: 430px;
+  justify-self: end;
+  width: 100%;
+  max-width: 520px;
+}
+
+.hero-tile {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--blush);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hero-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-tile--1 { width: 58%; aspect-ratio: 4 / 5; top: 0;    right: 4%;  transform: rotate(1.6deg);  z-index: 2; }
+.hero-tile--2 { width: 44%; aspect-ratio: 1 / 1; bottom: 0;  left: 2%;  transform: rotate(-2.4deg); z-index: 3; }
+.hero-tile--3 { width: 34%; aspect-ratio: 1 / 1; top: 12%;   left: 0;   transform: rotate(-1deg);   z-index: 1; }
+
+.hero-tile:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow: var(--shadow-lg);
+  z-index: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-tile,
+  .hero-tile:hover { transition: none; transform: none; }
+}
+
+/* Rakhi variant keeps a photographic backdrop but no longer bleaches the copy
+   to white-on-red. */
+.hero--rakhi {
+  background-image: linear-gradient(rgba(36, 27, 26, 0.55), rgba(36, 27, 26, 0.55)),
+                    url('/images/rakhi-hero-2026.jpg');
   background-size: cover;
   background-position: center;
 }
+.hero--rakhi .hero-title  { color: #fff; }
+.hero--rakhi .hero-lede   { color: rgba(255, 255, 255, 0.82); }
+.hero--rakhi .hero-eyebrow { color: var(--marigold); }
+.hero--rakhi .btn--ghost  { color: #fff; border-color: rgba(255, 255, 255, 0.45); }
+.hero--rakhi .btn--ghost:hover { background: rgba(255, 255, 255, 0.12); }
 
-.hero-bright-eyebrow {
-  font-family: var(--font-family-primary);
-  font-size: clamp(0.85rem, 1.6vw, 0.95rem);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.85);
-  margin: 0;
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 1.25rem; }
+  .hero-copy  { max-width: none; }
+  .hero-lede  { max-width: 46ch; font-size: var(--text-base); margin-top: 0.75rem; }
+  .hero-actions { margin-top: 1.15rem; }
+  /* Absolute overlap needs room the phone does not have, and the tiles were
+     being clipped by the section's overflow. A row of three instead. */
+  .hero-collage {
+    display: flex;
+    gap: 0.6rem;
+    aspect-ratio: auto;
+    min-height: 0;
+    max-height: none;
+    max-width: none;
+    justify-self: stretch;
+  }
+  .hero-tile,
+  .hero-tile--1,
+  .hero-tile--2,
+  .hero-tile--3 {
+    position: static;
+    flex: 1 1 0;
+    width: auto;
+    aspect-ratio: 3 / 4;
+    inset: auto;
+  }
+  .hero-tile--1 { transform: rotate(1.4deg); }
+  .hero-tile--2 { transform: rotate(-1.8deg); }
+  .hero-tile--3 { transform: rotate(0.8deg); }
 }
 
-.hero-bright-title {
-  font-family: var(--font-family-heading);
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.12;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-}
-
-.hero-bright-title em {
-  font-style: italic;
-  color: #f5ede4;
-}
-
-.hero-bright-subtitle {
-  font-family: var(--font-family-primary);
-  font-size: clamp(0.95rem, 2vw, 1.05rem);
-  color: rgba(255,255,255,0.78);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.hero-bright-actions {
-  display: flex;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 0.4rem;
-}
-
-.hero-bright-btn-primary {
-  display: inline-flex; align-items: center;
-  padding: 0.75rem 1.75rem;
-  background: #fff; color: #760909 !important;
-  font-family: var(--font-family-primary); font-size: 0.9rem; font-weight: 700;
-  letter-spacing: 0.03em; border-radius: 9999px; text-decoration: none;
-  transition: background 0.2s, transform 0.18s;
-}
-.hero-bright-btn-primary:hover { background: #f5ede4; transform: translateY(-2px); color: #760909 !important; }
-
-.hero-bright-btn-secondary {
-  display: inline-flex; align-items: center;
-  padding: 0.75rem 1.75rem;
-  background: rgba(255,255,255,0.12); color: #fff !important;
-  font-family: var(--font-family-primary); font-size: 0.9rem; font-weight: 600;
-  letter-spacing: 0.02em; border-radius: 9999px; text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.3);
-  transition: background 0.2s, transform 0.18s;
-}
-.hero-bright-btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); color: #fff !important; }
-
-@media (max-width: 768px) {
-  .hero-bright { padding: 2.5rem 0 2.25rem; }
-  .hero-bright-title { font-size: clamp(1.9rem, 7vw, 2.6rem); }
-}
-
-@media (max-width: 480px) {
-  .hero-bright { padding: 2rem 0 1.75rem; }
-  .hero-bright-actions { flex-direction: column; width: 100%; }
-  .hero-bright-btn-primary,
-  .hero-bright-btn-secondary { justify-content: center; }
+/* The hero previously filled 71% of a 390x844 screen before a single product
+   was visible. */
+@media (max-width: 560px) {
+  .hero { padding: 1.25rem 0 1.5rem; }
+  .hero-collage { gap: 0.45rem; }
+  .hero-title { font-size: clamp(1.85rem, 8vw, 2.3rem); }
+  .hero-lede { font-size: var(--text-sm); line-height: 1.5; }
+  .hero-note { font-size: var(--text-2xs); margin-top: 0.7rem; }
+  .hero-actions { gap: 0.5rem; margin-top: 1rem; }
+  .hero-actions .btn { flex: 1 1 0; justify-content: center; padding-inline: 0.75rem; }
 }
 
 /* ================================================================
    TRUST BAR
    ================================================================ */
 
-.trust-bar { background: #1a1714; padding: 1.4rem 0; }
-.trust-bar-inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: 13px; padding: .6rem 2rem; flex: 1; min-width: 180px; }
+.trust-bar {
+  background: var(--ink);
+  padding: 1.75rem 0;
+}
+
+.trust-bar-inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem 2rem;
+}
+
+.trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+/* Emoji stood in for icons here (magnifier, gift, speech bubble, flag). They
+   render differently on every platform and read as placeholder art; this is
+   the same outline set the navbar and footer already use. */
 .trust-icon {
-  font-size: 1.6rem; flex-shrink: 0; line-height: 1; display: inline-block;
-  font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--marigold);
+  margin-top: 1px;
 }
-.trust-bar .trust-item strong {
-  display: block !important; font-family: var(--font-family-primary) !important;
-  color: #f5ede4 !important; font-size: 1.05rem !important;
-  font-weight: var(--font-weight-semibold) !important; line-height: 1.3 !important;
+
+.trust-item strong {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
 }
-.trust-bar .trust-item span {
-  font-family: var(--font-family-primary) !important; color: rgba(245,237,228,.6) !important;
-  font-size: .92rem !important; line-height: 1.4 !important; display: block !important;
+
+.trust-item span {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.45;
+  margin-top: 2px;
 }
-.trust-divider { width: 1px; height: 38px; background: rgba(255,255,255,.08); flex-shrink: 0; }
-@media (max-width: 900px) { .trust-item { padding: .6rem 1.25rem; } }
-@media (max-width: 968px) { .trust-bar { display: none !important; } }
+
+@media (max-width: 900px) {
+  .trust-bar-inner { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 520px) {
+  .trust-bar { padding: 1.25rem 0; }
+  .trust-bar-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .trust-item span { display: none; }
+}
 
 /* ================================================================
    FEATURED SECTION
    ================================================================ */
 
-.featured-section { background: #fffaf6; padding: var(--spacing-2xl) 0 3.5rem; }
+.featured-section { background: var(--paper); padding: var(--spacing-2xl) 0 3.5rem; }
 
 .featured-header {
   display: flex; align-items: flex-end; justify-content: space-between;
   margin-bottom: 2rem; flex-wrap: wrap; gap: 0.75rem;
 }
+
+@media (max-width: 640px) {
+  .featured-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .featured-sticker { font-size: 0.95rem; }
+}
 .featured-header-left { display: flex; flex-direction: column; gap: 0.3rem; }
-.featured-sticker { align-self: flex-start; font-size: 0.9rem; padding: 0.25rem 0.7rem; }
+.featured-sticker { align-self: flex-start; }
 .featured-eyebrow {
   font-family: var(--font-family-primary); font-size: 0.78rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary-color);
 }
 .featured-title {
-  font-family: var(--font-family-heading); font-size: clamp(1.75rem, 3vw, 2.4rem);
-  font-weight: 700; color: #1a1714; margin: 0; line-height: 1.18;
+  font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 600; letter-spacing: -0.02em; color: var(--ink); margin: 0; line-height: 1.1;
 }
 .featured-view-all {
-  font-family: var(--font-family-primary); font-size: 0.92rem; font-weight: 600;
-  color: var(--primary-color); text-decoration: none; padding: 0.5rem 1.25rem;
-  border: 1.5px solid var(--primary-color); border-radius: 9999px;
-  transition: background 0.2s, color 0.2s; white-space: nowrap;
+  font-family: var(--font-ui); font-size: var(--text-sm); font-weight: 600;
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1.5px solid var(--marigold);
+  padding-bottom: 2px; white-space: nowrap;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
 }
-.featured-view-all:hover { background: var(--primary-color); color: #fff; }
+.featured-view-all:hover { color: var(--maroon); border-color: var(--maroon); }
 
 .featured-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;
@@ -167,153 +277,10 @@
 @media (max-width: 1024px) { .featured-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px)  { .featured-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } }
 
-/* ================================================================
-   FEAT CARD — used everywhere: home, products, categories, seller
-   ================================================================ */
-
-.feat-card {
-  background: #ffffff; border-radius: 0px; overflow: hidden; cursor: pointer;
-  border: 1px solid rgba(118,9,9,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);
-  display: flex; flex-direction: column;
-  animation: featCardIn 0.45s cubic-bezier(0.4,0,0.2,1) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
-  -webkit-tap-highlight-color: transparent;
-}
-
-@keyframes featCardIn {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.feat-card:hover { box-shadow: 0 12px 32px rgba(118,9,9,0.13), 0 4px 10px rgba(0,0,0,0.07); }
-@media (hover: none) { .feat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); } }
-
-/* First 2 cards are LCP candidates — skip the opacity:0 animation so they paint immediately */
-.feat-card--no-anim { animation: none; opacity: 1; }
-
-.feat-img-zone {
-  position: relative; width: 100%; aspect-ratio: 1 / 1;
-  background: #f5ede4; overflow: hidden; flex-shrink: 0;
-}
-
-.feat-img {
-  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.8s ease-in-out;
-}
-
-/* Second image — hidden by default, fades in on hover */
-.feat-img-hover {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-  pointer-events: none;
-}
-
-/* Only fade primary out when a second image actually exists (.has-second-img on the zone) */
-.feat-img-zone.has-second-img:hover .feat-img { opacity: 0; transform: scale(1.02); }
-.feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 1; }
-/* On cards without second image, keep normal zoom */
-.feat-img-zone:not(.has-second-img):hover .feat-img { transform: scale(1.04); }
-@media (hover: none) {
-  .feat-img-zone.has-second-img:hover .feat-img { opacity: 1 !important; transform: none !important; }
-  .feat-img-zone.has-second-img:hover .feat-img-hover { opacity: 0 !important; }
-  /* Hover-crossfade is a desktop-only affordance; touch grids show a
-     single static image and reveal the rest on the product detail page. */
-}
-
-.feat-badge-popular {
-  position: absolute; top: 10px; left: 10px;
-  background: #760909; color: #fff;
-  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 400;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 6px; pointer-events: none;
-}
-
-/* Wishlist heart — pop animation */
-@keyframes heartPop {
-  0%   { transform: scale(1); }
-  30%  { transform: scale(1.45); }
-  60%  { transform: scale(0.88); }
-  100% { transform: scale(1); }
-}
-
-.feat-wishlist-btn {
-  position: absolute; top: 10px; right: 10px;
-  width: 34px; height: 34px; border-radius: 50%;
-  background: rgba(255,255,255,0.92); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  color: #aaa; box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  transition: color 0.2s, background 0.2s, transform 0.15s;
-  -webkit-tap-highlight-color: transparent; z-index: 2;
-}
-.feat-wishlist-btn svg { width: 16px; height: 16px; }
-.feat-wishlist-btn:hover  { color: var(--primary-color); background: #fff; transform: scale(1.1); }
-.feat-wishlist-btn.active { color: var(--primary-color); background: #fff; }
-.feat-wishlist-btn.heart-pop { animation: heartPop 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both; }
-
-.feat-info-zone {
-  padding: 0.875rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex: 1;
-}
-.feat-category {
-  font-family: var(--font-family-primary); font-size: 0.68rem; font-weight: 400;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary-color); margin: 0; opacity: 0.85;
-}
-.feat-title {
-  font-family: var(--font-family-primary); font-size: 0.9rem; font-weight: 600;
-  color: #1a1714; margin: 0; line-height: 1.4;
-  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-@media (min-width: 768px) { .feat-title { font-size: 0.95rem; } }
-.feat-price {
-  font-family: var(--font-family-primary); font-size: 1.05rem; font-weight: 700;
-  color: var(--primary-color); margin: 0.15rem 0 0.5rem;
-}
-.feat-price-original {
-  font-weight: 400; font-size: 0.9rem; color: #aaa;
-  text-decoration: line-through; margin-right: 6px;
-}
-.feat-price-current { font-weight: 700; color: var(--primary-color); }
-
-.feat-actions { display: flex; gap: 0.5rem; margin-top: auto; }
-
-.feat-add-btn {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-  padding: 0.6rem 0.75rem; background: var(--primary-color); color: #fff;
-  border: none; border-radius: 9999px;
-  font-family: var(--font-family-primary); font-size: 0.78rem; font-weight: 700;
-  letter-spacing: 0.04em; cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-  -webkit-tap-highlight-color: transparent; white-space: nowrap;
-}
-.feat-add-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
-.feat-add-btn:hover  { background: #5a0707; }
-.feat-add-btn:active { transform: scale(0.97); }
-.feat-add-btn.added  { background: #2e7d32; }
-
-.feat-wishlist-text-btn {
-  display: flex; align-items: center; justify-content: center; gap: 0.35rem;
-  padding: 0.6rem 0.85rem; background: transparent; color: #888;
-  border: 1.5px solid #e0d5cd; border-radius: 9999px;
-  font-family: var(--font-family-primary); font-size: 0.78rem; font-weight: 600;
-  cursor: pointer; transition: color 0.2s, border-color 0.2s, background 0.2s;
-  -webkit-tap-highlight-color: transparent; white-space: nowrap; flex-shrink: 0;
-}
-.feat-wishlist-text-btn svg { width: 13px; height: 13px; }
-.feat-wishlist-text-btn:hover  { color: var(--primary-color); border-color: var(--primary-color); background: rgba(118,9,9,0.04); }
-.feat-wishlist-text-btn.active { color: var(--primary-color); border-color: var(--primary-color); }
-
-@media (max-width: 768px) {
-  .featured-section { padding: var(--spacing-xl) 0 2.5rem; }
-  .featured-header { margin-bottom: 1.25rem; }
-  .feat-add-btn { font-size: 0.72rem; padding: 0.55rem 0.6rem; }
-  .feat-wishlist-text-btn { font-size: 0.72rem; padding: 0.55rem 0.65rem; }
-  .feat-price { font-size: 0.95rem; }
-  .feat-info-zone { padding: 0.75rem 0.875rem 0.875rem; }
-}
-
+/* The product card now lives in src/components/ProductCard.css. It was
+   previously declared three times over — here, in Products.css and in
+   Categories.css — with values that had drifted apart, so the same card
+   looked different depending on which page you were on. */
 
 /* ================================================================
    CTA
@@ -385,211 +352,5 @@
   .feat-price { font-size: 0.8rem !important; margin: 0 !important; }
   .feat-actions { display: none !important; }
 }
-/* ── Category circles strip ── */
-.category-circles-strip {
-  background: #fff;
-  padding: 1rem 0 0.875rem;
-  border-bottom: 1px solid #f0ebe8;
-  overflow: visible;
-}
-.category-circles-scroll {
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  overflow-y: visible;
-  align-items: flex-start;
-  padding: 0.5rem 0 0.5rem 1rem;
-  /* touch-action / momentum / scrollbar hiding come from base.css.
-     `scroll-behavior: smooth` is deliberately NOT set: it animates every
-     scrollLeft change, which made dragging this rail lag behind the finger.
-     Arrow buttons pass behavior:'smooth' per-call instead. */
-  scroll-snap-type: x proximity;
-}
-
-.category-circle-item {
-  scroll-snap-align: start;
-}
-.category-circles-scroll::after {
-  content: '';
-  display: block;
-  min-width: 1rem;
-  flex-shrink: 0;
-}
-.category-circles-scroll::-webkit-scrollbar { display: none; }
-
-.category-circle-item, .category-circle-item--btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  text-decoration: none;
-  flex-shrink: 0;
-  width: 90px;
-}
-.category-circle-img {
-  width: 82px;
-  height: 82px;
-  min-width: 82px;
-  min-height: 82px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #faf5f5;
-  border: 1.5px solid rgba(118,9,9,0.15);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.18s;
-  aspect-ratio: 1 / 1;
-  transform: translateZ(0);
-}
-.category-circle-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
-  transform: scale(1.08);
-  transition: transform 0.25s ease;
-}
-.category-circle-fallback {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.category-circle-item:hover .category-circle-img,
-.category-circle-item:active .category-circle-img {
-  border-color: var(--primary-color);
-}
-.category-circle-item:hover .category-circle-img img,
-.category-circle-item:active .category-circle-img img {
-  transform: scale(1.12);
-}
-
-/* No hover/active highlight on mobile */
-@media (max-width: 768px) {
-  .category-circle-item:hover .category-circle-img,
-  .category-circle-item:active .category-circle-img,
-  .category-circle-item--btn:hover .category-circle-img,
-  .category-circle-item--btn:active .category-circle-img {
-    border-color: #ede0e0;
-    transform: none;
-  }
-}
-.category-circle-label {
-  font-family: var(--font-family-heading);
-  font-size: 0.67rem;
-  font-weight: 700;
-  font-style: normal;
-  color: #3a2020;
-  text-align: center;
-  line-height: 1.3;
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: normal;
-  hyphens: none;
-  width: 92px;
-  max-width: 92px;
-}
-@media (min-width: 768px) {
-  .category-circles-scroll {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 0.5rem 2rem 0.75rem;
-    gap: 1.5rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .category-circles-scroll::-webkit-scrollbar { display: none; }
-  .category-circle-item, .category-circle-item--btn { width: 96px; }
-  .category-circle-img  { width: 84px; height: 84px; min-width: 84px; min-height: 84px; }
-  .category-circle-label { font-size: 0.72rem; width: 96px; }
-}
-
-/* ── Circle buttons (Products page filter) ── */
-.category-circle-item--btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  width: 84px;
-}
-.category-circles-strip--products {
-  border-bottom: none;
-  padding: 0.75rem 0 0.25rem;
-  background: transparent;
-}
-.category-circle-item--btn:hover .category-circle-img,
-.category-circle-item--btn:active .category-circle-img {
-  border-color: var(--primary-color);
-  transform: scale(1.06);
-}
-.category-circle-item--btn.circle-active .category-circle-img {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-color);
-}
-.category-circle-all {
-  width: 82px;
-  height: 82px;
-  min-width: 82px;
-  min-height: 82px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #760909;
-  border: 1.5px solid rgba(118,9,9,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-}
-.category-circle-item--btn.circle-active .category-circle-all {
-  background: #760909;
-  color: #fff;
-}
-/* ── Circle scroll arrows ─────────────────────────────────────────────────── */
-.circles-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.circles-arrow {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #fff;
-  border: 1.5px solid #e0d4d4;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--primary-color);
-  transition: box-shadow 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-}
-.circles-arrow:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-  border-color: var(--primary-color);
-}
-.circles-arrow--left  { left: 0; }
-.circles-arrow--right { right: 0; }
-
-/* Only show on desktop — mobile uses touch */
-@media (max-width: 768px) {
-  .circles-arrow { display: none; }
-}
+/* The category rail moved to src/components/CategoryRail.css. Products.css
+   carried a second, diverging copy of it. */

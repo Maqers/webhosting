@@ -515,7 +515,7 @@ export default function Checkout() {
                     <div className="checkout-payment-icon">💳</div>
                     <div>
                       <strong>Pay via UPI</strong>
-                      <span>Scan the QR code in the order summary →</span>
+                      <span>Scan the QR code in the order summary</span>
                     </div>
                   </label>
                 </div>
