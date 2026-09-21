@@ -696,7 +696,10 @@ export default function Checkout() {
                     <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
                   </div>
                   <p className="checkout-upi-note">
-                    Scan with any UPI app, then click Place Order.
+                    <strong>Scan with any UPI app, then click Place Order.</strong>
+                    <span className="checkout-upi-warning">
+                      We only receive your order details when you click Place Order.
+                    </span>
                   </p>
                 </div>
               )}

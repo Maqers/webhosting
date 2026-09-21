@@ -287,10 +287,24 @@
 }
 
 .checkout-upi-note {
-  font-size: 0.8125rem;
-  color: var(--text-secondary, #666);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--ink);
   line-height: 1.5;
   margin: 0;
+}
+
+.checkout-upi-note strong {
+  display: block;
+  font-weight: 700;
+}
+
+/* People scan the code and assume that is the order placed. */
+.checkout-upi-warning {
+  display: block;
+  margin-top: 0.4rem;
+  font-weight: 600;
+  color: var(--maroon);
 }
 
 /* Summary */

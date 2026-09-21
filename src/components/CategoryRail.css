@@ -44,6 +44,14 @@
 }
 .category-circles-scroll::-webkit-scrollbar { display: none; }
 
+/* index.css sets `overflow: hidden` on every <button> to contain a ripple
+   ::before. On these buttons it clipped the circle: the item box is 86px wide
+   and the hover `scale(1.06)` takes the 82px circle to 91px, so the photograph
+   was cut flat down both sides while the ring around it stayed round. */
+.category-circle-item--btn {
+  overflow: visible;
+}
+
 .category-circle-item, .category-circle-item--btn {
   display: flex;
   flex-direction: column;
