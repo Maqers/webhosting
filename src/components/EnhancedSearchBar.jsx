@@ -252,7 +252,9 @@ const EnhancedSearchBar = ({ onSearch, autoFocus = false }) => {
                   onMouseEnter={() => setActiveIndex(i)}
                   onClick={() => openProduct(product)}
                 >
-                  <ImageWithFallback src={product.images[0]} alt="" className="suggestion-image" />
+                  <span className="suggestion-thumb">
+                    <ImageWithFallback src={product.images[0]} alt="" />
+                  </span>
                   <span className="suggestion-info">
                     <span
                       className="suggestion-title"

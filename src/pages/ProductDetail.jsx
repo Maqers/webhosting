@@ -38,13 +38,22 @@ const ProductDetail = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Back used to fall through to `/category/{id}` whenever no explicit `from`
+  // state had been passed, which sent people to a category page they had never
+  // visited. Arriving from search, a shared link or any card that did not set
+  // the state landed you somewhere unrelated. Real history first.
   const handleBack = () => {
     if (location.state?.from) {
-      navigate(location.state.from);
-    } else {
-      // No history state — go to the product's own category
-      navigate(product ? `/category/${product.categoryId}` : '/products');
+      navigate(location.state.from)
+      return
     }
+    // React Router tracks its position in the session history here; anything
+    // above 0 means there is a previous in-app page to return to.
+    if (window.history.state?.idx > 0) {
+      navigate(-1)
+      return
+    }
+    navigate('/products')
   };
 
   // Support both slug-based URLs (/product/customised-pouch) and

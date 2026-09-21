@@ -214,7 +214,10 @@ html {
   flex-direction: column;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  /* `clip`, not `hidden`: `overflow-x: hidden` coerces overflow-y from
+     `visible` to `auto`, which quietly turns #root into a scroll container.
+     The document then has two nested scrollers and the wheel scrolls neither. */
+  overflow-x: clip;
   box-sizing: border-box;
 }
 

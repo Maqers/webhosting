@@ -133,37 +133,18 @@
   .hero-copy  { max-width: none; }
   .hero-lede  { max-width: 46ch; font-size: var(--text-base); margin-top: 0.75rem; }
   .hero-actions { margin-top: 1.15rem; }
-  /* Absolute overlap needs room the phone does not have, and the tiles were
-     being clipped by the section's overflow. A row of three instead. */
-  .hero-collage {
-    display: flex;
-    gap: 0.6rem;
-    aspect-ratio: auto;
-    min-height: 0;
-    max-height: none;
-    max-width: none;
-    justify-self: stretch;
-  }
-  .hero-tile,
-  .hero-tile--1,
-  .hero-tile--2,
-  .hero-tile--3 {
-    position: static;
-    flex: 1 1 0;
-    width: auto;
-    aspect-ratio: 3 / 4;
-    inset: auto;
-  }
-  .hero-tile--1 { transform: rotate(1.4deg); }
-  .hero-tile--2 { transform: rotate(-1.8deg); }
-  .hero-tile--3 { transform: rotate(0.8deg); }
+
+  /* The collage is a desktop device. Stacked on a phone it became a strip of
+     three unrelated product shots with clashing backdrops, sitting directly
+     above the category circles, which already carry imagery. Dropping it gets
+     real products on screen sooner. */
+  .hero-collage { display: none; }
 }
 
 /* The hero previously filled 71% of a 390x844 screen before a single product
    was visible. */
 @media (max-width: 560px) {
-  .hero { padding: 1.25rem 0 1.5rem; }
-  .hero-collage { gap: 0.45rem; }
+  .hero { padding: 1.5rem 0 1.75rem; }
   .hero-title { font-size: clamp(1.85rem, 8vw, 2.3rem); }
   .hero-lede { font-size: var(--text-sm); line-height: 1.5; }
   .hero-note { font-size: var(--text-2xs); margin-top: 0.7rem; }
@@ -275,7 +256,7 @@
   min-height: 600px;
 }
 @media (max-width: 1024px) { .featured-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 768px)  { .featured-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } }
+@media (max-width: 768px) { .featured-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } }
 
 /* The product card now lives in src/components/ProductCard.css. It was
    previously declared three times over — here, in Products.css and in
@@ -315,42 +296,16 @@
 
 .product-id { display: none !important; }
 
-@media (max-width: 968px) {
-  .feat-img-zone {
-    position: relative !important;
-    aspect-ratio: 4 / 5 !important;
-    height: auto !important;
-    overflow: hidden !important;
-    background: #f5ede4 !important;
-  }
-  .feat-img {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center top !important;
-    display: block !important;
-  }
-  .feat-img-hover {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center top !important;
-    display: block !important;
-  }
-}
+
 
 @media (max-width: 480px) {
   .featured-grid { gap: 0.5rem !important; }
-  .feat-img-zone { aspect-ratio: 3 / 4 !important; }
-  .feat-category { display: none !important; }
-  .feat-info-zone { padding: 0.45rem 0.6rem 0.55rem !important; gap: 0.08rem !important; justify-content: flex-start !important; }
-  .feat-title { font-size: 0.72rem !important; line-height: 1.3 !important; margin: 0 !important; }
-  .feat-price { font-size: 0.8rem !important; margin: 0 !important; }
-  .feat-actions { display: none !important; }
+  
+  
+  
+  
+  
+  
 }
 /* The category rail moved to src/components/CategoryRail.css. Products.css
    carried a second, diverging copy of it. */

@@ -37,10 +37,10 @@ body {
   overflow-x: hidden;
 }
 
-body {
-  /* Set by useScrollLock when a drawer/modal opens; must stay overridable. */
-  overscroll-behavior-y: none;
-}
+/* `overscroll-behavior-y: none` was set here and broke wheel scrolling on
+   desktop: it stops scroll chaining, so once a wheel event landed on an inner
+   scroll container the page underneath never moved. Scroll chaining is the
+   default for a reason; the scroll lock does not need this. */
 
 /* Media never forces horizontal overflow. Class-based rules (.feat-img etc.)
    are more specific and still win, so intrinsic-ratio images are untouched. */

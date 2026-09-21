@@ -111,11 +111,14 @@
 .navbar-logo:hover { opacity: .85; }
 .navbar-logo:focus-visible { outline: 2px solid rgba(118,9,9,.4); outline-offset: 2px; border-radius: 4px; }
 
+/* The wordmark stays Garamond. Karla is for interface text only; it was
+   picking up the body face when --font-family-primary was repointed. */
 .logo-text {
+  font-family: var(--font-display);
   font-size: clamp(1.1rem, 3.5vw, 2rem);
   font-weight: 700;
-  color: #760909;
-  letter-spacing: .05em;
+  color: var(--maroon);
+  letter-spacing: .04em;
   line-height: 1;
   white-space: nowrap;
 }
@@ -137,12 +140,16 @@
   flex-shrink: 0;
 }
 
+/* `min-width: 0` let the search field be squeezed to 58px between 969px and
+   ~1250px, where the desktop row appears but there is not yet room for the
+   wordmark, two dropdowns, four nav links and three labelled icons. The field
+   now holds a floor and the surrounding chrome gives way instead. */
 .navbar-center-section {
   display: none;
-  flex: 1;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  min-width: 0;
+  min-width: 220px;
   max-width: min(520px, 35%);
   margin: 0 12px;
 }
@@ -669,4 +676,15 @@ body.menu-open .navbar-logo {
   .mobile-accordion-trigger,
   .mobile-accordion-arrow,
   .dropdown-arrow { transition: none !important; animation: none !important; }
+}
+
+/* ── Narrow desktop (969px – 1279px) ─────────────────────────────────────
+   Drop the icon captions and tighten the link row so the search field keeps
+   a usable width. */
+@media (min-width: 969px) and (max-width: 1279px) {
+  .navbar-icon-label { display: none; }
+  .navbar-link { font-size: 0.9rem; padding: 0.5rem 0.55rem; }
+  .navbar-dropdown-trigger { font-size: 0.9rem; padding: 0.5rem 0.55rem; }
+  .navbar-center-section { margin: 0 8px; max-width: none; }
+  .navbar-desktop-row { gap: 4px; }
 }
