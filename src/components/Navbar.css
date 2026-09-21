@@ -74,12 +74,14 @@
 .mobile-logo  { flex: 0 0 auto; }
 
 /* ── Desktop row: hidden on mobile ── */
+/* This had padding on the right only, so the wordmark sat flush against the
+   left edge of the window with nothing to breathe into. */
 .navbar-desktop-row {
   display: none;
   align-items: center;
   width: 100%;
   height: var(--navbar-height-desktop);
-  padding: 0 20px 0 0;
+  padding: 0 clamp(20px, 2.5vw, 40px);
   box-sizing: border-box;
   gap: 8px;
 }
