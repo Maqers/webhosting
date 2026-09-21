@@ -305,14 +305,16 @@
   justify-content: center;
 }
 
+/* White on #c8a96e measured 2.24:1 at 8px, which is unreadable. Ink on the
+   same gold reads at well over 7:1, and 10px fits the badge comfortably. */
 .navbar-cart-count {
   position: absolute;
-  top: -4px; right: -6px;
+  top: -5px; right: -7px;
   background: #c8a96e;
-  color: white;
-  font-size: 0.5rem;
+  color: var(--ink);
+  font-size: 0.625rem;
   font-weight: 700;
-  width: 13px; height: 13px;
+  width: 15px; height: 15px;
   border-radius: 50%;
   display: flex;
   align-items: center;

@@ -301,9 +301,6 @@ const Products = () => {
           does the job. */}
       <div className="products-topbar">
         <div className="container products-topbar-inner">
-          <p className="products-count">
-            {filteredProducts.length} {filteredProducts.length === 1 ? 'gift' : 'gifts'}
-          </p>
           <div className="products-topbar-actions">
             <button
               type="button"

@@ -549,17 +549,10 @@
 .products-topbar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
 }
 
-.products-count {
-  font-family: var(--font-ui);
-  font-size: var(--text-sm);
-  color: var(--ink-soft);
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-}
 
 .products-topbar-actions {
   display: flex;
@@ -678,4 +671,19 @@
 
 @media (min-width: 969px) {
   .products-sheet { display: none; }
+}
+
+/* The grid page carries more content than a text page, so it is not held to
+   the site's 1200px measure: the rail sat a long way in from the left edge on
+   a wide screen while the grid was cramped. */
+@media (min-width: 1200px) {
+  .products-topbar-inner,
+  .products-layout {
+    max-width: min(1440px, calc(100% - 4rem));
+  }
+}
+
+@media (min-width: 1440px) {
+  .products-layout { grid-template-columns: 236px minmax(0, 1fr); }
+  .products-layout .products-grid { grid-template-columns: repeat(4, 1fr); }
 }
