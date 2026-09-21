@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { sendPhoneOtp, verifyPhoneOtp, refreshSession, logoutSession } from '../config/supabaseConfig'
+import { sendPhoneOtp, verifyPhoneOtp, refreshSession, logoutSession, getGoogleAuthUrl, getUserFromToken, updateUserProfile } from '../config/supabaseConfig'
+import { claimGuestOrders } from '../utils/guestOrders'
 
 const AuthContext = createContext(null)
 const STORAGE_KEY = 'maqers_auth_session'
@@ -29,10 +30,35 @@ export function AuthProvider({ children }) {
       if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
       else localStorage.removeItem(STORAGE_KEY)
     } catch { /* ignore */ }
+    // Any order placed as a guest (before this login) gets attached to the
+    // account the moment a session becomes active — covers OTP verify,
+    // Google redirect, and plain session rehydration on return visits.
+    if (next?.user?.id && next?.access_token) {
+      claimGuestOrders(next.user.id, next.access_token).catch(() => {})
+    }
   }, [])
 
-  // Rehydrate/refresh on load
+  // Handle the redirect back from Google (GoTrue's implicit flow appends
+  // #access_token=...&refresh_token=... to the page URL instead of returning
+  // JSON), then fall back to rehydrating/refreshing any stored session.
   useEffect(() => {
+    if (window.location.hash.includes('access_token')) {
+      const params = new URLSearchParams(window.location.hash.slice(1))
+      const access_token = params.get('access_token')
+      const refresh_token = params.get('refresh_token')
+      const expires_in = Number(params.get('expires_in')) || 3600
+      if (access_token) {
+        getUserFromToken(access_token)
+          .then(user => persist({ access_token, refresh_token, expires_at: Date.now() + expires_in * 1000, user }))
+          .catch(() => {})
+          .finally(() => {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search)
+            setLoading(false)
+          })
+        return
+      }
+    }
+
     const stored = loadStoredSession()
     if (!stored) { setLoading(false); return }
 
@@ -75,6 +101,18 @@ export function AuthProvider({ children }) {
     return result.user
   }, [persist])
 
+  const loginWithGoogle = useCallback(() => {
+    const redirectTo = window.location.origin + window.location.pathname
+    window.location.href = getGoogleAuthUrl(redirectTo)
+  }, [])
+
+  const updateProfile = useCallback(async (fields) => {
+    if (!session?.access_token) throw new Error('Not logged in')
+    const updated = await updateUserProfile(session.access_token, fields)
+    persist({ ...session, user: updated })
+    return updated
+  }, [session, persist])
+
   const logout = useCallback(async () => {
     if (session?.access_token) await logoutSession(session.access_token)
     persist(null)
@@ -87,6 +125,8 @@ export function AuthProvider({ children }) {
     loading,
     sendOtp,
     verifyOtp,
+    loginWithGoogle,
+    updateProfile,
     logout,
     loginModalOpen,
     openLoginModal: () => setLoginModalOpen(true),

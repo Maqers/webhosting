@@ -9,6 +9,7 @@
    ================================================================ */
 
 .hero {
+  position: relative; /* anchors the Diwali sparkle overlay */
   background: var(--paper);
   border-bottom: 1px solid var(--rule);
   padding: clamp(1.75rem, 4vw, 3.25rem) 0 clamp(2rem, 4vw, 3.25rem);
@@ -20,6 +21,8 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(1.5rem, 5vw, 4rem);
+  position: relative;
+  z-index: 2;
 }
 
 .hero-copy {
@@ -307,3 +310,39 @@
 }
 /* The category rail moved to src/components/CategoryRail.css. Products.css
    carried a second, diverging copy of it. */
+
+/* ── Seasonal hero variants ───────────────────────────────────────────────
+   The Rakhi and Diwali banners swap the paper background for a photographic
+   one and flip the copy to white. Ported from the pre-revamp `.hero-bright`
+   markup, which this hero replaced. */
+.hero--rakhi,
+.hero--diwali {
+  border-bottom: none;
+}
+
+.hero--diwali {
+  background-image:
+    linear-gradient(rgba(40, 2, 2, 0.58), rgba(40, 2, 2, 0.58)),
+    url('/images/diwali-hero-2026.jpg'),
+    radial-gradient(circle at 50% 30%, #a83a12, #760909 65%);
+  background-size: cover;
+  background-position: center;
+}
+
+.hero--diwali .hero-title { color: #fff; }
+.hero--diwali .hero-lede { color: rgba(255, 255, 255, 0.82); }
+.hero--diwali .hero-eyebrow { color: var(--marigold); }
+.hero--diwali .hero-note { color: rgba(255, 255, 255, 0.65); }
+.hero--diwali .btn--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.45); }
+.hero--diwali .btn--ghost:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+
+/* On a festive hero the photograph is the backdrop, so the product collage
+   would sit image-on-image. */
+.hero--rakhi .hero-collage,
+.hero--diwali .hero-collage { display: none; }
+
+.hero--rakhi .hero-inner,
+.hero--diwali .hero-inner { grid-template-columns: 1fr; }
+
+.hero--rakhi .hero-copy,
+.hero--diwali .hero-copy { max-width: 36rem; }

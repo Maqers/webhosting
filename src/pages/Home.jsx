@@ -4,6 +4,7 @@ import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
+import DiwaliSparkles from '../components/DiwaliSparkles';
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import SeoHead from "../components/SeoHead";
@@ -14,6 +15,14 @@ import "./Home.css";
 // after, reverting to the normal hero with no code change needed next year.
 const RAKHI_BANNER_EXPIRES = new Date("2026-08-29T00:00:00+05:30");
 const showRakhiBanner = new Date() < RAKHI_BANNER_EXPIRES;
+
+// Diwali 2026 runs Nov 6-10 (main day Nov 8) — starts showing ~3 weeks out
+// and auto-hides itself the day after the festival ends, same self-expiring
+// pattern as the Rakhi banner above.
+const DIWALI_BANNER_STARTS = new Date("2026-10-18T00:00:00+05:30");
+const DIWALI_BANNER_EXPIRES = new Date("2026-11-11T00:00:00+05:30");
+const now = new Date();
+const showDiwaliBanner = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
 
 const Home = () => {
   const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()), []);
@@ -59,10 +68,13 @@ const HOME_CAT_IMAGES = {
         url="/"
       />
 
-      {/* The hero used to be a flat maroon slab with two buttons on it, showing
-          none of the thing being sold. It now opens on the products, which are
-          the strongest asset here, and each one is a real link. */}
-      <section className={`hero${showRakhiBanner ? ' hero--rakhi' : ''}`}>
+      {/* The hero opens on real products rather than a flat colour slab. The
+          seasonal Rakhi and Diwali variants swap in a photographic backdrop
+          and hide the collage, since the photograph is already the image. */}
+      <section
+        className={`hero${showRakhiBanner ? ' hero--rakhi' : ''}${showDiwaliBanner ? ' hero--diwali' : ''}`}
+      >
+        {showDiwaliBanner && <DiwaliSparkles />}
         <div className="container hero-inner">
           <div className="hero-copy">
             {showRakhiBanner ? (
@@ -75,6 +87,21 @@ const HOME_CAT_IMAGES = {
                 </p>
                 <div className="hero-actions">
                   <Link to="/category/rakshabandhan" className="btn btn--primary">Shop rakhi gifts</Link>
+                  <button className="btn btn--ghost" onClick={openGiftFinder} type="button">
+                    Help me choose
+                  </button>
+                </div>
+              </>
+            ) : showDiwaliBanner ? (
+              <>
+                <p className="hero-eyebrow">Diwali</p>
+                <h1 className="hero-title">Light up<br />someone&rsquo;s festival.</h1>
+                <p className="hero-lede">
+                  Handmade diyas, hampers and decor from independent Indian sellers,
+                  posted anywhere in the country.
+                </p>
+                <div className="hero-actions">
+                  <Link to="/products" className="btn btn--primary">Shop Diwali gifts</Link>
                   <button className="btn btn--ghost" onClick={openGiftFinder} type="button">
                     Help me choose
                   </button>
@@ -98,24 +125,26 @@ const HOME_CAT_IMAGES = {
             )}
           </div>
 
-          <div className="hero-collage" aria-hidden={heroPicks.length === 0}>
-            {heroPicks.map((product, i) => (
-              <Link
-                key={product.id}
-                to={`/product/${product.slug}`}
-                className={`hero-tile hero-tile--${i + 1}`}
-                aria-label={product.title}
-              >
-                <ImageWithFallback
-                  src={product.images[0]}
-                  alt={product.title}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  priority={i === 0}
-                  sizes="(max-width: 900px) 40vw, 300px"
-                />
-              </Link>
-            ))}
-          </div>
+          {!showRakhiBanner && !showDiwaliBanner && (
+            <div className="hero-collage" aria-hidden={heroPicks.length === 0}>
+              {heroPicks.map((product, i) => (
+                <Link
+                  key={product.id}
+                  to={`/product/${product.slug}`}
+                  className={`hero-tile hero-tile--${i + 1}`}
+                  aria-label={product.title}
+                >
+                  <ImageWithFallback
+                    src={product.images[0]}
+                    alt={product.title}
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    priority={i === 0}
+                    sizes="(max-width: 900px) 40vw, 300px"
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
