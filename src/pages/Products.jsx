@@ -4,6 +4,8 @@ import { getAllProducts, getSortedCategories, getProductsByCategory, occasionPro
 import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
+import ProductFilters, { PRICE_BANDS } from '../components/ProductFilters'
+import { useScrollLock } from '../hooks/useScrollLock'
 import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
@@ -56,6 +58,9 @@ const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
+  const [priceBands, setPriceBands] = useState([])
+  const [inStockOnly, setInStockOnly] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
@@ -100,13 +105,65 @@ const Products = () => {
       });
     }
 
+    if (priceBands.length > 0) {
+      const bands = PRICE_BANDS.filter(b => priceBands.includes(b.id))
+      filtered = filtered.filter(p => bands.some(b => p.price >= b.min && p.price < b.max))
+    }
+
+    if (inStockOnly) {
+      filtered = filtered.filter(p => p.inStock !== false)
+    }
+
     filtered = sortProducts(filtered, sortBy, {
       searchQuery: searchQuery || null,
       relevanceScores
     })
 
     return expandProductsByColor(filtered)
-  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
+  }, [selectedCategories, priceBands, inStockOnly, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
+
+  const toggleCategory = useCallback(id => {
+    setSelectedCategories(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id])
+  }, [])
+  const togglePriceBand = useCallback(id => {
+    setPriceBands(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id])
+  }, [])
+  const resetFilters = useCallback(() => {
+    setSelectedCategories([]); setPriceBands([]); setInStockOnly(false)
+  }, [])
+
+  const activeFilterCount = selectedCategories.length + priceBands.length + (inStockOnly ? 1 : 0)
+
+  // Counts shown beside each option. Each is computed against the other
+  // filters only, so ticking "Under 500" does not drive every category count
+  // to zero.
+  const { categoryCounts, priceCounts } = useMemo(() => {
+    const base = getAllProducts().filter(p => (inStockOnly ? p.inStock !== false : true))
+
+    const byPrice = priceBands.length
+      ? base.filter(p => PRICE_BANDS.filter(b => priceBands.includes(b.id))
+          .some(b => p.price >= b.min && p.price < b.max))
+      : base
+
+    const cCounts = new Map()
+    byPrice.forEach(p => {
+      const ids = new Set([p.categoryId, ...(p.meta?.secondaryCategories || [])])
+      ids.forEach(id => id && cCounts.set(id, (cCounts.get(id) || 0) + 1))
+    })
+
+    const inCats = selectedCategories.length
+      ? base.filter(p => selectedCategories.includes(p.categoryId)
+          || p.meta?.secondaryCategories?.some(c => selectedCategories.includes(c)))
+      : base
+    const pCounts = new Map()
+    PRICE_BANDS.forEach(b => {
+      pCounts.set(b.id, inCats.filter(p => p.price >= b.min && p.price < b.max).length)
+    })
+
+    return { categoryCounts: cCounts, priceCounts: pCounts }
+  }, [selectedCategories, priceBands, inStockOnly])
+
+  useScrollLock(filtersOpen)
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
   const visibleProducts = filteredProducts.slice(0, visibleCount)
@@ -238,69 +295,53 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <div ref={sentinelRef} aria-hidden="true" />
-      {isPinned && <div style={{ height: filtersHeight }} aria-hidden="true" />}
-      <div
-        ref={filtersSectionRef}
-        className={`products-filters-section${isPinned ? ' products-filters-section--pinned' : ''}`}
-        style={isPinned ? { top: navHeight } : undefined}
-      >
-        <div className="container">
-          <div className="filters-wrapper">
-            <div className="category-circles-strip category-circles-strip--products">
-              <div className="category-circles-scroll">
-                {/* All — always first */}
-                <button
-                  type="button"
-                  className={`category-circle-item category-circle-item--btn ${selectedCategories.length === 0 ? 'circle-active' : ''}`}
-                  onClick={handleClearAll}
-                >
-                  <div className="category-circle-all">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                    </svg>
-                  </div>
-                  <span className="category-circle-label">All</span>
-                </button>
-                {/* Dynamic from catalog — picks up admin name/category changes automatically */}
-                {getCachedCategories()
-                  .filter(c => c.id !== 'Oxidised-jewellery')
-                  .map(cat => {
-                    const isSelected = selectedCategories.includes(cat.id)
-                    const img = CAT_IMAGES[cat.id] || ''
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        className={`category-circle-item category-circle-item--btn ${isSelected ? 'circle-active' : ''}`}
-                        onClick={() => handleCategoryToggle(cat.id)}
-                      >
-                        <div className="category-circle-img">
-                          {img
-                            ? <picture>
-                                {img.startsWith('/images/') && <source srcSet={img.replace(/\.[^.]+$/, '.webp')} type="image/webp" />}
-                                <img src={img} alt={cat.name} loading="lazy" onError={e => { e.currentTarget.style.display='none' }} />
-                              </picture>
-                            : <span style={{ fontSize: '1.2rem' }}>{cat.icon || '🎁'}</span>
-                          }
-                        </div>
-                        <span className="category-circle-label">{cat.name}</span>
-                      </button>
-                    )
-                  })
-                }
-              </div>
-            </div>
-            <div className="filters-controls-row">
-              <ProductSort onSortChange={() => { }} />
-            </div>
+      {/* The circular category strip that used to sit here expressed only one
+          dimension and gave no way to see what was applied. Those circles
+          remain on the home page as a browse entry point; here the filter rail
+          does the job. */}
+      <div className="products-topbar">
+        <div className="container products-topbar-inner">
+          <p className="products-count">
+            {filteredProducts.length} {filteredProducts.length === 1 ? 'gift' : 'gifts'}
+          </p>
+          <div className="products-topbar-actions">
+            <button
+              type="button"
+              className="products-filter-toggle"
+              onClick={() => setFiltersOpen(true)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <line x1="4" y1="7" x2="20" y2="7" /><line x1="7" y1="12" x2="17" y2="12" />
+                <line x1="10" y1="17" x2="14" y2="17" />
+              </svg>
+              Filters
+              {activeFilterCount > 0 && <span className="pf-count">{activeFilterCount}</span>}
+            </button>
+            <ProductSort onSortChange={() => { }} />
           </div>
         </div>
       </div>
 
       <div className="products-content">
-        <div className="container">
+        <div className="container products-layout">
+          <aside className="products-rail">
+            <ProductFilters
+              categories={categories}
+              selectedCategories={selectedCategories}
+              onToggleCategory={toggleCategory}
+              priceBands={priceBands}
+              onTogglePriceBand={togglePriceBand}
+              inStockOnly={inStockOnly}
+              onToggleInStock={() => setInStockOnly(v => !v)}
+              onReset={resetFilters}
+              categoryCounts={categoryCounts}
+              priceCounts={priceCounts}
+              activeCount={activeFilterCount}
+            />
+          </aside>
+
+          <div className="products-main">
           {(searchQuery || searchResults) && (
             <div className="search-results-header">
               <h2>{searchQuery ? `Search Results for "${searchQuery}"` : 'Search Results'}</h2>
@@ -353,8 +394,43 @@ const Products = () => {
               <p>Try adjusting your filters or search terms</p>
             </div>
           )}
+          </div>
         </div>
       </div>
+
+      {/* Same panel as the rail, presented as a sheet where a column will not
+          fit. Rendering it only while open keeps one set of checkbox inputs in
+          the document at a time. */}
+      {filtersOpen && (
+        <div className="products-sheet" role="dialog" aria-modal="true" aria-label="Filters">
+          <button
+            type="button"
+            className="products-sheet-backdrop"
+            aria-label="Close filters"
+            onClick={() => setFiltersOpen(false)}
+          />
+          <div className="products-sheet-panel">
+            <ProductFilters
+              categories={categories}
+              selectedCategories={selectedCategories}
+              onToggleCategory={toggleCategory}
+              priceBands={priceBands}
+              onTogglePriceBand={togglePriceBand}
+              inStockOnly={inStockOnly}
+              onToggleInStock={() => setInStockOnly(v => !v)}
+              onReset={resetFilters}
+              categoryCounts={categoryCounts}
+              priceCounts={priceCounts}
+              activeCount={activeFilterCount}
+            />
+            <div className="products-sheet-foot">
+              <button type="button" className="btn btn--primary" onClick={() => setFiltersOpen(false)}>
+                Show {filteredProducts.length} {filteredProducts.length === 1 ? 'gift' : 'gifts'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

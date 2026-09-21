@@ -24,10 +24,15 @@
   }
 }
 
-/* Hide floating buttons when cart or wishlist drawer is open */
+/* Hide floating buttons when a drawer or sheet is open. The WhatsApp button
+   sits at z-index 999999, so it draws over any overlay rather than behind it;
+   the bottom navigation likewise covered the filter sheet's footer. */
 body:has(.cart-drawer.open) .gift-assistant-btn,
 body:has(.cart-drawer.open) .whatsapp-button,
 body:has(.wishlist-drawer.open) .gift-assistant-btn,
-body:has(.wishlist-drawer.open) .whatsapp-button {
+body:has(.wishlist-drawer.open) .whatsapp-button,
+body:has(.products-sheet) .gift-assistant-btn,
+body:has(.products-sheet) .whatsapp-button,
+body:has(.products-sheet) .bottom-nav {
   display: none !important;
 }
