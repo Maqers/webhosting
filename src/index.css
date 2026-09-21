@@ -1,61 +1,12 @@
 /* Handwritten accent font used for small playful touches across the site */
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap');
 
-/* Import mobile-first base styles - MUST be at the top before any other CSS rules */
-@import './styles/mobile-base.css';
-
-/* Critical: Zoom-safe utilities - Fixes mobile zoom breaking UI */
-@import './styles/zoom-safe.css';
-
-/* Critical: Zoom prevention & mobile fixes */
-@import './styles/zoom-prevention.css';
+/* Mobile-first foundation. Replaces the former 20-file device-patch stack —
+   see base.css for what those files were silently breaking. */
+@import './styles/base.css';
 
 /* Premium Animation System */
 @import './styles/animations.css';
-
-/* Comprehensive Mobile Responsiveness */
-@import './styles/mobile-responsive.css';
-
-/* Comprehensive Responsiveness Fixes - Production-ready responsive system */
-@import './styles/responsive-fixes.css';
-
-/* iPhone Critical Fixes - Specific fixes for iPhone users */
-@import './styles/iphone-critical-fixes.css';
-
-/* iPhone Product Page Fix - Fix product info not showing */
-@import './styles/iphone-product-fix.css';
-
-/* iPhone Hero Background Fix - Fix hero background too big on iPhone */
-@import './styles/iphone-hero-fix.css';
-
-/* Mobile Hero Image Full Width Fix - Fix landing images not taking full width */
-@import './styles/mobile-hero-image-fix.css';
-
-/* Category Page Image Full Width Fix - Fix category images not taking full width */
-@import './styles/category-image-fix.css';
-
-/* Text Breaking Fix - Prevent text breaking issues across entire application */
-@import './styles/text-breaking-fix.css';
-
-/* WhatsApp Button Visibility Fix - Ensure WhatsApp button shows on all pages */
-@import './styles/whatsapp-visibility-fix.css';
-
-/* faq-hero-fix and contact-hero-fix moved to FAQs.jsx and Contact.jsx respectively */
-
-/* iPhone All Hero Sections Fix - Comprehensive fix for all hero sections on iPhone */
-@import './styles/iphone-all-hero-fix.css';
-
-/* iOS Safari Comprehensive Fix - Production-ready fixes for all iPhone-specific issues */
-@import './styles/ios-safari-comprehensive-fix.css';
-
-/* iOS Safari Critical Fixes - Must be last to override other styles */
-@import './styles/ios-safari-fixes.css';
-
-/* Android Scrolling Fixes - Critical fix for Android device scrolling issues */
-@import './styles/android-scroll-fix.css';
-
-/* Mobile scroll priority - MUST be last so touch scroll works on all devices */
-@import './styles/mobile-scroll-priority.css';
 
 /* Global reset - Must come after @import statements */
 * {
@@ -796,46 +747,9 @@ body {
   box-sizing: border-box;
 }
 
-/* Ensure all elements respect container bounds */
-* {
-  max-width: 100%;
-}
-
-/* ============================================================================
-   GLOBAL MOBILE SCROLL SAFETY
-   Ensures the page can always scroll vertically on small screens
-   ============================================================================ */
-@media (max-width: 768px) {
-  /* html IS the scroll container on mobile */
-  html {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    touch-action: pan-y pinch-zoom !important;
-    -ms-touch-action: pan-y pinch-zoom !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* body must NOT be a scroll container — use clip so overflow-y:visible isn't coerced to auto */
-  body {
-    overflow-x: clip !important;
-    overflow-y: visible !important;
-    height: auto !important;
-    min-height: 100% !important;
-    touch-action: pan-y pinch-zoom !important;
-    -ms-touch-action: pan-y pinch-zoom !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #root,
-  .App {
-    overflow-x: clip !important;
-    overflow-y: visible !important;
-    min-height: 100vh !important;
-    height: auto !important;
-  }
-}
+/* Mobile scroll behaviour lives in base.css. It must NOT be forced with
+   !important here: useScrollLock sets body position/overflow at runtime and
+   an !important rule would silently discard it. */
 
 img,
 video,

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
+import { useScrollLock } from '../hooks/useScrollLock'
 import './Modal.css'
 
 /**
@@ -25,6 +26,8 @@ const Modal = ({
 }) => {
   const modalRef = useRef(null)
   const previousActiveElementRef = useRef(null)
+
+  useScrollLock(isOpen)
   const firstFocusableElementRef = useRef(null)
   const lastFocusableElementRef = useRef(null)
 
@@ -104,8 +107,7 @@ const Modal = ({
         }
       }, 100)
 
-      // Prevent body scroll
-      document.body.style.overflow = 'hidden'
+      // Body scroll is frozen by useScrollLock below.
 
       // Add keyboard listeners
       document.addEventListener('keydown', handleEscKey)
@@ -113,7 +115,6 @@ const Modal = ({
 
       return () => {
         clearTimeout(timer)
-        document.body.style.overflow = ''
         document.removeEventListener('keydown', handleEscKey)
         document.removeEventListener('keydown', trapFocus)
 

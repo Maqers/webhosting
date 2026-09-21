@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { trackEvent } from '../utils/analytics'
+import { useScrollLock } from '../hooks/useScrollLock'
 import './GiftAssistant.css'
 
 const CATEGORY_NAMES = {
@@ -86,20 +87,7 @@ export default function GiftAssistant() {
     return () => document.removeEventListener('keydown', handleEsc)
   }, [isOpen])
 
-  useEffect(() => {
-    if (isOpen) {
-      const w = window.innerWidth - document.documentElement.clientWidth
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${w}px`
-    } else {
-      document.body.style.overflow = ''
-      document.body.style.paddingRight = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-      document.body.style.paddingRight = ''
-    }
-  }, [isOpen])
+  useScrollLock(isOpen)
 
   const handleOpen = () => {
     setIsOpen(true)

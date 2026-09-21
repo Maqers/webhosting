@@ -371,7 +371,7 @@
   .filters-wrapper { gap: var(--spacing-lg); align-items: center; }
   .category-filters { gap: 0.75rem; }
   .filter-chip { padding: 0.75rem 1.375rem; font-size: 0.9375rem; min-height: 44px; }
-  .products-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
   .container { padding: 0 var(--spacing-md); }
 }
 
@@ -577,13 +577,31 @@
 }
 
 @media (max-width: 480px) {
-  .products-grid { gap: 0.5rem !important; }
+  .products-grid { gap: 0.5rem; }
   .feat-img-zone { aspect-ratio: 3 / 4 !important; }
   .feat-category { display: none !important; }
   .feat-info-zone { padding: 0.45rem 0.6rem 0.55rem !important; gap: 0.08rem !important; justify-content: flex-start !important; }
   .feat-title { font-size: 0.72rem !important; line-height: 1.3 !important; margin: 0 !important; }
   .feat-price { font-size: 0.8rem !important; margin: 0 !important; }
   .feat-actions { display: none !important; }
+}
+
+/* ── Product grid ──────────────────────────────────────────────────────────
+   This had no base declaration: its columns came only from the deleted
+   zoom-safe.css / mobile-base.css patches, so it is defined properly here.
+   Shared with Categories.jsx, which uses the same class. */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1200px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
 }
 
 /* ── Category circles (imported from Home layout) ── */

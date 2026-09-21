@@ -4,6 +4,7 @@ import EnhancedSearchBar from './EnhancedSearchBar'
 import { getSortedCategories } from '../data/catalog'
 import { occasionCategories as OCCASION_CATEGORIES_RAW } from '../data/occasionCatalog'
 const OCCASION_CATEGORIES = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
+import { useScrollLock } from '../hooks/useScrollLock'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
@@ -40,6 +41,8 @@ const Navbar = () => {
   const firstItemRef = useRef(null)
   const prevActiveRef = useRef(null)
 
+  useScrollLock(isOpen)
+
   const isActive    = (path) => location.pathname === path
   const isCatActive = (slug) => location.pathname === `/category/${slug}` || location.pathname.startsWith(`/category/${slug}/`)
   const isProductsActive = () => location.pathname === '/products' || location.pathname.startsWith('/product/')
@@ -63,28 +66,21 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
+  // Scroll freezing is handled by useScrollLock; this effect only owns the
+  // menu-open class hooks and focus management.
   useEffect(() => {
+    const root = document.getElementById('root')
     if (isOpen) {
-      const y = window.scrollY, root = document.getElementById('root')
-      document.body.style.position = 'fixed'; document.body.style.top = `-${y}px`
-      document.body.style.width = '100%'; document.body.classList.add('menu-open')
-      if (root) root.classList.add('menu-open-blur')
+      document.body.classList.add('menu-open')
+      root?.classList.add('menu-open-blur')
       prevActiveRef.current = document.activeElement
-      setTimeout(() => firstItemRef.current?.focus(), 150)
-    } else {
-      const y = document.body.style.top, root = document.getElementById('root')
-      document.body.style.position = ''; document.body.style.top = ''
-      document.body.style.width = ''; document.body.classList.remove('menu-open')
-      if (root) root.classList.remove('menu-open-blur')
-      if (y) window.scrollTo(0, parseInt(y || '0') * -1)
-      prevActiveRef.current?.focus()
+      const t = setTimeout(() => firstItemRef.current?.focus(), 150)
+      return () => clearTimeout(t)
     }
-    return () => {
-      const root = document.getElementById('root')
-      document.body.style.position = ''; document.body.style.top = ''
-      document.body.style.width = ''; document.body.classList.remove('menu-open')
-      if (root) root.classList.remove('menu-open-blur')
-    }
+    document.body.classList.remove('menu-open')
+    root?.classList.remove('menu-open-blur')
+    prevActiveRef.current?.focus()
+    return undefined
   }, [isOpen])
 
   useEffect(() => {

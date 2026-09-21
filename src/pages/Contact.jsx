@@ -5,7 +5,6 @@ import PhoneCard from '../components/PhoneCard'
 import { getAllPhones, getEmail, getInstagramUsername } from '../data/contactInfo'
 import { trackEvent } from '../utils/analytics'
 import './Contact.css'
-import '../styles/contact-hero-fix.css'
 
 const Contact = () => {
   const contactPhones = useMemo(() => getAllPhones(), [])

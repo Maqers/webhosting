@@ -398,12 +398,16 @@
   overflow-x: auto;
   overflow-y: visible;
   align-items: flex-start;
-  -webkit-overflow-scrolling: touch;
   padding: 0.5rem 0 0.5rem 1rem;
-  scrollbar-width: none;
-  touch-action: pan-x;
-  overscroll-behavior-x: none;
-  scroll-behavior: smooth;
+  /* touch-action / momentum / scrollbar hiding come from base.css.
+     `scroll-behavior: smooth` is deliberately NOT set: it animates every
+     scrollLeft change, which made dragging this rail lag behind the finger.
+     Arrow buttons pass behavior:'smooth' per-call instead. */
+  scroll-snap-type: x proximity;
+}
+
+.category-circle-item {
+  scroll-snap-align: start;
 }
 .category-circles-scroll::after {
   content: '';

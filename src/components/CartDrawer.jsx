@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useScrollLock } from '../hooks/useScrollLock'
 import './CartDrawer.css'
 
 export default function CartDrawer() {
@@ -11,14 +11,7 @@ export default function CartDrawer() {
   const deliveryFree = total >= DELIVERY_THRESHOLD
   const grandTotal = deliveryFree ? total : total + DELIVERY_CHARGE
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
+  useScrollLock(isOpen)
 
   return (
     <>

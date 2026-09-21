@@ -12,9 +12,13 @@
 /* Mobile: body must not be a scroll container — otherwise position:sticky breaks.
    overflow-x:hidden coerces overflow-y:visible→auto, making body a scroll container
    that intercepts sticky elements. Use clip: it clips horizontal overflow without
-   creating a scroll container (since overflow-y stays visible). */
+   creating a scroll container (since overflow-y stays visible).
+
+   The :not([data-scroll-locked]) guard matters: useScrollLock sets body overflow
+   inline, and an unconditional !important here would discard it, which is how
+   drawers and modals ended up scrolling the page behind them on every phone. */
 @media (max-width: 768px) {
-  body {
+  body:not([data-scroll-locked]) {
     overflow-x: clip !important;
     overflow-y: visible !important;
   }
