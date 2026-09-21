@@ -72,6 +72,7 @@ const ProductDetail = () => {
   const mobileImgRef = useRef(null)
   const touchStartXRef = useRef(0)
   const touchStartYRef = useRef(0)
+  const imageCountRef = useRef(0)
 
   const whatsappNumber = getWhatsAppNumber()
   const { addItem } = useCart()
@@ -272,33 +273,84 @@ const ProductDetail = () => {
 
   const images = product?.images || []
   const hasMultiple = images.length > 1
+  imageCountRef.current = images.length
   const goPrev = useCallback(() => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1)), [images.length])
   const goNext = useCallback(() => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1)), [images.length])
 
-  // Native (non-passive) touch listener so we can preventDefault on horizontal swipes,
-  // preventing the page from scrolling sideways while the user changes images.
+  // Swipe used to fire on touchend only: the image never followed the finger,
+  // so a swipe felt like nothing happened and then the picture jumped. The
+  // preventDefault() there was also a no-op, since by touchend the page has
+  // already scrolled. This tracks the drag, locks to an axis once the gesture's
+  // intent is clear, and only blocks the page scroll for horizontal drags.
+  //
+  // Gesture state lives in refs, not state: if the effect re-subscribed
+  // whenever the offset changed it would reset `active`/`axis` mid-drag and the
+  // swipe would never complete.
+  const [dragOffset, setDragOffset] = useState(0)
+  const dragRef = useRef(0)
+  const selectedImageRef = useRef(selectedImage)
+
+  useEffect(() => { selectedImageRef.current = selectedImage }, [selectedImage])
+
   useEffect(() => {
     const el = mobileImgRef.current
-    if (!el) return
+    if (!el || !hasMultiple) return undefined
+
+    let axis = null // null = undecided, 'x' = swiping, 'y' = page scroll
+    let active = false
+
+    const setOffset = (v) => { dragRef.current = v; setDragOffset(v) }
+
     const onStart = (e) => {
+      if (e.touches.length !== 1) return
+      active = true
+      axis = null
       touchStartXRef.current = e.touches[0].clientX
       touchStartYRef.current = e.touches[0].clientY
     }
-    const onEnd = (e) => {
-      const dx = touchStartXRef.current - e.changedTouches[0].clientX
-      const dy = touchStartYRef.current - e.changedTouches[0].clientY
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
-        e.preventDefault()
-        dx > 0 ? goNext() : goPrev()
+
+    const onMove = (e) => {
+      if (!active || e.touches.length !== 1) return
+      const dx = e.touches[0].clientX - touchStartXRef.current
+      const dy = e.touches[0].clientY - touchStartYRef.current
+
+      if (axis === null) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+        // A bias towards vertical: an imprecise downward flick on a product
+        // photo should scroll the page, not change the image.
+        axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y'
       }
+
+      if (axis !== 'x') return
+      e.preventDefault()
+      // Resist past the ends so the first and last image feel like edges.
+      const i = selectedImageRef.current
+      const atEdge = (dx > 0 && i === 0) || (dx < 0 && i === imageCountRef.current - 1)
+      setOffset(atEdge ? dx * 0.25 : dx)
     }
+
+    const onEnd = () => {
+      if (!active) return
+      active = false
+      const travelled = dragRef.current
+      setOffset(0)
+      if (axis !== 'x') return
+      const threshold = Math.max(40, el.offsetWidth * 0.18)
+      if (travelled <= -threshold) goNext()
+      else if (travelled >= threshold) goPrev()
+    }
+
     el.addEventListener('touchstart', onStart, { passive: true })
-    el.addEventListener('touchend', onEnd, { passive: false })
+    el.addEventListener('touchmove', onMove, { passive: false })
+    el.addEventListener('touchend', onEnd, { passive: true })
+    el.addEventListener('touchcancel', onEnd, { passive: true })
     return () => {
       el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove', onMove)
       el.removeEventListener('touchend', onEnd)
+      el.removeEventListener('touchcancel', onEnd)
     }
-  }, [goNext, goPrev])
+  }, [goNext, goPrev, hasMultiple])
 
   const LENS_SIZE = 120
   const ZOOM = 2
@@ -482,7 +534,11 @@ const ProductDetail = () => {
               <div
                 ref={mobileImgRef}
                 className="mobile-single-image"
-                onClick={() => setProductImageLightbox(true)}
+                onClick={() => { if (Math.abs(dragOffset) < 6) setProductImageLightbox(true) }}
+                style={{
+                  transform: dragOffset ? `translateX(${dragOffset}px)` : undefined,
+                  transition: dragOffset ? 'none' : 'transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)',
+                }}
               >
                 <ImageWithFallback
                   key={selectedImage}

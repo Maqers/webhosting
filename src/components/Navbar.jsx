@@ -26,6 +26,7 @@ const Navbar = () => {
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [mobileOccasionOpen, setMobileOccasionOpen] = useState(false)
   const [mobileProductOpen, setMobileProductOpen]   = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen]     = useState(false)
 
   // Derived from catalog.js — always in sync, no manual maintenance
   const PRODUCT_CATEGORIES = getSortedCategories()
@@ -47,11 +48,16 @@ const Navbar = () => {
   const isCatActive = (slug) => location.pathname === `/category/${slug}` || location.pathname.startsWith(`/category/${slug}/`)
   const isProductsActive = () => location.pathname === '/products' || location.pathname.startsWith('/product/')
 
-  const handleSearch = useCallback((results) => {
-    if (location.pathname === '/products' && results?.query) return
-    if (results?.query) navigate('/products', { state: { searchQuery: results.query, searchResults: results } })
-    else if (results?.hasResults) navigate('/products', { state: { searchResults: results } })
+  // EnhancedSearchBar owns navigation now; this used to navigate a second time
+  // with identical state right after it had already done so. The only jobs left
+  // here are closing the mobile chrome and resetting the grid when the field is
+  // cleared, which previously left stale results on screen.
+  const handleSearch = useCallback((payload) => {
     setIsOpen(false)
+    setMobileSearchOpen(false)
+    if (payload?.cleared && location.pathname === '/products') {
+      navigate('/products', { replace: true, state: null })
+    }
   }, [navigate, location.pathname])
 
   const closeMenu = useCallback(() => {
@@ -125,7 +131,6 @@ const Navbar = () => {
     { path: '/contact', label: 'Contact Us' },
   ]
 
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountRef = useRef(null)
 
@@ -314,11 +319,6 @@ const Navbar = () => {
 
         </div>
       </nav>
-
-      {/* Mobile search row — below navbar, hidden on desktop */}
-      <div className="navbar-mobile-search-row">
-        <EnhancedSearchBar onSearch={handleSearch} />
-      </div>
 
       <div className={`navbar-menu-backdrop ${isOpen ? 'active' : ''}`} onClick={closeMenu} aria-hidden="true" />
 

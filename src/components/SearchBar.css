@@ -3,10 +3,10 @@
  * Clean final version. Replaces the entire SearchBar.css file.
  */
 
-/* Desktop: hide dropdown (search navigates to products page) */
-@media (min-width: 969px) {
-  .search-suggestions { display: none !important; }
-}
+/* The dropdown used to be `display: none !important` here at >=969px while the
+   component separately refused to compute suggestions at <=768px, leaving it
+   visible only in a 200px-wide band of viewport widths. It now renders at every
+   width, anchored to .search-bar-container rather than positioned by script. */
 
 /* ============================================================================
    CONTAINER
@@ -123,19 +123,68 @@
 .clear-search:hover { background: var(--primary-color); opacity: 1; transform: scale(1.1); }
 
 /* ============================================================================
-   SUBMIT BUTTON — hidden (search fires on Enter only)
+   SUBMIT BUTTON
    ============================================================================ */
 
-.search-submit-btn { display: none !important; }
+.search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  margin-left: 4px;
+  padding: 0 0.85rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary-color);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.18s, opacity 0.18s;
+}
+
+.search-submit:hover:not(:disabled) { background: var(--primary-hover); }
+.search-submit:disabled { opacity: 0.35; cursor: default; }
+.search-submit-icon { display: none; }
+
+/* Icon-only below the desktop navbar breakpoint, where width is tight. */
+@media (max-width: 968px) {
+  .search-submit { padding: 0 0.6rem; }
+  .search-submit-text { display: none; }
+  .search-submit-icon { display: block; }
+}
+
+/* "See everything for …" row at the foot of the dropdown. */
+.suggestion-view-all {
+  display: block;
+  width: 100%;
+  padding: 0.8rem var(--spacing-md);
+  background: var(--bg-secondary);
+  border: none;
+  border-top: 1px solid var(--border-light);
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.suggestion-view-all:hover { background: rgba(118, 9, 9, 0.06); }
 
 /* ============================================================================
    SUGGESTIONS DROPDOWN
    ============================================================================ */
 
 .search-suggestions {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; max-width: 700px;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  width: 100%;
   background: var(--bg-primary);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.08);
@@ -164,6 +213,11 @@
    ============================================================================ */
 
 .suggestion-item {
+  appearance: none;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
@@ -187,9 +241,10 @@
   flex-shrink: 0;
 }
 
-.suggestion-info { flex: 1; min-width: 0; overflow: hidden; }
+.suggestion-info { flex: 1; min-width: 0; overflow: hidden; display: block; }
 
 .suggestion-title {
+  display: block;
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   font-size: .875rem;
