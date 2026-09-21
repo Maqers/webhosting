@@ -1,5 +1,5 @@
-/* Karla carries all interface text; Caveat is used only by the sticker. */
-@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Caveat:wght@600;700&display=swap');
+/* Karla carries all interface text. */
+@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 /* Mobile-first foundation. Replaces the former 20-file device-patch stack —
    see base.css for what those files were silently breaking. */
@@ -28,9 +28,8 @@
      carrying all the emphasis nothing could be more important than anything
      else. It is now reserved for price and primary action.
 
-     Marigold is the second voice, and it belongs to the stickers. Giving them
-     their own colour is what lets them read as a wink instead of competing
-     with a call to action. */
+     Marigold is the second voice, used sparingly for highlights and hover
+     accents so maroon is not the only colour carrying emphasis. */
 
   --ink:            #241B1A;   /* warm near-black: text, dark surfaces      */
   --ink-soft:       #574B49;   /* secondary text                            */
@@ -40,7 +39,7 @@
   --maroon-deep:    #5C0A0F;   /* hover                                     */
   --maroon-tint:    #F7EBEB;   /* selected states, quiet fills              */
 
-  --marigold:       #E8A33D;   /* the sticker voice                         */
+  --marigold:       #E8A33D;   /* secondary accent: rules, hovers           */
   --marigold-tint:  #FDF2DF;
 
   --paper:          #FBF7F2;   /* page                                      */
@@ -84,15 +83,13 @@
      Garamond was set on everything, including 11px uppercase letterspaced
      micro-labels, where its small x-height and fine strokes turn to mush.
      Karla now carries every piece of interface text; Garamond keeps the
-     display voice it is good at. Caveat is confined to the sticker. */
+     display voice it is good at. */
 
   --font-display: 'EB Garamond', 'EB Garamond Fallback', Georgia, serif;
   --font-ui:      'Karla', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-accent:  'Caveat', cursive;
 
   --font-family-primary: var(--font-ui);
   --font-family-heading: var(--font-display);
-  --font-family-accent:  var(--font-accent);
 
   /* Type scale, 1.25 ratio off a 16px base */
   --text-2xs:  0.6875rem;  /* 11 */
@@ -903,8 +900,8 @@ li {
   to { transform: rotate(360deg); }
 }
 
-/* The old .site-sticker / .site-kicker utilities moved to the Sticker
-   component, which owns the handwritten voice and its 46-entry library. */
+/* The .site-sticker / .site-kicker handwritten utilities were removed along
+   with the sticker component. */
 
 /* ============================================================================
    BUTTONS

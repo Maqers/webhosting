@@ -3,7 +3,6 @@ import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
 import { occasionCategories as OCCASION_CATEGORIES_RAW, getOccasionProducts } from '../data/occasionCatalog'
 import ImageWithFallback from '../components/ImageWithFallback'
-import Sticker from '../components/Sticker'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import SeoHead from '../components/SeoHead'
@@ -288,7 +287,6 @@ const ProductCard = ({ product, index }) => {
       <div ref={imgZoneRef} className={`feat-img-zone${secondImage ? ' has-second-img' : ''}`}>
         <ImageWithFallback src={product.images[0]} alt={product.title} className="feat-img" loading={index < 8 ? 'eager' : 'lazy'} />
         {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
-        <Sticker product={product} className="sticker--on-card" />
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
           <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

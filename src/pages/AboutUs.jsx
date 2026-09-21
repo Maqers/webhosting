@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import SeoHead from '../components/SeoHead'
-import Sticker from '../components/Sticker'
 import './AboutUs.css'
 
 const AboutUs = () => {
@@ -33,12 +32,10 @@ const AboutUs = () => {
 
           {/* ── FOUNDERS ───────────────────────────────────────── */}
           <div className="about-section scroll-animate founders-section">
-            <Sticker sticker={{ id: 'hi', emoji: '👋', text: "hi, it's us" }} className="founders-kicker" />
             <h2>The two people who won't stop texting sellers</h2>
             <div className="founders-layout">
               <div className="polaroid">
                 <img src="/images/founders-anandita-kamya.jpg" alt="Anandita and Kamya, co-founders of Maqers" />
-                <p className="polaroid-caption">us, pretending we know what we're doing</p>
               </div>
               <div className="founders-copy">
                 <p>
@@ -57,10 +54,6 @@ const AboutUs = () => {
                   get genuinely offended when a candle smells worse than the listing promised. If you have
                   questions, complaints, or just want to tell us we picked a weird font, our WhatsApp is open.
                 </p>
-                <div className="founders-stickers">
-                  <Sticker sticker={{ id: 'vetted', emoji: '🫡', text: 'personally vetted, by us, literally' }} />
-                  <Sticker sticker={{ id: 'chai', emoji: '☕', text: 'running on chai and stubbornness' }} />
-                </div>
               </div>
             </div>
           </div>

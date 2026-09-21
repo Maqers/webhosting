@@ -230,10 +230,8 @@
     gap: 0.6rem;
     margin-bottom: 1rem;
   }
-  .featured-sticker { font-size: 0.95rem; }
 }
 .featured-header-left { display: flex; flex-direction: column; gap: 0.3rem; }
-.featured-sticker { align-self: flex-start; }
 .featured-eyebrow {
   font-family: var(--font-family-primary); font-size: 0.78rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary-color);

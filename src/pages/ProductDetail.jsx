@@ -7,15 +7,11 @@ import { useWishlist } from '../context/WishlistContext'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { FeaturedCard } from './Home'
 import SeoHead from '../components/SeoHead'
-import Sticker from '../components/Sticker'
 import { trackEvent } from '../utils/analytics'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
 import './ProductDetail.css'
 import './Home.css'
-
-// The three hardcoded stickers that lived here moved to data/stickers.js,
-// which now holds 46 of them with conditions for when each one is allowed.
 
 // Descriptions are stored as plain strings with a lightweight markup
 // convention the admin portal's formatting toolbar writes: **bold**,
@@ -628,9 +624,6 @@ const ProductDetail = () => {
 
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
-            {/* density 1: there is only one product on this page, so it is not
-                competing with a grid of neighbours for attention. */}
-            <Sticker product={product} density={1} className="product-detail-sticker sticker--lg" />
 
             <div className="price-section">
               {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (

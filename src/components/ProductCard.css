@@ -171,10 +171,15 @@
    One button, revealed on hover where there is a pointer. */
 .feat-actions { margin-top: auto; padding-top: 0.6rem; }
 
+/* base.css gives every control a 44px floor on touch devices. On a 153px-wide
+   card that made an 11px label sit in a pill half the height of the text block
+   under the photo. The card itself is the large tap target; this button opts
+   out and sizes to its content. */
 .feat-add-btn {
   width: 100%;
+  min-height: 36px;
   display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-  padding: 0.58rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   background: var(--maroon); color: #fff;
   border: none; border-radius: var(--radius-full);
   font-family: var(--font-ui); font-size: var(--text-xs); font-weight: 600;
@@ -209,8 +214,8 @@
   .feat-price { font-size: var(--text-sm); }
   /* Add to Cart stays on phones too; it used to be hidden below 480px, so the
      only way to buy from a grid was to open the product first. */
-  .feat-actions { padding-top: 0.45rem; }
-  .feat-add-btn { padding: 0.5rem 0.4rem; font-size: var(--text-2xs); gap: 0.25rem; }
+  .feat-actions { padding-top: 0.4rem; }
+  .feat-add-btn { min-height: 34px; padding: 0.35rem 0.4rem; font-size: var(--text-2xs); gap: 0.25rem; }
   .feat-add-btn svg { width: 12px; height: 12px; }
 }
 

@@ -5,7 +5,6 @@ import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
 import ImageWithFallback from '../components/ImageWithFallback'
-import Sticker from '../components/Sticker'
 import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -433,7 +432,6 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
-        <Sticker product={product} className="sticker--on-card" />
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button
           className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`}

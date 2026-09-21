@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
-import Sticker from "../components/Sticker";
 import MarqueeBanner from '../components/Marqueebanner';
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -168,10 +167,6 @@ const HOME_CAT_IMAGES = {
           <div className="featured-header">
             <div className="featured-header-left">
               <h2 className="featured-title">Most loved right now</h2>
-              <Sticker
-                sticker={{ id: 'featured', emoji: '🔥', text: 'actually loved, not just labelled' }}
-                className="featured-sticker"
-              />
             </div>
             <Link to="/products" className="featured-view-all">See everything</Link>
           </div>
@@ -282,7 +277,6 @@ export const FeaturedCard = ({ product, index }) => {
             <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />
           </picture>
         )}
-        <Sticker product={product} className="sticker--on-card" />
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`} onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"} type="button">
           <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
