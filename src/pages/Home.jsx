@@ -111,8 +111,8 @@ const HOME_CAT_IMAGES = {
               <>
                 <h1 className="hero-title">Saw it on Instagram?<br />Buy it here.</h1>
                 <p className="hero-lede">
-                  Hundreds of independent Indian makers, each one personally vetted,
-                  in a single place with a checkout that actually works.
+                  Straight from independent Indian makers, each one personally
+                  vetted, in a single place with a checkout that actually works.
                 </p>
                 <div className="hero-actions">
                   <Link to="/products" className="btn btn--primary">Shop all gifts</Link>

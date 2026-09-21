@@ -126,7 +126,10 @@ const Navbar = () => {
   const { isLoggedIn, user, openLoginModal, logout } = useAuth()
   const accountDisplayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.phone || user?.email
 
-  const menuItems = [    { path: '/',        label: 'Home'       },
+  // No Home entry: the wordmark to the left of these links already goes home,
+  // so it was a second control doing the same job. The mobile menu keeps its
+  // own Home row, where there is no always-visible wordmark to rely on.
+  const menuItems = [
     { path: '/about',   label: 'About'      },
     { path: '/faqs',    label: 'FAQs'       },
     { path: '/contact', label: 'Contact Us' },
@@ -396,7 +399,7 @@ const Navbar = () => {
               </div>
             )}
 
-            {menuItems.filter(i => i.path !== '/').map((item) => (
+            {menuItems.map((item) => (
               <Link key={item.path} to={item.path} className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>{item.label}</Link>
             ))}
           </div>
