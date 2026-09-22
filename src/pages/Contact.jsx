@@ -4,6 +4,7 @@ import Toast from '../components/Toast'
 import PhoneCard from '../components/PhoneCard'
 import { getAllPhones, getEmail, getInstagramUsername } from '../data/contactInfo'
 import { trackEvent } from '../utils/analytics'
+import SeoHead from '../components/SeoHead'
 import './Contact.css'
 
 const Contact = () => {
@@ -28,6 +29,11 @@ const Contact = () => {
 
   return (
     <div className="contact-page">
+      <SeoHead
+        title="Contact Us"
+        description="Questions about an order, a product or selling with us? Reach Maqers on WhatsApp, phone or email, any day between 10am and 11pm."
+        url="/contact"
+      />
       <div className="contact-hero">
         <div className="hero-overlay"></div>
         <div className="container">

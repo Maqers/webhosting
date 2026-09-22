@@ -5,6 +5,7 @@ import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
 import ProductFilters, { PRICE_BANDS } from '../components/ProductFilters'
+import SeoHead from '../components/SeoHead'
 import { useScrollLock } from '../hooks/useScrollLock'
 import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
@@ -177,61 +178,12 @@ const Products = () => {
   // position:sticky. Two stacked native sticky elements (navbar + this
   // banner) trigger a well-known class of iOS Safari rendering bugs that
   // make the banner visibly jitter while scrolling. Driving this with an
-  // IntersectionObserver + position:fixed sidesteps the browser's native
-  // sticky implementation entirely.
-  const sentinelRef = useRef(null)
-  const filtersSectionRef = useRef(null)
-  const [isPinned, setIsPinned] = useState(false)
-  const [navHeight, setNavHeight] = useState(0)
-  const [filtersHeight, setFiltersHeight] = useState(0)
+  // The sticky category banner this file used to pin (sentinel +
+  // IntersectionObserver + a measured navbar offset) went with the circle
+  // strip. Its refs were left attached to nothing, so isPinned could never
+  // become true, while a ResizeObserver on the navbar kept running on every
+  // render of this page.
 
-  useEffect(() => {
-    const navbarEl = document.querySelector('.navbar')
-    if (!navbarEl) return
-    const measure = () => setNavHeight(navbarEl.getBoundingClientRect().height)
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(navbarEl)
-    return () => ro.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const el = filtersSectionRef.current
-    if (!el) return
-    const measure = () => setFiltersHeight(el.getBoundingClientRect().height)
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel || navHeight === 0) return
-    // Desktop navbar is not sticky (position: static), so there's nothing
-    // fixed at the top for this banner to pin itself below there — doing so
-    // would offset it by navHeight into a blank gap where the navbar used to
-    // be before it scrolled away. Only pin on mobile, where the navbar stays
-    // sticky.
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsPinned(window.innerWidth >= 969 ? false : !entry.isIntersecting),
-      { rootMargin: `-${navHeight}px 0px 0px 0px`, threshold: 0 }
-    )
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [navHeight])
-
-  const handleCategoryToggle = useCallback((categoryId) => {
-    setSelectedCategories(prev => {
-      if (categoryId === 'All') return []
-      if (prev.includes(categoryId)) return prev.filter(id => id !== categoryId)
-      return [...prev, categoryId]
-    })
-    setVisibleCount(PAGE_SIZE)
-    const newParams = new URLSearchParams(searchParams)
-    newParams.delete('page')
-    setSearchParams(newParams, { replace: true })
-  }, [searchParams, setSearchParams])
 
   const handleClearAll = useCallback(() => {
     setSelectedCategories([])
@@ -299,6 +251,13 @@ const Products = () => {
           dimension and gave no way to see what was applied. Those circles
           remain on the home page as a browse entry point; here the filter rail
           does the job. */}
+      {/* seoTitle and seoDescription were computed here and never rendered,
+          so the catalogue page shipped with no document title of its own and
+          no h1. The heading is visually hidden because the page's own design
+          leads with the toolbar, but crawlers and screen readers need it. */}
+      <SeoHead title={seoTitle} description={seoDescription} url="/products" />
+      <h1 className="sr-only">{seoTitle}</h1>
+
       <div className="products-topbar">
         <div className="container products-topbar-inner">
           <div className="products-topbar-actions">
