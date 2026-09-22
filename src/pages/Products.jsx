@@ -185,13 +185,6 @@ const Products = () => {
   // render of this page.
 
 
-  const handleClearAll = useCallback(() => {
-    setSelectedCategories([])
-    setVisibleCount(PAGE_SIZE)
-    const newParams = new URLSearchParams(searchParams)
-    newParams.delete('page')
-    setSearchParams(newParams, { replace: true })
-  }, [searchParams, setSearchParams])
 
   // Restore category filter from URL param (e.g. when navigating back from product detail)
   useEffect(() => {
