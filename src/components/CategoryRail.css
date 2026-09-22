@@ -31,6 +31,10 @@
      scrollLeft change, which made dragging this rail lag behind the finger.
      Arrow buttons pass behavior:'smooth' per-call instead. */
   scroll-snap-type: x proximity;
+  /* Without this the first item snaps its start to the container's start,
+     ignoring the left padding, so the rail settled at scrollLeft 32 on load
+     and the "previous" arrow appeared before anything had been scrolled. */
+  scroll-padding-left: 1rem;
 }
 
 .category-circle-item {
@@ -135,6 +139,7 @@
     overflow-x: auto;
     justify-content: flex-start;
     padding: 0.5rem 2rem 0.75rem;
+    scroll-padding-left: 2rem;
     gap: 1.5rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -224,10 +229,14 @@
 .circles-arrow--left  { left: 0; }
 .circles-arrow--right { right: 0; }
 
-/* Only show on desktop — mobile uses touch */
-@media (max-width: 768px) {
+/* Pointer devices only. On touch the rail is dragged directly, and a floating
+   button over the circles would just be in the way. */
+@media (hover: none), (pointer: coarse) {
   .circles-arrow { display: none; }
 }
+
+.circles-wrapper { min-width: 0; }
+.circles-wrapper > .category-circles-scroll { flex: 1 1 0; min-width: 0; }
 
 /* Products page variant: transparent, tighter, and constrained so it cannot
    break out of the filter bar's flex row.

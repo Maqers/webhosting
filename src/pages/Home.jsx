@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useRef } from "react";
+import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
@@ -31,6 +31,37 @@ const Home = () => {
     () => getPopularProducts().filter(p => p.inStock !== false && p.images?.length).slice(0, 3),
     []
   );
+  // A mouse-only visitor had no way to reach the overflow on this rail: the
+  // scrollbar is hidden, there are no arrows, and a plain wheel scrolls the
+  // page. At 1000px–1280px that hid two to five categories outright. Arrows
+  // appear only where there is a fine pointer and only on the side that has
+  // somewhere to go.
+  const railRef = useRef(null)
+  const [railEdges, setRailEdges] = useState({ left: false, right: false })
+
+  const measureRail = useCallback(() => {
+    const el = railRef.current
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    setRailEdges({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 })
+  }, [])
+
+  useEffect(() => {
+    const el = railRef.current
+    if (!el) return undefined
+    measureRail()
+    el.addEventListener('scroll', measureRail, { passive: true })
+    const ro = new ResizeObserver(measureRail)
+    ro.observe(el)
+    return () => { el.removeEventListener('scroll', measureRail); ro.disconnect() }
+  }, [measureRail])
+
+  const nudgeRail = useCallback(dir => {
+    const el = railRef.current
+    if (!el) return
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' })
+  }, [])
+
   const openGiftFinder = useCallback(
     () => window.dispatchEvent(new Event('maqers:open-gift-finder')),
     []
@@ -152,7 +183,26 @@ const HOME_CAT_IMAGES = {
 
       {/* ── Scrollable category circles ── */}
       <div className="category-circles-strip">
-        <div className="category-circles-scroll">
+        <div className="circles-wrapper">
+          {railEdges.left && (
+            <button type="button" className="circles-arrow circles-arrow--left"
+              onClick={() => nudgeRail(-1)} aria-label="Previous categories">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          )}
+          {railEdges.right && (
+            <button type="button" className="circles-arrow circles-arrow--right"
+              onClick={() => nudgeRail(1)} aria-label="More categories">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          )}
+        <div className="category-circles-scroll" ref={railRef}>
           {getSortedCategories()
             .filter(c => c.id !== 'Oxidised-jewellery')
             .map((cat, catIndex) => {
@@ -188,6 +238,7 @@ const HOME_CAT_IMAGES = {
               )
             })
           }
+          </div>
         </div>
       </div>
 

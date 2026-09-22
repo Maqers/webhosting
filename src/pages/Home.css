@@ -131,6 +131,17 @@
 .hero--rakhi .btn--ghost  { color: #fff; border-color: rgba(255, 255, 255, 0.45); }
 .hero--rakhi .btn--ghost:hover { background: rgba(255, 255, 255, 0.12); }
 
+/* Desktop only. The hero ran 511px, most of it the collage, which pushed the
+   product grid well below the fold. Scoped to 901px and up so the mobile hero,
+   already tuned to 274px, is untouched. */
+@media (min-width: 901px) {
+  .hero { padding: 2rem 0 2.25rem; }
+  .hero-collage { max-width: 400px; max-height: 330px; }
+  .hero-title { font-size: clamp(2rem, 4.4vw, 3rem); }
+  .hero-lede { font-size: var(--text-base); margin-top: 0.85rem; }
+  .hero-actions { margin-top: 1.4rem; }
+}
+
 @media (max-width: 900px) {
   .hero-inner { grid-template-columns: 1fr; gap: 1.25rem; }
   .hero-copy  { max-width: none; }
