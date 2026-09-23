@@ -610,11 +610,14 @@ function addOccasionMapKey(source, occasionId) {
 // occasion only shows on the site once it exists in BOTH files.
 
 function parseOccasionCatalogEntries(source) {
-  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*emoji:\s*"([^"]*)",\s*order:\s*(\d+),\s*description:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+  // circleImage is optional and trails description, so entries written before
+  // it existed still parse. An occasion with one gets a circle on the home
+  // page; without one it appears everywhere else but not there.
+  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*emoji:\s*"([^"]*)",\s*order:\s*(\d+),\s*description:\s*"((?:[^"\\]|\\.)*)"(?:,\s*circleImage:\s*"([^"]*)")?\s*\}/g;
   const results = [];
   let m;
   while ((m = regex.exec(source)) !== null) {
-    results.push({ id: m[1], name: m[2], slug: m[3], emoji: m[4], order: parseInt(m[5]), description: m[6].replace(/\\"/g, '"') });
+    results.push({ id: m[1], name: m[2], slug: m[3], emoji: m[4], order: parseInt(m[5]), description: m[6].replace(/\\"/g, '"'), circleImage: m[7] || "" });
   }
   return results.sort((a, b) => a.order - b.order);
 }
@@ -626,7 +629,8 @@ function insertOccasionCatalogEntry(source, occ, order) {
     slug: "${occ.id}",
     emoji: "${occ.emoji || ""}",
     order: ${order},
-    description: "${sanitizeForJS(occ.description || "")}"
+    description: "${sanitizeForJS(occ.description || "")}"${occ.circleImage ? `,
+    circleImage: "${sanitizeForJS(occ.circleImage)}"` : ""}
   },`;
   return source.replace(/(export const occasionCategories = \[)([\s\S]*?)(\n\])/m, (_, open, content, close) => `${open}${content}\n${entry}${close}`);
 }
@@ -636,6 +640,17 @@ function updateOccasionCatalogEntry(source, id, updated) {
   r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?name:\\s*)"[^"]*"`), `$1"${sanitizeForJS(updated.name)}"`);
   r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?emoji:\\s*)"[^"]*"`), `$1"${updated.emoji || ""}"`);
   r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?description:\\s*)"[^"]*"`), `$1"${sanitizeForJS(updated.description || "")}"`);
+
+  // circleImage may or may not already be on the entry, so replace it when it
+  // is there and append it after description when it is not.
+  const hasField = new RegExp(`id:\\s*"${id}",[\\s\\S]*?circleImage:`).test(r);
+  if (updated.circleImage) {
+    r = hasField
+      ? r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?circleImage:\\s*)"[^"]*"`), `$1"${sanitizeForJS(updated.circleImage)}"`)
+      : r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?description:\\s*"[^"]*")`), `$1,\n    circleImage: "${sanitizeForJS(updated.circleImage)}"`);
+  } else if (hasField) {
+    r = r.replace(new RegExp(`(id:\\s*"${id}",[\\s\\S]*?description:\\s*"[^"]*"),\\s*circleImage:\\s*"[^"]*"`), `$1`);
+  }
   return r;
 }
 
@@ -754,7 +769,7 @@ export default function AdminPortal() {
   const [occasionEdits, setOccasionEdits] = useState({});
   const [occasionCatalogEntries, setOccasionCatalogEntries] = useState([]);
   const [showAddOccasion, setShowAddOccasion] = useState(false);
-  const [newOccasion, setNewOccasion] = useState({ name: "", emoji: "", description: "" });
+  const [newOccasion, setNewOccasion] = useState({ name: "", emoji: "", description: "", circleImage: "" });
   const [editingOccasion, setEditingOccasion] = useState(null);
   const [occasionOrderDirty, setOccasionOrderDirty] = useState(false);
 
@@ -1429,7 +1444,7 @@ export default function AdminPortal() {
       await commitCatalog(updated, sha, `Add occasion product bucket: ${id}`, creds);
 
       loadCatalogData(updated, sha);
-      setNewOccasion({ name: "", emoji: "", description: "" });
+      setNewOccasion({ name: "", emoji: "", description: "", circleImage: "" });
       setShowAddOccasion(false);
       showToast(`Occasion "${newOccasion.name}" added!`);
     } catch (err) { showToast(err.message, "error"); }
@@ -3016,6 +3031,12 @@ export default function AdminPortal() {
                     <label style={ts.label}>Description</label>
                     <textarea style={{ ...ts.input, height: 70, resize: "vertical" }} placeholder="Short, playful blurb shown on the By Occasion page..."
                       value={newOccasion.description} onChange={e => setNewOccasion(o => ({ ...o, description: e.target.value }))} />
+                    <label style={ts.label}>Home circle image</label>
+                    <input style={ts.input} placeholder="/images/example.webp — leave blank for no circle"
+                      value={newOccasion.circleImage} onChange={e => setNewOccasion(o => ({ ...o, circleImage: e.target.value }))} />
+                    <p style={{ fontSize: 11, color: "#999", margin: "4px 0 0" }}>
+                      Set this and the occasion gets a circle on the home page. Leave it blank and it still appears in the nav, By Occasion and its own page.
+                    </p>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ textAlign: "center", color: "#aaa" }}>
@@ -3043,6 +3064,10 @@ export default function AdminPortal() {
                     <label style={ts.label}>Description</label>
                     <textarea style={{ ...ts.input, height: 70, resize: "vertical" }} value={editingOccasion.description}
                       onChange={e => setEditingOccasion(o => ({ ...o, description: e.target.value }))} />
+                    <label style={ts.label}>Home circle image</label>
+                    <input style={ts.input} placeholder="/images/example.webp — leave blank for no circle"
+                      value={editingOccasion.circleImage || ""}
+                      onChange={e => setEditingOccasion(o => ({ ...o, circleImage: e.target.value }))} />
                   </div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ textAlign: "center", color: "#888" }}>
