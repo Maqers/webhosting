@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getPopularProducts, getSortedCategories } from "../data/catalog";
+import { occasionCategories } from "../data/occasionCatalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
 import MarqueeBanner from '../components/Marqueebanner';
@@ -61,6 +62,14 @@ const Home = () => {
     if (!el) return
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' })
   }, [])
+
+  // Occasions that have opted into a home circle by setting circleImage.
+  const occasionCircles = useMemo(
+    () => [...occasionCategories]
+      .filter(o => o.circleImage)
+      .sort((a, b) => a.order - b.order),
+    []
+  );
 
   const openGiftFinder = useCallback(
     () => window.dispatchEvent(new Event('maqers:open-gift-finder')),
@@ -203,28 +212,31 @@ const HOME_CAT_IMAGES = {
             </button>
           )}
         <div className="category-circles-scroll" ref={railRef}>
-          {/* Diwali is an occasion, not a product category, so it is not in
-              getSortedCategories() and is prepended by hand. It links to
-              /category/diwali, which resolves occasion slugs the same way
-              /category/rakshabandhan already did. */}
-          <Link
-            to="/category/diwali"
-            state={{ from: '/' }}
-            className="category-circle-item category-circle-item--btn"
-            style={{ textDecoration: 'none' }}
-          >
-            <div className="category-circle-img">
-              <img
-                src="/images/chambu-modak-diya-img-1.webp"
-                alt="Diwali"
-                width="82"
-                height="82"
-                loading="eager"
-                decoding="async"
-              />
-            </div>
-            <span className="category-circle-label">Diwali</span>
-          </Link>
+          {/* Occasions with a circleImage set lead the rail. This was a
+              hardcoded Diwali block, which meant an occasion created in the
+              admin portal never got a circle; it is driven by the data now, so
+              setting the image in the portal is all it takes. */}
+          {occasionCircles.map(occ => (
+            <Link
+              key={occ.id}
+              to={`/category/${occ.slug}`}
+              state={{ from: '/' }}
+              className="category-circle-item category-circle-item--btn"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="category-circle-img">
+                <img
+                  src={occ.circleImage}
+                  alt={occ.name}
+                  width="82"
+                  height="82"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+              <span className="category-circle-label">{occ.name}</span>
+            </Link>
+          ))}
           {getSortedCategories()
             .filter(c => c.id !== 'Oxidised-jewellery' && c.id !== 'Wedding-Gifts')
             .map((cat, catIndex) => {
