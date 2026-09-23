@@ -268,7 +268,7 @@ const HOME_CAT_IMAGES = {
         <div className="container">
           <div className="featured-header">
             <div className="featured-header-left">
-              <h2 className="featured-title">Most loved right now</h2>
+              <h2 className="featured-title">Founders&rsquo; picks</h2>
             </div>
             <Link to="/products" className="featured-view-all">See everything</Link>
           </div>
