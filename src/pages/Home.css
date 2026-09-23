@@ -155,6 +155,50 @@
   .hero-collage { display: none; }
 }
 
+/* Colours only: on a phone the hero is a plain band with no product collage
+   to carry it, and on paper it read as a notification strip rather than a
+   banner. The maroon field comes back below 900px, where the collage is
+   hidden; the desktop hero stays on paper. Layout and type are unchanged. */
+@media (max-width: 900px) {
+  .hero {
+    background: var(--maroon);
+    border-bottom: none;
+  }
+
+  .hero-title { color: #fff; }
+  .hero-lede { color: rgba(255, 255, 255, 0.84); }
+  .hero-note { color: rgba(255, 255, 255, 0.72); }
+  .hero-eyebrow { color: var(--marigold); }
+
+  /* Inverted for a dark field: solid white is the primary, outlined white the
+     secondary, which is what the old red banner did. */
+  .hero-actions .btn--primary,
+  .hero-actions .btn--primary:visited {
+    background: #fff;
+    border-color: #fff;
+    color: var(--maroon);
+  }
+  .hero-actions .btn--primary:hover,
+  .hero-actions .btn--primary:focus {
+    background: var(--blush);
+    border-color: var(--blush);
+    color: var(--maroon);
+  }
+
+  .hero-actions .btn--ghost,
+  .hero-actions .btn--ghost:visited {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #fff;
+  }
+  .hero-actions .btn--ghost:hover,
+  .hero-actions .btn--ghost:focus {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #fff;
+  }
+}
+
 /* The hero previously filled 71% of a 390x844 screen before a single product
    was visible. */
 @media (max-width: 560px) {

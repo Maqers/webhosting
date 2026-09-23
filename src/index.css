@@ -258,24 +258,13 @@ h4 {
   font-weight: var(--font-weight-semibold);
 }
 
-/* Mobile-specific zoom-safe typography */
-@media (max-width: 768px) {
-  h1 {
-    font-size: clamp(1.5rem, 8%, 2.25rem) !important;
-  }
-
-  h2 {
-    font-size: clamp(1.25rem, 7%, 1.875rem) !important;
-  }
-
-  h3 {
-    font-size: clamp(1.125rem, 6%, 1.5rem) !important;
-  }
-
-  h4 {
-    font-size: clamp(1rem, 5%, 1.25rem) !important;
-  }
-}
+/* The mobile heading block that lived here was the last survivor of the old
+   zoom-safe stylesheet. A percentage inside a font-size clamp() resolves
+   against the parent's font size, so `clamp(1.125rem, 6%, 1.5rem)` always
+   collapsed to its minimum, and the !important meant every h1-h4 on a phone
+   was pinned there regardless of what the component asked for. It is why
+   product titles rendered at 18px on mobile while ProductCard.css was asking
+   for 13px. Headings size from their own rules now. */
 
 p {
   margin: 0;
