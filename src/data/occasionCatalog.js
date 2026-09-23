@@ -6,6 +6,16 @@
 
 export const occasionCategories = [
   {
+    id: "diwali",
+    name: "Diwali",
+    slug: "diwali",
+    emoji: "\u{1FA94}",
+    // -1 rather than 0 so Diwali leads through the festival without
+    // renumbering the 23 existing occasions, whose orders run 0 to 22.
+    order: -1,
+    description: "Diyas, candles, decor and hampers for the one festival where turning up empty-handed is not an option."
+  },
+  {
     id: "shaadi-fever",
     name: "Shaadi Fever",
     slug: "shaadi-fever",

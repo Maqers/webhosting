@@ -210,7 +210,7 @@
   .feat-img-zone { aspect-ratio: 4 / 5; }
   .feat-category { display: none; }
   .feat-info-zone { padding: 0.5rem 0.55rem 0.6rem; gap: 0.1rem; }
-  .feat-title { font-size: var(--text-xs); }
+  .feat-title { font-size: var(--text-sm); }
   .feat-price { font-size: var(--text-sm); }
   /* Add to Cart stays on phones too; it used to be hidden below 480px, so the
      only way to buy from a grid was to open the product first. */

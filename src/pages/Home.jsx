@@ -203,8 +203,30 @@ const HOME_CAT_IMAGES = {
             </button>
           )}
         <div className="category-circles-scroll" ref={railRef}>
+          {/* Diwali is an occasion, not a product category, so it is not in
+              getSortedCategories() and is prepended by hand. It links to
+              /category/diwali, which resolves occasion slugs the same way
+              /category/rakshabandhan already did. */}
+          <Link
+            to="/category/diwali"
+            state={{ from: '/' }}
+            className="category-circle-item category-circle-item--btn"
+            style={{ textDecoration: 'none' }}
+          >
+            <div className="category-circle-img">
+              <img
+                src="/images/chambu-modak-diya-img-1.webp"
+                alt="Diwali"
+                width="82"
+                height="82"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+            <span className="category-circle-label">Diwali</span>
+          </Link>
           {getSortedCategories()
-            .filter(c => c.id !== 'Oxidised-jewellery')
+            .filter(c => c.id !== 'Oxidised-jewellery' && c.id !== 'Wedding-Gifts')
             .map((cat, catIndex) => {
               const img = HOME_CAT_IMAGES[cat.id] || ''
               // Only the first 5 circles are typically above the fold on mobile
@@ -246,7 +268,7 @@ const HOME_CAT_IMAGES = {
         <div className="container">
           <div className="featured-header">
             <div className="featured-header-left">
-              <h2 className="featured-title">Most loved right now</h2>
+              <h2 className="featured-title">Founders&rsquo; picks</h2>
             </div>
             <Link to="/products" className="featured-view-all">See everything</Link>
           </div>
