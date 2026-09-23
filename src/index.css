@@ -1,61 +1,18 @@
-/* Handwritten accent font used for small playful touches across the site */
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap');
+/* Karla carries all interface text. */
+@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
-/* Import mobile-first base styles - MUST be at the top before any other CSS rules */
-@import './styles/mobile-base.css';
-
-/* Critical: Zoom-safe utilities - Fixes mobile zoom breaking UI */
-@import './styles/zoom-safe.css';
-
-/* Critical: Zoom prevention & mobile fixes */
-@import './styles/zoom-prevention.css';
+/* Mobile-first foundation. Replaces the former 20-file device-patch stack —
+   see base.css for what those files were silently breaking. */
+@import './styles/base.css';
 
 /* Premium Animation System */
 @import './styles/animations.css';
 
-/* Comprehensive Mobile Responsiveness */
-@import './styles/mobile-responsive.css';
+/* Product card — one definition shared by every grid on the site. */
+@import './components/ProductCard.css';
 
-/* Comprehensive Responsiveness Fixes - Production-ready responsive system */
-@import './styles/responsive-fixes.css';
-
-/* iPhone Critical Fixes - Specific fixes for iPhone users */
-@import './styles/iphone-critical-fixes.css';
-
-/* iPhone Product Page Fix - Fix product info not showing */
-@import './styles/iphone-product-fix.css';
-
-/* iPhone Hero Background Fix - Fix hero background too big on iPhone */
-@import './styles/iphone-hero-fix.css';
-
-/* Mobile Hero Image Full Width Fix - Fix landing images not taking full width */
-@import './styles/mobile-hero-image-fix.css';
-
-/* Category Page Image Full Width Fix - Fix category images not taking full width */
-@import './styles/category-image-fix.css';
-
-/* Text Breaking Fix - Prevent text breaking issues across entire application */
-@import './styles/text-breaking-fix.css';
-
-/* WhatsApp Button Visibility Fix - Ensure WhatsApp button shows on all pages */
-@import './styles/whatsapp-visibility-fix.css';
-
-/* faq-hero-fix and contact-hero-fix moved to FAQs.jsx and Contact.jsx respectively */
-
-/* iPhone All Hero Sections Fix - Comprehensive fix for all hero sections on iPhone */
-@import './styles/iphone-all-hero-fix.css';
-
-/* iOS Safari Comprehensive Fix - Production-ready fixes for all iPhone-specific issues */
-@import './styles/ios-safari-comprehensive-fix.css';
-
-/* iOS Safari Critical Fixes - Must be last to override other styles */
-@import './styles/ios-safari-fixes.css';
-
-/* Android Scrolling Fixes - Critical fix for Android device scrolling issues */
-@import './styles/android-scroll-fix.css';
-
-/* Mobile scroll priority - MUST be last so touch scroll works on all devices */
-@import './styles/mobile-scroll-priority.css';
+/* Category rail — shared by Home and Products. */
+@import './components/CategoryRail.css';
 
 /* Global reset - Must come after @import statements */
 * {
@@ -65,113 +22,157 @@
 }
 
 :root {
-  /* Custom Gifts Platform Color Palette */
-  --primary-color: #760909;
-  --primary-hover: #5d0707;
-  --primary-light: #8a0f0f;
-  --secondary-color: #ead0b3;
-  --secondary-dark: #d4b896;
-  --accent-color: #760909;
-  --success-color: #28a745;
-  --error-color: #dc3545;
+  /* ══ PALETTE ══════════════════════════════════════════════════════════════
+     Maroon previously did six jobs at once: page background, every badge,
+     every price, every button, every link and the footer. With one colour
+     carrying all the emphasis nothing could be more important than anything
+     else. It is now reserved for price and primary action.
 
-  /* Neutral Colors */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F8F8F8;
-  --bg-tertiary: #FAFAFA;
-  --bg-cream: #ead0b3;
+     Marigold is the second voice, used sparingly for highlights and hover
+     accents so maroon is not the only colour carrying emphasis. */
 
-  /* Text Colors */
-  --text-primary: #000000;
-  --text-secondary: #333333;
-  --text-tertiary: #666666;
-  --text-disabled: #999999;
+  --ink:            #241B1A;   /* warm near-black: text, dark surfaces      */
+  --ink-soft:       #574B49;   /* secondary text                            */
+  --ink-mute:       #6E615E;   /* tertiary text, meta (4.5:1 on --paper)    */
+
+  --maroon:         #7A0E14;   /* price + primary action ONLY               */
+  --maroon-deep:    #5C0A0F;   /* hover                                     */
+  --maroon-tint:    #F7EBEB;   /* selected states, quiet fills              */
+
+  --marigold:       #E8A33D;   /* secondary accent: rules, hovers           */
+  --marigold-tint:  #FDF2DF;
+
+  --paper:          #FBF7F2;   /* page                                      */
+  --paper-raised:   #FFFFFF;   /* cards, sheets                             */
+  --blush:          #F2E4DC;   /* image placeholder, quiet panels           */
+
+  --rule:           #E6DCD4;   /* hairlines                                 */
+  --rule-strong:    #D4C5BB;
+
+  --positive:       #2F6B43;
+  --critical:       #B4232C;
+
+  /* ── Compatibility aliases ───────────────────────────────────────────────
+     ~40 stylesheets reference these names. Repointing them here migrates the
+     whole site at once; new work should use the semantic names above. */
+  --primary-color:   var(--maroon);
+  --primary-hover:   var(--maroon-deep);
+  --primary-light:   #8F1219;
+  --secondary-color: var(--blush);
+  --secondary-dark:  var(--rule-strong);
+  --accent-color:    var(--marigold);
+  --success-color:   var(--positive);
+  --error-color:     var(--critical);
+
+  --bg-primary:   var(--paper-raised);
+  --bg-secondary: var(--paper);
+  --bg-tertiary:  var(--paper);
+  --bg-cream:     var(--blush);
+
+  --text-primary:    var(--ink);
+  --text-secondary:  var(--ink-soft);
+  --text-tertiary:   var(--ink-mute);
+  --text-disabled:   #AFA5A2;
   --text-on-primary: #FFFFFF;
-  /* White text for use on primary color backgrounds */
 
-  /* Border & Divider */
-  --border-light: #E8E8E8;
-  --border-medium: #D3D3D3;
-  --divider: #E8E8E8;
+  --border-light:  var(--rule);
+  --border-medium: var(--rule-strong);
+  --divider:       var(--rule);
 
-  /* Shadows - Enhanced for depth */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.12);
-  --shadow-2xl: 0 16px 48px rgba(0, 0, 0, 0.15);
+  /* ══ TYPE ═════════════════════════════════════════════════════════════════
+     Garamond was set on everything, including 11px uppercase letterspaced
+     micro-labels, where its small x-height and fine strokes turn to mush.
+     Karla now carries every piece of interface text; Garamond keeps the
+     display voice it is good at. */
 
-  /* Colored shadows */
-  --shadow-primary: 0 4px 16px rgba(118, 9, 9, 0.15);
-  --shadow-primary-lg: 0 8px 32px rgba(118, 9, 9, 0.2);
+  --font-display: 'EB Garamond', 'EB Garamond Fallback', Georgia, serif;
+  --font-ui:      'Karla', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
+  --font-family-primary: var(--font-ui);
+  --font-family-heading: var(--font-display);
 
-  /* Typography - Garamond */
-  --font-family-primary: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
-  --font-family-heading: 'EB Garamond', 'Garamond', serif;
-  --font-family-accent: 'Caveat', 'EB Garamond', cursive;
-  --font-size-xs: 0.75rem;
-  /* 12px */
-  --font-size-sm: 0.875rem;
-  /* 14px */
-  --font-size-base: 1rem;
-  /* 16px */
-  --font-size-lg: 1.125rem;
-  /* 18px */
-  --font-size-xl: 1.25rem;
-  /* 20px */
-  --font-size-2xl: 1.5rem;
-  /* 24px */
-  --font-size-3xl: 1.875rem;
-  /* 30px */
-  --font-size-4xl: 2.25rem;
-  /* 36px */
+  /* Type scale, 1.25 ratio off a 16px base */
+  --text-2xs:  0.6875rem;  /* 11 */
+  --text-xs:   0.8125rem;  /* 13 */
+  --text-sm:   0.875rem;   /* 14 */
+  --text-base: 1rem;       /* 16 */
+  --text-lg:   1.125rem;   /* 18 */
+  --text-xl:   1.375rem;   /* 22 */
+  --text-2xl:  1.75rem;    /* 28 */
+  --text-3xl:  2.25rem;    /* 36 */
+  --text-4xl:  3rem;       /* 48 */
 
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
+  --font-size-xs:  var(--text-xs);
+  --font-size-sm:  var(--text-sm);
+  --font-size-base: var(--text-base);
+  --font-size-lg:  var(--text-lg);
+  --font-size-xl:  var(--text-xl);
+  --font-size-2xl: var(--text-2xl);
+  --font-size-3xl: var(--text-3xl);
+  --font-size-4xl: var(--text-4xl);
+
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
   --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-weight-bold:     700;
 
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  --line-height-tight:   1.18;
+  --line-height-normal:  1.55;
+  --line-height-relaxed: 1.7;
 
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
+  /* Comfortable measure. Body copy on About ran the full 1200px container,
+     about 150 characters a line, and was centred on top of that. */
+  --measure: 68ch;
 
-  /* Transitions - Premium Motion System */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slower: 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* ══ SPACE ════════════════════════════════════════════════════════════════ */
+  --spacing-xs:  0.25rem;
+  --spacing-sm:  0.5rem;
+  --spacing-md:  1rem;
+  --spacing-lg:  1.5rem;
+  --spacing-xl:  2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4.5rem;
 
-  /* Premium Easing Functions */
-  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ══ RADIUS ═══════════════════════════════════════════════════════════════
+     Radius previously ranged across 11 hardcoded values with no logic to
+     which got used where. Three steps, by role. */
+  --radius-sm:   4px;    /* inputs, chips        */
+  --radius-md:   10px;   /* cards, panels        */
+  --radius-lg:   18px;   /* sheets, large panels */
+  --radius-full: 999px;  /* pills, avatars       */
+  --radius-xl:   var(--radius-lg);
+  --radius-2xl:  var(--radius-lg);
+
+  /* ══ ELEVATION ════════════════════════════════════════════════════════════
+     Warm-tinted rather than neutral grey, so shadows sit on paper. */
+  --shadow-xs: 0 1px 2px rgba(36, 27, 26, 0.05);
+  --shadow-sm: 0 2px 6px rgba(36, 27, 26, 0.07);
+  --shadow-md: 0 6px 18px rgba(36, 27, 26, 0.08);
+  --shadow-lg: 0 14px 36px rgba(36, 27, 26, 0.11);
+  --shadow-xl: 0 22px 56px rgba(36, 27, 26, 0.14);
+  --shadow-2xl: var(--shadow-xl);
+  --shadow-primary:    0 4px 16px rgba(122, 14, 20, 0.16);
+  --shadow-primary-lg: 0 10px 30px rgba(122, 14, 20, 0.2);
+
+  /* ══ MOTION ═══════════════════════════════════════════════════════════════ */
+  --transition-fast:   140ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-base:   240ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slow:   380ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slower: 560ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  --ease-premium:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:        cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-spring-gentle: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-smooth:        cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out-expo:      cubic-bezier(0.19, 1, 0.22, 1);
 
-  /* Animation Durations */
   --duration-instant: 0ms;
-  --duration-fast: 150ms;
-  --duration-base: 250ms;
-  --duration-slow: 400ms;
-  --duration-slower: 600ms;
+  --duration-fast:    140ms;
+  --duration-base:    240ms;
+  --duration-slow:    380ms;
+  --duration-slower:  560ms;
 }
+
 
 body {
   font-family: var(--font-family-primary);
@@ -210,7 +211,10 @@ html {
   flex-direction: column;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  /* `clip`, not `hidden`: `overflow-x: hidden` coerces overflow-y from
+     `visible` to `auto`, which quietly turns #root into a scroll container.
+     The document then has two nested scrollers and the wheel scrolls neither. */
+  overflow-x: clip;
   box-sizing: border-box;
 }
 
@@ -221,10 +225,13 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-display);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
+  letter-spacing: -0.01em;
   color: var(--text-primary);
   margin: 0;
+  text-wrap: balance;
 }
 
 h1 {
@@ -634,8 +641,10 @@ a {
   transition: color var(--transition-fast);
 }
 
-/* Prevent :active and :visited from affecting navigation incorrectly */
-a:visited {
+/* Scoped with :not() so it stops outranking single-class component styles.
+   Unscoped, its (0,1,1) specificity beat .btn--primary (0,1,0) and the hero's
+   primary call to action rendered as near-black text on dark maroon. */
+a:visited:not([class]) {
   color: inherit;
 }
 
@@ -716,22 +725,63 @@ img {
   color: var(--text-on-primary);
 }
 
-/* Ensure all elements inside hero sections and red background containers inherit white text */
-.hero-title,
-.hero-subtitle,
+/* ── Page heroes ──────────────────────────────────────────────────────────
+   Every page opened on a full-bleed maroon gradient with centred white text,
+   which is why a global rule here used to force .hero-title and friends to
+   white. They are now quiet paper headers: the maroon is spent on actions and
+   prices instead, and the copy is left-aligned so the eye has a fixed edge. */
+
+.about-hero,
+.contact-hero,
+.faqs-hero,
+.categories-hero,
+.products-hero,
+.policy-hero {
+  position: relative;
+  background: var(--paper);
+  background-image: none;
+  border-bottom: 1px solid var(--rule);
+  padding: clamp(1.75rem, 4vw, 3rem) 0;
+  text-align: left;
+  color: var(--ink);
+  overflow: visible;
+}
+
 .about-title,
-.about-subtitle,
 .contact-title,
-.contact-subtitle,
-.categories-title,
-.categories-subtitle,
-.products-title,
-.products-subtitle,
 .faqs-title,
+.categories-title,
+.products-title,
+.policy-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  color: var(--ink);
+  margin: 0;
+}
+
+.about-subtitle,
+.contact-subtitle,
 .faqs-subtitle,
-.cta-content h2,
-.cta-content p {
-  color: var(--text-on-primary);
+.categories-subtitle,
+.products-subtitle,
+.policy-subtitle {
+  font-family: var(--font-ui);
+  font-size: var(--text-lg);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0.5rem 0 0;
+  max-width: 52ch;
+}
+
+/* The decorative overlays these heroes used to need over their gradients. */
+.about-hero .hero-overlay,
+.contact-hero .hero-overlay,
+.faqs-hero .hero-overlay,
+.policy-hero::before {
+  display: none;
 }
 
 /* Reduced Motion */
@@ -755,23 +805,10 @@ img {
 /* Container - Zoom-safe and responsive */
 .container {
   width: 100%;
-  max-width: min(1200px, 95%);
-  margin: 0 auto;
-  /* Zoom-safe: Fixed spacing */
-  padding: 0 var(--spacing-lg);
-  overflow-x: hidden;
-  /* Prevent horizontal overflow */
+  /* Width and gutters are defined once, in base.css. This block used to
+     re-declare them and then force a 6px mobile gutter with !important, so
+     content sat almost flush against both screen edges. */
   box-sizing: border-box;
-}
-
-@media (max-width: 768px) {
-  .container {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 0.375rem !important;
-    margin: 0 !important;
-    box-sizing: border-box;
-  }
 }
 
 /* Prevent horizontal scroll globally - Critical for mobile zoom */
@@ -796,46 +833,9 @@ body {
   box-sizing: border-box;
 }
 
-/* Ensure all elements respect container bounds */
-* {
-  max-width: 100%;
-}
-
-/* ============================================================================
-   GLOBAL MOBILE SCROLL SAFETY
-   Ensures the page can always scroll vertically on small screens
-   ============================================================================ */
-@media (max-width: 768px) {
-  /* html IS the scroll container on mobile */
-  html {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    touch-action: pan-y pinch-zoom !important;
-    -ms-touch-action: pan-y pinch-zoom !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* body must NOT be a scroll container — use clip so overflow-y:visible isn't coerced to auto */
-  body {
-    overflow-x: clip !important;
-    overflow-y: visible !important;
-    height: auto !important;
-    min-height: 100% !important;
-    touch-action: pan-y pinch-zoom !important;
-    -ms-touch-action: pan-y pinch-zoom !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #root,
-  .App {
-    overflow-x: clip !important;
-    overflow-y: visible !important;
-    min-height: 100vh !important;
-    height: auto !important;
-  }
-}
+/* Mobile scroll behaviour lives in base.css. It must NOT be forced with
+   !important here: useScrollLock sets body position/overflow at runtime and
+   an !important rule would silently discard it. */
 
 img,
 video,
@@ -865,7 +865,8 @@ select {
   box-sizing: border-box;
 }
 
-/* Prevent text overflow */
+/* Break only words that genuinely cannot fit. `hyphens: auto` here used to
+   hyphenate ordinary words mid-line all over the site. */
 p,
 h1,
 h2,
@@ -876,9 +877,8 @@ h6,
 span,
 a,
 li {
-  word-wrap: break-word;
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: manual;
 }
 
 /* Grid and flex containers - Prevent overflow */
@@ -888,40 +888,80 @@ li {
   overflow-x: hidden;
 }
 
-/* Cards and containers - Zoom-safe */
+/* `.container` is deliberately left out here: this rule was resetting its
+   max-width to 100%, so page content spanned the full viewport at every width
+   and the 1200px measure never applied. */
 .card,
-.container,
 .section {
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* ── Shared "cute" accent utilities (handwritten stickers/kickers) ── */
-.site-sticker {
+/* The .site-sticker / .site-kicker handwritten utilities were removed along
+   with the sticker component. */
+
+/* ============================================================================
+   BUTTONS
+   Every page previously styled its own; `.hero-bright-btn-primary` alone used
+   three `!important` declarations to win against them. One system, by role.
+   ============================================================================ */
+
+.btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-family: var(--font-family-accent);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  background: #fdf1e0;
-  border: 1.5px dashed var(--primary-color);
-  border-radius: 9999px;
-  padding: 0.3rem 0.9rem;
-  transform: rotate(-2deg);
-  white-space: nowrap;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.72rem 1.4rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              color var(--transition-fast);
 }
 
-.site-kicker {
-  display: inline-block;
-  font-family: var(--font-family-accent);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  transform: rotate(-3deg);
+.btn--primary,
+.btn--primary:visited {
+  background: var(--maroon);
+  border-color: var(--maroon);
+  color: #fff;
+}
+.btn--primary:hover,
+.btn--primary:focus {
+  background: var(--maroon-deep);
+  border-color: var(--maroon-deep);
+  color: #fff;
+}
+
+.btn--ghost,
+.btn--ghost:visited {
+  background: transparent;
+  border-color: var(--rule-strong);
+  color: var(--ink);
+}
+.btn--ghost:hover,
+.btn--ghost:focus {
+  background: var(--paper-raised);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+.btn:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
 }

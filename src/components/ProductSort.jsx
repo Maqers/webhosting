@@ -12,13 +12,15 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SORT_TYPES, SORT_LABELS, DEFAULT_SORT, getSortOptions } from '../utils/sorting'
 import { trackEvent } from '../utils/analytics'
+import { useScrollLock } from '../hooks/useScrollLock'
 import './ProductSort.css'
-import '../styles/iphone-sort-fix.css'
 
 const ProductSort = ({ onSortChange, className = '' }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
   const sheetRef = useRef(null)
+
+  useScrollLock(isMobileSheetOpen)
   const backdropRef = useRef(null)
 
   // Get sort from URL or default
@@ -54,89 +56,12 @@ const ProductSort = ({ onSortChange, className = '' }) => {
     }
   }
 
-  /**
-   * Open mobile sheet
-   */
-  const openMobileSheet = () => {
-    setIsMobileSheetOpen(true)
-    
-    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      // iPhone: Store scroll position and prevent scrolling
-      const scrollY = window.scrollY
-      document.body.classList.add('sort-modal-open')
-      document.documentElement.classList.add('sort-modal-open')
-      // Store scroll position for restoration
-      document.body.style.top = `-${scrollY}px`
-      document.body.dataset.scrollY = scrollY.toString()
-    } else {
-      // Non-iPhone devices
-      document.body.classList.add('sort-modal-open')
-      document.body.style.overflow = 'hidden'
-    }
-  }
-
-  /**
-   * Close mobile sheet
-   */
-  const closeMobileSheet = () => {
-    setIsMobileSheetOpen(false)
-    
-    // iPhone fix: Restore scrolling immediately
-    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      // Restore scroll position
-      const scrollY = document.body.dataset.scrollY || '0'
-      
-      // Remove classes immediately
-      document.body.classList.remove('sort-modal-open')
-      document.documentElement.classList.remove('sort-modal-open')
-      
-      // Reset all styles
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.overflow = ''
-      document.body.style.width = ''
-      document.body.style.height = ''
-      delete document.body.dataset.scrollY
-      
-      // Reset html styles
-      document.documentElement.style.overflow = ''
-      document.documentElement.style.position = ''
-      
-      // Restore scroll position and ensure scrolling works
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(scrollY, 10))
-        
-        // Ensure products are visible
-        const productsGrid = document.querySelector('.products-grid')
-        const productsPage = document.querySelector('.products-page')
-        const productsContent = document.querySelector('.products-content')
-        
-        if (productsGrid) {
-          productsGrid.style.visibility = 'visible'
-          productsGrid.style.opacity = '1'
-        }
-        
-        if (productsPage) {
-          productsPage.style.overflow = ''
-          productsPage.style.position = 'relative'
-        }
-        
-        if (productsContent) {
-          productsContent.style.overflow = ''
-          productsContent.style.position = 'relative'
-        }
-        
-        // Restore scrolling
-        document.body.style.overflow = 'auto'
-        document.body.style.overflowX = 'hidden'
-        document.body.style.overflowY = 'auto'
-      })
-    } else {
-      // For non-iPhone devices
-      document.body.classList.remove('sort-modal-open')
-      document.body.style.overflow = ''
-    }
-  }
+  // Both handlers used to branch on a /iPhone|iPad|iPod/ user-agent test, which
+  // has been wrong for iPads since iOS 13 (they report as "Macintosh"), and the
+  // iOS branch then reached into .products-grid to force visibility back on.
+  // useScrollLock handles all of it in one place.
+  const openMobileSheet = () => setIsMobileSheetOpen(true)
+  const closeMobileSheet = () => setIsMobileSheetOpen(false)
 
   /**
    * Handle backdrop click
@@ -161,51 +86,9 @@ const ProductSort = ({ onSortChange, className = '' }) => {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isMobileSheetOpen])
 
-  /**
-   * Cleanup body overflow on unmount
-   */
-  useEffect(() => {
-    return () => {
-      // Ensure cleanup on unmount
-      document.body.classList.remove('sort-modal-open')
-      document.documentElement.classList.remove('sort-modal-open')
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      document.body.style.height = ''
-      if (document.body.dataset.scrollY) {
-        window.scrollTo(0, parseInt(document.body.dataset.scrollY, 10))
-        delete document.body.dataset.scrollY
-      }
-      document.documentElement.style.overflow = ''
-      document.documentElement.style.position = ''
-    }
-  }, [])
-  
-  /**
-   * Additional cleanup: Ensure scrolling is restored if modal is closed externally
-   */
-  useEffect(() => {
-    if (!isMobileSheetOpen) {
-      // Modal is closed, ensure scrolling is restored
-      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        requestAnimationFrame(() => {
-          if (!document.body.classList.contains('sort-modal-open')) {
-            document.body.style.position = ''
-            document.body.style.top = ''
-            document.body.style.overflow = 'auto'
-            document.body.style.overflowX = 'hidden'
-            document.body.style.overflowY = 'auto'
-            document.documentElement.style.overflow = ''
-            if (document.body.dataset.scrollY) {
-              delete document.body.dataset.scrollY
-            }
-          }
-        })
-      }
-    }
-  }, [isMobileSheetOpen])
+  // The two defensive cleanup effects that used to live here (an unmount reset
+  // and a rAF that re-forced body overflow on iOS) are unnecessary now: the lock
+  // is reference-counted and releases itself in useScrollLock's cleanup.
 
   return (
     <div className={`product-sort ${className}`}>

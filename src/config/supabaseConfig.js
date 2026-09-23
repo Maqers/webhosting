@@ -1,6 +1,13 @@
 // Shared Supabase project config, reused by AuthContext, Checkout, and OrderHistory.
 // Same public anon key already embedded in AdminPortal.jsx.
-export const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co"
+//
+// The host here is what Google prints on its consent screen ("Sign in to
+// ipkyssauulddtthrebnw.supabase.co"), because the OAuth callback lives on this
+// domain. Pointing a Supabase custom domain such as auth.maqers.in at the
+// project and setting VITE_SUPABASE_URL to it is all this app needs to change;
+// the matching redirect URI still has to be added to the Google OAuth client.
+export const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL || "https://ipkyssauulddtthrebnw.supabase.co"
 export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0"
 
 // ── Phone OTP auth (Supabase GoTrue REST API) ──────────────────────────────

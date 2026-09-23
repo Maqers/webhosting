@@ -68,7 +68,7 @@
 
 .by-page-arrow {
   font-size: 1.25rem;
-  color: #ccc;
+  color: var(--ink-soft);
   flex-shrink: 0;
   line-height: 1;
 }
@@ -77,4 +77,10 @@
   font-size: 0.8rem;
   color: #aaa;
   margin-right: 0.5rem;
+}
+
+/* Matches the Categories page: sub-headings were 3.29:1 on the page. */
+.by-section-heading p,
+.categories-section-heading p {
+  color: var(--ink-soft);
 }

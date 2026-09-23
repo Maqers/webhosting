@@ -74,12 +74,14 @@
 .mobile-logo  { flex: 0 0 auto; }
 
 /* ── Desktop row: hidden on mobile ── */
+/* This had padding on the right only, so the wordmark sat flush against the
+   left edge of the window with nothing to breathe into. */
 .navbar-desktop-row {
   display: none;
   align-items: center;
   width: 100%;
   height: var(--navbar-height-desktop);
-  padding: 0 20px 0 0;
+  padding: 0 clamp(20px, 2.5vw, 40px);
   box-sizing: border-box;
   gap: 8px;
 }
@@ -116,11 +118,14 @@
 .navbar-logo:hover { opacity: .85; }
 .navbar-logo:focus-visible { outline: 2px solid rgba(118,9,9,.4); outline-offset: 2px; border-radius: 4px; }
 
+/* The wordmark stays Garamond. Karla is for interface text only; it was
+   picking up the body face when --font-family-primary was repointed. */
 .logo-text {
+  font-family: var(--font-display);
   font-size: clamp(1.1rem, 3.5vw, 2rem);
   font-weight: 700;
-  color: #760909;
-  letter-spacing: .05em;
+  color: var(--maroon);
+  letter-spacing: .04em;
   line-height: 1;
   white-space: nowrap;
 }
@@ -142,12 +147,16 @@
   flex-shrink: 0;
 }
 
+/* `min-width: 0` let the search field be squeezed to 58px between 969px and
+   ~1250px, where the desktop row appears but there is not yet room for the
+   wordmark, two dropdowns, four nav links and three labelled icons. The field
+   now holds a floor and the surrounding chrome gives way instead. */
 .navbar-center-section {
   display: none;
-  flex: 1;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  min-width: 0;
+  min-width: 220px;
   max-width: min(520px, 35%);
   margin: 0 12px;
 }
@@ -298,14 +307,16 @@
   justify-content: center;
 }
 
+/* White on #c8a96e measured 2.24:1 at 8px, which is unreadable. Ink on the
+   same gold reads at well over 7:1, and 10px fits the badge comfortably. */
 .navbar-cart-count {
   position: absolute;
-  top: -4px; right: -6px;
+  top: -5px; right: -7px;
   background: #c8a96e;
-  color: white;
-  font-size: 0.5rem;
+  color: var(--ink);
+  font-size: 0.625rem;
   font-weight: 700;
-  width: 13px; height: 13px;
+  width: 15px; height: 15px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -362,9 +373,10 @@
 .navbar-dropdown-trigger {
   color: #3a1a1a !important;
   text-decoration: none;
-  font-size: 1rem;
-  font-weight: 700;
-  padding: .5rem .875rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: .5rem .75rem;
   border-radius: 6px;
   white-space: nowrap;
   display: flex;
@@ -495,8 +507,9 @@
 }
 
 .navbar-link {
-  color: #3a1a1a !important; text-decoration: none; font-size: 1rem; font-weight: 700;
-  padding: .5rem .875rem; border-radius: 6px; white-space: nowrap;
+  color: #3a1a1a !important; text-decoration: none;
+  font-family: var(--font-ui); font-size: var(--text-sm); font-weight: 600;
+  padding: .5rem .75rem; border-radius: 6px; white-space: nowrap;
   min-height: 40px; display: flex; align-items: center;
   outline: none; flex-shrink: 0; transition: background .15s, color .15s;
 }
@@ -674,4 +687,15 @@ body.menu-open .navbar-logo {
   .mobile-accordion-trigger,
   .mobile-accordion-arrow,
   .dropdown-arrow { transition: none !important; animation: none !important; }
+}
+
+/* ── Narrow desktop (969px – 1279px) ─────────────────────────────────────
+   Drop the icon captions and tighten the link row so the search field keeps
+   a usable width. */
+@media (min-width: 969px) and (max-width: 1279px) {
+  .navbar-icon-label { display: none; }
+  .navbar-link,
+  .navbar-dropdown-trigger { padding: 0.5rem 0.5rem; }
+  .navbar-center-section { margin: 0 8px; max-width: none; }
+  .navbar-desktop-row { gap: 4px; }
 }

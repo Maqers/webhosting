@@ -7,27 +7,22 @@ const Diamond = () => (
   </svg>
 );
 
+// Emoji removed: they rendered as a different glyph on every platform and sat
+// mid-sentence in an otherwise typographic band.
 const desktopItems = [
-  "Handcrafted with love",
+  "Free delivery above \u20B9499",
   "Straight from artisan hands",
-  "Prepaid orders only",
-  "🚚 FREE delivery above ₹499",
-  "Curated from Instagram's best finds",
-  "One-of-a-kind pieces",
-  "Support local artisans",
-  "Ethnic elegance, modern edge",
+  "Every seller personally vetted",
+  "One of a kind pieces",
+  "Ships across India",
+  "Curated from Instagram's best",
 ];
 
 const mobileItems = [
-  "🚚 FREE delivery above ₹499",
-  "🔍 Hand-picked sellers",
-  "🎁 Genuinely handmade",
-  "💬 Order via cart",
-  "🇮🇳 Support Indian home biz",
-  "✨ One-of-a-kind pieces",
-  "🚚 Ships across India",
-  "Handcrafted with love",
-  "Curated from Instagram's best",
+  "Free delivery above \u20B9499",
+  "Every seller personally vetted",
+  "One of a kind pieces",
+  "Ships across India",
 ];
 
 export default function MarqueeBanner() {

@@ -4,6 +4,9 @@ import { getAllProducts, getSortedCategories, getProductsByCategory, occasionPro
 import { searchAll } from '../utils/search'
 import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '../utils/sorting'
 import ProductSort from '../components/ProductSort'
+import ProductFilters, { PRICE_BANDS } from '../components/ProductFilters'
+import SeoHead from '../components/SeoHead'
+import { useScrollLock } from '../hooks/useScrollLock'
 import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
 import { useCart } from '../context/CartContext'
@@ -56,6 +59,9 @@ const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
+  const [priceBands, setPriceBands] = useState([])
+  const [inStockOnly, setInStockOnly] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
@@ -100,13 +106,65 @@ const Products = () => {
       });
     }
 
+    if (priceBands.length > 0) {
+      const bands = PRICE_BANDS.filter(b => priceBands.includes(b.id))
+      filtered = filtered.filter(p => bands.some(b => p.price >= b.min && p.price < b.max))
+    }
+
+    if (inStockOnly) {
+      filtered = filtered.filter(p => p.inStock !== false)
+    }
+
     filtered = sortProducts(filtered, sortBy, {
       searchQuery: searchQuery || null,
       relevanceScores
     })
 
     return expandProductsByColor(filtered)
-  }, [selectedCategories, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
+  }, [selectedCategories, priceBands, inStockOnly, sortBy, searchResults, searchResultsData, searchQuery, relevanceScores])
+
+  const toggleCategory = useCallback(id => {
+    setSelectedCategories(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id])
+  }, [])
+  const togglePriceBand = useCallback(id => {
+    setPriceBands(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id])
+  }, [])
+  const resetFilters = useCallback(() => {
+    setSelectedCategories([]); setPriceBands([]); setInStockOnly(false)
+  }, [])
+
+  const activeFilterCount = selectedCategories.length + priceBands.length + (inStockOnly ? 1 : 0)
+
+  // Counts shown beside each option. Each is computed against the other
+  // filters only, so ticking "Under 500" does not drive every category count
+  // to zero.
+  const { categoryCounts, priceCounts } = useMemo(() => {
+    const base = getAllProducts().filter(p => (inStockOnly ? p.inStock !== false : true))
+
+    const byPrice = priceBands.length
+      ? base.filter(p => PRICE_BANDS.filter(b => priceBands.includes(b.id))
+          .some(b => p.price >= b.min && p.price < b.max))
+      : base
+
+    const cCounts = new Map()
+    byPrice.forEach(p => {
+      const ids = new Set([p.categoryId, ...(p.meta?.secondaryCategories || [])])
+      ids.forEach(id => id && cCounts.set(id, (cCounts.get(id) || 0) + 1))
+    })
+
+    const inCats = selectedCategories.length
+      ? base.filter(p => selectedCategories.includes(p.categoryId)
+          || p.meta?.secondaryCategories?.some(c => selectedCategories.includes(c)))
+      : base
+    const pCounts = new Map()
+    PRICE_BANDS.forEach(b => {
+      pCounts.set(b.id, inCats.filter(p => p.price >= b.min && p.price < b.max).length)
+    })
+
+    return { categoryCounts: cCounts, priceCounts: pCounts }
+  }, [selectedCategories, priceBands, inStockOnly])
+
+  useScrollLock(filtersOpen)
 
   const showSkeletons = filteredProducts.length === 0 && !searchQuery && !searchResults && selectedCategories.length === 0
   const visibleProducts = filteredProducts.slice(0, visibleCount)
@@ -120,69 +178,13 @@ const Products = () => {
   // position:sticky. Two stacked native sticky elements (navbar + this
   // banner) trigger a well-known class of iOS Safari rendering bugs that
   // make the banner visibly jitter while scrolling. Driving this with an
-  // IntersectionObserver + position:fixed sidesteps the browser's native
-  // sticky implementation entirely.
-  const sentinelRef = useRef(null)
-  const filtersSectionRef = useRef(null)
-  const [isPinned, setIsPinned] = useState(false)
-  const [navHeight, setNavHeight] = useState(0)
-  const [filtersHeight, setFiltersHeight] = useState(0)
+  // The sticky category banner this file used to pin (sentinel +
+  // IntersectionObserver + a measured navbar offset) went with the circle
+  // strip. Its refs were left attached to nothing, so isPinned could never
+  // become true, while a ResizeObserver on the navbar kept running on every
+  // render of this page.
 
-  useEffect(() => {
-    const navbarEl = document.querySelector('.navbar')
-    if (!navbarEl) return
-    const measure = () => setNavHeight(navbarEl.getBoundingClientRect().height)
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(navbarEl)
-    return () => ro.disconnect()
-  }, [])
 
-  useEffect(() => {
-    const el = filtersSectionRef.current
-    if (!el) return
-    const measure = () => setFiltersHeight(el.getBoundingClientRect().height)
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel || navHeight === 0) return
-    // Desktop navbar is not sticky (position: static), so there's nothing
-    // fixed at the top for this banner to pin itself below there — doing so
-    // would offset it by navHeight into a blank gap where the navbar used to
-    // be before it scrolled away. Only pin on mobile, where the navbar stays
-    // sticky.
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsPinned(window.innerWidth >= 969 ? false : !entry.isIntersecting),
-      { rootMargin: `-${navHeight}px 0px 0px 0px`, threshold: 0 }
-    )
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [navHeight])
-
-  const handleCategoryToggle = useCallback((categoryId) => {
-    setSelectedCategories(prev => {
-      if (categoryId === 'All') return []
-      if (prev.includes(categoryId)) return prev.filter(id => id !== categoryId)
-      return [...prev, categoryId]
-    })
-    setVisibleCount(PAGE_SIZE)
-    const newParams = new URLSearchParams(searchParams)
-    newParams.delete('page')
-    setSearchParams(newParams, { replace: true })
-  }, [searchParams, setSearchParams])
-
-  const handleClearAll = useCallback(() => {
-    setSelectedCategories([])
-    setVisibleCount(PAGE_SIZE)
-    const newParams = new URLSearchParams(searchParams)
-    newParams.delete('page')
-    setSearchParams(newParams, { replace: true })
-  }, [searchParams, setSearchParams])
 
   // Restore category filter from URL param (e.g. when navigating back from product detail)
   useEffect(() => {
@@ -238,69 +240,57 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <div ref={sentinelRef} aria-hidden="true" />
-      {isPinned && <div style={{ height: filtersHeight }} aria-hidden="true" />}
-      <div
-        ref={filtersSectionRef}
-        className={`products-filters-section${isPinned ? ' products-filters-section--pinned' : ''}`}
-        style={isPinned ? { top: navHeight } : undefined}
-      >
-        <div className="container">
-          <div className="filters-wrapper">
-            <div className="category-circles-strip category-circles-strip--products">
-              <div className="category-circles-scroll">
-                {/* All — always first */}
-                <button
-                  type="button"
-                  className={`category-circle-item category-circle-item--btn ${selectedCategories.length === 0 ? 'circle-active' : ''}`}
-                  onClick={handleClearAll}
-                >
-                  <div className="category-circle-all">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                    </svg>
-                  </div>
-                  <span className="category-circle-label">All</span>
-                </button>
-                {/* Dynamic from catalog — picks up admin name/category changes automatically */}
-                {getCachedCategories()
-                  .filter(c => c.id !== 'Oxidised-jewellery')
-                  .map(cat => {
-                    const isSelected = selectedCategories.includes(cat.id)
-                    const img = CAT_IMAGES[cat.id] || ''
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        className={`category-circle-item category-circle-item--btn ${isSelected ? 'circle-active' : ''}`}
-                        onClick={() => handleCategoryToggle(cat.id)}
-                      >
-                        <div className="category-circle-img">
-                          {img
-                            ? <picture>
-                                {img.startsWith('/images/') && <source srcSet={img.replace(/\.[^.]+$/, '.webp')} type="image/webp" />}
-                                <img src={img} alt={cat.name} loading="lazy" onError={e => { e.currentTarget.style.display='none' }} />
-                              </picture>
-                            : <span style={{ fontSize: '1.2rem' }}>{cat.icon || '🎁'}</span>
-                          }
-                        </div>
-                        <span className="category-circle-label">{cat.name}</span>
-                      </button>
-                    )
-                  })
-                }
-              </div>
-            </div>
-            <div className="filters-controls-row">
-              <ProductSort onSortChange={() => { }} />
-            </div>
+      {/* The circular category strip that used to sit here expressed only one
+          dimension and gave no way to see what was applied. Those circles
+          remain on the home page as a browse entry point; here the filter rail
+          does the job. */}
+      {/* seoTitle and seoDescription were computed here and never rendered,
+          so the catalogue page shipped with no document title of its own and
+          no h1. The heading is visually hidden because the page's own design
+          leads with the toolbar, but crawlers and screen readers need it. */}
+      <SeoHead title={seoTitle} description={seoDescription} url="/products" />
+      <h1 className="sr-only">{seoTitle}</h1>
+
+      <div className="products-topbar">
+        <div className="container products-topbar-inner">
+          <div className="products-topbar-actions">
+            <button
+              type="button"
+              className="products-filter-toggle"
+              onClick={() => setFiltersOpen(true)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <line x1="4" y1="7" x2="20" y2="7" /><line x1="7" y1="12" x2="17" y2="12" />
+                <line x1="10" y1="17" x2="14" y2="17" />
+              </svg>
+              Filters
+              {activeFilterCount > 0 && <span className="pf-count">{activeFilterCount}</span>}
+            </button>
+            <ProductSort onSortChange={() => { }} />
           </div>
         </div>
       </div>
 
       <div className="products-content">
-        <div className="container">
+        <div className="container products-layout">
+          <aside className="products-rail">
+            <ProductFilters
+              categories={categories}
+              selectedCategories={selectedCategories}
+              onToggleCategory={toggleCategory}
+              priceBands={priceBands}
+              onTogglePriceBand={togglePriceBand}
+              inStockOnly={inStockOnly}
+              onToggleInStock={() => setInStockOnly(v => !v)}
+              onReset={resetFilters}
+              categoryCounts={categoryCounts}
+              priceCounts={priceCounts}
+              activeCount={activeFilterCount}
+            />
+          </aside>
+
+          <div className="products-main">
           {(searchQuery || searchResults) && (
             <div className="search-results-header">
               <h2>{searchQuery ? `Search Results for "${searchQuery}"` : 'Search Results'}</h2>
@@ -353,8 +343,43 @@ const Products = () => {
               <p>Try adjusting your filters or search terms</p>
             </div>
           )}
+          </div>
         </div>
       </div>
+
+      {/* Same panel as the rail, presented as a sheet where a column will not
+          fit. Rendering it only while open keeps one set of checkbox inputs in
+          the document at a time. */}
+      {filtersOpen && (
+        <div className="products-sheet" role="dialog" aria-modal="true" aria-label="Filters">
+          <button
+            type="button"
+            className="products-sheet-backdrop"
+            aria-label="Close filters"
+            onClick={() => setFiltersOpen(false)}
+          />
+          <div className="products-sheet-panel">
+            <ProductFilters
+              categories={categories}
+              selectedCategories={selectedCategories}
+              onToggleCategory={toggleCategory}
+              priceBands={priceBands}
+              onTogglePriceBand={togglePriceBand}
+              inStockOnly={inStockOnly}
+              onToggleInStock={() => setInStockOnly(v => !v)}
+              onReset={resetFilters}
+              categoryCounts={categoryCounts}
+              priceCounts={priceCounts}
+              activeCount={activeFilterCount}
+            />
+            <div className="products-sheet-foot">
+              <button type="button" className="btn btn--primary" onClick={() => setFiltersOpen(false)}>
+                Show {filteredProducts.length} {filteredProducts.length === 1 ? 'gift' : 'gifts'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -432,7 +457,6 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         {secondImage && <img src={secondImage} alt="" className="feat-img-hover" aria-hidden="true" loading="lazy" />}
-        {product.popular && <span className="feat-badge-popular">Popular</span>}
         {product.inStock === false && <span className="feat-badge-out-of-stock">Out of Stock</span>}
         <button
           className={`feat-wishlist-btn${wishlisted ? " active" : ""}${heartPop ? " heart-pop" : ""}`}
@@ -469,24 +493,12 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
             type="button"
             aria-label="Add to cart"
             disabled={product.inStock === false}
-            style={product.inStock === false ? { background: '#aaa', cursor: 'not-allowed', pointerEvents: 'none' } : {}}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
             {product.inStock === false ? "Out of Stock" : addedFeedback ? "Added!" : needsOptions ? "Select Options" : "Add to Cart"}
-          </button>
-          <button
-            className={`feat-wishlist-text-btn${wishlisted ? " active" : ""}`}
-            onClick={handleWishlist}
-            type="button"
-            aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}
-          >
-            <svg viewBox="0 0 24 24" fill={wishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            {wishlisted ? "Saved" : "Wishlist"}
           </button>
         </div>
       </div>

@@ -16,19 +16,6 @@ import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } f
 import './ProductDetail.css'
 import './Home.css'
 
-const PRODUCT_STICKERS = [
-  '👀 a fan favourite',
-  '🏃 tends to sell out',
-  '🫶 keeps getting reordered',
-]
-
-const hashToIndex = (id, len) => {
-  const str = String(id)
-  let hash = 0
-  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) % len
-  return Math.abs(hash) % len
-}
-
 // Descriptions are stored as plain strings with a lightweight markup
 // convention the admin portal's formatting toolbar writes: **bold**,
 // __underline__, and literal \n for line breaks. Escape first so any stray
@@ -50,13 +37,22 @@ const ProductDetail = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Back used to fall through to `/category/{id}` whenever no explicit `from`
+  // state had been passed, which sent people to a category page they had never
+  // visited. Arriving from search, a shared link or any card that did not set
+  // the state landed you somewhere unrelated. Real history first.
   const handleBack = () => {
     if (location.state?.from) {
-      navigate(location.state.from);
-    } else {
-      // No history state — go to the product's own category
-      navigate(product ? `/category/${product.categoryId}` : '/products');
+      navigate(location.state.from)
+      return
     }
+    // React Router tracks its position in the session history here; anything
+    // above 0 means there is a previous in-app page to return to.
+    if (window.history.state?.idx > 0) {
+      navigate(-1)
+      return
+    }
+    navigate('/products')
   };
 
   // Support both slug-based URLs (/product/customised-pouch) and
@@ -75,6 +71,7 @@ const ProductDetail = () => {
   const mobileImgRef = useRef(null)
   const touchStartXRef = useRef(0)
   const touchStartYRef = useRef(0)
+  const imageCountRef = useRef(0)
 
   const whatsappNumber = getWhatsAppNumber()
   const { addItem } = useCart()
@@ -328,33 +325,84 @@ const ProductDetail = () => {
 
   const images = product?.images || []
   const hasMultiple = images.length > 1
+  imageCountRef.current = images.length
   const goPrev = useCallback(() => setSelectedImage((i) => (i <= 0 ? images.length - 1 : i - 1)), [images.length])
   const goNext = useCallback(() => setSelectedImage((i) => (i >= images.length - 1 ? 0 : i + 1)), [images.length])
 
-  // Native (non-passive) touch listener so we can preventDefault on horizontal swipes,
-  // preventing the page from scrolling sideways while the user changes images.
+  // Swipe used to fire on touchend only: the image never followed the finger,
+  // so a swipe felt like nothing happened and then the picture jumped. The
+  // preventDefault() there was also a no-op, since by touchend the page has
+  // already scrolled. This tracks the drag, locks to an axis once the gesture's
+  // intent is clear, and only blocks the page scroll for horizontal drags.
+  //
+  // Gesture state lives in refs, not state: if the effect re-subscribed
+  // whenever the offset changed it would reset `active`/`axis` mid-drag and the
+  // swipe would never complete.
+  const [dragOffset, setDragOffset] = useState(0)
+  const dragRef = useRef(0)
+  const selectedImageRef = useRef(selectedImage)
+
+  useEffect(() => { selectedImageRef.current = selectedImage }, [selectedImage])
+
   useEffect(() => {
     const el = mobileImgRef.current
-    if (!el) return
+    if (!el || !hasMultiple) return undefined
+
+    let axis = null // null = undecided, 'x' = swiping, 'y' = page scroll
+    let active = false
+
+    const setOffset = (v) => { dragRef.current = v; setDragOffset(v) }
+
     const onStart = (e) => {
+      if (e.touches.length !== 1) return
+      active = true
+      axis = null
       touchStartXRef.current = e.touches[0].clientX
       touchStartYRef.current = e.touches[0].clientY
     }
-    const onEnd = (e) => {
-      const dx = touchStartXRef.current - e.changedTouches[0].clientX
-      const dy = touchStartYRef.current - e.changedTouches[0].clientY
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
-        e.preventDefault()
-        dx > 0 ? goNext() : goPrev()
+
+    const onMove = (e) => {
+      if (!active || e.touches.length !== 1) return
+      const dx = e.touches[0].clientX - touchStartXRef.current
+      const dy = e.touches[0].clientY - touchStartYRef.current
+
+      if (axis === null) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+        // A bias towards vertical: an imprecise downward flick on a product
+        // photo should scroll the page, not change the image.
+        axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y'
       }
+
+      if (axis !== 'x') return
+      e.preventDefault()
+      // Resist past the ends so the first and last image feel like edges.
+      const i = selectedImageRef.current
+      const atEdge = (dx > 0 && i === 0) || (dx < 0 && i === imageCountRef.current - 1)
+      setOffset(atEdge ? dx * 0.25 : dx)
     }
+
+    const onEnd = () => {
+      if (!active) return
+      active = false
+      const travelled = dragRef.current
+      setOffset(0)
+      if (axis !== 'x') return
+      const threshold = Math.max(40, el.offsetWidth * 0.18)
+      if (travelled <= -threshold) goNext()
+      else if (travelled >= threshold) goPrev()
+    }
+
     el.addEventListener('touchstart', onStart, { passive: true })
-    el.addEventListener('touchend', onEnd, { passive: false })
+    el.addEventListener('touchmove', onMove, { passive: false })
+    el.addEventListener('touchend', onEnd, { passive: true })
+    el.addEventListener('touchcancel', onEnd, { passive: true })
     return () => {
       el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove', onMove)
       el.removeEventListener('touchend', onEnd)
+      el.removeEventListener('touchcancel', onEnd)
     }
-  }, [goNext, goPrev])
+  }, [goNext, goPrev, hasMultiple])
 
   const LENS_SIZE = 120
   const ZOOM = 2
@@ -377,6 +425,27 @@ const ProductDetail = () => {
   )
   const handleMouseLeave = useCallback(() => setLensVisible(false), [])
 
+  // Real, per-product facts. Anything the catalogue does not have is simply
+  // not shown rather than padded out with generic copy. Declared above the
+  // `if (!product)` return so the hook runs on every render.
+  const productFacts = useMemo(() => {
+    if (!product) return []
+    const m = product.meta || {}
+    const facts = []
+    if (m.delivery_time) facts.push({ label: 'Made and shipped in', value: m.delivery_time })
+    if (m.moq > 1) facts.push({ label: 'Minimum order', value: `${m.moq} units` })
+    if (m.colors?.length > 1) {
+      facts.push({
+        label: 'Colours',
+        value: m.colors.map(c => (typeof c === 'object' ? c.name : c)).filter(Boolean).join(', '),
+      })
+    }
+    if (m.sizes?.length) facts.push({ label: 'Sizes', value: m.sizes.join(', ') })
+    const personalisation = (m.personalisation_options || []).filter(o => o && o.trim())
+    if (personalisation.length) facts.push({ label: 'Can be personalised', value: personalisation.join(', ') })
+    return facts
+  }, [product])
+
   if (!product) {
     return (
       <div className="product-not-found">
@@ -394,6 +463,9 @@ const ProductDetail = () => {
 
   const currentImage = images[selectedImage]
   const categoryName = product.category || (product.categoryId ? getCategoryByIdOrSlug(product.categoryId)?.name : '') || ''
+
+  // Real, per-product facts. Anything missing from the catalogue is simply
+  // not shown rather than being padded out with generic copy.
 
   // ── JSON-LD Product schema ─────────────────────────────────────────────────
   const BASE_URL = 'https://maqers.in'
@@ -538,7 +610,11 @@ const ProductDetail = () => {
               <div
                 ref={mobileImgRef}
                 className="mobile-single-image"
-                onClick={() => setProductImageLightbox(true)}
+                onClick={() => { if (Math.abs(dragOffset) < 6) setProductImageLightbox(true) }}
+                style={{
+                  transform: dragOffset ? `translateX(${dragOffset}px)` : undefined,
+                  transition: dragOffset ? 'none' : 'transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)',
+                }}
               >
                 <ImageWithFallback
                   key={selectedImage}
@@ -602,17 +678,10 @@ const ProductDetail = () => {
               </p>
             )}
 
-            {product.popular && <span className="popular-tag">Popular</span>}
             <h1 className="product-detail-title">{product.title}</h1>
             <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
-            {product.popular && (
-              <span className="site-sticker product-detail-sticker">
-                {PRODUCT_STICKERS[hashToIndex(product.id, PRODUCT_STICKERS.length)]}
-              </span>
-            )}
 
             <div className="price-section">
-              <span className="price-label">Price:</span>
               {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
                 <span className="product-detail-price">
                   {selectedSize && product.meta.sizePrices[selectedSize]
@@ -767,19 +836,27 @@ const ProductDetail = () => {
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
-              <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy →</Link></p>
+              <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
             </div>
 
-            <div className="product-features">
-              <h3>Product Features</h3>
-              <ul>
-                <li>Premium quality materials</li>
-                <li>Handcrafted with attention to detail</li>
-                <li>Elegant royal design</li>
-                <li>Perfect for gifting</li>
-                <li>Authentic Indian home businesses & small businesses</li>
-              </ul>
-            </div>
+            {/* These five bullets used to be hardcoded and identical on every
+                product ("Elegant royal design" on a bar of soap), which reads
+                as filler on a site whose whole pitch is that a human checked
+                each listing. Built from the product's own metadata now, and
+                omitted when there is nothing to say. */}
+            {productFacts.length > 0 && (
+              <div className="product-features">
+                <h3>The details</h3>
+                <dl className="product-facts">
+                  {productFacts.map(fact => (
+                    <div className="product-fact" key={fact.label}>
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
           </div>
 
           {/* ── Customer Reviews — shown if reviews exist, or the logged-in
@@ -890,7 +967,7 @@ const ProductDetail = () => {
               <div className="more-from-maker-header">
                 <h3 className="more-from-maker-title">{isMaker ? "More from this maker" : "You may also like"}</h3>
                 {isMaker && makerCode && (
-                  <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">View all →</Link>
+                  <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">See everything</Link>
                 )}
               </div>
               {moreProducts.length > 0 ? (

@@ -2,12 +2,15 @@ import { useNavigate } from 'react-router-dom'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { getAllProducts } from '../data/catalog'
+import { useScrollLock } from '../hooks/useScrollLock'
 import './WishlistDrawer.css'
 
 export default function WishlistDrawer() {
   const { items, toggleItem, isOpen, setIsOpen } = useWishlist()
   const { addItem } = useCart()
   const navigate = useNavigate()
+
+  useScrollLock(isOpen)
 
   const allProducts = getAllProducts()
 

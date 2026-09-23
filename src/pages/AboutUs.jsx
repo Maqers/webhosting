@@ -32,14 +32,10 @@ const AboutUs = () => {
 
           {/* ── FOUNDERS ───────────────────────────────────────── */}
           <div className="about-section scroll-animate founders-section">
-            <span className="site-kicker founders-kicker">hi, it's us</span>
             <h2>The two people who won't stop texting sellers</h2>
             <div className="founders-layout">
               <div className="polaroid">
-                <div className="polaroid-tape polaroid-tape-left"></div>
-                <div className="polaroid-tape polaroid-tape-right"></div>
                 <img src="/images/founders-anandita-kamya.jpg" alt="Anandita and Kamya, co-founders of Maqers" />
-                <p className="polaroid-caption">us, pretending we know what we're doing</p>
               </div>
               <div className="founders-copy">
                 <p>
@@ -58,10 +54,6 @@ const AboutUs = () => {
                   get genuinely offended when a candle smells worse than the listing promised. If you have
                   questions, complaints, or just want to tell us we picked a weird font, our WhatsApp is open.
                 </p>
-                <div className="founders-stickers">
-                  <span className="site-sticker sticker">🫡 personally vetted, by us, literally</span>
-                  <span className="site-sticker sticker">☕ running on chai and stubbornness</span>
-                </div>
               </div>
             </div>
           </div>
@@ -80,14 +72,14 @@ const AboutUs = () => {
                 <div className="about-stat-sub">Gifts for every budget, from small surprises to big ones</div>
               </div>
               <div className="about-stat-card">
-                <div className="about-stat-num about-stat-emoji" role="img" aria-label="handshake">🤝</div>
-                <div className="about-stat-label">WhatsApp ordering</div>
-                <div className="about-stat-sub">Talk to us directly. No confusing checkout flows.</div>
+                <div className="about-stat-num">48h</div>
+                <div className="about-stat-label">Damage window</div>
+                <div className="about-stat-sub">Send an unboxing video and we arrange the pickup</div>
               </div>
               <div className="about-stat-card">
-                <div className="about-stat-num about-stat-emoji" role="img" aria-label="India">🇮🇳</div>
+                <div className="about-stat-num">1:1</div>
                 <div className="about-stat-label">Indian home businesses</div>
-                <div className="about-stat-sub">Every purchase supports a real person's livelihood</div>
+                <div className="about-stat-sub">Every order goes straight to one person's livelihood</div>
               </div>
             </div>
           </div>
@@ -191,7 +183,7 @@ const AboutUs = () => {
                   Whether you're a solo creator working from your bedroom or a small team with big ideas,
                   list on Maqers and reach buyers who are already looking for exactly what you make.
                 </p>
-                <a href="/contact" className="seller-cta-btn">Apply to sell on Maqers →</a>
+                <a href="/contact" className="seller-cta-btn">Apply to sell on Maqers</a>
               </div>
             </div>
           </div>

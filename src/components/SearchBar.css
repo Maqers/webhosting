@@ -3,10 +3,10 @@
  * Clean final version. Replaces the entire SearchBar.css file.
  */
 
-/* Desktop: hide dropdown (search navigates to products page) */
-@media (min-width: 969px) {
-  .search-suggestions { display: none !important; }
-}
+/* The dropdown used to be `display: none !important` here at >=969px while the
+   component separately refused to compute suggestions at <=768px, leaving it
+   visible only in a 200px-wide band of viewport widths. It now renders at every
+   width, anchored to .search-bar-container rather than positioned by script. */
 
 /* ============================================================================
    CONTAINER
@@ -123,19 +123,69 @@
 .clear-search:hover { background: var(--primary-color); opacity: 1; transform: scale(1.1); }
 
 /* ============================================================================
-   SUBMIT BUTTON — hidden (search fires on Enter only)
+   SUBMIT BUTTON
    ============================================================================ */
 
-.search-submit-btn { display: none !important; }
+.search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  margin-left: 4px;
+  padding: 0 0.85rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary-color);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.18s, opacity 0.18s;
+}
+
+.search-submit:hover:not(:disabled) { background: var(--primary-hover); }
+.search-submit:disabled { opacity: 0.35; cursor: default; }
+.search-submit-icon { display: none; }
+
+/* Icon-only below the desktop navbar breakpoint, where width is tight. */
+@media (max-width: 968px) {
+  .search-submit { padding: 0 0.6rem; }
+  .search-submit-text { display: none; }
+  .search-submit-icon { display: block; }
+}
+
+/* "See everything for …" row at the foot of the dropdown. */
+.suggestion-view-all {
+  display: block;
+  width: 100%;
+  padding: 0.8rem var(--spacing-md);
+  background: var(--bg-secondary);
+  border: none;
+  border-top: 1px solid var(--border-light);
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.suggestion-view-all:hover { background: rgba(118, 9, 9, 0.06); }
 
 /* ============================================================================
    SUGGESTIONS DROPDOWN
    ============================================================================ */
 
 .search-suggestions {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; max-width: 700px;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: min(60vh, 420px);
   background: var(--bg-primary);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.08);
@@ -164,14 +214,19 @@
    ============================================================================ */
 
 .suggestion-item {
+  appearance: none;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  gap: 0.7rem;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: background .15s;
-  border-bottom: 1px solid var(--border-light);
-  min-height: 56px;
+  border-bottom: 1px solid var(--rule);
+  min-height: 0;
   box-sizing: border-box;
   overflow: hidden;
   width: 100%;
@@ -181,32 +236,41 @@
 .suggestion-item:hover { background: rgba(118,9,9,.04); }
 .suggestion-item.selected { background: rgba(118,9,9,.08); }
 
-.suggestion-image {
-  width: 44px; height: 44px;
-  object-fit: cover; border-radius: var(--radius-md);
+/* ImageWithFallback sets width/height:100% inline, which no class rule can
+   beat, so the thumbnail expanded to fill the dropdown. Sizing the wrapper
+   instead and letting the image fill it keeps the row compact. */
+.suggestion-thumb {
+  display: block;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--blush);
 }
 
-.suggestion-info { flex: 1; min-width: 0; overflow: hidden; }
+.suggestion-info { flex: 1; min-width: 0; overflow: hidden; display: block; }
 
 .suggestion-title {
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  font-size: .875rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.3;
+  white-space: nowrap;
   overflow: hidden;
-  line-height: 1.4;
+  text-overflow: ellipsis;
 }
 
 .suggestion-item:hover .suggestion-title { color: var(--primary-color); }
 
 .suggestion-meta {
-  font-size: .75rem; color: var(--text-secondary);
-  display: flex; gap: var(--spacing-xs);
-  align-items: center; margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  color: var(--ink-mute);
+  display: flex; gap: 0.3rem;
+  align-items: center; margin-top: 1px;
 }
 
 .search-highlight {
@@ -284,3 +348,30 @@
     display: flex !important;
   }
 }
+
+/* `type="search"` draws WebKit's own clear button, which sat next to the
+   component's, so the field showed two crosses. */
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.clear-search {
+  position: absolute;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.clear-search:hover { color: var(--ink); background: var(--rule); }

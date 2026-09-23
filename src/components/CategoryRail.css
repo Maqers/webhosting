@@ -1,0 +1,258 @@
+/**
+ * CATEGORY RAIL
+ *
+ * The horizontally scrolling circles on Home and Products. Both pages had
+ * their own copy; the Products one still set `scroll-behavior: smooth`, which
+ * animates every scroll change and made dragging lag behind the finger.
+ *
+ * `min-width: 0` on the strip matters: it sits inside a flex parent on the
+ * Products page, and a flex item defaults to `min-width: auto`, so the rail
+ * refused to shrink and instead overflowed 152px past both edges of the page,
+ * pushing the "All" button off-screen.
+ */
+
+/* ── Category circles strip ── */
+.category-circles-strip {
+  min-width: 0;
+  background: #fff;
+  padding: 1rem 0 0.875rem;
+  border-bottom: 1px solid #f0ebe8;
+  overflow: visible;
+}
+.category-circles-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  align-items: flex-start;
+  padding: 0.5rem 0 0.5rem 1rem;
+  /* touch-action / momentum / scrollbar hiding come from base.css.
+     `scroll-behavior: smooth` is deliberately NOT set: it animates every
+     scrollLeft change, which made dragging this rail lag behind the finger.
+     Arrow buttons pass behavior:'smooth' per-call instead. */
+  scroll-snap-type: x proximity;
+  /* Without this the first item snaps its start to the container's start,
+     ignoring the left padding, so the rail settled at scrollLeft 32 on load
+     and the "previous" arrow appeared before anything had been scrolled. */
+  scroll-padding-left: 1rem;
+}
+
+.category-circle-item {
+  scroll-snap-align: start;
+}
+.category-circles-scroll::after {
+  content: '';
+  display: block;
+  min-width: 1rem;
+  flex-shrink: 0;
+}
+.category-circles-scroll::-webkit-scrollbar { display: none; }
+
+/* index.css sets `overflow: hidden` on every <button> to contain a ripple
+   ::before. On these buttons it clipped the circle: the item box is 86px wide
+   and the hover `scale(1.06)` takes the 82px circle to 91px, so the photograph
+   was cut flat down both sides while the ring around it stayed round. */
+.category-circle-item--btn {
+  overflow: visible;
+}
+
+.category-circle-item, .category-circle-item--btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  flex-shrink: 0;
+  width: 90px;
+}
+.category-circle-img {
+  width: 82px;
+  height: 82px;
+  min-width: 82px;
+  min-height: 82px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #faf5f5;
+  border: 1.5px solid rgba(118,9,9,0.15);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s;
+  aspect-ratio: 1 / 1;
+  transform: translateZ(0);
+}
+.category-circle-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transform: scale(1.08);
+  transition: transform 0.25s ease;
+}
+.category-circle-fallback {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.category-circle-item:hover .category-circle-img,
+.category-circle-item:active .category-circle-img {
+  border-color: var(--primary-color);
+}
+.category-circle-item:hover .category-circle-img img,
+.category-circle-item:active .category-circle-img img {
+  transform: scale(1.12);
+}
+
+/* No hover/active highlight on mobile */
+@media (max-width: 768px) {
+  .category-circle-item:hover .category-circle-img,
+  .category-circle-item:active .category-circle-img,
+  .category-circle-item--btn:hover .category-circle-img,
+  .category-circle-item--btn:active .category-circle-img {
+    border-color: #ede0e0;
+    transform: none;
+  }
+}
+.category-circle-label {
+  font-family: var(--font-family-heading);
+  font-size: 0.67rem;
+  font-weight: 700;
+  font-style: normal;
+  color: #3a2020;
+  text-align: center;
+  line-height: 1.3;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  width: 92px;
+  max-width: 92px;
+}
+@media (min-width: 768px) {
+  .category-circles-scroll {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 0.5rem 2rem 0.75rem;
+    scroll-padding-left: 2rem;
+    gap: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .category-circles-scroll::-webkit-scrollbar { display: none; }
+  .category-circle-item, .category-circle-item--btn { width: 96px; }
+  .category-circle-img  { width: 84px; height: 84px; min-width: 84px; min-height: 84px; }
+  .category-circle-label { font-size: 0.72rem; width: 96px; }
+}
+
+/* ── Circle buttons (Products page filter) ── */
+.category-circle-item--btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  width: 84px;
+}
+.category-circles-strip--products {
+  border-bottom: none;
+  padding: 0.75rem 0 0.25rem;
+  background: transparent;
+}
+.category-circle-item--btn:hover .category-circle-img,
+.category-circle-item--btn:active .category-circle-img {
+  border-color: var(--primary-color);
+  transform: scale(1.06);
+}
+.category-circle-item--btn.circle-active .category-circle-img {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+.category-circle-all {
+  width: 82px;
+  height: 82px;
+  min-width: 82px;
+  min-height: 82px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #760909;
+  border: 1.5px solid rgba(118,9,9,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.category-circle-item--btn.circle-active .category-circle-all {
+  background: #760909;
+  color: #fff;
+}
+/* ── Circle scroll arrows ─────────────────────────────────────────────────── */
+.circles-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.circles-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #e0d4d4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--primary-color);
+  transition: box-shadow 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.circles-arrow:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  border-color: var(--primary-color);
+}
+.circles-arrow--left  { left: 0; }
+.circles-arrow--right { right: 0; }
+
+/* Pointer devices only. On touch the rail is dragged directly, and a floating
+   button over the circles would just be in the way. */
+@media (hover: none), (pointer: coarse) {
+  .circles-arrow { display: none; }
+}
+
+.circles-wrapper { min-width: 0; }
+.circles-wrapper > .category-circles-scroll { flex: 1 1 0; min-width: 0; }
+
+/* Products page variant: transparent, tighter, and constrained so it cannot
+   break out of the filter bar's flex row.
+
+   `flex: 1 1 0` rather than just `min-width: 0`: with the default
+   `flex-basis: auto` the rail is still sized from its content (1592px of
+   circles), so it overflowed 76px past each edge of the page and pushed the
+   "All" button off-screen. A zero basis makes it take the row and scroll. */
+.category-circles-strip--products {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  background: transparent;
+  border-bottom: none;
+  padding: 0.25rem 0 0.15rem;
+}
+
+.filters-wrapper { min-width: 0; }
+.filters-wrapper > * { min-width: 0; }

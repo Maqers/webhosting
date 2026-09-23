@@ -4,6 +4,7 @@ import EnhancedSearchBar from './EnhancedSearchBar'
 import { getSortedCategories } from '../data/catalog'
 import { occasionCategories as OCCASION_CATEGORIES_RAW } from '../data/occasionCatalog'
 const OCCASION_CATEGORIES = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
+import { useScrollLock } from '../hooks/useScrollLock'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
@@ -25,6 +26,7 @@ const Navbar = () => {
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [mobileOccasionOpen, setMobileOccasionOpen] = useState(false)
   const [mobileProductOpen, setMobileProductOpen]   = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen]     = useState(false)
 
   // Derived from catalog.js — always in sync, no manual maintenance
   const PRODUCT_CATEGORIES = getSortedCategories()
@@ -40,15 +42,22 @@ const Navbar = () => {
   const firstItemRef = useRef(null)
   const prevActiveRef = useRef(null)
 
+  useScrollLock(isOpen)
+
   const isActive    = (path) => location.pathname === path
   const isCatActive = (slug) => location.pathname === `/category/${slug}` || location.pathname.startsWith(`/category/${slug}/`)
   const isProductsActive = () => location.pathname === '/products' || location.pathname.startsWith('/product/')
 
-  const handleSearch = useCallback((results) => {
-    if (location.pathname === '/products' && results?.query) return
-    if (results?.query) navigate('/products', { state: { searchQuery: results.query, searchResults: results } })
-    else if (results?.hasResults) navigate('/products', { state: { searchResults: results } })
+  // EnhancedSearchBar owns navigation now; this used to navigate a second time
+  // with identical state right after it had already done so. The only jobs left
+  // here are closing the mobile chrome and resetting the grid when the field is
+  // cleared, which previously left stale results on screen.
+  const handleSearch = useCallback((payload) => {
     setIsOpen(false)
+    setMobileSearchOpen(false)
+    if (payload?.cleared && location.pathname === '/products') {
+      navigate('/products', { replace: true, state: null })
+    }
   }, [navigate, location.pathname])
 
   const closeMenu = useCallback(() => {
@@ -63,28 +72,21 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
+  // Scroll freezing is handled by useScrollLock; this effect only owns the
+  // menu-open class hooks and focus management.
   useEffect(() => {
+    const root = document.getElementById('root')
     if (isOpen) {
-      const y = window.scrollY, root = document.getElementById('root')
-      document.body.style.position = 'fixed'; document.body.style.top = `-${y}px`
-      document.body.style.width = '100%'; document.body.classList.add('menu-open')
-      if (root) root.classList.add('menu-open-blur')
+      document.body.classList.add('menu-open')
+      root?.classList.add('menu-open-blur')
       prevActiveRef.current = document.activeElement
-      setTimeout(() => firstItemRef.current?.focus(), 150)
-    } else {
-      const y = document.body.style.top, root = document.getElementById('root')
-      document.body.style.position = ''; document.body.style.top = ''
-      document.body.style.width = ''; document.body.classList.remove('menu-open')
-      if (root) root.classList.remove('menu-open-blur')
-      if (y) window.scrollTo(0, parseInt(y || '0') * -1)
-      prevActiveRef.current?.focus()
+      const t = setTimeout(() => firstItemRef.current?.focus(), 150)
+      return () => clearTimeout(t)
     }
-    return () => {
-      const root = document.getElementById('root')
-      document.body.style.position = ''; document.body.style.top = ''
-      document.body.style.width = ''; document.body.classList.remove('menu-open')
-      if (root) root.classList.remove('menu-open-blur')
-    }
+    document.body.classList.remove('menu-open')
+    root?.classList.remove('menu-open-blur')
+    prevActiveRef.current?.focus()
+    return undefined
   }, [isOpen])
 
   useEffect(() => {
@@ -124,13 +126,15 @@ const Navbar = () => {
   const { isLoggedIn, user, openLoginModal, logout } = useAuth()
   const accountDisplayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.phone || user?.email
 
-  const menuItems = [    { path: '/',        label: 'Home'       },
+  // No Home entry: the wordmark to the left of these links already goes home,
+  // so it was a second control doing the same job. The mobile menu keeps its
+  // own Home row, where there is no always-visible wordmark to rely on.
+  const menuItems = [
     { path: '/about',   label: 'About'      },
     { path: '/faqs',    label: 'FAQs'       },
     { path: '/contact', label: 'Contact Us' },
   ]
 
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountRef = useRef(null)
   const mobileAccountRef = useRef(null)
@@ -276,7 +280,7 @@ const Navbar = () => {
                               <span>{cat.name}</span>
                             </Link>
                           ))}
-                          <Link to="/categories" className="navbar-dropdown-view-all" onClick={() => setCategoriesOpen(false)}>View all →</Link>
+                          <Link to="/categories" className="navbar-dropdown-view-all" onClick={() => setCategoriesOpen(false)}>All categories</Link>
                         </div>
                       </div>
                     </div>
@@ -344,11 +348,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile search row — below navbar, hidden on desktop */}
-      <div className="navbar-mobile-search-row">
-        <EnhancedSearchBar onSearch={handleSearch} />
-      </div>
-
       <div className={`navbar-menu-backdrop ${isOpen ? 'active' : ''}`} onClick={closeMenu} aria-hidden="true" />
 
       <div id="mobile-menu" ref={menuRef} className={`navbar-menu-mobile ${isOpen ? 'active' : ''}`} aria-hidden={!isOpen} role="dialog" aria-modal={isOpen} style={{ display: isOpen ? 'flex' : 'none' }}>
@@ -400,7 +399,7 @@ const Navbar = () => {
               </div>
             )}
 
-            {menuItems.filter(i => i.path !== '/').map((item) => (
+            {menuItems.map((item) => (
               <Link key={item.path} to={item.path} className={`mobile-menu-link ${isActive(item.path) ? 'active' : ''}`} onClick={closeMenu} tabIndex={isOpen ? 0 : -1}>{item.label}</Link>
             ))}
           </div>
