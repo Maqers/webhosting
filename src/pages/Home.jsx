@@ -63,13 +63,18 @@ const Home = () => {
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' })
   }, [])
 
-  // Occasions that have opted into a home circle by setting circleImage.
-  const occasionCircles = useMemo(
-    () => [...occasionCategories]
+  // The rail is whatever carries a circleImage, whether that is a product
+  // category or an occasion, ordered by circleOrder. Both are editable from
+  // the admin portal's Circles tab, so nothing here is hardcoded.
+  const circles = useMemo(() => {
+    const fromCategories = getSortedCategories()
+      .filter(c => c.circleImage)
+      .map(c => ({ key: `cat:${c.id}`, to: `/category/${c.id}`, name: c.name, image: c.circleImage, circleOrder: c.circleOrder ?? 999 }));
+    const fromOccasions = occasionCategories
       .filter(o => o.circleImage)
-      .sort((a, b) => a.order - b.order),
-    []
-  );
+      .map(o => ({ key: `occ:${o.id}`, to: `/category/${o.slug}`, name: o.name, image: o.circleImage, circleOrder: o.circleOrder ?? 0 }));
+    return [...fromOccasions, ...fromCategories].sort((a, b) => a.circleOrder - b.circleOrder);
+  }, []);
 
   const openGiftFinder = useCallback(
     () => window.dispatchEvent(new Event('maqers:open-gift-finder')),
@@ -78,22 +83,6 @@ const Home = () => {
   const featuredGridRef = useRef(null);
   useMobileCenterSwap(featuredGridRef, '.feat-img-zone.has-second-img');
 
-// Thumbnail images for category circles (168px webp, displayed at 82-84px @2x retina)
-const HOME_CAT_IMAGES = {
-  'Handbags':             '/images/thumb-photo-2026-05-12-09-25-50.webp',
-  'Handmade-Accessories': '/images/thumb-remove-the-white-text-box-with-kl-53-from-the-imag.webp',
-  'Candles':              '/images/thumb-8.webp',
-  'Florals':              '/images/thumb-remove-the-background-make-it-transparent.webp',
-  'Wedding-Gifts':        '/images/thumb-whatsapp-image-2026-04-17-at-15.22.22.webp',
-  'Kids-Accessories':     '/images/thumb-dsc_8211.webp',
-  'Home-decor':           '/images/thumb-28.webp',
-  'Handmade-Soaps':       '/images/thumb-56.webp',
-  'Customised-Hampers':   '/images/thumb-48.webp',
-  'Cosmetics':            '/images/thumb-whatsapp-image-2026-05-01-at-2.16.13-pm-(1).webp',
-  'resin-products':       '/images/thumb-29.webp',
-  'Charm-accessories':    '/images/thumb-enchanted_charm_watch_2.webp',
-  'Frames&Paintings':     '/images/thumb-17.webp',
-}
   // The manual touchmove handler that used to live here drove el.scrollLeft by
   // hand on every frame. It existed only because a global
   // `touch-action: pan-y !important` blocked native horizontal panning; with
@@ -212,66 +201,28 @@ const HOME_CAT_IMAGES = {
             </button>
           )}
         <div className="category-circles-scroll" ref={railRef}>
-          {/* Occasions with a circleImage set lead the rail. This was a
-              hardcoded Diwali block, which meant an occasion created in the
-              admin portal never got a circle; it is driven by the data now, so
-              setting the image in the portal is all it takes. */}
-          {occasionCircles.map(occ => (
+          {circles.map((circle, i) => (
             <Link
-              key={occ.id}
-              to={`/category/${occ.slug}`}
+              key={circle.key}
+              to={circle.to}
               state={{ from: '/' }}
               className="category-circle-item category-circle-item--btn"
               style={{ textDecoration: 'none' }}
             >
               <div className="category-circle-img">
                 <img
-                  src={occ.circleImage}
-                  alt={occ.name}
+                  src={circle.image}
+                  alt={circle.name}
                   width="82"
                   height="82"
-                  loading="eager"
+                  loading={i < 5 ? 'eager' : 'lazy'}
                   decoding="async"
+                  onError={e => { e.currentTarget.style.display = 'none' }}
                 />
               </div>
-              <span className="category-circle-label">{occ.name}</span>
+              <span className="category-circle-label">{circle.name}</span>
             </Link>
           ))}
-          {getSortedCategories()
-            .filter(c => c.id !== 'Oxidised-jewellery' && c.id !== 'Wedding-Gifts')
-            .map((cat, catIndex) => {
-              const img = HOME_CAT_IMAGES[cat.id] || ''
-              // Only the first 5 circles are typically above the fold on mobile
-              const isAboveFold = catIndex < 5
-              return (
-                <Link
-                  key={cat.id}
-                  to={`/category/${cat.id}`}
-                  state={{ from: '/' }}
-                  className="category-circle-item category-circle-item--btn"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <div className="category-circle-img">
-                    {img
-                      ? <img
-                          src={img}
-                          alt={cat.name}
-                          width="82"
-                          height="82"
-                          loading={isAboveFold ? 'eager' : 'lazy'}
-                          fetchPriority="low"
-                          decoding="async"
-                          onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling && (e.currentTarget.nextSibling.style.display='flex') }}
-                        />
-                      : null
-                    }
-                    <span className="category-circle-fallback" style={{display:'none'}}>{cat.name[0]}</span>
-                  </div>
-                  <span className="category-circle-label">{cat.name}</span>
-                </Link>
-              )
-            })
-          }
           </div>
         </div>
       </div>

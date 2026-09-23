@@ -352,12 +352,25 @@ function parseProducts(source) {
 
 function parseCategories(source) {
   const cats = [];
-  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*description:\s*"([^"]*)",\s*icon:\s*"([^"]*)",\s*order:\s*(\d+),\s*featured:\s*(true|false)/g;
+  // circleImage/circleOrder are optional and sit after `featured`, so entries
+  // written before they existed parse unchanged.
+  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*description:\s*"([^"]*)",\s*icon:\s*"([^"]*)",\s*order:\s*(\d+),\s*featured:\s*(true|false)(?:,\s*circleImage:\s*"([^"]*)")?(?:,\s*circleOrder:\s*(\d+))?/g;
   let m;
   while ((m = regex.exec(source)) !== null) {
-    cats.push({ id: m[1], name: m[2], slug: m[3], description: m[4], icon: m[5], order: parseInt(m[6]), featured: m[7] === "true" });
+    cats.push({ id: m[1], name: m[2], slug: m[3], description: m[4], icon: m[5], order: parseInt(m[6]), featured: m[7] === "true", circleImage: m[8] || "", circleOrder: m[9] !== undefined ? parseInt(m[9]) : null });
   }
   return cats.sort((a, b) => a.order - b.order);
+}
+
+// Sets or clears circleImage/circleOrder on one category entry in catalog.js.
+// The fields sit immediately after `featured: <bool>`, so this rewrites that
+// tail without touching the rest of a long single-line category object.
+function updateCategoryCircleInSource(source, categoryId, circleImage, circleOrder) {
+  const re = new RegExp(`(\\{\\s*id:\\s*"${categoryId}",[\\s\\S]*?featured:\\s*(?:true|false))(?:,\\s*circleImage:\\s*"[^"]*")?(?:,\\s*circleOrder:\\s*\\d+)?`);
+  const tail = circleImage
+    ? `, circleImage: "${sanitizeForJS(circleImage)}", circleOrder: ${Number(circleOrder) || 0}`
+    : "";
+  return source.replace(re, (_, head) => head + tail);
 }
 
 function parseOccasionMap(source) {
@@ -622,6 +635,23 @@ function parseOccasionCatalogEntries(source) {
   return results.sort((a, b) => a.order - b.order);
 }
 
+// Sets or clears circleImage/circleOrder on one occasionCatalog.js entry.
+function updateOccasionCircleInSource(source, occasionId, circleImage, circleOrder) {
+  let r = source;
+  const hasImg = new RegExp(`id:\\s*"${occasionId}",[\\s\\S]*?circleImage:`).test(r);
+  const hasOrd = new RegExp(`id:\\s*"${occasionId}",[\\s\\S]*?circleOrder:`).test(r);
+  // Strip whatever is there, then re-add, so set/update/clear share one path.
+  if (hasOrd) r = r.replace(new RegExp(`(id:\\s*"${occasionId}",[\\s\\S]*?),\\s*circleOrder:\\s*\\d+`), "$1");
+  if (hasImg) r = r.replace(new RegExp(`(id:\\s*"${occasionId}",[\\s\\S]*?),\\s*circleImage:\\s*"[^"]*"`), "$1");
+  if (circleImage) {
+    r = r.replace(
+      new RegExp(`(id:\\s*"${occasionId}",[\\s\\S]*?description:\\s*"(?:[^"\\\\]|\\\\.)*")`),
+      `$1,\n    circleImage: "${sanitizeForJS(circleImage)}",\n    circleOrder: ${Number(circleOrder) || 0}`
+    );
+  }
+  return r;
+}
+
 function insertOccasionCatalogEntry(source, occ, order) {
   const entry = `  {
     id: "${occ.id}",
@@ -769,6 +799,11 @@ export default function AdminPortal() {
   const [occasionEdits, setOccasionEdits] = useState({});
   const [occasionCatalogEntries, setOccasionCatalogEntries] = useState([]);
   const [showAddOccasion, setShowAddOccasion] = useState(false);
+  // Circles tab
+  const [circleDraft, setCircleDraft] = useState({ mode: "existing", sourceType: "category", sourceId: "", name: "", image: "", products: [] });
+  const [circleImageFile, setCircleImageFile] = useState(null);
+  const [circleOrderDirty, setCircleOrderDirty] = useState(false);
+  const [circles, setCircles] = useState([]);
   const [newOccasion, setNewOccasion] = useState({ name: "", emoji: "", description: "", circleImage: "" });
   const [editingOccasion, setEditingOccasion] = useState(null);
   const [occasionOrderDirty, setOccasionOrderDirty] = useState(false);
@@ -1428,6 +1463,135 @@ export default function AdminPortal() {
   // sequential commits. If the second one fails, the occasion will exist in
   // occasionCatalog.js but not yet have a product-id bucket; re-running Save
   // (or just adding a product to it from the Occasions tab) fixes it.
+  // ─── Home Circles ──────────────────────────────────────────────────────────
+  // A circle is any category or occasion carrying a circleImage; the rail on
+  // the home page sorts them by circleOrder. Both live in the data files, so
+  // everything here is an edit to catalog.js / occasionCatalog.js.
+  const liveCircles = useMemo(() => {
+    const fromCats = categories.filter(c => c.circleImage).map(c => ({
+      key: `cat:${c.id}`, type: "category", id: c.id, name: c.name,
+      image: c.circleImage, circleOrder: c.circleOrder ?? 999,
+      productCount: products.filter(p => p.categoryId === c.id || (p.secondaryCategories || []).includes(c.id)).length,
+    }));
+    const fromOccs = occasionCatalogEntries.filter(o => o.circleImage).map(o => ({
+      key: `occ:${o.id}`, type: "occasion", id: o.id, name: o.name,
+      image: o.circleImage, circleOrder: o.circleOrder ?? 0,
+      productCount: (occasionMap[o.id] || []).length,
+    }));
+    return [...fromOccs, ...fromCats].sort((a, b) => a.circleOrder - b.circleOrder);
+  }, [categories, occasionCatalogEntries, occasionMap, products]);
+
+  useEffect(() => { setCircles(liveCircles); setCircleOrderDirty(false); }, [liveCircles]);
+
+  function moveCircle(key, dir) {
+    setCircles(prev => {
+      const i = prev.findIndex(c => c.key === key);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
+    setCircleOrderDirty(true);
+  }
+
+  // Uploads the chosen picture to public/images and returns its path, so the
+  // user picks a file rather than typing a path.
+  async function uploadCircleImage() {
+    if (!circleImageFile) return circleDraft.image;
+    const name = uniqueImageName(circleImageFile.file.name);
+    let sha; try { const ex = await ghGet(`public/images/${name}`, creds); sha = ex.sha; } catch {}
+    await ghPut(`public/images/${name}`, circleImageFile.base64, `Add circle image: ${name}`, sha, creds);
+    if (circleImageFile.webpBase64) {
+      const webpName = toWebpName(name);
+      let wSha; try { const ex = await ghGet(`public/images/${webpName}`, creds); wSha = ex.sha; } catch {}
+      await ghPut(`public/images/${webpName}`, circleImageFile.webpBase64, `Add circle image: ${webpName}`, wSha, creds);
+      return `/images/${webpName}`;
+    }
+    return `/images/${name}`;
+  }
+
+  async function handleSaveCircleOrder() {
+    setPublishing(true);
+    try {
+      let { source, sha } = await fetchCatalog(creds);
+      let occ = await fetchOccasionCatalog(creds);
+      let occSource = occ.source;
+      circles.forEach((c, idx) => {
+        if (c.type === "category") source = updateCategoryCircleInSource(source, c.id, c.image, idx);
+        else occSource = updateOccasionCircleInSource(occSource, c.id, c.image, idx);
+      });
+      await commitCatalog(source, sha, "Reorder home circles", creds);
+      await commitOccasionCatalog(occSource, occ.sha, "Reorder home circles", creds);
+      const fresh = await fetchCatalog(creds);
+      loadCatalogData(fresh.source, fresh.sha);
+      setCircleOrderDirty(false);
+      showToast("Circle order saved!");
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  async function handleRemoveCircle(circle) {
+    if (!window.confirm(`Remove the "${circle.name}" circle from the home page? The ${circle.type} itself is kept.`)) return;
+    setPublishing(true);
+    try {
+      if (circle.type === "category") {
+        const { source, sha } = await fetchCatalog(creds);
+        await commitCatalog(updateCategoryCircleInSource(source, circle.id, "", 0), sha, `Remove home circle: ${circle.name}`, creds);
+      } else {
+        const { source, sha } = await fetchOccasionCatalog(creds);
+        await commitOccasionCatalog(updateOccasionCircleInSource(source, circle.id, "", 0), sha, `Remove home circle: ${circle.name}`, creds);
+      }
+      const fresh = await fetchCatalog(creds);
+      loadCatalogData(fresh.source, fresh.sha);
+      showToast(`"${circle.name}" removed from the home page.`);
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
+  async function handleSaveCircle() {
+    const d = circleDraft;
+    setPublishing(true);
+    try {
+      const image = await uploadCircleImage();
+      if (!image) throw new Error("Pick a picture for the circle.");
+      const nextOrder = circles.length;
+
+      if (d.mode === "existing") {
+        if (!d.sourceId) throw new Error("Choose a category or occasion.");
+        if (d.sourceType === "category") {
+          const { source, sha } = await fetchCatalog(creds);
+          await commitCatalog(updateCategoryCircleInSource(source, d.sourceId, image, nextOrder), sha, `Add home circle: ${d.sourceId}`, creds);
+        } else {
+          const { source, sha } = await fetchOccasionCatalog(creds);
+          await commitOccasionCatalog(updateOccasionCircleInSource(source, d.sourceId, image, nextOrder), sha, `Add home circle: ${d.sourceId}`, creds);
+        }
+      } else {
+        // New circle: create an occasion, give it the chosen products, show it.
+        if (!d.name.trim()) throw new Error("Give the circle a name.");
+        const id = slugify(d.name);
+        if (occasionCatalogEntries.some(o => o.id === id)) throw new Error("Something with this name already exists.");
+        const occ = await fetchOccasionCatalog(creds);
+        const maxOrder = Math.max(...parseOccasionCatalogEntries(occ.source).map(o => o.order), -1);
+        let occSource = insertOccasionCatalogEntry(occ.source, { id, name: d.name, emoji: "", description: "", circleImage: image }, maxOrder + 1);
+        occSource = updateOccasionCircleInSource(occSource, id, image, nextOrder);
+        await commitOccasionCatalog(occSource, occ.sha, `Add occasion and home circle: ${d.name}`, creds);
+
+        const cat = await fetchCatalog(creds);
+        let catSource = addOccasionMapKey(cat.source, id);
+        if (d.products.length) catSource = updateOccasionMapInSource(catSource, { [id]: d.products });
+        await commitCatalog(catSource, cat.sha, `Add products to ${id}`, creds);
+      }
+
+      const fresh = await fetchCatalog(creds);
+      loadCatalogData(fresh.source, fresh.sha);
+      setCircleDraft({ mode: "existing", sourceType: "category", sourceId: "", name: "", image: "", products: [] });
+      setCircleImageFile(null);
+      showToast("Circle saved!");
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setPublishing(false); }
+  }
+
   async function handleAddOccasion() {
     if (!newOccasion.name.trim()) return showToast("Occasion name required.", "error");
     const id = slugify(newOccasion.name);
@@ -1767,6 +1931,7 @@ export default function AdminPortal() {
     { id: "by-category", label: "By Category", icon: "⊟" },
     { id: "categories", label: "Categories", icon: "⊞" },
     { id: "occasions", label: "Occasions", icon: "♡" },
+    { id: "circles", label: "Home Circles", icon: "◎" },
     { id: "sellers", label: "Sellers", icon: "◎" },
   ];
 
@@ -3166,6 +3331,150 @@ export default function AdminPortal() {
         )}
 
         {/* ── SELLERS ── */}
+        {activeTab === "circles" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <h1 style={ts.pageTitle}>Home Circles</h1>
+              {circleOrderDirty && (
+                <button style={ts.primaryBtn} onClick={handleSaveCircleOrder} disabled={publishing}>
+                  {publishing ? "Saving..." : "Save Circle Order"}
+                </button>
+              )}
+            </div>
+            <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
+              The round shortcuts under the banner on the home page. A circle is any category or occasion with a picture set here.
+              Removing one only takes it off the home page, it does not delete the category or occasion.
+            </p>
+
+            {/* ── Live circles ── */}
+            <div style={{ ...ts.card, marginBottom: 24 }}>
+              <h2 style={ts.cardTitle}>On the home page ({circles.length})</h2>
+              {circles.length === 0 && <p style={{ color: "#999", fontSize: 13 }}>No circles yet. Add one below.</p>}
+              {circles.map((c, i) => (
+                <div key={c.key} style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 0", borderBottom: "1px solid #f0ede8" }}>
+                  <img src={c.image} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", flexShrink: 0, background: "#f5ede4" }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "#333" }}>{c.name}</div>
+                    <div style={{ fontSize: 12, color: "#999" }}>
+                      {c.type === "category" ? "Product category" : "Occasion"} · {c.productCount} product{c.productCount === 1 ? "" : "s"}
+                      {c.productCount === 0 && (
+                        <span style={{ color: "#b4232c", fontWeight: 600 }}> · empty, this circle leads nowhere</span>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <button type="button" style={{ ...ts.editBtn, padding: "1px 8px", fontSize: 10, opacity: i === 0 ? 0.35 : 1 }}
+                      disabled={i === 0} onClick={() => moveCircle(c.key, -1)} aria-label="Move up">▲</button>
+                    <button type="button" style={{ ...ts.editBtn, padding: "1px 8px", fontSize: 10, opacity: i === circles.length - 1 ? 0.35 : 1 }}
+                      disabled={i === circles.length - 1} onClick={() => moveCircle(c.key, 1)} aria-label="Move down">▼</button>
+                  </div>
+                  <button style={ts.editBtn} onClick={() => handleRemoveCircle(c)} disabled={publishing}>Remove</button>
+                </div>
+              ))}
+            </div>
+
+            {/* ── Add a circle ── */}
+            <div style={ts.card}>
+              <h2 style={ts.cardTitle}>Add a circle</h2>
+              <div style={{ display: "flex", gap: 10, marginBottom: 18 }}>
+                {[["existing", "Use an existing category or occasion"], ["new", "Create a new one"]].map(([mode, label]) => (
+                  <button key={mode} type="button" onClick={() => setCircleDraft(d => ({ ...d, mode }))}
+                    style={circleDraft.mode === mode ? ts.chipActive : ts.chip}>{label}</button>
+                ))}
+              </div>
+
+              <div style={ts.grid2}>
+                <div>
+                  {circleDraft.mode === "existing" ? (
+                    <>
+                      <label style={ts.label}>Type</label>
+                      <select style={ts.input} value={circleDraft.sourceType}
+                        onChange={e => setCircleDraft(d => ({ ...d, sourceType: e.target.value, sourceId: "" }))}>
+                        <option value="category">Product category</option>
+                        <option value="occasion">Occasion</option>
+                      </select>
+                      <label style={ts.label}>Which one</label>
+                      <select style={ts.input} value={circleDraft.sourceId}
+                        onChange={e => setCircleDraft(d => ({ ...d, sourceId: e.target.value }))}>
+                        <option value="">Choose…</option>
+                        {(circleDraft.sourceType === "category" ? categories : occasionCatalogEntries)
+                          .filter(x => !x.circleImage)
+                          .map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+                      </select>
+                      <p style={{ fontSize: 11, color: "#999", margin: "4px 0 0" }}>
+                        Only things without a circle are listed. Anything already on the home page is above.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <label style={ts.label}>Circle name *</label>
+                      <input style={ts.input} placeholder="e.g. Diwali Picks" value={circleDraft.name}
+                        onChange={e => setCircleDraft(d => ({ ...d, name: e.target.value }))} />
+                      <p style={{ fontSize: 11, color: "#999", margin: "4px 0 12px" }}>
+                        Creates an occasion with this name, so it also appears in the nav bar and on By Occasion.
+                      </p>
+                      <label style={ts.label}>Products in this circle ({circleDraft.products.length})</label>
+                      <div style={{ maxHeight: 220, overflowY: "auto", border: "1px solid #f0ede8", borderRadius: 8, padding: 8 }}>
+                        {products.map(pr => (
+                          <label key={pr.id} style={{ display: "flex", gap: 8, alignItems: "center", padding: "3px 0", fontSize: 13, cursor: "pointer" }}>
+                            <input type="checkbox" checked={circleDraft.products.includes(pr.id)}
+                              onChange={() => setCircleDraft(d => ({
+                                ...d,
+                                products: d.products.includes(pr.id) ? d.products.filter(x => x !== pr.id) : [...d.products, pr.id],
+                              }))} />
+                            <span style={{ color: "#555" }}>{pr.title}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div>
+                  <label style={ts.label}>Picture *</label>
+                  <input type="file" accept="image/*" style={{ ...ts.input, padding: 8 }}
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = async ev => {
+                        const raw = ev.target.result.split(",")[1];
+                        const { base64, webpBase64 } = await compressProductImage(raw, file.type).catch(() => ({ base64: raw, webpBase64: null }));
+                        setCircleImageFile({ file, preview: ev.target.result, base64, webpBase64 });
+                      };
+                      reader.readAsDataURL(file);
+                    }} />
+                  <p style={{ fontSize: 11, color: "#999", margin: "4px 0 12px" }}>
+                    Square images work best; it is cropped to a circle.
+                  </p>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{
+                      width: 96, height: 96, borderRadius: "50%", margin: "0 auto 8px",
+                      border: "1.5px solid #e0d4d4", overflow: "hidden", background: "#faf5f5",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      {circleImageFile
+                        ? <img src={circleImageFile.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <span style={{ fontSize: 11, color: "#bbb" }}>preview</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#777" }}>
+                      {circleDraft.mode === "new"
+                        ? (circleDraft.name || "Circle name")
+                        : ((circleDraft.sourceType === "category" ? categories : occasionCatalogEntries).find(x => x.id === circleDraft.sourceId)?.name || "Nothing chosen")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 18 }}>
+                <button style={ts.primaryBtn} onClick={handleSaveCircle} disabled={publishing}>
+                  {publishing ? "Saving..." : "Add circle"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === "sellers" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
