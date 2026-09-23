@@ -11,8 +11,7 @@ export const occasionCategories = [
     slug: "diwali",
     emoji: "🪔",
     order: 0,
-    description: "Diyas, candles, decor and hampers for the one festival where turning up empty-handed is not an option.",
-    circleImage: "/images/chambu-modak-diya-img-1.webp"
+    description: "Diyas, candles, decor and hampers for the one festival where turning up empty-handed is not an option."
   },
   {
     id: "shaadi-fever",
