@@ -7,7 +7,7 @@
  * Drop into src/pages/AdminPortal.jsx
  */
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import "./AdminPortal.css";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
