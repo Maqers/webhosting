@@ -634,7 +634,7 @@ export default function Checkout() {
                     <div className="checkout-payment-icon">💳</div>
                     <div>
                       <strong>Pay via UPI</strong>
-                      <span>Scan the QR code in the order summary</span>
+                      <span>Scan the QR in the order summary, then confirm below</span>
                     </div>
                   </label>
                 </div>
@@ -643,11 +643,11 @@ export default function Checkout() {
 
             <div className="checkout-section checkout-place-section">
               <button className="checkout-place-btn" onClick={handlePlaceOrder} disabled={submitting}>
-                {submitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
+                {submitting ? 'CONFIRMING...' : "I'VE PAID"}
               </button>
               {hasErrors && (
                 <p className="checkout-form-error-summary">
-                  ⚠️ Please fill in all required fields marked above before placing your order.
+                  Please fill in the required fields above before confirming your payment.
                 </p>
               )}
               <p className="checkout-terms">By placing your order you agree to our terms</p>
@@ -696,9 +696,9 @@ export default function Checkout() {
                     <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
                   </div>
                   <p className="checkout-upi-note">
-                    <strong>Scan with any UPI app, then click Place Order.</strong>
+                    <strong>Pay in any UPI app, then tap &ldquo;I&rsquo;ve paid&rdquo;.</strong>
                     <span className="checkout-upi-warning">
-                      We only receive your order details when you click Place Order.
+                      Your order only reaches us when you tap that button.
                     </span>
                   </p>
                 </div>
