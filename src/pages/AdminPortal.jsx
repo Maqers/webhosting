@@ -146,7 +146,23 @@ async function fetchCatalog(creds) {
   return { source, sha: file.sha };
 }
 
+// catalog.js and occasionCatalog.js are written by string surgery here, so a
+// bad edit is only discovered when the deploy fails to build. This parses the
+// source the same way the bundler would before anything is committed. They
+// contain no imports, so stripping `export` leaves a plain script that
+// `new Function` will parse without executing module machinery.
+function assertParses(source, label) {
+  try {
+    // eslint-disable-next-line no-new-func
+    new Function(source.replace(/^export (const|function|default) /gm, "$1 "));
+  } catch (err) {
+    throw new Error(`Refusing to commit ${label}: it would not parse (${err.message}). Nothing was written.`);
+  }
+  return source;
+}
+
 async function commitCatalog(source, sha, message, creds) {
+  assertParses(source, "catalog.js");
   const encoded = btoa(unescape(encodeURIComponent(source)));
   return ghPut("src/data/catalog.js", encoded, message, sha, creds);
 }
@@ -158,6 +174,7 @@ async function fetchCatalog2(creds) {
 }
 
 async function commitCatalog2(source, sha, message, creds) {
+  assertParses(source, "catalog.js");
   const encoded = btoa(unescape(encodeURIComponent(source)));
   return ghPut("src/data/catalog.js", encoded, message, sha, creds);
 }
@@ -169,6 +186,7 @@ async function fetchOccasionCatalog(creds) {
 }
 
 async function commitOccasionCatalog(source, sha, message, creds) {
+  assertParses(source, "occasionCatalog.js");
   const encoded = btoa(unescape(encodeURIComponent(source)));
   return ghPut("src/data/occasionCatalog.js", encoded, message, sha, creds);
 }
@@ -572,11 +590,23 @@ function insertProductIntoSource(source, product, id) {
     return source.slice(0, blockStart) + "\n" + entry + "\n  " + source.slice(closingIdx);
   }
 
-  // Insert new entry before the closing ]
-  // `entry` already ends with its own trailing comma (see buildEntry), so no
-  // extra separator comma is added here — doing so previously created a
-  // double-comma / array-elision bug ("},," ) whenever a product was inserted.
-  return source.slice(0, closingIdx) + "\n" + entry + "\n  " + source.slice(closingIdx);
+  // Insert the new entry before the closing ].
+  //
+  // `entry` carries its own trailing comma (see buildEntry), so none is added
+  // after it — doing that previously produced "},," and an array hole. But the
+  // element already sitting last needs a comma before the new one, and the last
+  // element of an array usually has none. Without this the file became
+  //     { ...last... }
+  //     { id: 356, ... },
+  // which is what broke the deploy with "Unexpected token '{'".
+  const head = source.slice(0, closingIdx);
+  const lastCharIdx = head.search(/\s*$/) - 1 >= 0 ? head.replace(/\s+$/, "").length - 1 : -1;
+  const needsComma = lastCharIdx >= 0 && head[lastCharIdx] !== ",";
+  const patchedHead = needsComma
+    ? head.slice(0, lastCharIdx + 1) + "," + head.slice(lastCharIdx + 1)
+    : head;
+
+  return patchedHead + "\n" + entry + "\n  " + source.slice(closingIdx);
 }
 
 function insertCategoryIntoSource(source, cat, order) {
