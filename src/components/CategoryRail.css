@@ -25,6 +25,12 @@
   overflow-x: auto;
   overflow-y: visible;
   align-items: flex-start;
+  /* The circles are pinned left by default, so on a wide screen they trail off
+     into empty space: 136px at 1440, 616px at 1920. Centring closes that.
+     `safe` matters: plain `center` would push the overflow past the scroll
+     container's start once the rail is wider than the viewport, making the
+     first circles unreachable. */
+  justify-content: safe center;
   padding: 0.5rem 0 0.5rem 1rem;
   /* touch-action / momentum / scrollbar hiding come from base.css.
      `scroll-behavior: smooth` is deliberately NOT set: it animates every
@@ -137,9 +143,13 @@
   .category-circles-scroll {
     flex-wrap: nowrap;
     overflow-x: auto;
-    justify-content: flex-start;
+    /* Was flex-start, which is what left the trailing gap on wide screens;
+       the base rule's `safe center` applies here too now. */
     padding: 0.5rem 2rem 0.75rem;
     scroll-padding-left: 2rem;
+    /* The trailing spacer exists because the mobile rule has no right padding.
+       Here padding-right already provides the gutter, and leaving the spacer in
+       skews the centring by its own width. */
     gap: 1.5rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -256,3 +266,7 @@
 
 .filters-wrapper { min-width: 0; }
 .filters-wrapper > * { min-width: 0; }
+
+@media (min-width: 768px) {
+  .category-circles-scroll::after { display: none; }
+}
