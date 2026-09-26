@@ -81,6 +81,9 @@ export default function Checkout() {
   const [orderId, setOrderId] = useState('')
   const [upiCopied, setUpiCopied] = useState(false)
   const [showQR, setShowQR] = useState(false)
+  // The QR only appears once the customer has asked to pay, so the page reads
+  // as a sequence: fill your details, pay, then confirm.
+  const [payRevealed, setPayRevealed] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -324,6 +327,19 @@ export default function Checkout() {
     }
   }
 
+  const handleRevealPayment = () => {
+    setSubmitAttempted(true)
+    if (!validate()) {
+      document.querySelector('.checkout-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
+    setPayRevealed(true)
+    // Give the block a frame to mount before scrolling it into view.
+    requestAnimationFrame(() => {
+      document.querySelector('.checkout-pay-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  }
+
   const handlePlaceOrder = async () => {
     setSubmitAttempted(true)
     if (!validate()) return
@@ -556,95 +572,49 @@ export default function Checkout() {
               {addressSaveError && <p className="checkout-error" style={{ marginTop: 8 }}>{addressSaveError}</p>}
             </div>
 
-            <div className="checkout-section">
-              <h2 className="checkout-section-title">PAYMENT METHOD</h2>
+            <div className="checkout-section checkout-pay-section">
+              <h2 className="checkout-section-title">PAYMENT</h2>
 
-              {isMobile && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+              {!payRevealed ? (
+                <>
+                  <p className="checkout-pay-intro">
+                    Pay by UPI. Tap below and we&rsquo;ll show you the code to scan.
+                  </p>
+                  <button type="button" className="checkout-pay-btn" onClick={handleRevealPayment}>
+                    Pay now &middot; &#8377;{grandTotal.toLocaleString('en-IN')}
+                  </button>
+                </>
+              ) : (
+                <div className="checkout-pay-panel">
+                  <p className="checkout-pay-step">Scan here to pay &#8377;{grandTotal.toLocaleString('en-IN')}</p>
+
+                  <div className="checkout-pay-qr">
+                    <img src="/images/upi-qr.png" alt={`UPI QR code to pay ₹${grandTotal}`} />
+                  </div>
+
+                  <button type="button" className="checkout-upi-copy" onClick={handleCopyUPI}>
+                    {upiCopied ? 'UPI ID copied' : `Or copy UPI ID: ${UPI_ID}`}
+                  </button>
+
+                  <p className="checkout-pay-hint">
+                    Pay in any UPI app, then come back and confirm below.
+                    Your order only reaches us once you do.
+                  </p>
+
+                  <button className="checkout-place-btn" onClick={handlePlaceOrder} disabled={submitting}>
+                    {submitting ? 'CONFIRMING...' : `I'VE PAID \u20B9${grandTotal.toLocaleString('en-IN')}`}
+                  </button>
+
                   <button
                     type="button"
-                    onClick={handleCopyUPI}
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                      padding: '0.85rem 1.25rem', borderRadius: 10, cursor: 'pointer',
-                      background: upiCopied ? '#2a7a2a' : '#1a1714', color: '#c8a96e',
-                      border: 'none', fontSize: '0.9rem', fontFamily: 'var(--font-primary)', fontWeight: 600,
-                      transition: 'background 0.2s'
-                    }}
+                    className="checkout-pay-back"
+                    onClick={() => setPayRevealed(false)}
+                    disabled={submitting}
                   >
-                    {upiCopied ? '✓ Copied!' : '📋 Copy UPI ID'}
+                    Go back and edit my details
                   </button>
-                  {upiCopied && (
-                    <div style={{
-                      background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8,
-                      padding: '0.65rem 1rem', fontSize: '0.82rem', color: '#166534', textAlign: 'center'
-                    }}>
-                      UPI ID copied! Paste it in your UPI app to pay ₹{grandTotal.toLocaleString('en-IN')}
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setShowQR(q => !q)}
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                      padding: '0.85rem 1.25rem', borderRadius: 10, cursor: 'pointer',
-                      background: 'transparent', color: '#1a1714',
-                      border: '1.5px solid #d0c9bf', fontSize: '0.9rem',
-                      fontFamily: 'var(--font-primary)', fontWeight: 600
-                    }}
-                  >
-                    📷 {showQR ? 'Hide QR Code' : 'Scan QR Code'}
-                  </button>
-                  {showQR && (
-                    <div style={{ textAlign: 'center', padding: '0.5rem 0' }}>
-                      <img
-                        src="/images/upi-qr.png"
-                        alt="UPI QR Code"
-                        style={{ width: 180, height: 180, objectFit: 'contain', borderRadius: 8, border: '1px solid #eee' }}
-                      />
-                      <p style={{ fontSize: '0.78rem', color: '#888', marginTop: '0.5rem' }}>
-                        Scan with any UPI app · UPI ID: <strong style={{ color: '#1a1714' }}>{UPI_ID}</strong>
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const a = document.createElement('a');
-                          a.href = '/images/upi-qr.png';
-                          a.download = 'maqers-upi-qr.png';
-                          a.click();
-                        }}
-                        style={{
-                          marginTop: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                          padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #d0c9bf',
-                          background: 'transparent', color: '#666', fontSize: '0.78rem',
-                          fontFamily: 'var(--font-primary)', cursor: 'pointer'
-                        }}
-                      >
-                        ⬇ Download QR
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
-
-              {!isMobile && (
-                <div className="checkout-payment-options">
-                  <label className="checkout-payment-option selected">
-                    <input type="radio" name="payment" value="upi" checked={true} onChange={() => {}} />
-                    <div className="checkout-payment-icon">💳</div>
-                    <div>
-                      <strong>Pay via UPI</strong>
-                      <span>Scan the QR in the order summary, then confirm below</span>
-                    </div>
-                  </label>
-                </div>
-              )}
-            </div>
-
-            <div className="checkout-section checkout-place-section">
-              <button className="checkout-place-btn" onClick={handlePlaceOrder} disabled={submitting}>
-                {submitting ? 'CONFIRMING...' : "I'VE PAID"}
-              </button>
               {hasErrors && (
                 <p className="checkout-form-error-summary">
                   Please fill in the required fields above before confirming your payment.
@@ -688,21 +658,9 @@ export default function Checkout() {
                   <span className="checkout-total-val">₹{grandTotal.toLocaleString('en-IN')}</span>
                 </div>
               </div>
-
-              {!isMobile && (
-                <div className="checkout-upi-box">
-                  <p className="checkout-upi-label">Scan & Pay ₹{grandTotal.toLocaleString('en-IN')}</p>
-                  <div className="checkout-qr-placeholder">
-                    <img src="/images/upi-qr.png" alt="UPI QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
-                  </div>
-                  <p className="checkout-upi-note">
-                    <strong>Pay in any UPI app, then tap &ldquo;I&rsquo;ve paid&rdquo;.</strong>
-                    <span className="checkout-upi-warning">
-                      Your order only reaches us when you tap that button.
-                    </span>
-                  </p>
-                </div>
-              )}
+              {/* The QR used to sit here permanently, which made the reveal
+                  pointless: the code was already on screen before anyone asked
+                  to pay. It lives in the payment step now. */}
             </div>
           </div>
         </div>

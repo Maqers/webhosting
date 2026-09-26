@@ -786,3 +786,120 @@
   color: var(--ink-soft);
   margin-bottom: 1.5rem;
 }
+
+/* ── Staged payment ───────────────────────────────────────────────────────
+   Checkout used to show the QR permanently in the summary column while the
+   button beside the form said "Place order", so the two halves of one action
+   sat in different columns and nothing signalled that paying happens in
+   another app. It is a sequence now: details, pay, confirm. */
+
+.checkout-pay-intro {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  margin: 0 0 0.9rem;
+}
+
+.checkout-pay-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--maroon);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.checkout-pay-btn:hover { background: var(--maroon-deep); }
+
+/* ── Revealed panel ── */
+
+.checkout-pay-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  animation: payReveal 0.28s var(--ease-premium) both;
+}
+
+@keyframes payReveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout-pay-panel { animation: none; }
+}
+
+.checkout-pay-step {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  text-align: center;
+}
+
+.checkout-pay-qr {
+  width: 210px;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+}
+.checkout-pay-qr img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.checkout-upi-copy {
+  background: none;
+  border: none;
+  padding: 0.3rem 0.5rem;
+  min-height: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.checkout-upi-copy:hover { color: var(--maroon); }
+
+.checkout-pay-hint {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-align: center;
+  max-width: 34ch;
+  margin: 0;
+}
+
+.checkout-pay-panel .checkout-place-btn {
+  width: 100%;
+  border-radius: var(--radius-full);
+  margin-top: 0.2rem;
+}
+
+.checkout-pay-back {
+  background: none;
+  border: none;
+  min-height: 0;
+  padding: 0.2rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.checkout-pay-back:hover { color: var(--ink); }
+.checkout-pay-back:disabled { opacity: 0.4; cursor: default; }

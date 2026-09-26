@@ -33,6 +33,10 @@ body:has(.wishlist-drawer.open) .gift-assistant-btn,
 body:has(.wishlist-drawer.open) .whatsapp-button,
 body:has(.products-sheet) .gift-assistant-btn,
 body:has(.products-sheet) .whatsapp-button,
-body:has(.products-sheet) .bottom-nav {
+body:has(.products-sheet) .bottom-nav,
+/* The revealed payment panel puts the confirm button low on a phone, exactly
+   where both floating buttons sit. */
+body:has(.checkout-pay-panel) .gift-assistant-btn,
+body:has(.checkout-pay-panel) .whatsapp-button {
   display: none !important;
 }
