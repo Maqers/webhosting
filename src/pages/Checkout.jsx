@@ -592,9 +592,22 @@ export default function Checkout() {
                     <img src="/images/upi-qr.png" alt={`UPI QR code to pay ₹${grandTotal}`} />
                   </div>
 
-                  <button type="button" className="checkout-upi-copy" onClick={handleCopyUPI}>
-                    {upiCopied ? 'UPI ID copied' : `Or copy UPI ID: ${UPI_ID}`}
-                  </button>
+                  <div className="checkout-pay-alts">
+                    <button type="button" className="checkout-upi-copy" onClick={handleCopyUPI}>
+                      {upiCopied ? 'UPI ID copied' : `Copy UPI ID: ${UPI_ID}`}
+                    </button>
+                    <a
+                      className="checkout-upi-copy"
+                      href="/images/upi-qr.png"
+                      download="maqers-upi-qr.png"
+                    >
+                      Save QR to gallery
+                    </a>
+                  </div>
+
+                  <p className="checkout-pay-scanhint">
+                    On your phone? Save the code, then use &ldquo;scan from gallery&rdquo; in your UPI app.
+                  </p>
 
                   <p className="checkout-pay-hint">
                     Pay in any UPI app, then come back and confirm below.
