@@ -22,6 +22,7 @@ const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq
 
 const COUPON_CODE = 'MAQERSDIWALI100'
 const COUPON_AMOUNT = 100
+const COUPON_MIN_ORDER = 2000
 
 function getDeliveryFee(subtotal) {
   return 0
@@ -56,12 +57,19 @@ export default function Checkout() {
   const deliveryFee = getDeliveryFee(total)
   const [couponApplied, setCouponApplied] = useState(false)
   const [showCouponCelebration, setShowCouponCelebration] = useState(false)
-  // Never let the discount push an order below zero.
-  const couponDiscount = couponApplied ? Math.min(COUPON_AMOUNT, total) : 0
+  const couponEligible = total >= COUPON_MIN_ORDER
+  const couponShortfall = COUPON_MIN_ORDER - total
+  const couponDiscount = couponApplied ? COUPON_AMOUNT : 0
+  // The cart drawer is still usable on this page, so the subtotal can drop
+  // under the minimum after the coupon was applied.
+  useEffect(() => {
+    if (!couponEligible) setCouponApplied(false)
+  }, [couponEligible])
   const grandTotal = total + deliveryFee - couponDiscount
   const couponNote = couponApplied ? `, ${COUPON_CODE} -₹${couponDiscount}` : ''
 
   const applyCoupon = () => {
+    if (!couponEligible) return
     setCouponApplied(true)
     setShowCouponCelebration(true)
     trackEvent('CouponApplied', { code: COUPON_CODE, value: COUPON_AMOUNT })
@@ -672,11 +680,15 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
-              <div className={`checkout-coupon ${couponApplied ? 'applied' : ''}`}>
+              <div className={`checkout-coupon ${couponApplied ? 'applied' : ''} ${couponEligible ? '' : 'locked'}`}>
                 <div className="checkout-coupon-info">
                   <span className="checkout-coupon-code">🪔 {COUPON_CODE}</span>
                   <span className="checkout-coupon-desc">
-                    {couponApplied ? `₹${couponDiscount} off applied` : `Diwali special: ₹${COUPON_AMOUNT} off this order`}
+                    {couponApplied
+                      ? `₹${couponDiscount} off applied`
+                      : couponEligible
+                        ? `Diwali special: ₹${COUPON_AMOUNT} off orders of ₹${COUPON_MIN_ORDER.toLocaleString('en-IN')}+`
+                        : `Add ₹${couponShortfall.toLocaleString('en-IN')} more to unlock ₹${COUPON_AMOUNT} off (orders of ₹${COUPON_MIN_ORDER.toLocaleString('en-IN')}+)`}
                   </span>
                 </div>
                 {couponApplied ? (
@@ -684,7 +696,7 @@ export default function Checkout() {
                     Remove
                   </button>
                 ) : (
-                  <button type="button" className="checkout-coupon-btn" onClick={applyCoupon}>
+                  <button type="button" className="checkout-coupon-btn" onClick={applyCoupon} disabled={!couponEligible}>
                     Apply
                   </button>
                 )}

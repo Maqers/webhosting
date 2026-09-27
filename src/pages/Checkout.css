@@ -992,3 +992,14 @@
   color: #2e7d32;
   font-weight: 700;
 }
+
+.checkout-coupon.locked {
+  border-color: #d8d2ca;
+  background: #faf8f5;
+}
+.checkout-coupon.locked .checkout-coupon-code { color: var(--text-secondary, #666); }
+.checkout-coupon-btn:disabled,
+.checkout-coupon-btn:disabled:hover {
+  background: #cfc8bf;
+  cursor: not-allowed;
+}
