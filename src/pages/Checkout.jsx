@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabaseRest } from '../config/supabaseConfig'
 import { saveGuestOrder } from '../utils/guestOrders'
 import SeoHead from '../components/SeoHead'
+import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
 import './Checkout.css'
@@ -18,6 +19,9 @@ const EMAILJS_TEMPLATE_CUSTOMER = 'template_cp8gsrc' // ← replace with your Em
 const EMAILJS_TEMPLATE_SELLER = 'template_REPLACE_ME' // ← create a new EmailJS template for this, see notes
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
 const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq9f1nTqbOf8ZXbOI1bvk_uIa6jwUjvYshdvOFNAUcqlYbM8U8_pVAvQYxZxhI/exec'
+
+const COUPON_CODE = 'MAQERSDIWALI100'
+const COUPON_AMOUNT = 100
 
 function getDeliveryFee(subtotal) {
   return 0
@@ -50,7 +54,18 @@ export default function Checkout() {
   const { user, isLoggedIn, accessToken, updateProfile, openLoginModal } = useAuth()
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
-  const grandTotal = total + deliveryFee
+  const [couponApplied, setCouponApplied] = useState(false)
+  const [showCouponCelebration, setShowCouponCelebration] = useState(false)
+  // Never let the discount push an order below zero.
+  const couponDiscount = couponApplied ? Math.min(COUPON_AMOUNT, total) : 0
+  const grandTotal = total + deliveryFee - couponDiscount
+  const couponNote = couponApplied ? `, ${COUPON_CODE} -₹${couponDiscount}` : ''
+
+  const applyCoupon = () => {
+    setCouponApplied(true)
+    setShowCouponCelebration(true)
+    trackEvent('CouponApplied', { code: COUPON_CODE, value: COUPON_AMOUNT })
+  }
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   useEffect(() => {
@@ -202,7 +217,7 @@ export default function Checkout() {
         customer_phone: form.phone,
         shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
         items: buildItemsText(),
-        total: `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery)`,
+        total: `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery${couponNote})`,
         sellers: buildSellersText(),
         payment_method: paymentNote,
       },
@@ -225,7 +240,7 @@ export default function Checkout() {
           items_list: buildItemsText(),
           subtotal: `₹${total.toLocaleString('en-IN')}`,
           delivery_fee: 'FREE',
-          grand_total: `₹${grandTotal.toLocaleString('en-IN')}`,
+          grand_total: `₹${grandTotal.toLocaleString('en-IN')}${couponApplied ? ` (${COUPON_CODE} saved you ₹${couponDiscount})` : ''}`,
           upi_id: UPI_ID,
         },
         EMAILJS_PUBLIC_KEY
@@ -373,6 +388,7 @@ export default function Checkout() {
       item_count: items.length,
       product_ids: items.map(i => i.id),
       payment_method: paymentMethod,
+      ...(couponApplied && { coupon: COUPON_CODE, discount: couponDiscount }),
     })
     clearCart()
     setOrderPlaced(true)
@@ -656,6 +672,23 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
+              <div className={`checkout-coupon ${couponApplied ? 'applied' : ''}`}>
+                <div className="checkout-coupon-info">
+                  <span className="checkout-coupon-code">🪔 {COUPON_CODE}</span>
+                  <span className="checkout-coupon-desc">
+                    {couponApplied ? `₹${couponDiscount} off applied` : `Diwali special: ₹${COUPON_AMOUNT} off this order`}
+                  </span>
+                </div>
+                {couponApplied ? (
+                  <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => setCouponApplied(false)}>
+                    Remove
+                  </button>
+                ) : (
+                  <button type="button" className="checkout-coupon-btn" onClick={applyCoupon}>
+                    Apply
+                  </button>
+                )}
+              </div>
               <div className="checkout-summary-breakdown">
                 <div className="checkout-summary-row">
                   <span>Subtotal</span>
@@ -665,6 +698,12 @@ export default function Checkout() {
                   <span>Delivery</span>
                   <span className='checkout-free-delivery'>FREE</span>
                 </div>
+                {couponApplied && (
+                  <div className="checkout-summary-row">
+                    <span>Coupon ({COUPON_CODE})</span>
+                    <span className="checkout-coupon-discount">&minus;₹{couponDiscount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
                 <p className="checkout-free-msg">🎉 Free delivery!</p>
                 <div className="checkout-summary-row checkout-grand-total">
                   <span>Total</span>
@@ -679,6 +718,13 @@ export default function Checkout() {
         </div>
       </div>
 
+      {showCouponCelebration && (
+        <CouponCelebration
+          code={COUPON_CODE}
+          amount={couponDiscount}
+          onClose={() => setShowCouponCelebration(false)}
+        />
+      )}
     </div>
   )
 }

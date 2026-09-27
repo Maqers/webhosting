@@ -75,16 +75,13 @@ const Navbar = () => {
   // Scroll freezing is handled by useScrollLock; this effect only owns the
   // menu-open class hooks and focus management.
   useEffect(() => {
-    const root = document.getElementById('root')
     if (isOpen) {
       document.body.classList.add('menu-open')
-      root?.classList.add('menu-open-blur')
       prevActiveRef.current = document.activeElement
       const t = setTimeout(() => firstItemRef.current?.focus(), 150)
       return () => clearTimeout(t)
     }
     document.body.classList.remove('menu-open')
-    root?.classList.remove('menu-open-blur')
     prevActiveRef.current?.focus()
     return undefined
   }, [isOpen])

@@ -535,7 +535,7 @@
 
 .navbar-menu-backdrop {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
+  background: rgba(0,0,0,.25);
   z-index: var(--menu-backdrop-z-index);
   opacity: 0; visibility: hidden;
   transition: opacity .3s, visibility .3s; pointer-events: none;
@@ -547,11 +547,11 @@
    ============================================================================ */
 
 .navbar-menu-mobile {
-  position: fixed; top: 0; right: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; max-width: min(380px, 85%);
   height: 100%; height: 100dvh;
-  background: rgba(255,255,255,.98);
-  box-shadow: -8px 0 48px rgba(0,0,0,.25);
+  background: #fff;
+  box-shadow: 8px 0 48px rgba(0,0,0,.25);
   z-index: var(--menu-drawer-z-index);
   display: none; flex-direction: column; overflow: hidden;
 }
@@ -562,7 +562,7 @@
 }
 
 @keyframes menuSlideIn {
-  from { transform: translateX(100%); opacity: 0; }
+  from { transform: translateX(-100%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 
@@ -650,17 +650,11 @@ body.menu-open {
   overflow: hidden;
 }
 
-body.menu-open #root.menu-open-blur main,
-body.menu-open #root.menu-open-blur .home,
-body.menu-open #root.menu-open-blur .products-page,
-body.menu-open #root.menu-open-blur .categories-page,
-body.menu-open #root.menu-open-blur .product-detail,
-body.menu-open #root.menu-open-blur .about-page,
-body.menu-open #root.menu-open-blur .faqs,
-body.menu-open #root.menu-open-blur .contact-page,
-body.menu-open #root.menu-open-blur footer {
-  filter: blur(8px) brightness(.6);
-  pointer-events: none;
+/* The floating gift/WhatsApp buttons sit above everything, including the
+   drawer, so they'd cover the menu's bottom rows. */
+body.menu-open .gift-assistant-btn,
+body.menu-open .whatsapp-button {
+  visibility: hidden;
 }
 
 body.menu-open nav.navbar,

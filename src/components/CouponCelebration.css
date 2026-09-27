@@ -1,0 +1,129 @@
+.coupon-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  animation: couponFadeIn 0.2s ease-out;
+}
+
+.coupon-celebration-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 340px;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  text-align: center;
+  padding-top: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: couponPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.coupon-celebration-icon {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: var(--primary-color, #760909);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Little dashes around the tick, like a sunburst. */
+.coupon-celebration-rays {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from -4deg, var(--primary-color, #760909) 0 8deg, transparent 8deg 45deg);
+  -webkit-mask: radial-gradient(circle, transparent 36px, #000 37px, #000 41px, transparent 42px);
+          mask: radial-gradient(circle, transparent 36px, #000 37px, #000 41px, transparent 42px);
+  animation: couponRays 0.6s ease-out;
+}
+
+.coupon-celebration-code {
+  margin: 0 1.25rem 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  letter-spacing: 0.02em;
+  word-break: break-word;
+}
+
+.coupon-celebration-saved {
+  margin: 0 1.25rem 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.coupon-celebration-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: none;
+  border: none;
+  border-top: 1px solid #ede8e0;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary-color, #760909);
+  cursor: pointer;
+}
+.coupon-celebration-btn:hover { background: #fdf5f0; }
+
+.coupon-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.coupon-confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 9px;
+  height: 14px;
+  opacity: 0;
+  animation-name: couponConfettiFall;
+  animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1);
+  animation-fill-mode: forwards;
+}
+.coupon-confetti-piece--1 { width: 8px; height: 8px; border-radius: 50%; }
+.coupon-confetti-piece--2 { width: 12px; height: 5px; }
+
+@keyframes couponConfettiFall {
+  0%   { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--drift), 105vh, 0) rotate(var(--spin)); }
+}
+
+@keyframes couponFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes couponPop {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes couponRays {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coupon-confetti { display: none; }
+  .coupon-celebration,
+  .coupon-celebration-card,
+  .coupon-celebration-rays { animation: none; }
+}
