@@ -462,13 +462,25 @@
 .hero--diwali .btn--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.45); }
 .hero--diwali .btn--ghost:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
 
-/* On a festive hero the photograph is the backdrop, so the product collage
-   would sit image-on-image. */
-.hero--rakhi .hero-collage,
-.hero--diwali .hero-collage { display: none; }
+/* On the Rakhi hero the photograph is the backdrop, so the product collage
+   would sit image-on-image. The Diwali mandala is a pattern rather than a
+   photo, so on desktop it keeps the collage of Diwali hampers on the right. */
+.hero--rakhi .hero-collage { display: none; }
+.hero--rakhi .hero-inner { grid-template-columns: 1fr; }
+.hero--rakhi .hero-copy { max-width: 36rem; }
 
-.hero--rakhi .hero-inner,
-.hero--diwali .hero-inner { grid-template-columns: 1fr; }
-
-.hero--rakhi .hero-copy,
-.hero--diwali .hero-copy { max-width: 36rem; }
+/* The desktop primary button is maroon, which vanishes on the maroon field;
+   invert it to white the way the phone hero already does. */
+.hero--diwali .hero-actions .btn--primary,
+.hero--diwali .hero-actions .btn--primary:visited {
+  background: #fff;
+  border-color: #fff;
+  color: var(--maroon);
+}
+.hero--diwali .hero-actions .btn--primary:hover,
+.hero--diwali .hero-actions .btn--primary:focus {
+  background: var(--blush);
+  border-color: var(--blush);
+  color: var(--maroon);
+}
+.hero--diwali .hero-tile { box-shadow: 0 10px 30px rgba(20, 2, 2, 0.45); }

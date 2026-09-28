@@ -24,21 +24,11 @@ const DIWALI_BANNER_STARTS = new Date("2026-09-29T00:00:00+05:30");
 const DIWALI_BANNER_EXPIRES = new Date("2026-11-11T00:00:00+05:30");
 const now = new Date();
 const isDiwaliSeason = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
-// The Diwali hero is phone-only: desktop keeps the everyday hero with the
-// product collage. Matches the 900px breakpoint the hero CSS uses for mobile.
-const PHONE_QUERY = "(max-width: 900px)";
 
 const Home = () => {
-  const [isPhone, setIsPhone] = useState(
-    () => typeof window !== "undefined" && window.matchMedia(PHONE_QUERY).matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia(PHONE_QUERY);
-    const onChange = e => setIsPhone(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  const showDiwaliBanner = isDiwaliSeason && isPhone;
+  // On desktop the Diwali hero keeps the product collage on the right, which
+  // shows Diwali hampers (see heroPicks); phones hide the collage in CSS.
+  const showDiwaliBanner = isDiwaliSeason;
   // A product is popular when any of its colours is, so expand first and keep
   // only the colour cards that are themselves marked popular.
   const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()).filter(p => p.popular), []);
@@ -150,10 +140,10 @@ const Home = () => {
             ) : showDiwaliBanner ? (
               <>
                 <p className="hero-eyebrow">Maqers wishes you</p>
-                <h1 className="hero-title">Happy Diwali</h1>
+                <h1 className="hero-title">A Happy Diwali</h1>
                 <p className="hero-lede">
                   Handmade diyas, hampers and decor from independent Indian sellers,
-                  posted anywhere in the country.
+                  delivered across India.
                 </p>
                 <div className="hero-actions">
                   <Link to="/category/diwali" className="btn btn--primary">Shop all Diwali gifts</Link>
@@ -161,6 +151,7 @@ const Home = () => {
                     Help me choose
                   </button>
                 </div>
+                <p className="hero-note">Free delivery over &#8377;499, anywhere in India.</p>
               </>
             ) : (
               <>
@@ -190,7 +181,7 @@ const Home = () => {
             )}
           </div>
 
-          {!showRakhiBanner && !showDiwaliBanner && (
+          {!showRakhiBanner && (
             <div className="hero-collage" aria-hidden={heroPicks.length === 0}>
               {heroPicks.map((product, i) => (
                 <Link
