@@ -444,14 +444,17 @@
 }
 
 .hero--diwali {
-  background-color: #3a0404;
+  background-color: #7a1208;
+  /* The photo already darkens toward its edges, so the scrim only needs to
+     sit behind the copy on the left; a flat 50% one buried the mandala. */
   background-image:
-    linear-gradient(rgba(30, 2, 2, 0.5), rgba(30, 2, 2, 0.5)),
+    linear-gradient(100deg, rgba(40, 4, 4, 0.5) 0%, rgba(40, 4, 4, 0.18) 75%),
     url('/images/diwali-hero-2026.jpg');
   background-size: cover;
   background-position: center;
 }
-
+.hero--diwali .hero-title,
+.hero--diwali .hero-lede { text-shadow: 0 1px 10px rgba(40, 4, 4, 0.55); }
 .hero--diwali .hero-title { color: #fff; }
 .hero--diwali .hero-lede { color: rgba(255, 255, 255, 0.82); }
 .hero--diwali .hero-eyebrow { color: var(--marigold); }
