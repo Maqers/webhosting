@@ -16,24 +16,31 @@
  * and a `_variantColor` marker so callers can deep-link to `?color=` and give
  * each card a unique React key.
  */
+export function splitsByColor(colors, images) {
+  return (
+    Array.isArray(colors) &&
+    colors.length > 1 &&
+    images?.length > 0 &&
+    colors.every(c => c && typeof c === 'object' && c.name && Number.isInteger(c.imageIndex)) &&
+    new Set(colors.map(c => c.imageIndex)).size === colors.length
+  )
+}
+
+// A colour can carry its own `popular` / `featured` flag (set per colour from
+// the admin Products tab); a colour without one inherits the product's.
 export function expandProductsByColor(products) {
   const expanded = []
   for (const p of products) {
     const colors = p.meta?.colors
-    const allLinkedToOwnImage =
-      Array.isArray(colors) &&
-      colors.length > 1 &&
-      p.images?.length > 0 &&
-      colors.every(c => c && typeof c === 'object' && c.name && Number.isInteger(c.imageIndex)) &&
-      new Set(colors.map(c => c.imageIndex)).size === colors.length
-
-    if (allLinkedToOwnImage) {
+    if (splitsByColor(colors, p.images)) {
       colors.forEach((c, idx) => {
         const mainImage = p.images[c.imageIndex] || p.images[0]
         const restImages = p.images.filter((_, i) => i !== c.imageIndex)
         expanded.push({
           ...p,
           title: `${p.title} — ${c.name}`,
+          popular: c.popular ?? p.popular,
+          featured: c.featured ?? p.featured,
           images: [mainImage, ...restImages],
           _variantColor: c.name,
           _variantKey: `${p.id}-color-${idx}`,

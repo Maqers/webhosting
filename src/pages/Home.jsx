@@ -26,11 +26,15 @@ const now = new Date();
 const showDiwaliBanner = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
 
 const Home = () => {
-  const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()), []);
+  // A product is popular when any of its colours is, so expand first and keep
+  // only the colour cards that are themselves marked popular.
+  const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()).filter(p => p.popular), []);
   // Three real products carry the hero, so it changes as the catalogue does.
   const heroPicks = useMemo(
-    () => getPopularProducts().filter(p => p.inStock !== false && p.images?.length).slice(0, 3),
-    []
+    () => popularProducts
+      .filter((p, i, all) => p.inStock !== false && p.images?.length && all.findIndex(q => q.id === p.id) === i)
+      .slice(0, 3),
+    [popularProducts]
   );
   // A mouse-only visitor had no way to reach the overflow on this rail: the
   // scrollbar is hidden, there are no arrows, and a plain wheel scrolls the
@@ -159,7 +163,7 @@ const Home = () => {
               {heroPicks.map((product, i) => (
                 <Link
                   key={product.id}
-                  to={`/product/${product.slug}`}
+                  to={`/product/${product.slug}${productLinkQuery(product)}`}
                   className={`hero-tile hero-tile--${i + 1}`}
                   aria-label={product.title}
                 >

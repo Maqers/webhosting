@@ -9,6 +9,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import "./AdminPortal.css";
+import { splitsByColor } from "../utils/productVariants";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -261,6 +262,16 @@ function normalizeDescription(raw) {
     .replace(/\\\\/g, '\\');    // \\\\ -> single backslash
 }
 
+// Fisher–Yates: a fair random order, unlike sort(() => Math.random() - 0.5).
+function shuffled(list) {
+  const a = [...list];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function getNextId(source) {
   const ids = [...source.matchAll(/\bid:\s*(\d+)/g)].map(m => parseInt(m[1]));
   return ids.length ? Math.max(...ids) + 1 : 1;
@@ -306,11 +317,17 @@ function parseProducts(source) {
       if (!raw) {
         p.colors = [];
       } else if (raw.includes("name:")) {
-        // Object format: { name: "Red", imageIndex: 0 }
-        const objRegex = /\{\s*name:\s*"([^"]+)",\s*imageIndex:\s*(\d+)\s*\}/g;
+        // Object format: { name: "Red", imageIndex: 0 }, optionally followed by
+        // per-colour popular / featured flags.
+        const objRegex = /\{\s*name:\s*"([^"]+)",\s*imageIndex:\s*(\d+)(?:,\s*popular:\s*(true|false))?(?:,\s*featured:\s*(true|false))?\s*\}/g;
         const cols = [];
         let om;
-        while ((om = objRegex.exec(raw)) !== null) cols.push({ name: om[1], imageIndex: parseInt(om[2]) });
+        while ((om = objRegex.exec(raw)) !== null) {
+          const c = { name: om[1], imageIndex: parseInt(om[2]) };
+          if (om[3]) c.popular = om[3] === "true";
+          if (om[4]) c.featured = om[4] === "true";
+          cols.push(c);
+        }
         p.colors = cols;
       } else {
         // Legacy string format
@@ -479,7 +496,8 @@ function serializeColors(colors) {
     .filter(c => c && (typeof c === "object" ? c.name && c.name !== "[object Object]" : typeof c === "string" && c !== "[object Object]"))
     .map(c => {
       if (typeof c === "object" && c.name) {
-        return `{ name: "${sanitizeForJS(c.name)}", imageIndex: ${Number(c.imageIndex) || 0} }`;
+        const flags = ["popular", "featured"].filter(f => typeof c[f] === "boolean").map(f => `, ${f}: ${c[f]}`).join("");
+        return `{ name: "${sanitizeForJS(c.name)}", imageIndex: ${Number(c.imageIndex) || 0}${flags} }`;
       }
       return `{ name: "${sanitizeForJS(String(c))}", imageIndex: 0 }`;
     })
@@ -822,6 +840,7 @@ export default function AdminPortal() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [productFilter, setProductFilter] = useState("");
   const [productFilterCat, setProductFilterCat] = useState("all");
+  const [productFlagFilter, setProductFlagFilter] = useState("all");
   const [pendingChanges, setPendingChanges] = useState({});
   const [editingCategory, setEditingCategory] = useState(null);
   const [newCategory, setNewCategory] = useState({ name: "", description: "", icon: "gift" });
@@ -1337,6 +1356,17 @@ export default function AdminPortal() {
     setPendingChanges(prev => ({ ...prev, [product.id]: { ...current, [flag]: !current[flag] } }));
   }
 
+  // Popular / featured for one colour of a product that shows a card per
+  // colour. Every colour gets an explicit value (inheriting the product's
+  // until now), and the product-level flag becomes "any colour has it" so
+  // search boosts and getPopularProducts() still find the product.
+  function handleToggleColorFlag(product, colorIdx, flag) {
+    const current = pendingChanges[product.id] || product;
+    const colors = current.colors.map(c => ({ ...c, [flag]: c[flag] ?? !!current[flag] }));
+    colors[colorIdx] = { ...colors[colorIdx], [flag]: !colors[colorIdx][flag] };
+    setPendingChanges(prev => ({ ...prev, [product.id]: { ...current, colors, [flag]: colors.some(c => c[flag]) } }));
+  }
+
   function handleStageProductEdit(edited) {
     setPendingChanges(prev => ({ ...prev, [edited.id]: edited }));
     setEditingProduct(null); setEditImageFiles([]);
@@ -1694,6 +1724,38 @@ export default function AdminPortal() {
     if (productFilterCat === "all" || !localOrderByCat[productFilterCat]) return filteredProducts;
     const orderMap = Object.fromEntries((localOrderByCat[productFilterCat] || []).map((id, i) => [id, i]));
     return [...filteredProducts].sort((a, b) => (orderMap[a.id] ?? 999) - (orderMap[b.id] ?? 999));
+  }
+
+  // One row per colour for products the shop shows as a card per colour, so
+  // each colour's popular / featured can be set on its own. Rows are then
+  // narrowed by the flag filter, using pending (unpublished) values.
+  function getDisplayedRows() {
+    const rows = [];
+    for (const product of getDisplayedProducts()) {
+      const p = pendingChanges[product.id] || product;
+      if (splitsByColor(p.colors, p.images)) {
+        p.colors.forEach((c, colorIdx) => rows.push({
+          key: `${product.id}-color-${colorIdx}`, product, p, colorIdx,
+          title: `${p.title} — ${c.name}`,
+          image: p.images[c.imageIndex] || p.images[0],
+          popular: c.popular ?? p.popular,
+          featured: c.featured ?? p.featured,
+          inStock: p.inStock,
+        }));
+      } else {
+        rows.push({ key: String(product.id), product, p, colorIdx: null, title: p.title, image: p.images[0], popular: p.popular, featured: p.featured, inStock: p.inStock });
+      }
+    }
+    const test = {
+      all: () => true,
+      popular: r => r.popular,
+      "not-popular": r => !r.popular,
+      featured: r => r.featured,
+      "not-featured": r => !r.featured,
+      "in-stock": r => r.inStock,
+      "out-of-stock": r => !r.inStock,
+    }[productFlagFilter] || (() => true);
+    return rows.filter(test);
   }
 
   // ── Seller functions ─────────────────────────────────────────────────────────
@@ -2509,11 +2571,13 @@ export default function AdminPortal() {
         )}
 
         {/* ── PRODUCTS ── */}
-        {activeTab === "products" && (
+        {activeTab === "products" && (() => {
+          const displayedRows = getDisplayedRows();
+          return (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div>
-                <h1 style={{ ...ts.pageTitle, marginBottom: 4 }}>Products ({filteredProducts.length})</h1>
+                <h1 style={{ ...ts.pageTitle, marginBottom: 4 }}>Products ({displayedRows.length})</h1>
                 {Object.keys(pendingChanges).length > 0 && (
                   <p style={{ margin: 0, fontSize: 12, color: "#a07840" }}>
                     {Object.keys(pendingChanges).length} unsaved change(s)
@@ -2543,6 +2607,15 @@ export default function AdminPortal() {
                 <option value="all">All Categories</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
+              <select style={{ ...ts.input, width: 170, margin: 0 }} value={productFlagFilter} onChange={e => setProductFlagFilter(e.target.value)}>
+                <option value="all">All flags</option>
+                <option value="popular">Popular</option>
+                <option value="not-popular">Not popular</option>
+                <option value="featured">Featured</option>
+                <option value="not-featured">Not featured</option>
+                <option value="in-stock">In stock</option>
+                <option value="out-of-stock">Out of stock</option>
+              </select>
             </div>
 
             <div style={ts.productTable}>
@@ -2554,12 +2627,18 @@ export default function AdminPortal() {
                 <span style={{ flex: 1 }}>Featured</span>
                 <span style={{ flex: 1 }}>Actions</span>
               </div>
-              {getDisplayedProducts().map(product => {
-                const p = pendingChanges[product.id] || product;
+              {displayedRows.length === 0 && (
+                <p style={{ padding: 24, margin: 0, textAlign: "center", color: "#999", fontSize: 13 }}>No products match these filters.</p>
+              )}
+              {displayedRows.map((row, rowIdx) => {
+                const { product, p, colorIdx } = row;
                 const isDirty = !!pendingChanges[product.id];
                 const isEditingThis = editingProduct?.id === product.id;
+                // A product with a row per colour gets one edit panel, under its last row.
+                const isLastRowOfProduct = displayedRows[rowIdx + 1]?.product.id !== product.id;
+                const toggle = flag => colorIdx === null ? handleToggleFlag(product, flag) : handleToggleColorFlag(product, colorIdx, flag);
                 return (
-                  <React.Fragment key={product.id}>
+                  <React.Fragment key={row.key}>
                   <div
                     draggable={productFilterCat !== "all"}
                     onDragStart={e => handleDragStart(e, product.id)}
@@ -2571,11 +2650,11 @@ export default function AdminPortal() {
                       <span title="Drag to reorder" style={{ cursor: "grab", color: "#ccc", fontSize: 18, marginRight: 8, flexShrink: 0, userSelect: "none" }}>⠿</span>
                     )}
                     <div style={{ flex: 3, display: "flex", alignItems: "center", gap: 10 }}>
-                      <img src={p.images[0]} alt="" style={ts.rowThumb} onError={e => { e.target.style.display = "none"; }} />
+                      <img src={row.image} alt="" style={ts.rowThumb} onError={e => { e.target.style.display = "none"; }} />
                       <div>
                         <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#222" }}>
                           {isDirty && <span style={{ color: "#c8a96e", marginRight: 4 }}>*</span>}
-                          {p.title}
+                          {row.title}
                         </p>
                         <p style={{ margin: 0, fontSize: 11, color: "#999" }}>{categories.find(c => c.id === p.categoryId)?.name} · ID {p.id}</p>
                       </div>
@@ -2588,15 +2667,15 @@ export default function AdminPortal() {
                       </button>
                     </span>
                     <span style={{ flex: 1 }}>
-                      <button onClick={() => handleToggleFlag(product, "popular")}
-                        style={{ ...ts.flagToggle, background: p.popular ? "#fff3e0" : "#f5f5f5", color: p.popular ? "#e65100" : "#999" }}>
-                        {p.popular ? "Yes" : "No"}
+                      <button onClick={() => toggle("popular")}
+                        style={{ ...ts.flagToggle, background: row.popular ? "#fff3e0" : "#f5f5f5", color: row.popular ? "#e65100" : "#999" }}>
+                        {row.popular ? "Yes" : "No"}
                       </button>
                     </span>
                     <span style={{ flex: 1 }}>
-                      <button onClick={() => handleToggleFlag(product, "featured")}
-                        style={{ ...ts.flagToggle, background: p.featured ? "#e8eaf6" : "#f5f5f5", color: p.featured ? "#3949ab" : "#999" }}>
-                        {p.featured ? "Yes" : "No"}
+                      <button onClick={() => toggle("featured")}
+                        style={{ ...ts.flagToggle, background: row.featured ? "#e8eaf6" : "#f5f5f5", color: row.featured ? "#3949ab" : "#999" }}>
+                        {row.featured ? "Yes" : "No"}
                       </button>
                     </span>
                     <span style={{ flex: 1, display: "flex", gap: 4, alignItems: "center" }}>
@@ -2612,7 +2691,7 @@ export default function AdminPortal() {
                         onClick={() => handleDeleteProduct(product)}>✕</button>
                     </span>
                   </div>
-                  {isEditingThis && (
+                  {isEditingThis && isLastRowOfProduct && (
                     <div ref={editFormRef} style={{ background: "#fdf8f0", border: "1px solid #e8d9b8", borderTop: "none", padding: 20, marginBottom: 0 }}>
                       <div style={ts.grid2}>
                         <div>
@@ -2911,7 +2990,14 @@ export default function AdminPortal() {
                           <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "8px 0 16px" }}>
                             {["inStock", "popular", "featured"].map(flag => (
                               <label key={flag} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, color: "#333" }}>
-                                <input type="checkbox" checked={editingProduct[flag]} onChange={() => setEditingProduct(p => ({ ...p, [flag]: !p[flag] }))} />
+                                <input type="checkbox" checked={editingProduct[flag]} onChange={() => setEditingProduct(p => {
+                                  const v = !p[flag];
+                                  // Setting it for the whole product overrides any per-colour value.
+                                  const colors = flag !== "inStock" && Array.isArray(p.colors)
+                                    ? p.colors.map(c => c && typeof c === "object" && typeof c[flag] === "boolean" ? { ...c, [flag]: v } : c)
+                                    : p.colors;
+                                  return { ...p, [flag]: v, colors };
+                                })} />
                                 <span style={{ textTransform: "capitalize" }}>{flag}</span>
                               </label>
                             ))}
@@ -2990,7 +3076,8 @@ export default function AdminPortal() {
               })}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* ── CATEGORIES ── */}
         {activeTab === "categories" && (
@@ -3123,14 +3210,22 @@ export default function AdminPortal() {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <h1 style={ts.pageTitle}>By Category</h1>
-                {hasChanges && (
-                  <button style={ts.primaryBtn} onClick={handleByCatPublish} disabled={byCatPublishing}>
-                    {byCatPublishing ? "Publishing..." : `Publish Order`}
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button style={ts.ghostBtn} onClick={() => setByCatOrder(Object.fromEntries(categories.map(c => [c.id, shuffled(getOrder(c.id))])))}>
+                    ⤨ Shuffle all categories
                   </button>
-                )}
+                  {hasChanges && (
+                    <button style={ts.ghostBtn} onClick={() => setByCatOrder({})}>Discard</button>
+                  )}
+                  {hasChanges && (
+                    <button style={ts.primaryBtn} onClick={handleByCatPublish} disabled={byCatPublishing}>
+                      {byCatPublishing ? "Publishing..." : `Publish Order`}
+                    </button>
+                  )}
+                </div>
               </div>
               <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
-                Drag ⠿ to reorder products within each category. Hit Publish Order when done.
+                Drag ⠿ to reorder products within each category, or hit Shuffle for a random order. Nothing goes live until you hit Publish Order.
               </p>
               {categories.map(cat => {
                 const catProds = getOrder(cat.id).map(id => products.find(p => p.id === id)).filter(Boolean);
@@ -3143,6 +3238,10 @@ export default function AdminPortal() {
                       <h2 style={{ ...ts.cardTitle, margin: 0 }}>{cat.name}</h2>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         {byCatOrder[cat.id] && <span style={{ fontSize: 11, color: "#c8a96e", fontWeight: 600 }}>● unsaved</span>}
+                        <button type="button" style={ts.editBtn}
+                          onClick={e => { e.stopPropagation(); setByCatOrder(prev => ({ ...prev, [cat.id]: shuffled(getOrder(cat.id)) })); }}>
+                          ⤨ Shuffle
+                        </button>
                         <span style={ts.flag}>{catProds.length} products</span>
                         <span style={{ fontSize: 12, color: "#aaa" }}>{isOpen ? "▲" : "▼"}</span>
                       </div>
@@ -3197,6 +3296,9 @@ export default function AdminPortal() {
               <h1 style={ts.pageTitle}>Occasion Map</h1>
               <div style={{ display: "flex", gap: 10 }}>
                 <button style={ts.ghostBtn} onClick={() => setShowAddOccasion(s => !s)}>+ Add Occasion</button>
+                <button style={ts.ghostBtn} onClick={() => setOccasionEdits(prev => Object.fromEntries(Object.entries(prev).map(([id, ids]) => [id, shuffled(ids)])))}>
+                  ⤨ Shuffle all occasions
+                </button>
                 {occasionOrderDirty && (
                   <button style={ts.primaryBtn} onClick={handleSaveOccasionOrder} disabled={publishing}>
                     {publishing ? "Saving..." : "Save Occasion Order"}
@@ -3209,7 +3311,7 @@ export default function AdminPortal() {
             </div>
             <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
               Use the ▲▼ on each occasion card to reorder them in the nav bar and Shop by Occasion page — hit "Save Occasion Order" once you're happy.
-              Within a card, toggle which products belong to it and drag them to reorder — hit "Save All" for those.
+              Within a card, toggle which products belong to it and drag them to reorder, or hit Shuffle for a random order — hit "Save All" for those.
             </p>
 
             {showAddOccasion && (
@@ -3286,6 +3388,8 @@ export default function AdminPortal() {
                     <h2 style={{ ...ts.cardTitle, margin: 0 }}>{occ.emoji ? `${occ.emoji} ` : ""}{occ.name}</h2>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       <span style={ts.flag}>{currentIds.length} products</span>
+                      <button type="button" style={ts.editBtn} disabled={currentIds.length < 2}
+                        onClick={() => setOccasionEdits(e2 => ({ ...e2, [occ.id]: shuffled(currentIds) }))}>⤨ Shuffle</button>
                       <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         <button type="button" style={{ ...ts.editBtn, padding: "1px 8px", fontSize: 10, lineHeight: 1.4, opacity: occIdx === 0 ? 0.35 : 1 }}
                           disabled={occIdx === 0} onClick={() => moveOccasion(occ.id, -1)} aria-label="Move up">▲</button>
