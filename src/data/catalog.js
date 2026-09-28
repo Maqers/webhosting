@@ -451,6 +451,11 @@ export const occasionProductMap = {
   'occasion-gifts':        [64, 65, 71, 27, 28, 29, 32, 33, 36, 37, 56, 57, 8, 113, 114, 156, 157, 158, 159, 165, 166, 167, 184, 185, 186, 187, 188, 189, 191, 196, 200, 201, 202, 203, 204, 205, 206, 211, 212, 214, 215, 217, 218, 219, 220, 221, 222, 223, 227, 229, 232, 233, 235, 239, 240, 261, 266, 270, 272, 281, 282, 286, 291, 292, 293, 294, 295, 296, 297, 298, 307, 308, 309, 310, 311, 312, 315, 316, 318, 320, 322, 329, 331, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 349, 350, 359],
 };
 
+// Card order per category ('cat:<id>') and occasion ('occ:<id>'), written by
+// the admin's shuffle / drag. Keys are product ids, or 'id:Colour' for a
+// colour card, so each colour can sit anywhere in the grid.
+export const displayOrder = {};
+
 export const getAllProducts = () => Object.values(productsByCategory).flat();
 
 export const getProductsByCategory = (categoryIdOrSlug) => {

@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { getAllProducts, getSortedCategories, getProductsByCategory, occasionProductMap } from '../data/catalog'
+import { getAllProducts, getSortedCategories, getProductsByCategory, getCategoryByIdOrSlug, occasionProductMap, displayOrder } from '../data/catalog'
 import { occasionCategories as OCCASION_CATEGORIES_RAW, getOccasionProducts } from '../data/occasionCatalog'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import SeoHead from '../components/SeoHead'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
-import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
+import { expandProductsByColor, productLinkQuery, applyDisplayOrder } from '../utils/productVariants'
 import './Categories.css'
 
 const occasionCategories = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
@@ -128,8 +128,13 @@ const Categories = () => {
     if (sortBy === 'price-asc') products = [...products].sort((a,b) => a.price - b.price)
     else if (sortBy === 'price-desc') products = [...products].sort((a,b) => b.price - a.price)
     else if (sortBy === 'name') products = [...products].sort((a,b) => a.title.localeCompare(b.title))
-    return expandProductsByColor(products)
-  }, [rawCategoryProducts, activeFilter, sortBy])
+    const expanded = expandProductsByColor(products)
+    if (sortBy !== 'default' || selectedCategory === 'All') return expanded
+    const orderKey = occasionProductMap[selectedCategory]
+      ? `occ:${selectedCategory}`
+      : `cat:${getCategoryByIdOrSlug(selectedCategory)?.id}`
+    return applyDisplayOrder(expanded, displayOrder[orderKey])
+  }, [rawCategoryProducts, activeFilter, sortBy, selectedCategory])
 
   const seoTitle = selectedCategoryObj
     ? `${selectedCategoryObj.name}: Handmade Gifts`

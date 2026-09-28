@@ -56,3 +56,19 @@ export function expandProductsByColor(products) {
 export function productLinkQuery(product) {
   return product._variantColor ? `?color=${encodeURIComponent(product._variantColor)}` : ''
 }
+
+// Key a listing card by product, or by product + colour for a colour card.
+// Matches the keys the admin writes into catalog.js's displayOrder.
+export const variantOrderKey = p => (p._variantColor ? `${p.id}:${p._variantColor}` : String(p.id))
+
+// Orders expanded cards by a saved key list (from the admin's shuffle/drag).
+// Cards not in the list (new products, renamed colours) keep their natural
+// order after the listed ones.
+export function applyDisplayOrder(items, order) {
+  if (!order?.length) return items
+  const pos = new Map(order.map((k, i) => [k, i]))
+  return items
+    .map((p, i) => ({ p, i, r: pos.has(variantOrderKey(p)) ? pos.get(variantOrderKey(p)) : Infinity }))
+    .sort((a, b) => (a.r === b.r ? a.i - b.i : a.r - b.r))
+    .map(x => x.p)
+}

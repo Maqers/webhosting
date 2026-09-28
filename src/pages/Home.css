@@ -444,10 +444,10 @@
 }
 
 .hero--diwali {
+  background-color: #3a0404;
   background-image:
-    linear-gradient(rgba(40, 2, 2, 0.58), rgba(40, 2, 2, 0.58)),
-    url('/images/diwali-hero-2026.jpg'),
-    radial-gradient(circle at 50% 30%, #a83a12, #760909 65%);
+    linear-gradient(rgba(30, 2, 2, 0.5), rgba(30, 2, 2, 0.5)),
+    url('/images/diwali-hero-2026.jpg');
   background-size: cover;
   background-position: center;
 }

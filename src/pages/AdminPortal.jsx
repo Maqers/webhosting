@@ -272,6 +272,54 @@ function shuffled(list) {
   return a;
 }
 
+// ─── Display order (per-colour shuffle) ─────────────────────────────────────
+// catalog.js's displayOrder holds the card order for each category
+// ('cat:<id>') and occasion ('occ:<id>'). Keys are product ids, or
+// 'id:Colour' for products the shop shows as one card per colour, so each
+// colour is shuffled and dragged as its own item. Written as JSON, which is
+// valid JS and parses back without a hand-rolled regex.
+const DISPLAY_ORDER_RE = /export const displayOrder = (\{[\s\S]*?\});/;
+
+function parseDisplayOrder(source) {
+  const m = source.match(DISPLAY_ORDER_RE);
+  if (!m) return {};
+  try { return JSON.parse(m[1]); } catch { return {}; }
+}
+
+function writeDisplayOrder(source, map) {
+  const block = `export const displayOrder = ${JSON.stringify(map, null, 2)};`;
+  if (DISPLAY_ORDER_RE.test(source)) return source.replace(DISPLAY_ORDER_RE, () => block);
+  return source.replace(/export const getAllProducts\s*=/, m => `${block}\n\n${m}`);
+}
+
+// One row per colour card (same rule the shop uses), one per plain product.
+function variantRows(productList) {
+  const rows = [];
+  for (const p of productList) {
+    if (splitsByColor(p.colors, p.images)) {
+      p.colors.forEach(c => rows.push({ key: `${p.id}:${c.name}`, product: p, title: `${p.title} — ${c.name}`, image: p.images[c.imageIndex] || p.images[0] }));
+    } else {
+      rows.push({ key: String(p.id), product: p, title: p.title, image: p.images[0] });
+    }
+  }
+  return rows;
+}
+
+// Listed keys first in list order; anything unlisted keeps its natural order after.
+function applyRowOrder(rows, order) {
+  if (!order?.length) return rows;
+  const pos = new Map(order.map((k, i) => [k, i]));
+  return rows
+    .map((r, i) => ({ r, i, o: pos.has(r.key) ? pos.get(r.key) : Infinity }))
+    .sort((a, b) => (a.o === b.o ? a.i - b.i : a.o - b.o))
+    .map(x => x.r);
+}
+
+// Product ids in order of their first card, for occasionProductMap.
+function idsFromKeys(keys) {
+  return [...new Set(keys.map(k => parseInt(k, 10)))];
+}
+
 function getNextId(source) {
   const ids = [...source.matchAll(/\bid:\s*(\d+)/g)].map(m => parseInt(m[1]));
   return ids.length ? Math.max(...ids) + 1 : 1;
@@ -859,9 +907,11 @@ export default function AdminPortal() {
 
   // ── Drag-and-drop reorder state ──────────────────────────────────────────────
   const [draggingId, setDraggingId] = useState(null);
-  const [draggingOcc, setDraggingOcc] = useState(null); // { occId, productId }
-  const [byCatDragging, setByCatDragging] = useState(null); // { catId, productId }
-  const [byCatOrder, setByCatOrder] = useState({}); // { catId: [id,...] }
+  const [draggingOcc, setDraggingOcc] = useState(null); // { occId, key }
+  const [byCatDragging, setByCatDragging] = useState(null); // { catId, key }
+  const [byCatOrder, setByCatOrder] = useState({}); // { catId: [rowKey,...] } unsaved
+  const [displayOrderMap, setDisplayOrderMap] = useState({}); // catalog.js displayOrder
+  const [occVariantOrder, setOccVariantOrder] = useState({}); // { occId: [rowKey,...] } unsaved
   const [byCatPublishing, setByCatPublishing] = useState(false);
   const [openCats, setOpenCats] = useState({});
   const [localOrderByCat, setLocalOrderByCat] = useState({}); // { catId: [productId, ...] }
@@ -924,6 +974,8 @@ export default function AdminPortal() {
     setOccasionMap(oMap);
     setOccasionCategories(parseOccasionCategories(source));
     setOccasionEdits(JSON.parse(JSON.stringify(oMap)));
+    setDisplayOrderMap(parseDisplayOrder(source));
+    setOccVariantOrder({});
     loadOccasionCatalogData(credsOverride);
     // Load sellers so they're available everywhere
     loadSellers();
@@ -1343,6 +1395,10 @@ export default function AdminPortal() {
         const orderedTexts = newOrder.map(id => entryTexts[id]).filter(Boolean).join("\n");
         source = source.slice(0, blockStart) + orderedTexts + source.slice(blockEnd);
       }
+      // A saved shuffle would override this drag order on the shop, so drop it.
+      const order = parseDisplayOrder(source);
+      changedCats.forEach(catId => delete order[`cat:${catId}`]);
+      source = writeDisplayOrder(source, order);
       await commitCatalog(source, sha, `Reorder products (${changedCats.join(", ")})`, creds);
       loadCatalogData(source, sha);
       setLocalOrderByCat({});
@@ -1498,6 +1554,20 @@ export default function AdminPortal() {
     finally { setPublishing(false); }
   }
 
+  // Cards for an occasion, one per colour, in the unsaved or saved order.
+  function getOccRows(occId) {
+    const ids = [...new Set(occasionEdits[occId] || [])];
+    const base = ids.map(id => products.find(p => p.id === id)).filter(Boolean);
+    return applyRowOrder(variantRows(base), occVariantOrder[occId] || displayOrderMap[`occ:${occId}`]);
+  }
+
+  // Keeps occasionProductMap in step (ids in order of their first card) so
+  // anything reading the plain id list sees roughly the same order.
+  function setOccOrder(occId, keys) {
+    setOccVariantOrder(prev => ({ ...prev, [occId]: keys }));
+    setOccasionEdits(prev => ({ ...prev, [occId]: idsFromKeys(keys) }));
+  }
+
   function toggleOccasionProduct(occasionId, productId) {
     setOccasionEdits(prev => {
       const current = prev[occasionId] || [];
@@ -1509,7 +1579,12 @@ export default function AdminPortal() {
     setPublishing(true);
     try {
       const { source, sha } = await fetchCatalog(creds);
-      const updated = updateOccasionMapInSource(source, occasionEdits);
+      let updated = updateOccasionMapInSource(source, occasionEdits);
+      if (Object.keys(occVariantOrder).length) {
+        const order = parseDisplayOrder(updated);
+        for (const [occId, keys] of Object.entries(occVariantOrder)) order[`occ:${occId}`] = keys;
+        updated = writeDisplayOrder(updated, order);
+      }
       await commitCatalog(updated, sha, "Update occasion product map", creds);
       loadCatalogData(updated, sha); showToast("Occasion map saved!");
     } catch (err) { showToast(err.message, "error"); }
@@ -3175,31 +3250,26 @@ export default function AdminPortal() {
         {activeTab === "by-category" && (() => {
           const hasChanges = Object.keys(byCatOrder).length > 0;
 
-          const getOrder = (catId) => {
-            if (byCatOrder[catId]) return byCatOrder[catId];
-            return products.filter(p => p.categoryId === catId).map(p => p.id);
+          // Every card the category page shows: its own products, then ones
+          // listing it as a secondary category, one row per colour card.
+          const getRows = (catId) => {
+            const base = [
+              ...products.filter(p => p.categoryId === catId),
+              ...products.filter(p => p.categoryId !== catId && p.secondaryCategories?.includes(catId)),
+            ];
+            return applyRowOrder(variantRows(base), byCatOrder[catId] || displayOrderMap[`cat:${catId}`]);
           };
+          const getOrder = (catId) => getRows(catId).map(r => r.key);
 
           const handleByCatPublish = async () => {
             setByCatPublishing(true);
             try {
-              let { source, sha } = await fetchCatalog(creds);
-              for (const catId of Object.keys(byCatOrder)) {
-                const newOrder = byCatOrder[catId];
-                const catProds = products.filter(p => p.categoryId === catId);
-                const entries = catProds
-                  .map(p => { const r = getEntryRange(source, p.id); return r ? { id: p.id, range: r } : null; })
-                  .filter(Boolean).sort((a, b) => a.range.start - b.range.start);
-                if (!entries.length) continue;
-                const entryTexts = {};
-                for (const e of entries) entryTexts[e.id] = source.slice(e.range.start, e.range.end);
-                const blockStart = entries[0].range.start;
-                const blockEnd = entries[entries.length - 1].range.end;
-                const orderedTexts = newOrder.map(id => entryTexts[id]).filter(Boolean).join("\n");
-                source = source.slice(0, blockStart) + orderedTexts + source.slice(blockEnd);
-              }
-              await commitCatalog(source, sha, `Reorder products by category (${Object.keys(byCatOrder).join(", ")})`, creds);
-              loadCatalogData(source, sha);
+              const { source, sha } = await fetchCatalog(creds);
+              const order = parseDisplayOrder(source);
+              for (const [catId, keys] of Object.entries(byCatOrder)) order[`cat:${catId}`] = keys;
+              const updated = writeDisplayOrder(source, order);
+              await commitCatalog(updated, sha, `Reorder products by category (${Object.keys(byCatOrder).join(", ")})`, creds);
+              loadCatalogData(updated, sha);
               setByCatOrder({});
               showToast("Category order published!");
             } catch (err) { showToast(err.message, "error"); }
@@ -3225,10 +3295,10 @@ export default function AdminPortal() {
                 </div>
               </div>
               <p style={{ color: "#888", fontSize: 13, marginBottom: 24 }}>
-                Drag ⠿ to reorder products within each category, or hit Shuffle for a random order. Nothing goes live until you hit Publish Order.
+                Drag ⠿ to reorder products within each category, or hit Shuffle for a random order. Each colour is its own card and moves on its own. Nothing goes live until you hit Publish Order.
               </p>
               {categories.map(cat => {
-                const catProds = getOrder(cat.id).map(id => products.find(p => p.id === id)).filter(Boolean);
+                const rows = getRows(cat.id);
                 const isOpen = openCats[cat.id];
                 return (
                   <div key={cat.id} style={{ ...ts.card, marginBottom: 12 }}>
@@ -3242,7 +3312,7 @@ export default function AdminPortal() {
                           onClick={e => { e.stopPropagation(); setByCatOrder(prev => ({ ...prev, [cat.id]: shuffled(getOrder(cat.id)) })); }}>
                           ⤨ Shuffle
                         </button>
-                        <span style={ts.flag}>{catProds.length} products</span>
+                        <span style={ts.flag}>{rows.length} cards</span>
                         <span style={{ fontSize: 12, color: "#aaa" }}>{isOpen ? "▲" : "▼"}</span>
                       </div>
                     </div>
@@ -3251,30 +3321,29 @@ export default function AdminPortal() {
                         <div style={{ padding: "8px 12px", background: "#faf8f5", fontSize: 11, color: "#999", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
                           ⠿ Drag to reorder
                         </div>
-                        {catProds.map((p) => (
-                          <div key={p.id}
+                        {rows.map(({ key, product: p, title, image }) => (
+                          <div key={key}
                             draggable
-                            onDragStart={() => setByCatDragging({ catId: cat.id, productId: p.id })}
+                            onDragStart={() => setByCatDragging({ catId: cat.id, key })}
                             onDragOver={e => {
                               e.preventDefault();
-                              if (!byCatDragging || byCatDragging.catId !== cat.id || byCatDragging.productId === p.id) return;
-                              const cur = getOrder(cat.id);
-                              const newOrder = [...cur];
-                              const posA = newOrder.indexOf(byCatDragging.productId);
-                              const posB = newOrder.indexOf(p.id);
+                              if (!byCatDragging || byCatDragging.catId !== cat.id || byCatDragging.key === key) return;
+                              const newOrder = getOrder(cat.id);
+                              const posA = newOrder.indexOf(byCatDragging.key);
+                              const posB = newOrder.indexOf(key);
                               if (posA !== -1 && posB !== -1) {
                                 newOrder.splice(posA, 1);
-                                newOrder.splice(posB, 0, byCatDragging.productId);
+                                newOrder.splice(posB, 0, byCatDragging.key);
                                 setByCatOrder(prev => ({ ...prev, [cat.id]: newOrder }));
                               }
                             }}
                             onDragEnd={() => setByCatDragging(null)}
-                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: byCatDragging?.productId === p.id ? "#f0ede8" : "#fff", cursor: "grab", userSelect: "none", opacity: byCatDragging?.productId === p.id ? 0.5 : 1 }}>
+                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: byCatDragging?.key === key ? "#f0ede8" : "#fff", cursor: "grab", userSelect: "none", opacity: byCatDragging?.key === key ? 0.5 : 1 }}>
                             <span style={{ color: "#ccc", fontSize: 18, flexShrink: 0 }}>⠿</span>
-                            <img src={p.images[0]} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, flexShrink: 0, border: "1px solid #eee" }} onError={e => { e.target.style.display = "none"; }} />
+                            <img src={image} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, flexShrink: 0, border: "1px solid #eee" }} onError={e => { e.target.style.display = "none"; }} />
                             <div style={{ flex: 1 }}>
-                              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#222" }}>{p.title}</p>
-                              <p style={{ margin: 0, fontSize: 11, color: "#999" }}>ID {p.id} · ₹{p.price}</p>
+                              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#222" }}>{title}</p>
+                              <p style={{ margin: 0, fontSize: 11, color: "#999" }}>ID {p.id} · ₹{p.price}{p.categoryId !== cat.id ? " · secondary" : ""}</p>
                             </div>
                             <span style={{ ...ts.flagToggle, background: p.inStock ? "#e8f5e8" : "#feeeed", color: p.inStock ? "#2a7a2a" : "#c00", fontSize: 11, padding: "3px 8px", borderRadius: 5 }}>
                               {p.inStock ? "In Stock" : "Out"}
@@ -3296,7 +3365,7 @@ export default function AdminPortal() {
               <h1 style={ts.pageTitle}>Occasion Map</h1>
               <div style={{ display: "flex", gap: 10 }}>
                 <button style={ts.ghostBtn} onClick={() => setShowAddOccasion(s => !s)}>+ Add Occasion</button>
-                <button style={ts.ghostBtn} onClick={() => setOccasionEdits(prev => Object.fromEntries(Object.entries(prev).map(([id, ids]) => [id, shuffled(ids)])))}>
+                <button style={ts.ghostBtn} onClick={() => occasionCatalogEntries.forEach(o => setOccOrder(o.id, shuffled(getOccRows(o.id).map(r => r.key))))}>
                   ⤨ Shuffle all occasions
                 </button>
                 {occasionOrderDirty && (
@@ -3381,15 +3450,16 @@ export default function AdminPortal() {
 
             {occasionCatalogEntries.map((occ, occIdx) => {
               const currentIds = occasionEdits[occ.id] || [];
-              const selectedProducts = currentIds.map(id => products.find(p => p.id === id)).filter(Boolean);
+              const occRows = getOccRows(occ.id);
               return (
                 <div key={occ.id} style={{ ...ts.card, marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <h2 style={{ ...ts.cardTitle, margin: 0 }}>{occ.emoji ? `${occ.emoji} ` : ""}{occ.name}</h2>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       <span style={ts.flag}>{currentIds.length} products</span>
-                      <button type="button" style={ts.editBtn} disabled={currentIds.length < 2}
-                        onClick={() => setOccasionEdits(e2 => ({ ...e2, [occ.id]: shuffled(currentIds) }))}>⤨ Shuffle</button>
+                      {occVariantOrder[occ.id] && <span style={{ fontSize: 11, color: "#c8a96e", fontWeight: 600 }}>● unsaved</span>}
+                      <button type="button" style={ts.editBtn} disabled={occRows.length < 2}
+                        onClick={() => setOccOrder(occ.id, shuffled(occRows.map(r => r.key)))}>⤨ Shuffle</button>
                       <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         <button type="button" style={{ ...ts.editBtn, padding: "1px 8px", fontSize: 10, lineHeight: 1.4, opacity: occIdx === 0 ? 0.35 : 1 }}
                           disabled={occIdx === 0} onClick={() => moveOccasion(occ.id, -1)} aria-label="Move up">▲</button>
@@ -3402,34 +3472,34 @@ export default function AdminPortal() {
                   {occ.description && <p style={{ fontSize: 12, color: "#999", margin: "0 0 12px" }}>{occ.description}</p>}
 
                   {/* Ordered list with ↑↓ reorder */}
-                  {selectedProducts.length > 0 && (
+                  {occRows.length > 0 && (
                     <div style={{ marginBottom: 16, border: "1px solid #f0ede8", borderRadius: 8, overflow: "hidden" }}>
                       <div style={{ padding: "8px 12px", background: "#faf8f5", fontSize: 11, color: "#999", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                        Display order (drag ↑↓ to reorder)
+                        Display order (drag ↑↓ to reorder · each colour moves on its own)
                       </div>
-                      {selectedProducts.map((p, idx) => (
-                        <div key={p.id}
+                      {occRows.map(({ key, product: p, title, image }, idx) => (
+                        <div key={key}
                           draggable
-                          onDragStart={() => setDraggingOcc({ occId: occ.id, productId: p.id })}
+                          onDragStart={() => setDraggingOcc({ occId: occ.id, key })}
                           onDragOver={e => {
                             e.preventDefault();
-                            if (!draggingOcc || draggingOcc.occId !== occ.id || draggingOcc.productId === p.id) return;
-                            const newIds = [...currentIds];
-                            const posA = newIds.indexOf(draggingOcc.productId);
-                            const posB = newIds.indexOf(p.id);
+                            if (!draggingOcc || draggingOcc.occId !== occ.id || draggingOcc.key === key) return;
+                            const keys = occRows.map(r => r.key);
+                            const posA = keys.indexOf(draggingOcc.key);
+                            const posB = keys.indexOf(key);
                             if (posA !== -1 && posB !== -1) {
-                              newIds.splice(posA, 1);
-                              newIds.splice(posB, 0, draggingOcc.productId);
-                              setOccasionEdits(e2 => ({ ...e2, [occ.id]: newIds }));
+                              keys.splice(posA, 1);
+                              keys.splice(posB, 0, draggingOcc.key);
+                              setOccOrder(occ.id, keys);
                             }
                           }}
                           onDragEnd={() => setDraggingOcc(null)}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: draggingOcc?.productId === p.id ? "#f0ede8" : "#fff", cursor: "grab", opacity: draggingOcc?.productId === p.id ? 0.5 : 1 }}>
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: draggingOcc?.key === key ? "#f0ede8" : "#fff", cursor: "grab", opacity: draggingOcc?.key === key ? 0.5 : 1 }}>
                           <span style={{ color: "#ccc", fontSize: 16, flexShrink: 0, userSelect: "none" }}>⠿</span>
                           <span style={{ fontSize: 11, color: "#ccc", width: 20, textAlign: "center", flexShrink: 0 }}>{idx + 1}</span>
-                          <img src={p.images[0]} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
-                          <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{p.title} <span style={{ color: "#bbb" }}>ID {p.id}</span></span>
-                          <button type="button"
+                          <img src={image} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
+                          <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{title} <span style={{ color: "#bbb" }}>ID {p.id}</span></span>
+                          <button type="button" title="Remove this product (all colours) from the occasion"
                             onClick={() => toggleOccasionProduct(occ.id, p.id)}
                             style={{ ...ts.editBtn, padding: "3px 8px", color: "#c00", flexShrink: 0 }}>×</button>
                         </div>

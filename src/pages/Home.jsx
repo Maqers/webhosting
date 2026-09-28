@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getPopularProducts, getSortedCategories } from "../data/catalog";
+import { getAllProducts, getPopularProducts, getSortedCategories, occasionProductMap } from "../data/catalog";
 import { occasionCategories } from "../data/occasionCatalog";
 import { expandProductsByColor, productLinkQuery } from "../utils/productVariants";
 import ImageWithFallback from "../components/ImageWithFallback";
@@ -23,19 +23,41 @@ const showRakhiBanner = new Date() < RAKHI_BANNER_EXPIRES;
 const DIWALI_BANNER_STARTS = new Date("2026-09-29T00:00:00+05:30");
 const DIWALI_BANNER_EXPIRES = new Date("2026-11-11T00:00:00+05:30");
 const now = new Date();
-const showDiwaliBanner = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
+const isDiwaliSeason = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
+// The Diwali hero is phone-only: desktop keeps the everyday hero with the
+// product collage. Matches the 900px breakpoint the hero CSS uses for mobile.
+const PHONE_QUERY = "(max-width: 900px)";
 
 const Home = () => {
+  const [isPhone, setIsPhone] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(PHONE_QUERY).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE_QUERY);
+    const onChange = e => setIsPhone(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  const showDiwaliBanner = isDiwaliSeason && isPhone;
   // A product is popular when any of its colours is, so expand first and keep
   // only the colour cards that are themselves marked popular.
   const popularProducts = useMemo(() => expandProductsByColor(getPopularProducts()).filter(p => p.popular), []);
   // Three real products carry the hero, so it changes as the catalogue does.
-  const heroPicks = useMemo(
-    () => popularProducts
+  // During Diwali the desktop collage shows hampers from the Diwali occasion,
+  // in the order set in the admin, instead of the popular picks.
+  const heroPicks = useMemo(() => {
+    if (isDiwaliSeason) {
+      const all = getAllProducts();
+      const hampers = (occasionProductMap.diwali || [])
+        .map(id => all.find(p => p.id === id))
+        .filter(p => p && p.categoryId === "Customised-Hampers" && p.inStock !== false && p.images?.length)
+        .slice(0, 3);
+      if (hampers.length === 3) return hampers;
+    }
+    return popularProducts
       .filter((p, i, all) => p.inStock !== false && p.images?.length && all.findIndex(q => q.id === p.id) === i)
-      .slice(0, 3),
-    [popularProducts]
-  );
+      .slice(0, 3);
+  }, [popularProducts]);
   // A mouse-only visitor had no way to reach the overflow on this rail: the
   // scrollbar is hidden, there are no arrows, and a plain wheel scrolls the
   // page. At 1000px–1280px that hid two to five categories outright. Arrows
@@ -127,8 +149,8 @@ const Home = () => {
               </>
             ) : showDiwaliBanner ? (
               <>
-                <p className="hero-eyebrow">Diwali</p>
-                <h1 className="hero-title">Light up<br />someone&rsquo;s festival.</h1>
+                <p className="hero-eyebrow">Maqers wishes you</p>
+                <h1 className="hero-title">Happy Diwali</h1>
                 <p className="hero-lede">
                   Handmade diyas, hampers and decor from independent Indian sellers,
                   posted anywhere in the country.
