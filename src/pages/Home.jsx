@@ -139,8 +139,8 @@ const Home = () => {
               </>
             ) : showDiwaliBanner ? (
               <>
-                <p className="hero-eyebrow">Maqers wishes you</p>
-                <h1 className="hero-title">A Happy Diwali</h1>
+                <p className="hero-eyebrow">Maqers wishes you a</p>
+                <h1 className="hero-title">Happy Diwali</h1>
                 <p className="hero-lede">
                   Handmade diyas, hampers and decor from independent Indian sellers,
                   delivered across India.
