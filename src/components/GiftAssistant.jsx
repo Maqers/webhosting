@@ -38,7 +38,7 @@ const OCCASIONS = [
   { label: 'Anniversary',  occasionKey: null },
   { label: 'Wedding',      occasionKey: 'shaadi-fever' },
   { label: 'Festival',     occasionKey: 'occasion-gifts' },
-  { label: 'Rakhi',        occasionKey: 'rakshabandhan' },
+  { label: 'Diwali',       occasionKey: 'diwali' },
   { label: 'Just Because', occasionKey: null },
   { label: 'Thank You',    occasionKey: null },
   { label: 'New Baby',     occasionKey: 'godh-bharai' },
@@ -52,7 +52,7 @@ const OCCASION_CATEGORY_PRIORITY = {
   'Anniversary':  ['Florals', 'Customised-Hampers', 'Candles', 'Frames&Paintings', 'Handmade-Accessories', 'Oxidised-jewellery'],
   'Wedding':      ['Handbags', 'Customised-Hampers', 'Handmade-Accessories', 'Oxidised-jewellery', 'Wedding-Gifts', 'Frames&Paintings'],
   'Festival':     ['Oxidised-jewellery', 'Handmade-Accessories', 'Candles', 'Home-decor', 'Charm-accessories', 'resin-products'],
-  'Rakhi':        ['Customised-Hampers', 'Handmade-Accessories', 'Oxidised-jewellery', 'Charm-accessories'],
+  'Diwali':       ['Candles', 'Customised-Hampers', 'Home-decor', 'resin-products', 'Frames&Paintings'],
   'Just Because': null,
   'Thank You':    ['Customised-Hampers', 'Candles', 'Frames&Paintings', 'Florals', 'Charm-accessories'],
   'New Baby':     ['Kids-Accessories', 'Customised-Hampers', 'Frames&Paintings', 'Florals'],
@@ -351,7 +351,7 @@ export default function GiftAssistant() {
                       <button
                         key={o.label}
                         type="button"
-                        className={`gift-chip${occasion?.label === o.label ? ' selected' : ''}${o.label === 'Rakhi' ? ' gift-chip--rainbow' : ''}`}
+                        className={`gift-chip${occasion?.label === o.label ? ' selected' : ''}${o.label === 'Diwali' ? ' gift-chip--festive' : ''}`}
                         onClick={() => setOccasion(o)}
                       >
                         {o.label}

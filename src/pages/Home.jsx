@@ -17,10 +17,10 @@ import "./Home.css";
 const RAKHI_BANNER_EXPIRES = new Date("2026-08-29T00:00:00+05:30");
 const showRakhiBanner = new Date() < RAKHI_BANNER_EXPIRES;
 
-// Diwali 2026 runs Nov 6-10 (main day Nov 8) — starts showing ~3 weeks out
-// and auto-hides itself the day after the festival ends, same self-expiring
+// Diwali 2026 runs Nov 6-10 (main day Nov 8) — switched on from Sep 29 and
+// auto-hides itself the day after the festival ends, same self-expiring
 // pattern as the Rakhi banner above.
-const DIWALI_BANNER_STARTS = new Date("2026-10-18T00:00:00+05:30");
+const DIWALI_BANNER_STARTS = new Date("2026-09-29T00:00:00+05:30");
 const DIWALI_BANNER_EXPIRES = new Date("2026-11-11T00:00:00+05:30");
 const now = new Date();
 const showDiwaliBanner = !showRakhiBanner && now >= DIWALI_BANNER_STARTS && now < DIWALI_BANNER_EXPIRES;
@@ -105,7 +105,7 @@ const Home = () => {
           seasonal Rakhi and Diwali variants swap in a photographic backdrop
           and hide the collage, since the photograph is already the image. */}
       <section
-        className={`hero${showRakhiBanner ? ' hero--rakhi' : ''}${showDiwaliBanner ? ' hero--diwali' : ''}`}
+        className={`hero${showRakhiBanner ? ' hero--rakhi' : showDiwaliBanner ? ' hero--diwali' : ' hero--plain'}`}
       >
         {showDiwaliBanner && <DiwaliSparkles />}
         <div className="container hero-inner">
@@ -134,7 +134,7 @@ const Home = () => {
                   posted anywhere in the country.
                 </p>
                 <div className="hero-actions">
-                  <Link to="/products" className="btn btn--primary">Shop Diwali gifts</Link>
+                  <Link to="/category/diwali" className="btn btn--primary">Shop all Diwali gifts</Link>
                   <button className="btn btn--ghost" onClick={openGiftFinder} type="button">
                     Help me choose
                   </button>
@@ -142,15 +142,25 @@ const Home = () => {
               </>
             ) : (
               <>
-                <h1 className="hero-title">Saw it on Instagram?<br />Buy it here.</h1>
-                <p className="hero-lede">
+                {/* Phones get the pre-revamp red banner copy (italic second
+                    line, shorter lede, sparkle gift-finder button); the
+                    hero-only-* spans pick the version per breakpoint. */}
+                <h1 className="hero-title">Saw it on Instagram?<br /><em className="hero-title-em">Buy it here.</em></h1>
+                <p className="hero-lede hero-only-desktop">
                   Straight from independent Indian makers, each one personally
                   vetted, in a single place with a checkout that actually works.
                 </p>
+                <p className="hero-lede hero-only-mobile">
+                  The best independent Indian sellers, in one place.
+                </p>
                 <div className="hero-actions">
-                  <Link to="/products" className="btn btn--primary">Shop all gifts</Link>
+                  <Link to="/products" className="btn btn--primary">
+                    <span className="hero-only-desktop">Shop all gifts</span>
+                    <span className="hero-only-mobile">Shop All Gifts</span>
+                  </Link>
                   <button className="btn btn--ghost" onClick={openGiftFinder} type="button">
-                    Help me choose
+                    <span className="hero-only-desktop">Help me choose</span>
+                    <span className="hero-only-mobile">✨ Find the Perfect Gift</span>
                   </button>
                 </div>
                 <p className="hero-note">Free delivery over &#8377;499, anywhere in India.</p>

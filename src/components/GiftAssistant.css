@@ -204,15 +204,15 @@
   box-shadow: none !important;
 }
 
-.gift-chip--rainbow {
+.gift-chip--festive {
   border: 2px solid transparent !important;
-  background-image: linear-gradient(#faf4f4, #faf4f4), linear-gradient(90deg, #ff595e, #ffca3a, #8ac926, #1982c4, #6a4c93) !important;
+  background-image: linear-gradient(#fdf6ec, #fdf6ec), linear-gradient(90deg, #f7b733, #fc8c1e, #e2541b, #fc8c1e, #f7b733) !important;
   background-origin: border-box !important;
   background-clip: padding-box, border-box !important;
 }
 
-.gift-chip--rainbow:hover {
-  background-image: linear-gradient(#f5e6e6, #f5e6e6), linear-gradient(90deg, #ff595e, #ffca3a, #8ac926, #1982c4, #6a4c93) !important;
+.gift-chip--festive:hover {
+  background-image: linear-gradient(#fbead2, #fbead2), linear-gradient(90deg, #f7b733, #fc8c1e, #e2541b, #fc8c1e, #f7b733) !important;
 }
 
 .gift-chip.selected:hover {

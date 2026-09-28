@@ -210,6 +210,74 @@
   .hero-actions .btn { flex: 1 1 0; justify-content: center; padding-inline: 0.75rem; }
 }
 
+/* ── Everyday hero on phones: the pre-revamp red banner ──────────────────
+   Centred, italic "Buy it here.", short lede, full-width stacked buttons
+   with the sparkle gift finder. Desktop keeps the editorial split: the
+   title <em> renders upright there and only the desktop copy shows. */
+.hero-title-em { font-style: normal; }
+.hero-only-mobile { display: none; }
+
+@media (max-width: 900px) {
+  .hero--plain .hero-only-desktop { display: none; }
+  .hero--plain .hero-only-mobile { display: inline; }
+  .hero--plain p.hero-only-mobile { display: block; }
+
+  .hero--plain { background: #760909; padding: 2.5rem 0 2.25rem; }
+  .hero--plain .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+    animation: heroPlainIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .hero--plain .hero-title {
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+  .hero--plain .hero-title-em { font-style: italic; color: #f5ede4; }
+  .hero--plain .hero-lede {
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.78);
+    margin-top: 1rem;
+  }
+  .hero--plain .hero-actions { justify-content: center; gap: 0.65rem; margin-top: 1.4rem; }
+  .hero--plain .hero-actions .btn {
+    flex: 0 0 auto;
+    padding: 0.75rem 1.75rem;
+    font-size: 0.9rem;
+    color: #760909;
+  }
+  .hero--plain .hero-actions .btn--primary { font-weight: 700; letter-spacing: 0.03em; }
+  .hero--plain .hero-actions .btn--ghost {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .hero--plain .hero-actions .btn--ghost:hover,
+  .hero--plain .hero-actions .btn--ghost:focus { background: rgba(255, 255, 255, 0.2); color: #fff; }
+  .hero--plain .hero-note { color: rgba(255, 255, 255, 0.72); margin-top: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .hero--plain { padding: 2rem 0 1.75rem; }
+  .hero--plain .hero-actions { flex-direction: column; width: 100%; }
+  .hero--plain .hero-actions .btn { width: 100%; }
+}
+
+@keyframes heroPlainIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--plain .hero-copy { animation: none; }
+}
+
 /* ================================================================
    TRUST BAR
    ================================================================ */
