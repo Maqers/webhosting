@@ -432,7 +432,7 @@ const ProductDetail = () => {
     if (!product) return []
     const m = product.meta || {}
     const facts = []
-    if (m.delivery_time) facts.push({ label: 'Made and shipped in', value: m.delivery_time })
+    // delivery_time is left out: the order timeline above already shows it.
     if (m.moq > 1) facts.push({ label: 'Minimum order', value: `${m.moq} units` })
     if (m.colors?.length > 1) {
       facts.push({

@@ -1493,9 +1493,21 @@ export default function AdminPortal() {
         }
         await sleep(350);
       }
+      // Link the new files to the product in catalog.js straight away. This
+      // used to wait for Stage Changes + Publish All, so closing the editor
+      // after the "uploaded" toast left the files in the repo but off the
+      // product. Only the images list is written; other unstaged edits in
+      // the form still go out through Stage Changes as before.
+      const { source, sha } = await fetchCatalog(creds);
+      const saved = parseProducts(source).find(p => p.id === editingProduct.id);
+      if (!saved) throw new Error(`Product ID ${editingProduct.id} not found in catalog`);
+      const savedImages = [...saved.images, ...newPaths];
+      await commitCatalog(updateProductInSource(source, { ...saved, images: savedImages }),
+        sha, `Add ${newPaths.length} image(s) to ${saved.title}`, creds);
+      setProducts(prev => prev.map(p => p.id === saved.id ? { ...p, images: savedImages } : p));
       setEditingProduct(p => ({ ...p, images: [...p.images, ...newPaths] }));
       setEditImageFiles([]);
-      showToast(`${newPaths.length} image(s) uploaded and added.`);
+      showToast(`${newPaths.length} image(s) added to the product and live.`);
     } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); publishInFlightRef.current = false; }
   }
