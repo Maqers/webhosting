@@ -262,6 +262,16 @@ function normalizeDescription(raw) {
     .replace(/\\\\/g, '\\');    // \\\\ -> single backslash
 }
 
+// Admin thumbnails get a per-visit query string. A photo shows here the moment
+// it is uploaded, a minute or two before Vercel has deployed it; fetched on its
+// bare /images/ URL, the browser cached that miss for 30 days and then showed
+// the photo broken on the shop too. The query keeps any early miss to this
+// admin visit.
+const ADMIN_IMG_VERSION = Date.now();
+function adminImg(src) {
+  return typeof src === "string" && src.startsWith("/images/") ? `${src}?v=${ADMIN_IMG_VERSION}` : src;
+}
+
 // Fisher–Yates: a fair random order, unlike sort(() => Math.random() - 0.5).
 function shuffled(list) {
   const a = [...list];
@@ -807,7 +817,7 @@ function ProductCard({ product, categories, previewIndex = 0 }) {
     <div style={ts.productCard}>
       <div style={ts.productCardImg}>
         {shownImage
-          ? <img src={shownImage} alt={product.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />
+          ? <img src={adminImg(shownImage)} alt={product.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />
           : <div style={{ color: "#ccc", fontSize: 10, textAlign: "center", paddingTop: 30 }}>No image</div>}
       </div>
       <div style={ts.productCardBody}>
@@ -2499,7 +2509,7 @@ export default function AdminPortal() {
                           <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
                             {newProduct.reviews.map((r, i) => (
                               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-                                {r.image ? <img src={r.image} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} /> : null}
+                                {r.image ? <img src={adminImg(r.image)} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} /> : null}
                                 <span>{"★".repeat(r.rating)}</span>
                                 <span style={{ fontWeight: 600 }}>{r.name}</span>
                                 {r.text && <span style={{ color: "#888", flex: 1 }}>{r.text}</span>}
@@ -2791,7 +2801,7 @@ export default function AdminPortal() {
                       <span title="Drag to reorder" style={{ cursor: "grab", color: "#ccc", fontSize: 18, marginRight: 8, flexShrink: 0, userSelect: "none" }}>⠿</span>
                     )}
                     <div style={{ flex: 3, display: "flex", alignItems: "center", gap: 10 }}>
-                      <img src={row.image} alt="" style={ts.rowThumb} onError={e => { e.target.style.display = "none"; }} />
+                      <img src={adminImg(row.image)} alt="" style={ts.rowThumb} onError={e => { e.target.style.display = "none"; }} />
                       <div>
                         <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#222" }}>
                           {isDirty && <span style={{ color: "#c8a96e", marginRight: 4 }}>*</span>}
@@ -3085,7 +3095,7 @@ export default function AdminPortal() {
                               <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
                                 {editingProduct.reviews.map((r, i) => (
                                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-                                    {r.image ? <img src={r.image} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} /> : null}
+                                    {r.image ? <img src={adminImg(r.image)} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} /> : null}
                                     <span>{"★".repeat(r.rating)}</span>
                                     <span style={{ fontWeight: 600 }}>{r.name}</span>
                                     {r.text && <span style={{ color: "#888", flex: 1 }}>{r.text}</span>}
@@ -3169,7 +3179,7 @@ export default function AdminPortal() {
                                       return { ...p, images: imgs, colors };
                                     });
                                   }}>
-                                  <img src={src} alt="" style={ts.thumbImg} onError={e => { e.target.style.display = "none"; }} />
+                                  <img src={adminImg(src)} alt="" style={ts.thumbImg} onError={e => { e.target.style.display = "none"; }} />
                                   {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
                                   <button type="button"
                                     onClick={() => setEditingProduct(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
@@ -3320,7 +3330,7 @@ export default function AdminPortal() {
                               style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: byCatDragging?.key === key ? "#f0ede8" : "#fff", cursor: "grab", userSelect: "none", opacity: byCatDragging?.key === key ? 0.5 : 1 }}>
                               <span style={{ color: "#ccc", fontSize: 16, flexShrink: 0 }}>⠿</span>
                               <span style={{ fontSize: 11, color: "#ccc", width: 20, textAlign: "center", flexShrink: 0 }}>{idx + 1}</span>
-                              <img src={image} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
+                              <img src={adminImg(image)} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
                               <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{title} <span style={{ color: "#bbb" }}>ID {p.id}{p.categoryId === catId ? "" : " · added"}</span></span>
                               {p.categoryId === catId ? (
                                 <span title="This is the product's main category; change it from the product's edit form" style={{ fontSize: 10, color: "#aaa", flexShrink: 0 }}>main</span>
@@ -3347,7 +3357,7 @@ export default function AdminPortal() {
                                 onClick={() => toggleCategoryProduct(catId, p)}
                                 style={{ ...ts.occasionProductBtn, ...(active ? ts.occasionProductBtnActive : {}), ...(isMain ? { cursor: "default", opacity: 0.6 } : {}) }}>
                                 <div style={ts.occasionProductImg}>
-                                  {p.images[0] && <img src={p.images[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
+                                  {p.images[0] && <img src={adminImg(p.images[0])} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
                                 </div>
                                 <p style={ts.occasionProductName}>{p.title}</p>
                                 <p style={ts.occasionProductId}>ID {p.id}</p>
@@ -3479,7 +3489,7 @@ export default function AdminPortal() {
                             onDragEnd={() => setByCatDragging(null)}
                             style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: byCatDragging?.key === key ? "#f0ede8" : "#fff", cursor: "grab", userSelect: "none", opacity: byCatDragging?.key === key ? 0.5 : 1 }}>
                             <span style={{ color: "#ccc", fontSize: 18, flexShrink: 0 }}>⠿</span>
-                            <img src={image} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, flexShrink: 0, border: "1px solid #eee" }} onError={e => { e.target.style.display = "none"; }} />
+                            <img src={adminImg(image)} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, flexShrink: 0, border: "1px solid #eee" }} onError={e => { e.target.style.display = "none"; }} />
                             <div style={{ flex: 1 }}>
                               <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#222" }}>{title}</p>
                               <p style={{ margin: 0, fontSize: 11, color: "#999" }}>ID {p.id} · ₹{p.price}{p.categoryId !== cat.id ? " · secondary" : ""}</p>
@@ -3636,7 +3646,7 @@ export default function AdminPortal() {
                           style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: draggingOcc?.key === key ? "#f0ede8" : "#fff", cursor: "grab", opacity: draggingOcc?.key === key ? 0.5 : 1 }}>
                           <span style={{ color: "#ccc", fontSize: 16, flexShrink: 0, userSelect: "none" }}>⠿</span>
                           <span style={{ fontSize: 11, color: "#ccc", width: 20, textAlign: "center", flexShrink: 0 }}>{idx + 1}</span>
-                          <img src={image} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
+                          <img src={adminImg(image)} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
                           <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{title} <span style={{ color: "#bbb" }}>ID {p.id}</span></span>
                           <button type="button" title="Remove this product (all colours) from the occasion"
                             onClick={() => toggleOccasionProduct(occ.id, p.id)}
@@ -3658,7 +3668,7 @@ export default function AdminPortal() {
                           <button key={p.id} type="button" onClick={() => toggleOccasionProduct(occ.id, p.id)}
                             style={{ ...ts.occasionProductBtn, ...(active ? ts.occasionProductBtnActive : {}) }}>
                             <div style={ts.occasionProductImg}>
-                              {p.images[0] && <img src={p.images[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
+                              {p.images[0] && <img src={adminImg(p.images[0])} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
                             </div>
                             <p style={ts.occasionProductName}>{p.title}</p>
                             <p style={ts.occasionProductId}>ID {p.id}</p>
@@ -3695,7 +3705,7 @@ export default function AdminPortal() {
               {circles.length === 0 && <p style={{ color: "#999", fontSize: 13 }}>No circles yet. Add one below.</p>}
               {circles.map((c, i) => (
                 <div key={c.key} style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 0", borderBottom: "1px solid #f0ede8" }}>
-                  <img src={c.image} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", flexShrink: 0, background: "#f5ede4" }} />
+                  <img src={adminImg(c.image)} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", flexShrink: 0, background: "#f5ede4" }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 600, fontSize: 14, color: "#333" }}>{c.name}</div>
                     <div style={{ fontSize: 12, color: "#999" }}>
@@ -4064,7 +4074,7 @@ export default function AdminPortal() {
                         {detailProducts.map(p => (
                           <div key={p.id} style={{ border: pendingChanges[p.id] ? "1px solid #c8a96e" : "1px solid #eee", borderRadius: 8, overflow: "hidden", background: pendingChanges[p.id] ? "#fffbf3" : "#fff" }}>
                             <div style={{ width: "100%", aspectRatio: "1", background: "#f5f3f0" }}>
-                              <img src={p.images?.[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+                              <img src={adminImg(p.images?.[0])} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
                             </div>
                             <div style={{ padding: "8px 10px" }}>
                               <p style={{ margin: "0 0 2px", fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.5 }}>{p.categoryId}</p>
