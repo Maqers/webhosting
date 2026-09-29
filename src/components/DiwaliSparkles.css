@@ -25,3 +25,9 @@
 @media (prefers-reduced-motion: reduce) {
   .diwali-sparkle { animation: none; opacity: 0.55; transform: none; }
 }
+
+/* On desktop the copy and collage sit either side of the mandala; keep the
+   sparkles over the mandala so none land on the text or buttons. */
+@media (min-width: 901px) {
+  .diwali-sparkles { left: 36%; right: 36%; }
+}

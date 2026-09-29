@@ -455,6 +455,22 @@
   background-size: cover;
   background-position: center;
 }
+/* The photo is 1199x668. Stretched to cover a desktop-wide hero it was
+   upscaled 2-3x and went soft, so on desktop it is sized to the hero's
+   height instead (close to 1:1 on a retina screen), centred as a medallion
+   between the copy and the collage. Its left and right edges already fade
+   to near-black, and the background colour picks up from there. */
+@media (min-width: 901px) {
+  .hero--diwali {
+    background-color: #270101;
+    background-image:
+      linear-gradient(90deg, rgba(39, 1, 1, 0.35), rgba(39, 1, 1, 0) 40%),
+      url('/images/diwali-hero-2026.jpg?v=2');
+    background-size: 100% 100%, auto 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}
 .hero--diwali .hero-title,
 .hero--diwali .hero-lede { text-shadow: 0 1px 10px rgba(40, 4, 4, 0.55); }
 .hero--diwali .hero-title { color: #fff; }
