@@ -910,6 +910,7 @@ export default function AdminPortal() {
   const [draggingOcc, setDraggingOcc] = useState(null); // { occId, key }
   const [byCatDragging, setByCatDragging] = useState(null); // { catId, key }
   const [byCatOrder, setByCatOrder] = useState({}); // { catId: [rowKey,...] } unsaved
+  const [catSecEdits, setCatSecEdits] = useState({}); // { productId: secondaryCategories[] } unsaved, from the category editor
   const [displayOrderMap, setDisplayOrderMap] = useState({}); // catalog.js displayOrder
   const [occVariantOrder, setOccVariantOrder] = useState({}); // { occId: [rowKey,...] } unsaved
   const [byCatPublishing, setByCatPublishing] = useState(false);
@@ -1554,14 +1555,67 @@ export default function AdminPortal() {
     finally { setPublishing(false); }
   }
 
+  // A product's secondary categories, including unsaved edits from the
+  // category editor.
+  function secondaryCatsOf(p) {
+    return catSecEdits[p.id] ?? p.secondaryCategories ?? [];
+  }
+
+  // Every card the category page shows: its own products, then ones listing
+  // it as a secondary category, one row per colour card, in the unsaved or
+  // saved order.
+  function getCatRows(catId) {
+    const base = [
+      ...products.filter(p => p.categoryId === catId),
+      ...products.filter(p => p.categoryId !== catId && secondaryCatsOf(p).includes(catId)),
+    ];
+    return applyRowOrder(variantRows(base), byCatOrder[catId] || displayOrderMap[`cat:${catId}`]);
+  }
+
+  // Adds or removes a product from a category through its secondary
+  // categories; a product's own (main) category is changed from its edit form.
+  function toggleCategoryProduct(catId, product) {
+    if (product.categoryId === catId) return;
+    const current = secondaryCatsOf(product);
+    const next = current.includes(catId) ? current.filter(c => c !== catId) : [...current, catId];
+    setCatSecEdits(prev => ({ ...prev, [product.id]: next }));
+  }
+
+  function closeCategoryEditor() {
+    const catId = editingCategory?.id;
+    setEditingCategory(null);
+    setCatSecEdits({});
+    if (catId) setByCatOrder(prev => { const { [catId]: _, ...rest } = prev; return rest; });
+  }
+
   async function handleSaveCategory() {
     setPublishing(true);
     try {
+      const catId = editingCategory.id;
       const { source, sha } = await fetchCatalog(creds);
-      const original = categories.find(c => c.id === editingCategory.id);
-      const updated = updateCategoryInSource(source, original, editingCategory);
+      const original = categories.find(c => c.id === catId);
+      let updated = updateCategoryInSource(source, original, editingCategory);
+      // Products added to or removed from this category.
+      const fresh = parseProducts(updated);
+      for (const [id, secs] of Object.entries(catSecEdits)) {
+        const p = fresh.find(x => x.id === Number(id));
+        if (p) updated = updateProductInSource(updated, { ...p, secondaryCategories: secs });
+      }
+      // Card order, if it was dragged or shuffled here.
+      if (byCatOrder[catId]) {
+        const order = parseDisplayOrder(updated);
+        order[`cat:${catId}`] = getCatRows(catId).map(r => r.key);
+        updated = writeDisplayOrder(updated, order);
+      }
       await commitCatalog(updated, sha, `Edit category: ${editingCategory.name}`, creds);
-      loadCatalogData(updated, sha); setEditingCategory(null); showToast("Category saved!");
+      // A product staged elsewhere would otherwise publish its old
+      // secondary categories over this save.
+      setPendingChanges(prev => {
+        const next = { ...prev };
+        for (const [id, secs] of Object.entries(catSecEdits)) if (next[id]) next[id] = { ...next[id], secondaryCategories: secs };
+        return next;
+      });
+      loadCatalogData(updated, sha); closeCategoryEditor(); showToast("Category saved!");
     } catch (err) { showToast(err.message, "error"); }
     finally { setPublishing(false); }
   }
@@ -2171,7 +2225,7 @@ export default function AdminPortal() {
             <h2 style={ts.sectionTitle}>Products by Category</h2>
             <div style={ts.catBreakdown}>
               {categories.map(cat => {
-                const count = products.filter(p => p.categoryId === cat.id).length;
+                const count = products.filter(p => p.categoryId === cat.id || (p.secondaryCategories || []).includes(cat.id)).length;
                 return (
                   <div key={cat.id} style={ts.catBreakdownRow}>
                     <span style={ts.catBreakdownName}>{cat.name}</span>
@@ -3224,12 +3278,93 @@ export default function AdminPortal() {
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ textAlign: "center", color: "#888" }}>
                       <p style={{ fontSize: 13 }}>ID (fixed): <strong style={{ color: "#333" }}>{editingCategory.id}</strong></p>
-                      <p style={{ fontSize: 13 }}>Products: <strong style={{ color: "#333" }}>{products.filter(p => p.categoryId === editingCategory.id).length}</strong></p>
+                      <p style={{ fontSize: 13 }}>Products: <strong style={{ color: "#333" }}>{products.filter(p => p.categoryId === editingCategory.id || secondaryCatsOf(p).includes(editingCategory.id)).length}</strong></p>
                     </div>
                   </div>
                 </div>
+
+                {(() => {
+                  const catId = editingCategory.id;
+                  const rows = getCatRows(catId);
+                  return (
+                    <div style={{ marginTop: 20 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <label style={{ ...ts.label, margin: 0 }}>Products in this category ({rows.length} cards)</label>
+                        <button type="button" style={ts.editBtn} disabled={rows.length < 2}
+                          onClick={() => setByCatOrder(prev => ({ ...prev, [catId]: shuffled(rows.map(r => r.key)) }))}>
+                          ⤨ Shuffle
+                        </button>
+                      </div>
+                      {rows.length > 0 && (
+                        <div style={{ marginBottom: 12, border: "1px solid #f0ede8", borderRadius: 8, overflow: "hidden", maxHeight: 420, overflowY: "auto" }}>
+                          <div style={{ padding: "8px 12px", background: "#faf8f5", fontSize: 11, color: "#999", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                            ⠿ Drag to reorder · each colour moves on its own
+                          </div>
+                          {rows.map(({ key, product: p, title, image }, idx) => (
+                            <div key={key}
+                              draggable
+                              onDragStart={() => setByCatDragging({ catId, key })}
+                              onDragOver={e => {
+                                e.preventDefault();
+                                if (!byCatDragging || byCatDragging.catId !== catId || byCatDragging.key === key) return;
+                                const keys = rows.map(r => r.key);
+                                const posA = keys.indexOf(byCatDragging.key);
+                                const posB = keys.indexOf(key);
+                                if (posA !== -1 && posB !== -1) {
+                                  keys.splice(posA, 1);
+                                  keys.splice(posB, 0, byCatDragging.key);
+                                  setByCatOrder(prev => ({ ...prev, [catId]: keys }));
+                                }
+                              }}
+                              onDragEnd={() => setByCatDragging(null)}
+                              style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderTop: "1px solid #f5f2ee", background: byCatDragging?.key === key ? "#f0ede8" : "#fff", cursor: "grab", userSelect: "none", opacity: byCatDragging?.key === key ? 0.5 : 1 }}>
+                              <span style={{ color: "#ccc", fontSize: 16, flexShrink: 0 }}>⠿</span>
+                              <span style={{ fontSize: 11, color: "#ccc", width: 20, textAlign: "center", flexShrink: 0 }}>{idx + 1}</span>
+                              <img src={image} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
+                              <span style={{ flex: 1, fontSize: 12, color: "#333" }}>{title} <span style={{ color: "#bbb" }}>ID {p.id}{p.categoryId === catId ? "" : " · added"}</span></span>
+                              {p.categoryId === catId ? (
+                                <span title="This is the product's main category; change it from the product's edit form" style={{ fontSize: 10, color: "#aaa", flexShrink: 0 }}>main</span>
+                              ) : (
+                                <button type="button" title="Remove this product (all colours) from the category"
+                                  onClick={() => toggleCategoryProduct(catId, p)}
+                                  style={{ ...ts.editBtn, padding: "3px 8px", color: "#c00", flexShrink: 0 }}>×</button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <details>
+                        <summary style={{ cursor: "pointer", fontSize: 12, color: "#c8a96e", fontWeight: 600, marginBottom: 10, userSelect: "none" }}>
+                          + Add / remove products ({products.length} total)
+                        </summary>
+                        <div style={{ ...ts.occasionProductGrid, marginTop: 10 }}>
+                          {products.map(p => {
+                            const isMain = p.categoryId === catId;
+                            const active = isMain || secondaryCatsOf(p).includes(catId);
+                            return (
+                              <button key={p.id} type="button" disabled={isMain}
+                                title={isMain ? "Main category, change it from the product's edit form" : undefined}
+                                onClick={() => toggleCategoryProduct(catId, p)}
+                                style={{ ...ts.occasionProductBtn, ...(active ? ts.occasionProductBtnActive : {}), ...(isMain ? { cursor: "default", opacity: 0.6 } : {}) }}>
+                                <div style={ts.occasionProductImg}>
+                                  {p.images[0] && <img src={p.images[0]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.target.style.display = "none"; }} />}
+                                </div>
+                                <p style={ts.occasionProductName}>{p.title}</p>
+                                <p style={ts.occasionProductId}>ID {p.id}</p>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </details>
+                      <p style={{ fontSize: 11, color: "#999", margin: "8px 0 0" }}>
+                        Added products also stay in their own category. Nothing goes live until you hit Save Changes.
+                      </p>
+                    </div>
+                  );
+                })()}
+
                 <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                  <button style={ts.ghostBtn} onClick={() => setEditingCategory(null)}>Cancel</button>
+                  <button style={ts.ghostBtn} onClick={closeCategoryEditor}>Cancel</button>
                   <button style={ts.primaryBtn} onClick={handleSaveCategory} disabled={publishing}>{publishing ? "Saving..." : "Save Changes"}</button>
                 </div>
               </div>
@@ -3237,12 +3372,12 @@ export default function AdminPortal() {
 
             <div style={ts.catGrid}>
               {categories.map(cat => {
-                const count = products.filter(p => p.categoryId === cat.id).length;
+                const count = products.filter(p => p.categoryId === cat.id || (p.secondaryCategories || []).includes(cat.id)).length;
                 return (
                   <div key={cat.id} style={ts.catCard}>
                     <div style={ts.catCardTop}>
                       <span style={ts.catCardOrder}>#{cat.order}</span>
-                      <button style={ts.editBtn} onClick={() => setEditingCategory({ ...cat })}>Edit</button>
+                      <button style={ts.editBtn} onClick={() => { closeCategoryEditor(); setEditingCategory({ ...cat }); }}>Edit</button>
                     </div>
                     <div style={ts.catCardName}>{cat.name}</div>
                     <div style={ts.catCardDesc}>{cat.description}</div>
@@ -3262,15 +3397,7 @@ export default function AdminPortal() {
         {activeTab === "by-category" && (() => {
           const hasChanges = Object.keys(byCatOrder).length > 0;
 
-          // Every card the category page shows: its own products, then ones
-          // listing it as a secondary category, one row per colour card.
-          const getRows = (catId) => {
-            const base = [
-              ...products.filter(p => p.categoryId === catId),
-              ...products.filter(p => p.categoryId !== catId && p.secondaryCategories?.includes(catId)),
-            ];
-            return applyRowOrder(variantRows(base), byCatOrder[catId] || displayOrderMap[`cat:${catId}`]);
-          };
+          const getRows = getCatRows;
           const getOrder = (catId) => getRows(catId).map(r => r.key);
 
           const handleByCatPublish = async () => {
