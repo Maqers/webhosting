@@ -55,11 +55,11 @@ export const occasionCategories = [
   },
   {
     id: "self-love-kits",
-    name: "Self-Love Kits",
+    name: "Self-Love Gifts",
     slug: "self-love-kits",
     emoji: "🌸",
     order: 8,
-    description: "Treat yourself. You've been doing the most. You deserve something pretty and completely unnecessary."
+    description: "Treat yourself. You've been doing the most. You deserve something pretty!"
   },
   {
     id: "breakup-hampers",
