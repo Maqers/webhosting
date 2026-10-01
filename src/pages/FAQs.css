@@ -9,8 +9,11 @@
   position: relative;
   background: var(--paper);
   color: var(--ink);
-  padding: 6rem 0 4rem;
-  text-align: center;
+  /* Match the shared paper-header style (index.css, About page): left-aligned
+     title + subtitle. Centring here fought the subtitle's 52ch max-width and
+     left it stranded off to the left under a centred title. */
+  padding: clamp(1.75rem, 4vw, 3rem) 0;
+  text-align: left;
   overflow: hidden;
   z-index: 1;
 }
