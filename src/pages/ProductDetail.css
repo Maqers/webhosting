@@ -142,6 +142,16 @@
   background: var(--bg-primary);
 }
 
+/* ImageWithFallback wraps the <img> in a <picture> when a .webp sidecar
+   exists. As a bare flex item the <picture> shrinks to the image's natural
+   height, so the img's height:100% has nothing to fill and landscape photos
+   letterbox with white bands above and below. Make it fill the frame. */
+.desktop-image-container > picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .main-image {
   width: 100%;
   height: 100%;
