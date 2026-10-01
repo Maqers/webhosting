@@ -10,6 +10,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import "./AdminPortal.css";
 import { splitsByColor } from "../utils/productVariants";
+import AdminCalendar from "./AdminCalendar";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -2169,6 +2170,7 @@ export default function AdminPortal() {
 
   const tabs = [
     { id: "dashboard", label: "Dashboard", icon: "◈" },
+    { id: "calendar", label: "Calendar", icon: "▦" },
     { id: "add-product", label: "Add Product", icon: "+" },
     { id: "products", label: "Products", icon: "▤" },
     { id: "by-category", label: "By Category", icon: "⊟" },
@@ -2248,6 +2250,11 @@ export default function AdminPortal() {
               })}
             </div>
           </div>
+        )}
+
+        {/* ── CALENDAR ── */}
+        {activeTab === "calendar" && (
+          <AdminCalendar creds={creds} ghGet={ghGet} ghPut={ghPut} showToast={showToast} ts={ts} />
         )}
 
         {/* ── ADD PRODUCT ── */}
