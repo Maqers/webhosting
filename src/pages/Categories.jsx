@@ -23,6 +23,7 @@ const CATEGORY_FILTERS = {
   'Home-decor':           ['Wooden', 'Glass', 'Decor', 'Evil Eye', 'Dining'],
   'Customised-Hampers':   ['Anniversary', 'Luxury', 'Personalised', 'Photo Frame'],
   'resin-products':       ['Clock', 'Keychain', 'Photo Frame', 'Nameplate'],
+  'diwali':               ['Hampers', 'Diyas & Holders', 'Candles', 'Pooja', 'Wall & Table Decor', 'Serveware'],
 }
 
 // Map filter label → tag keywords to match against
@@ -59,7 +60,18 @@ const FILTER_KEYWORDS = {
   'Photo Frame':     ['photo','frame'],
   'Clock':           ['clock'],
   'Nameplate':       ['nameplate','name plate'],
+  'Hampers':         ['hamper','gift box','gift basket','sandook','gift set','jhadi'],
+  'Diyas & Holders': ['diya','urli','oil lamp'],
+  'Candles':         ['candle','wax sachet','soy wax'],
+  'Pooja':           ['pooja','puja','thali','ganesha'],
+  'Wall & Table Decor': ['wall decor','wall art','wall hanging','decorative plate','vase','mirror','planter','mandala','lipan','bunny','lotus'],
+  'Serveware':       ['cups','mug','platter','bowl','serving'],
 }
+
+// Diwali descriptions mention diyas, candles and décor almost everywhere
+// (most hampers list what's inside), so these filters match title + tags
+// only — otherwise "Diyas" would surface every hamper.
+const TITLE_TAG_ONLY_FILTERS = new Set(['Hampers', 'Diyas & Holders', 'Candles', 'Pooja', 'Wall & Table Decor', 'Serveware'])
 
 const Categories = () => {
   const { name } = useParams()
@@ -119,7 +131,7 @@ const Categories = () => {
         const searchable = [
           ...(p.tags || []),
           p.title,
-          p.description || ''
+          TITLE_TAG_ONLY_FILTERS.has(activeFilter) ? '' : (p.description || '')
         ].join(' ').toLowerCase()
         return keywords.some(kw => searchable.includes(kw))
       })
