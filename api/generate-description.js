@@ -1,3 +1,9 @@
+// Generic words that made every title read the same. Matches whole words only.
+const BANNED_TITLE_WORDS = /\b(festive|festival|diwali|celebrations?|delight(ful)?|utsav|shubh|artisan(al)?|handcrafted|handmade|vibrant|elegant|beautiful|exquisite|unique|premium|luxury|gifts?)\b/i
+
+// Ignored when counting which title words are overused
+const TITLE_STOPWORDS = new Set(['and', 'the', 'with', 'for', 'set', 'of', 'pcs', 'piece', 'pieces'])
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -6,7 +12,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
-    const { imageBase64, mimeType, imageUrl, extraDetails } = req.body
+    const { imageBase64, mimeType, imageUrl, extraDetails, existingTitles } = req.body
 
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY is not configured in Vercel environment variables.' })
@@ -34,6 +40,23 @@ export default async function handler(req, res) {
 
     const extraSection = extraDetails
       ? `\nAdditional details from the seller — incorporate these precisely:\n${extraDetails}\n`
+      : ''
+
+    // Titles already in the catalog, so the model can see what's been used
+    // and steer away from it. Words in 4+ titles are called out explicitly.
+    const catalogTitles = (Array.isArray(existingTitles) ? existingTitles : [])
+      .filter(t => typeof t === 'string')
+      .slice(0, 600)
+      .map(t => t.slice(0, 80))
+    const wordCounts = {}
+    for (const t of catalogTitles) {
+      for (const w of new Set(t.toLowerCase().match(/[a-z]+/g) || [])) {
+        if (w.length > 2 && !TITLE_STOPWORDS.has(w)) wordCounts[w] = (wordCounts[w] || 0) + 1
+      }
+    }
+    const overusedWords = Object.entries(wordCounts).filter(([, n]) => n >= 4).map(([w]) => w)
+    const catalogSection = catalogTitles.length
+      ? `\nTitles already in the catalog (do not reuse any of these names or their distinctive words):\n${catalogTitles.join(' | ')}\n\nWords already overused in titles: ${overusedWords.join(', ')}. Only use one of these if it is the literal product type (e.g. mug, bag, candle) and nothing else fits.\n`
       : ''
 
     const prompt = `You are the in-house copywriter for Maqers, an Indian artisan marketplace with a specific voice: witty, warm, a little cheeky, talks to the shopper like a sharp friend giving gift advice — never like a corporate listing. Here's the actual voice used elsewhere on the site, for calibration (the surrounding quotation marks below are just how these examples are punctuated on the site, not a format to copy — do not start your own description with a quotation mark):
@@ -75,16 +98,31 @@ Opening line rules (this is where generic AI copy fails hardest, so follow close
 
 Return ONLY a valid JSON object in exactly this format:
 {
-  "title": "Specific product name, 4–7 words, title case",
+  "title_options": ["Best name", "Alternative name", "Alternative name"],
   "description": "Full rich description as described above",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
   "keywords": ["keyword phrase 1", "keyword phrase 2", "keyword phrase 3", "keyword phrase 4", "keyword phrase 5", "keyword phrase 6", "keyword phrase 7", "keyword phrase 8"]
 }
 
 Additional rules:
-- title: must name THIS specific product, not a category (bad: "Handmade Candle", good: "Midnight Rose Hand-Poured Soy Candle")
+- title_options: exactly 3 different names for THIS product, best first. See the naming rules below.
 - tags: 6–8 lowercase words or short phrases a buyer or social media post would use
-- keywords: 6–8 lowercase search phrases a real buyer would type into Google or an Indian e-commerce search bar`
+- keywords: 6–8 lowercase search phrases a real buyer would type into Google or an Indian e-commerce search bar
+
+Naming rules for title_options (the catalog is full of names like "Festive Diwali Delight Gift Box" and they all blur together, so this matters):
+- Shape: one evocative word or pair that captures THIS piece, then the plain product type so shoppers know what it is. 2 to 5 words, title case.
+- Draw the evocative part from what is actually in the photo, using Indian names for colours, motifs, flowers and crafts where they fit. A palette to pick from, not a checklist:
+  colours: Rani Pink, Gulabi, Haldi, Kesari, Sindoori, Mehendi Green, Neel, Firozi, Motia, Kattha, Ambar, Moongia, Badami
+  motifs and nature: Kamal (lotus), Mor (peacock), Genda (marigold), Mogra, Gulmohar, Raat Rani, Ambi (paisley), Chand, Tara, Bel, Patta, Jugnu, Titli
+  crafts and objects: Lippan, Meenakari, Zari, Gota, Kantha, Bandhani, Dokra, Jharokha, Toran, Urli, Thali, Potli, Kalash
+  moods and moments: Chandni, Roshni, Noor, Saanjh, Aangan, Mehfil, Rangoli, Jhilmil, Barsaat, Sukoon
+  English works too when it is specific and vivid (Lotus, Peacock, Marigold, Moonlit, Mirrorwork).
+- Only use a colour word if that colour clearly dominates the piece, and a motif only if it is visibly there. Accuracy beats flourish.
+- Never use these words in a title: Festive, Festival, Diwali, Celebration, Delight, Delightful, Utsav, Shubh, Artisan, Artisanal, Handcrafted, Handmade, Vibrant, Elegant, Beautiful, Exquisite, Unique, Premium, Luxury, Gift (Hamper, Box, Basket are fine as the product type). Occasion words belong in tags and keywords, not the name.
+- Make the 3 options genuinely different from each other: lead with a different evocative word in each.
+- Good: "Rani Pink Lotus Diya Thali", "Neel Kamal Lippan Plate", "Gulabi Genda Tealight Urli", "Haldi Mor Coaster Set", "Chandni Zari Potli", "Mogra Soy Candle Jar"
+- Bad: "Festive Diwali Delight Gift Box", "Vibrant Handcrafted Diya Plate", "Shubh Utsav Festive Basket", "Elegant Artisan Decor Piece"
+${catalogSection}`
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -126,10 +164,10 @@ Additional rules:
               properties: {
                 tags: { type: 'array', items: { type: 'string' } },
                 keywords: { type: 'array', items: { type: 'string' } },
-                title: { type: 'string' },
+                title_options: { type: 'array', items: { type: 'string' } },
                 description: { type: 'string' },
               },
-              required: ['tags', 'keywords', 'title', 'description'],
+              required: ['tags', 'keywords', 'title_options', 'description'],
               additionalProperties: false,
             },
           },
@@ -177,8 +215,21 @@ Additional rules:
       return res.status(502).json({ error: 'The AI left out tags or keywords this time. Please click Generate again.' })
     }
 
+    // Backstop for the naming rules: drop options that use a banned word or
+    // duplicate an existing title. If every option fails, keep them rather
+    // than return no title at all.
+    const existingLower = new Set(catalogTitles.map(t => t.trim().toLowerCase()))
+    const cleanedOptions = (Array.isArray(parsed.title_options) ? parsed.title_options : [])
+      .map(t => String(t).replace(/[—–]/g, ' ').replace(/""+/g, '"').replace(/\s+/g, ' ').trim())
+      .filter(Boolean)
+    const goodOptions = cleanedOptions.filter(t =>
+      !BANNED_TITLE_WORDS.test(t) && !existingLower.has(t.toLowerCase())
+    )
+    const titleOptions = [...new Set(goodOptions.length ? goodOptions : cleanedOptions)]
+
     return res.status(200).json({
-      title: (parsed.title || '').replace(/[—–]/g, ', ').replace(/""+/g, '"'),
+      title: titleOptions[0] || '',
+      titleOptions,
       description: cleanDescription,
       tags,
       keywords,

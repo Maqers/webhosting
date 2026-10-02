@@ -811,6 +811,20 @@ function Toast({ message, type, onClose }) {
   return <div style={{ ...ts.toast, background: bg }}>{message}</div>;
 }
 
+// Clickable alternative names from the last AI generation
+function TitleIdeas({ options, current, onPick }) {
+  if (!options || options.length < 2) return null;
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6, marginTop: 6 }}>
+      <span style={{ fontSize: 11, color: "#999" }}>Name ideas:</span>
+      {options.map(t => (
+        <button key={t} type="button" onClick={() => onPick(t)}
+          style={t === current ? ts.chipActive : ts.chip}>{t}</button>
+      ))}
+    </div>
+  );
+}
+
 function ProductCard({ product, categories, previewIndex = 0 }) {
   const cat = categories.find(c => c.id === product.categoryId);
   const shownImage = product.images[previewIndex] || product.images[0];
@@ -892,11 +906,16 @@ export default function AdminPortal() {
   const [aiEditExtraDetails, setAiEditExtraDetails] = useState('');
   const [aiEditGenerating, setAiEditGenerating] = useState(false);
   const [aiEditError, setAiEditError] = useState('');
+  // Alternative AI title ideas, shown as clickable chips under the Title field
+  const [aiTitleOptions, setAiTitleOptions] = useState([]);
+  const [aiEditTitleOptions, setAiEditTitleOptions] = useState([]);
   const [productStep, setProductStep] = useState("form");
   const fileInputRef = useRef();
   const editFileInputRef = useRef();
   const [editImageFiles, setEditImageFiles] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
+  // Name ideas belong to the product they were generated for
+  useEffect(() => { setAiEditTitleOptions([]); }, [editingProduct?.id]);
   const [productFilter, setProductFilter] = useState("");
   const [productFilterCat, setProductFilterCat] = useState("all");
   const [productFlagFilter, setProductFlagFilter] = useState("all");
@@ -1123,6 +1142,8 @@ export default function AdminPortal() {
       } else {
         body = { imageUrl, extraDetails };
       }
+      // Lets the AI avoid names (and overused words) already in the catalog
+      body.existingTitles = products.map(p => p.title).filter(Boolean);
       const res = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1149,7 +1170,9 @@ export default function AdminPortal() {
       extraDetails: aiExtraDetails.trim(),
       setGenerating: setAiGenerating,
       onError: setAiError,
-      onResult: r => setNewProduct(p => (
+      onResult: r => {
+        if (mode !== 'tags') setAiTitleOptions(r.titleOptions || []);
+        setNewProduct(p => (
         mode === 'tags'
           ? { ...p, tags: r.tags?.join(', ') || p.tags, keywords: r.keywords?.join(', ') || p.keywords }
           : {
@@ -1159,7 +1182,8 @@ export default function AdminPortal() {
               tags: r.tags?.join(', ') || p.tags,
               keywords: r.keywords?.join(', ') || p.keywords,
             }
-      )),
+        ));
+      },
     });
   }
 
@@ -1174,7 +1198,9 @@ export default function AdminPortal() {
       extraDetails: aiEditExtraDetails.trim(),
       setGenerating: setAiEditGenerating,
       onError: setAiEditError,
-      onResult: r => setEditingProduct(p => (
+      onResult: r => {
+        if (mode !== 'tags') setAiEditTitleOptions(r.titleOptions || []);
+        setEditingProduct(p => (
         mode === 'tags'
           ? { ...p, tags: r.tags?.length ? r.tags : p.tags, keywords: r.keywords?.length ? r.keywords : p.keywords }
           : {
@@ -1184,7 +1210,8 @@ export default function AdminPortal() {
               tags: r.tags?.length ? r.tags : p.tags,
               keywords: r.keywords?.length ? r.keywords : p.keywords,
             }
-      )),
+        ));
+      },
     });
   }
 
@@ -1256,7 +1283,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] });
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setPreviewImgIndex(0); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -2311,6 +2338,8 @@ export default function AdminPortal() {
                       <label style={ts.label}>Title *</label>
                       <input style={ts.input} placeholder="e.g. Lavender Soy Candle" value={newProduct.title}
                         onChange={e => setNewProduct(p => ({ ...p, title: e.target.value }))} />
+                      <TitleIdeas options={aiTitleOptions} current={newProduct.title}
+                        onPick={t => setNewProduct(p => ({ ...p, title: t }))} />
                       <label style={ts.label}>Category *</label>
                       <select style={ts.input} value={newProduct.categoryId}
                         onChange={e => setNewProduct(p => ({ ...p, categoryId: e.target.value }))}>
@@ -2658,7 +2687,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] });
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]); setPreviewImgIndex(0);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -2893,6 +2922,8 @@ export default function AdminPortal() {
 
                           <label style={ts.label}>Title</label>
                           <input style={ts.input} value={editingProduct.title} onChange={e => setEditingProduct(p => ({ ...p, title: e.target.value }))} />
+                          <TitleIdeas options={aiEditTitleOptions} current={editingProduct.title}
+                            onPick={t => setEditingProduct(p => ({ ...p, title: t }))} />
                           <label style={ts.label}>Category</label>
                           <select style={ts.input} value={editingProduct.categoryId} onChange={e => setEditingProduct(p => ({ ...p, categoryId: e.target.value }))}>
                             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
