@@ -142,14 +142,40 @@
   background: var(--bg-primary);
 }
 
-/* ImageWithFallback wraps the <img> in a <picture> when a .webp sidecar
-   exists. As a bare flex item the <picture> shrinks to the image's natural
-   height, so the img's height:100% has nothing to fill and landscape photos
-   letterbox with white bands above and below. Make it fill the frame. */
-.desktop-image-container > picture {
-  display: block;
-  width: 100%;
-  height: 100%;
+/* Desktop gallery: the frame takes each photo's own shape instead of forcing
+   3:4. A fixed frame either crops (object-fit: cover cut the bottom quarter
+   off 9:16 photos) or letterboxes (white bands on landscape ones), and the
+   catalogue mixes square, 3:4, 9:16 and landscape shots. Height is capped to
+   the viewport so tall photos stay above the fold; they narrow and centre.
+   Mobile (<=768px) already shows natural dimensions via .mobile-single-image. */
+@media (min-width: 769px) {
+  .main-image-wrap {
+    flex: 0 1 auto;
+    margin-inline: auto;
+    aspect-ratio: auto;
+    background: transparent;
+  }
+
+  .desktop-image-container {
+    position: static;
+    display: block;
+    background: transparent;
+  }
+
+  /* ImageWithFallback wraps the <img> in a <picture> when a .webp exists */
+  .desktop-image-container > picture {
+    display: block;
+  }
+
+  /* !important beats ImageWithFallback's inline width/height: 100% */
+  .desktop-image-container .main-image {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100%;
+    max-height: calc(100vh - var(--navbar-height, 64px) - 3rem);
+    object-fit: contain !important;
+    background: transparent;
+  }
 }
 
 .main-image {
