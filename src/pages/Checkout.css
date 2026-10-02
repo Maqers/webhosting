@@ -928,6 +928,47 @@
 }
 
 /* ── Coupon ─────────────────────────────────────────────────────────────── */
+.checkout-code-entry {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.checkout-code-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.875rem;
+  min-height: 36px;
+  border: 1px solid var(--rule, #e5ddd3);
+  border-radius: 9999px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px; /* 16px stops iOS Safari zooming in on focus */
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary, #1a1a1a);
+}
+.checkout-code-input::placeholder {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-secondary, #999);
+}
+.checkout-code-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #760909);
+}
+
+.checkout-code-entry .checkout-coupon-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.checkout-code-error {
+  font-size: 0.8rem;
+  color: #b00020;
+  margin: -0.35rem 0 0.75rem 0.25rem;
+}
+
 .checkout-coupon {
   display: flex;
   align-items: center;

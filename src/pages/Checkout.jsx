@@ -9,6 +9,7 @@ import SeoHead from '../components/SeoHead'
 import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
+import { occasionProductMap } from '../data/catalog'
 import './Checkout.css'
 
 const UPI_ID = '9650800399@pthdfc'
@@ -20,9 +21,27 @@ const EMAILJS_TEMPLATE_SELLER = 'template_REPLACE_ME' // ← create a new EmailJ
 const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
 const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq9f1nTqbOf8ZXbOI1bvk_uIa6jwUjvYshdvOFNAUcqlYbM8U8_pVAvQYxZxhI/exec'
 
-const COUPON_CODE = 'MAQERSDIWALI100'
-const COUPON_AMOUNT = 100
-const COUPON_MIN_ORDER = 2000
+// Only one coupon can be applied per order: applying one replaces the other.
+// Diwali items are whatever is on the Diwali page (occasionProductMap.diwali),
+// so the 5% coupon follows the admin's Diwali list automatically.
+const DIWALI_IDS = new Set(occasionProductMap.diwali || [])
+const COUPONS = [
+  {
+    code: 'MAQERSDIWALI100',
+    minOrder: 2000,
+    discountFor: (items, total) => (total >= 2000 ? 100 : 0),
+    pitch: 'Diwali special: ₹100 off orders of ₹2,000+',
+    locked: (items, total) => `Add ₹${(2000 - total).toLocaleString('en-IN')} more to unlock ₹100 off (orders of ₹2,000+)`,
+  },
+  {
+    code: 'MAQERSDIWALI5',
+    discountFor: (items) => Math.round(
+      items.filter(i => DIWALI_IDS.has(i.id)).reduce((sum, i) => sum + i.price * i.qty, 0) * 0.05
+    ),
+    pitch: '5% off every Diwali gift in your bag',
+    locked: () => 'Add a Diwali gift to use 5% off',
+  },
+]
 
 function getDeliveryFee(subtotal) {
   return 0
@@ -55,24 +74,42 @@ export default function Checkout() {
   const { user, isLoggedIn, accessToken, updateProfile, openLoginModal } = useAuth()
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
-  const [couponApplied, setCouponApplied] = useState(false)
+  const [appliedCode, setAppliedCode] = useState(null)
+  const [codeInput, setCodeInput] = useState('')
+  const [codeError, setCodeError] = useState('')
   const [showCouponCelebration, setShowCouponCelebration] = useState(false)
-  const couponEligible = total >= COUPON_MIN_ORDER
-  const couponShortfall = COUPON_MIN_ORDER - total
-  const couponDiscount = couponApplied ? COUPON_AMOUNT : 0
-  // The cart drawer is still usable on this page, so the subtotal can drop
-  // under the minimum after the coupon was applied.
+  const couponSavings = Object.fromEntries(COUPONS.map(c => [c.code, c.discountFor(items, total)]))
+  const appliedCoupon = COUPONS.find(c => c.code === appliedCode) || null
+  const couponApplied = !!appliedCoupon
+  const couponDiscount = appliedCoupon ? couponSavings[appliedCoupon.code] : 0
+  // The cart drawer is still usable on this page, so the cart can change
+  // after a coupon was applied (dropping under ₹2,000, or removing the last
+  // Diwali item). Drop the coupon once it no longer saves anything.
   useEffect(() => {
-    if (!couponEligible) setCouponApplied(false)
-  }, [couponEligible])
+    if (appliedCoupon && couponDiscount <= 0) setAppliedCode(null)
+  }, [appliedCoupon, couponDiscount])
   const grandTotal = total + deliveryFee - couponDiscount
-  const couponNote = couponApplied ? `, ${COUPON_CODE} -₹${couponDiscount}` : ''
+  const couponNote = couponApplied ? `, ${appliedCode} -₹${couponDiscount}` : ''
 
-  const applyCoupon = () => {
-    if (!couponEligible) return
-    setCouponApplied(true)
+  const applyCoupon = (code) => {
+    if (!(couponSavings[code] > 0)) return
+    setAppliedCode(code)
+    setCodeError('')
     setShowCouponCelebration(true)
-    trackEvent('CouponApplied', { code: COUPON_CODE, value: COUPON_AMOUNT })
+    trackEvent('CouponApplied', { code, value: couponSavings[code] })
+  }
+
+  // Typed code: same coupons and same one-per-order rule as the cards below.
+  const applyTypedCode = (e) => {
+    e.preventDefault()
+    const code = codeInput.trim().toUpperCase().replace(/\s+/g, '')
+    if (!code) return
+    const coupon = COUPONS.find(c => c.code === code)
+    if (!coupon) return setCodeError(`"${code}" isn't a valid code`)
+    if (appliedCode === code) return setCodeError(`${code} is already applied`)
+    if (!(couponSavings[code] > 0)) return setCodeError(coupon.locked(items, total))
+    applyCoupon(code)
+    setCodeInput('')
   }
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
@@ -248,7 +285,7 @@ export default function Checkout() {
           items_list: buildItemsText(),
           subtotal: `₹${total.toLocaleString('en-IN')}`,
           delivery_fee: 'FREE',
-          grand_total: `₹${grandTotal.toLocaleString('en-IN')}${couponApplied ? ` (${COUPON_CODE} saved you ₹${couponDiscount})` : ''}`,
+          grand_total: `₹${grandTotal.toLocaleString('en-IN')}${couponApplied ? ` (${appliedCode} saved you ₹${couponDiscount})` : ''}`,
           upi_id: UPI_ID,
         },
         EMAILJS_PUBLIC_KEY
@@ -396,7 +433,7 @@ export default function Checkout() {
       item_count: items.length,
       product_ids: items.map(i => i.id),
       payment_method: paymentMethod,
-      ...(couponApplied && { coupon: COUPON_CODE, discount: couponDiscount }),
+      ...(couponApplied && { coupon: appliedCode, discount: couponDiscount }),
     })
     clearCart()
     setOrderPlaced(true)
@@ -680,27 +717,51 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
-              <div className={`checkout-coupon ${couponApplied ? 'applied' : ''} ${couponEligible ? '' : 'locked'}`}>
-                <div className="checkout-coupon-info">
-                  <span className="checkout-coupon-code">🪔 {COUPON_CODE}</span>
-                  <span className="checkout-coupon-desc">
-                    {couponApplied
-                      ? `₹${couponDiscount} off applied`
-                      : couponEligible
-                        ? `Diwali special: ₹${COUPON_AMOUNT} off orders of ₹${COUPON_MIN_ORDER.toLocaleString('en-IN')}+`
-                        : `Add ₹${couponShortfall.toLocaleString('en-IN')} more to unlock ₹${COUPON_AMOUNT} off (orders of ₹${COUPON_MIN_ORDER.toLocaleString('en-IN')}+)`}
-                  </span>
-                </div>
-                {couponApplied ? (
-                  <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => setCouponApplied(false)}>
-                    Remove
-                  </button>
-                ) : (
-                  <button type="button" className="checkout-coupon-btn" onClick={applyCoupon} disabled={!couponEligible}>
-                    Apply
-                  </button>
-                )}
-              </div>
+              <form className="checkout-code-entry" onSubmit={applyTypedCode}>
+                <input
+                  type="text"
+                  className="checkout-code-input"
+                  placeholder="Have a coupon code?"
+                  value={codeInput}
+                  onChange={e => { setCodeInput(e.target.value); setCodeError('') }}
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  aria-label="Coupon code"
+                />
+                <button type="submit" className="checkout-coupon-btn" disabled={!codeInput.trim()}>Apply</button>
+              </form>
+              {codeError && <p className="checkout-code-error" role="alert">{codeError}</p>}
+              {COUPONS.map(c => {
+                const saves = couponSavings[c.code]
+                const isApplied = appliedCode === c.code
+                const eligible = saves > 0
+                return (
+                  <div key={c.code} className={`checkout-coupon ${isApplied ? 'applied' : ''} ${eligible ? '' : 'locked'}`}>
+                    <div className="checkout-coupon-info">
+                      <span className="checkout-coupon-code">🪔 {c.code}</span>
+                      <span className="checkout-coupon-desc">
+                        {isApplied
+                          ? `₹${saves.toLocaleString('en-IN')} off applied`
+                          : !eligible
+                            ? c.locked(items, total)
+                            : appliedCode
+                              ? `${c.pitch}. Saves ₹${saves.toLocaleString('en-IN')}, replaces ${appliedCode} (one coupon per order)`
+                              : `${c.pitch}. Saves ₹${saves.toLocaleString('en-IN')}`}
+                      </span>
+                    </div>
+                    {isApplied ? (
+                      <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => setAppliedCode(null)}>
+                        Remove
+                      </button>
+                    ) : (
+                      <button type="button" className="checkout-coupon-btn" onClick={() => applyCoupon(c.code)} disabled={!eligible}>
+                        {appliedCode ? 'Use instead' : 'Apply'}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
               <div className="checkout-summary-breakdown">
                 <div className="checkout-summary-row">
                   <span>Subtotal</span>
@@ -712,7 +773,7 @@ export default function Checkout() {
                 </div>
                 {couponApplied && (
                   <div className="checkout-summary-row">
-                    <span>Coupon ({COUPON_CODE})</span>
+                    <span>Coupon ({appliedCode})</span>
                     <span className="checkout-coupon-discount">&minus;₹{couponDiscount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
@@ -730,9 +791,9 @@ export default function Checkout() {
         </div>
       </div>
 
-      {showCouponCelebration && (
+      {showCouponCelebration && appliedCode && (
         <CouponCelebration
-          code={COUPON_CODE}
+          code={appliedCode}
           amount={couponDiscount}
           onClose={() => setShowCouponCelebration(false)}
         />
