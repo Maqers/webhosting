@@ -5,4 +5,4 @@ Allow: /
 Disallow: /admin
 Disallow: /checkout
 
-Sitemap: https://maqers.in/sitemap.xml
+Sitemap: https://www.maqers.in/sitemap.xml

@@ -30,7 +30,7 @@ import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 const DIST = resolve(ROOT, 'dist')
-const BASE_URL = 'https://maqers.in'
+const BASE_URL = 'https://www.maqers.in'
 
 const template = readFileSync(resolve(DIST, 'index.html'), 'utf8')
 
@@ -88,23 +88,26 @@ for (const product of products) {
     },
   }
 
+  // data-rh marks these as react-helmet-async's own tags, so when React
+  // mounts, <SeoHead> replaces them instead of adding a second canonical/
+  // description/og set next to them.
   const headInjection = `
   <title>${escapeHtml(fullTitle)}</title>
-  <meta name="description" content="${escapeHtml(metaDescription)}">
-  <link rel="canonical" href="${canonicalUrl}">
-  <meta property="og:site_name" content="Maqers">
-  <meta property="og:title" content="${escapeHtml(fullTitle)}">
-  <meta property="og:description" content="${escapeHtml(metaDescription)}">
-  <meta property="og:image" content="${primaryImage}">
-  <meta property="og:type" content="product">
-  <meta property="og:url" content="${canonicalUrl}">
-  <meta property="product:price:amount" content="${product.price}">
-  <meta property="product:price:currency" content="INR">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${escapeHtml(fullTitle)}">
-  <meta name="twitter:description" content="${escapeHtml(metaDescription)}">
-  <meta name="twitter:image" content="${primaryImage}">
-  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+  <meta data-rh="true" name="description" content="${escapeHtml(metaDescription)}">
+  <link data-rh="true" rel="canonical" href="${canonicalUrl}">
+  <meta data-rh="true" property="og:site_name" content="Maqers">
+  <meta data-rh="true" property="og:title" content="${escapeHtml(fullTitle)}">
+  <meta data-rh="true" property="og:description" content="${escapeHtml(metaDescription)}">
+  <meta data-rh="true" property="og:image" content="${primaryImage}">
+  <meta data-rh="true" property="og:type" content="product">
+  <meta data-rh="true" property="og:url" content="${canonicalUrl}">
+  <meta data-rh="true" property="product:price:amount" content="${product.price}">
+  <meta data-rh="true" property="product:price:currency" content="INR">
+  <meta data-rh="true" name="twitter:card" content="summary_large_image">
+  <meta data-rh="true" name="twitter:title" content="${escapeHtml(fullTitle)}">
+  <meta data-rh="true" name="twitter:description" content="${escapeHtml(metaDescription)}">
+  <meta data-rh="true" name="twitter:image" content="${primaryImage}">
+  <script data-rh="true" type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>`
 
   const inStock = product.inStock !== false

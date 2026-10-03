@@ -5,7 +5,7 @@
  * product feed in the standard RSS 2.0 + g: namespace format Google expects.
  *
  * Once written, this file is publicly served at:
- *   https://maqers.in/merchant-feed.xml
+ *   https://www.maqers.in/merchant-feed.xml
  *
  * One-time manual step (not something a script can do): in Google Merchant
  * Center, add this URL as a scheduled feed (Products > Feeds > Add feed >
@@ -26,7 +26,7 @@ import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
-const BASE_URL = 'https://maqers.in'
+const BASE_URL = 'https://www.maqers.in'
 
 const escapeXml = (str) =>
   String(str ?? '')

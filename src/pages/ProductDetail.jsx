@@ -314,7 +314,7 @@ const ProductDetail = () => {
       price: product.price,
       category_id: product.categoryId,
     })
-    let message = `Hello! I want to buy ${product.title}: https://maqers.in/product/${product.slug}`
+    let message = `Hello! I want to buy ${product.title}: https://www.maqers.in/product/${product.slug}`
     if (selectedColor) message += ` Colour: ${selectedColor}.`
     if (selectedSize) message += ` Size: ${selectedSize}.`
     if (selectedPersonalisation.length > 0) message += ` Personalisation: ${selectedPersonalisation.join(', ')}.`
@@ -468,7 +468,7 @@ const ProductDetail = () => {
   // not shown rather than being padded out with generic copy.
 
   // ── JSON-LD Product schema ─────────────────────────────────────────────────
-  const BASE_URL = 'https://maqers.in'
+  const BASE_URL = 'https://www.maqers.in'
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',

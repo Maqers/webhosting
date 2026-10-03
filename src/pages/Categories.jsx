@@ -151,8 +151,13 @@ const Categories = () => {
   const seoTitle = selectedCategoryObj
     ? `${selectedCategoryObj.name}: Handmade Gifts`
     : 'Shop All Collections'
+  // Occasions have their own written description; keep in sync with
+  // scripts/prerender-pages.js so the static and live versions match.
+  const occasionDescription = occasionCategories.find(o => o.slug === selectedCategoryObj?.slug)?.description
   const seoDescription = selectedCategoryObj
-    ? `Browse handpicked ${selectedCategoryObj.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`
+    ? occasionDescription
+      ? `${selectedCategoryObj.name} gifts: ${occasionDescription}`
+      : `Browse handpicked ${selectedCategoryObj.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`
     : 'Browse curated handmade gift collections from India\'s best independent artisans, by occasion or by product type.'
 
   return (
@@ -160,7 +165,7 @@ const Categories = () => {
       <SeoHead
         title={seoTitle}
         description={seoDescription}
-        url={selectedCategory !== 'All' ? `/category/${selectedCategory}` : '/categories'}
+        url={selectedCategory !== 'All' ? `/category/${selectedCategoryObj?.slug || selectedCategory}` : '/categories'}
       />
       {selectedCategory === 'All' && (
         <div className="categories-hero">

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
-const BASE_URL = 'https://maqers.in'
+const BASE_URL = 'https://www.maqers.in'
 const today = new Date().toISOString().split('T')[0]
 
 // ── Parse catalog.js without importing it (avoids ESM/CJS issues at build time)
@@ -32,9 +32,6 @@ while ((m = productRe.exec(catalogSrc)) !== null) {
   }
 }
 
-// Unique categories
-const categoryIds = [...new Set(products.map(p => p.categoryId))]
-
 // ── Build URL list ─────────────────────────────────────────────────────────────
 const staticPages = [
   { url: '/',            priority: '1.0', changefreq: 'weekly'  },
@@ -49,8 +46,16 @@ const staticPages = [
   { url: '/policies', priority: '0.4', changefreq: 'monthly' },
 ]
 
-const categoryPages = categoryIds.map(id => ({
-  url: `/category/${id}`,
+// Category and occasion pages, by the slug the site actually links to
+// (some ids differ in case, e.g. Cosmetics vs cosmetics). Oxidised-jewellery
+// is hidden from the storefront, so it stays out.
+const { categories } = await import('../src/data/catalog.js')
+const { occasionCategories } = await import('../src/data/occasionCatalog.js')
+const categoryPages = [
+  ...categories.filter(c => c.id !== 'Oxidised-jewellery').map(c => c.slug),
+  ...occasionCategories.map(o => o.slug),
+].map(slug => ({
+  url: `/category/${slug}`,
   priority: '0.7',
   changefreq: 'weekly',
 }))
@@ -81,4 +86,4 @@ const xml =
   '\n</urlset>\n'
 
 writeFileSync(resolve(ROOT, 'public/sitemap.xml'), xml)
-console.log(`✓ sitemap.xml — ${allPages.length} URLs (${products.length} products, ${categoryIds.length} categories)`)
+console.log(`✓ sitemap.xml — ${allPages.length} URLs (${products.length} products, ${categoryPages.length} category & occasion pages)`)

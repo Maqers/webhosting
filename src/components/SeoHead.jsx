@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 
-const BASE_URL = 'https://maqers.in'
+const BASE_URL = 'https://www.maqers.in'
 const DEFAULT_IMAGE = `${BASE_URL}/images/logo.png`
 const SITE_NAME = 'Maqers'
 const DEFAULT_TITLE = 'Maqers: Curated Handcrafted Gifts from India'
