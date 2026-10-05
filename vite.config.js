@@ -33,6 +33,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // Admin-only crop editor: the 'node_modules/react' prefix below
+          // would otherwise pull it into react-vendor, which every shopper loads
+          if (id.includes('node_modules/react-easy-crop')) return;
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
             return 'react-vendor';
           }

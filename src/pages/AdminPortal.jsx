@@ -11,6 +11,7 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import "./AdminPortal.css";
 import { splitsByColor } from "../utils/productVariants";
 import AdminCalendar from "./AdminCalendar";
+import AdminImageEditor from "./AdminImageEditor";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -909,6 +910,8 @@ export default function AdminPortal() {
   // Alternative AI title ideas, shown as clickable chips under the Title field
   const [aiTitleOptions, setAiTitleOptions] = useState([]);
   const [aiEditTitleOptions, setAiEditTitleOptions] = useState([]);
+  // Photo open in the crop/rotate editor: { list: "new" | "edit", index }
+  const [editingImage, setEditingImage] = useState(null);
   const [productStep, setProductStep] = useState("form");
   const fileInputRef = useRef();
   const editFileInputRef = useRef();
@@ -1106,6 +1109,28 @@ export default function AdminPortal() {
       img.onerror = reject;
       img.src = `data:${mimeType};base64,${base64}`;
     });
+  }
+
+  // Crop/rotate result from AdminImageEditor: re-run the normal compression +
+  // WebP step so what's uploaded matches what was previewed. The untouched
+  // original is kept so every re-edit starts from full quality.
+  async function applyImageEdit(dataUrl, mimeType, settings) {
+    const { list, index } = editingImage;
+    const rawBase64 = dataUrl.split(",")[1];
+    const { base64, mimeType: outMime, webpBase64 } = await compressProductImage(rawBase64, mimeType)
+      .catch(() => ({ base64: rawBase64, mimeType, webpBase64: null }));
+    const update = prev => prev.map((img, i) => i !== index ? img : {
+      ...img,
+      original: img.original || img.preview,
+      originalMime: img.originalMime || img.file?.type || img.mime,
+      editSettings: settings,
+      preview: dataUrl,
+      base64,
+      mime: outMime,
+      webpBase64,
+    });
+    if (list === "new") setImageFiles(update); else setEditImageFiles(update);
+    setEditingImage(null);
   }
 
   function toWebpName(name) {
@@ -2217,6 +2242,20 @@ export default function AdminPortal() {
   return (
     <div className="admin-portal" style={ts.shell}>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {editingImage && (() => {
+        const img = (editingImage.list === "new" ? imageFiles : editImageFiles)[editingImage.index];
+        if (!img) return null;
+        return (
+          <AdminImageEditor
+            src={img.original || img.preview}
+            mimeType={img.originalMime || img.file?.type || img.mime}
+            initialSettings={img.editSettings}
+            onApply={applyImageEdit}
+            onCancel={() => setEditingImage(null)}
+            ts={ts}
+          />
+        );
+      })()}
 
       <div style={ts.sidebar}>
         <div style={ts.sidebarLogo}>
@@ -2632,7 +2671,7 @@ export default function AdminPortal() {
                       </div>
                       {imageFiles.length > 0 && (
                         <>
-                          <p style={ts.fieldHint}>Drag to reorder · × to remove</p>
+                          <p style={ts.fieldHint}>Drag to reorder · × to remove · ✎ to crop or rotate</p>
                           <div style={ts.thumbGrid}>
                             {imageFiles.map((img, i) => (
                               <div key={img.name + i} style={{ ...ts.thumb, cursor: "pointer", outline: i === previewImgIndex ? "2px solid #c8a96e" : "none", outlineOffset: 2 }}
@@ -2663,6 +2702,8 @@ export default function AdminPortal() {
                                 <img src={img.preview} alt="" style={ts.thumbImg} />
                                 {i === 0 && <span style={ts.primaryBadge}>Primary</span>}
                                 <button type="button" onClick={e => { e.stopPropagation(); setImageFiles(prev => prev.filter((_, j) => j !== i)); }} style={ts.removeBtn}>x</button>
+                                <button type="button" title="Crop / rotate" aria-label="Crop or rotate this photo"
+                                  onClick={e => { e.stopPropagation(); setEditingImage({ list: "new", index: i }); }} style={ts.editImgBtn}>✎</button>
                               </div>
                             ))}
                           </div>
@@ -3243,6 +3284,8 @@ export default function AdminPortal() {
                                   <div key={i} style={ts.thumb}>
                                     <img src={img.preview} alt="" style={ts.thumbImg} />
                                     <button type="button" onClick={() => setEditImageFiles(prev => prev.filter((_, j) => j !== i))} style={ts.removeBtn}>×</button>
+                                    <button type="button" title="Crop / rotate" aria-label="Crop or rotate this photo"
+                                      onClick={() => setEditingImage({ list: "edit", index: i })} style={ts.editImgBtn}>✎</button>
                                   </div>
                                 ))}
                               </div>
@@ -4423,6 +4466,7 @@ const ts = {
   thumb: { position: "relative", borderRadius: 7, overflow: "hidden", border: "1px solid #eee" },
   thumbImg: { width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" },
   primaryBadge: { position: "absolute", top: 3, left: 3, background: "#c8a96e", color: "#fff", fontSize: 8, padding: "2px 4px", borderRadius: 3, fontWeight: 700, textTransform: "uppercase" },
+  editImgBtn: { position: "absolute", bottom: 3, right: 3, background: "rgba(0,0,0,0.55)", color: "#fff", border: "none", borderRadius: "50%", width: 22, height: 22, cursor: "pointer", fontSize: 12, lineHeight: "22px", textAlign: "center", padding: 0 },
   removeBtn: { position: "absolute", top: 3, right: 3, background: "rgba(0,0,0,0.55)", color: "#fff", border: "none", borderRadius: "50%", width: 18, height: 18, cursor: "pointer", fontSize: 13, lineHeight: "18px", textAlign: "center", padding: 0 },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14, marginBottom: 28 },
   statCard: { background: "#fff", borderRadius: 10, padding: "18px 16px", border: "1px solid #eee", textAlign: "center" },
