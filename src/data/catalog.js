@@ -1904,15 +1904,15 @@ export const displayOrder = {
   ],
   "cat:resin-products": [
     "39",
-    "365:Pink",
-    "365:Blue",
-    "365:Lavender",
-    "59",
     "38",
+    "365:Pink",
     "41",
+    "365:Lavender",
     "365:Yellow",
     "60",
-    "40"
+    "59",
+    "40",
+    "365:Blue"
   ],
   "cat:Customised-Hampers": [
     "295",
