@@ -173,6 +173,26 @@
   line-height: 1.2;
 }
 
+.category-title-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+  margin: 0 0 0.35rem;
+}
+
+.category-title-row .category-page-title {
+  margin: 0;
+}
+
+.category-page-count {
+  font-family: var(--font-family-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #8a8178;
+  white-space: nowrap;
+}
+
 .category-page-emoji {
   font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
 }
@@ -350,3 +370,132 @@
 /* Every other page hero is left-aligned; this one was still centred. */
 .categories-hero { text-align: left; }
 .categories-hero .container > * { margin-inline: 0; }
+
+/* ================================================================
+   FILTER RAIL + SHEET — mirrors All Products (Products.css) under its own
+   class names so neither page's lazily loaded CSS can restyle the other.
+   ================================================================ */
+
+.cat-layout {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.cat-rail {
+  position: sticky;
+  top: calc(var(--navbar-height-desktop, 96px) + 1rem);
+  max-height: calc(100vh - var(--navbar-height-desktop, 96px) - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+}
+.cat-rail::-webkit-scrollbar { width: 5px; }
+.cat-rail::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: var(--radius-full); }
+
+.cat-main { min-width: 0; }
+
+/* The rail takes a column, so the grid drops from four to three. */
+.cat-layout .products-grid { grid-template-columns: repeat(3, 1fr); }
+
+/* The row's top margin would push the chips below the rail's "Filters" heading */
+.cat-main .category-filters-row { margin-top: 0; }
+
+.cat-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* The toggle only exists where the rail cannot be shown. */
+.cat-filter-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  background: #fff;
+  border: 1.5px solid #e0d4d4;
+  border-radius: 20px;
+  font-family: var(--font-family-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a3a3a;
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .cat-layout { grid-template-columns: 196px minmax(0, 1fr); gap: 1.5rem; }
+  .cat-layout .products-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 968px) {
+  .cat-rail { display: none; }
+  .cat-filter-toggle { display: inline-flex; }
+  .cat-layout { display: block; }
+  .cat-layout .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .cat-layout .products-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .cat-filter-toggle { font-size: 0.8rem; padding: 0.3rem 0.75rem; }
+}
+
+.cat-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.cat-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: none;
+  padding: 0;
+  background: rgba(36, 27, 26, 0.45);
+  cursor: pointer;
+}
+
+.cat-sheet-panel {
+  position: relative;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper-raised);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 1.25rem 1.25rem 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: catSheetUp 0.24s var(--ease-premium) both;
+}
+
+@keyframes catSheetUp {
+  from { transform: translateY(12%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-sheet-panel { animation: none; }
+}
+
+.cat-sheet-foot {
+  position: sticky;
+  bottom: 0;
+  padding: 0.9rem 0 calc(0.9rem + env(safe-area-inset-bottom, 0px));
+  background: var(--paper-raised);
+  border-top: 1px solid var(--rule);
+  margin-top: 0.5rem;
+}
+.cat-sheet-foot .btn { width: 100%; }
+
+@media (min-width: 969px) {
+  .cat-sheet { display: none; }
+}
