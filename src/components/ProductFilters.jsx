@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { DELIVERY_BANDS } from '../utils/delivery'
 import './ProductFilters.css'
 
 /**
@@ -56,12 +57,17 @@ const Check = ({ checked, onChange, label, hint }) => (
   </label>
 )
 
+// Category pages omit `categories` (you're already in one) and pass the
+// delivery props instead; All Products passes categories and no delivery.
 const ProductFilters = ({
   categories,
-  selectedCategories,
+  selectedCategories = [],
   onToggleCategory,
   priceBands,
   onTogglePriceBand,
+  deliveryBands,
+  onToggleDeliveryBand,
+  deliveryCounts,
   inStockOnly,
   onToggleInStock,
   onReset,
@@ -79,19 +85,21 @@ const ProductFilters = ({
       )}
     </div>
 
-    <Section title="Category" count={selectedCategories.length}>
-      <div className="pf-scroll">
-        {categories.map(cat => (
-          <Check
-            key={cat.id}
-            checked={selectedCategories.includes(cat.id)}
-            onChange={() => onToggleCategory(cat.id)}
-            label={cat.name}
-            hint={categoryCounts.get(cat.id) ?? 0}
-          />
-        ))}
-      </div>
-    </Section>
+    {categories && (
+      <Section title="Category" count={selectedCategories.length}>
+        <div className="pf-scroll">
+          {categories.map(cat => (
+            <Check
+              key={cat.id}
+              checked={selectedCategories.includes(cat.id)}
+              onChange={() => onToggleCategory(cat.id)}
+              label={cat.name}
+              hint={categoryCounts.get(cat.id) ?? 0}
+            />
+          ))}
+        </div>
+      </Section>
+    )}
 
     <Section title="Price" count={priceBands.length}>
       {PRICE_BANDS.map(band => (
@@ -104,6 +112,20 @@ const ProductFilters = ({
         />
       ))}
     </Section>
+
+    {deliveryBands && (
+      <Section title="Delivery time" count={deliveryBands.length}>
+        {DELIVERY_BANDS.map(band => (
+          <Check
+            key={band.id}
+            checked={deliveryBands.includes(band.id)}
+            onChange={() => onToggleDeliveryBand(band.id)}
+            label={band.label}
+            hint={deliveryCounts.get(band.id) ?? 0}
+          />
+        ))}
+      </Section>
+    )}
 
     <Section title="Availability" count={inStockOnly ? 1 : 0}>
       <Check checked={inStockOnly} onChange={onToggleInStock} label="In stock only" />

@@ -7,6 +7,9 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import SeoHead from '../components/SeoHead'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
+import { useScrollLock } from '../hooks/useScrollLock'
+import ProductFilters, { PRICE_BANDS } from '../components/ProductFilters'
+import { DELIVERY_BANDS, inDeliveryBand } from '../utils/delivery'
 import { expandProductsByColor, productLinkQuery, applyDisplayOrder } from '../utils/productVariants'
 import './Categories.css'
 
@@ -78,10 +81,19 @@ const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState(name || 'All')
   const [activeFilter, setActiveFilter] = useState(null)
   const [sortBy, setSortBy] = useState('default')
+  // Same filter panel as All Products, minus Category, plus Delivery time
+  const [priceBands, setPriceBands] = useState([])
+  const [deliveryBands, setDeliveryBands] = useState([])
+  const [inStockOnly, setInStockOnly] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  useScrollLock(filtersOpen)
   const location = useLocation()
   const navigate = useNavigate()
 
-  useEffect(() => { setSelectedCategory(name || 'All'); setActiveFilter(null); setSortBy('default') }, [name])
+  useEffect(() => {
+    setSelectedCategory(name || 'All'); setActiveFilter(null); setSortBy('default')
+    setPriceBands([]); setDeliveryBands([]); setInStockOnly(false); setFiltersOpen(false)
+  }, [name])
 
   // Smart back
   const handleBack = () => {
@@ -107,7 +119,7 @@ const Categories = () => {
   }, [selectedCategory])
 
   const gridRef = useRef(null)
-  useMobileCenterSwap(gridRef, '.feat-img-zone.has-second-img', [selectedCategory, activeFilter, sortBy])
+  useMobileCenterSwap(gridRef, '.feat-img-zone.has-second-img', [selectedCategory, activeFilter, sortBy, priceBands, deliveryBands, inStockOnly])
 
   const allCats = [...occasionCategories, ...SOURCE_CATS]
   const selectedCategoryObj = selectedCategory === 'All'
@@ -122,9 +134,9 @@ const Categories = () => {
       : getProductsByCategory(selectedCategory)
   ).filter(Boolean)
 
-  const categoryProducts = useMemo(() => {
+  // Style chip first (Hampers, Candles…); the panel filters apply on top
+  const chipProducts = useMemo(() => {
     let products = rawCategoryProducts
-    // Apply sub-filter
     if (activeFilter && FILTER_KEYWORDS[activeFilter]) {
       const keywords = FILTER_KEYWORDS[activeFilter]
       products = products.filter(p => {
@@ -136,6 +148,33 @@ const Categories = () => {
         return keywords.some(kw => searchable.includes(kw))
       })
     }
+    return products
+  }, [rawCategoryProducts, activeFilter])
+
+  const matchesPrice = useCallback(p => !priceBands.length
+    || PRICE_BANDS.some(b => priceBands.includes(b.id) && p.price >= b.min && p.price < b.max), [priceBands])
+  const matchesDelivery = useCallback(p => !deliveryBands.length
+    || DELIVERY_BANDS.some(b => deliveryBands.includes(b.id) && inDeliveryBand(p, b)), [deliveryBands])
+  const matchesStock = useCallback(p => !inStockOnly || p.inStock !== false, [inStockOnly])
+
+  // Counts beside each option, each against the *other* filters, so ticking
+  // one price band doesn't zero out the rest (same as All Products).
+  const { priceCounts, deliveryCounts } = useMemo(() => {
+    const forPrice = chipProducts.filter(p => matchesDelivery(p) && matchesStock(p))
+    const forDelivery = chipProducts.filter(p => matchesPrice(p) && matchesStock(p))
+    return {
+      priceCounts: new Map(PRICE_BANDS.map(b => [b.id, forPrice.filter(p => p.price >= b.min && p.price < b.max).length])),
+      deliveryCounts: new Map(DELIVERY_BANDS.map(b => [b.id, forDelivery.filter(p => inDeliveryBand(p, b)).length])),
+    }
+  }, [chipProducts, matchesPrice, matchesDelivery, matchesStock])
+
+  const activePanelCount = priceBands.length + deliveryBands.length + (inStockOnly ? 1 : 0)
+  const togglePriceBand = useCallback(id => setPriceBands(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]), [])
+  const toggleDeliveryBand = useCallback(id => setDeliveryBands(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]), [])
+  const resetPanel = useCallback(() => { setPriceBands([]); setDeliveryBands([]); setInStockOnly(false) }, [])
+
+  const categoryProducts = useMemo(() => {
+    let products = chipProducts.filter(p => matchesPrice(p) && matchesDelivery(p) && matchesStock(p))
     // Apply sort
     if (sortBy === 'price-asc') products = [...products].sort((a,b) => a.price - b.price)
     else if (sortBy === 'price-desc') products = [...products].sort((a,b) => b.price - a.price)
@@ -146,7 +185,7 @@ const Categories = () => {
       ? `occ:${selectedCategory}`
       : `cat:${getCategoryByIdOrSlug(selectedCategory)?.id}`
     return applyDisplayOrder(expanded, displayOrder[orderKey])
-  }, [rawCategoryProducts, activeFilter, sortBy, selectedCategory])
+  }, [chipProducts, matchesPrice, matchesDelivery, matchesStock, sortBy, selectedCategory])
 
   const seoTitle = selectedCategoryObj
     ? `${selectedCategoryObj.name}: Handmade Gifts`
@@ -210,47 +249,116 @@ const Categories = () => {
             <div className="category-products-section">
               <div className="category-header">
                 <button onClick={handleBack} className="back-to-categories">{backLabel}</button>
-                <h1 className="category-page-title">
-                  {selectedCategoryObj?.emoji && <span className="category-page-emoji">{selectedCategoryObj.emoji} </span>}
-                  {selectedCategoryObj?.name || selectedCategory}
-                </h1>
+                <div className="category-title-row">
+                  <h1 className="category-page-title">
+                    {selectedCategoryObj?.emoji && <span className="category-page-emoji">{selectedCategoryObj.emoji} </span>}
+                    {selectedCategoryObj?.name || selectedCategory}
+                  </h1>
+                  {/* Counts what the grid shows, so it follows the sub-filter chips */}
+                  <span className="category-page-count">
+                    {categoryProducts.length} {categoryProducts.length === 1 ? 'item' : 'items'}
+                  </span>
+                </div>
               </div>
 
-              {/* Sub-filters + sort */}
-              {CATEGORY_FILTERS[selectedCategory] && (
-                <div className="category-filters-row">
-                  <div className="category-filter-chips">
-                    <button
-                      className={`cat-filter-chip${!activeFilter ? ' active' : ''}`}
-                      onClick={() => setActiveFilter(null)}
-                    >All</button>
-                    {CATEGORY_FILTERS[selectedCategory].map(f => (
-                      <button
-                        key={f}
-                        className={`cat-filter-chip${activeFilter === f ? ' active' : ''}`}
-                        onClick={() => setActiveFilter(f === activeFilter ? null : f)}
-                      >{f}</button>
-                    ))}
-                  </div>
-                  <select className="cat-sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                    <option value="default">Sort: Relevance</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="name">Name: A–Z</option>
-                  </select>
-                </div>
-              )}
+              {/* Same layout as All Products: filter rail on desktop, a
+                  "Filters" button + bottom sheet below 969px. */}
+              <div className="cat-layout">
+                <aside className="cat-rail">
+                  <ProductFilters
+                  priceBands={priceBands}
+                  onTogglePriceBand={togglePriceBand}
+                  priceCounts={priceCounts}
+                  deliveryBands={deliveryBands}
+                  onToggleDeliveryBand={toggleDeliveryBand}
+                  deliveryCounts={deliveryCounts}
+                  inStockOnly={inStockOnly}
+                  onToggleInStock={() => setInStockOnly(v => !v)}
+                  onReset={resetPanel}
+                  activeCount={activePanelCount}
+                  />
+                </aside>
 
-              {categoryProducts.length > 0 ? (
-                <div className="products-grid" ref={gridRef}>
-                  {categoryProducts.map((product, index) => (
-                    <ProductCard key={product._variantKey || product.id} product={product} index={index} />
-                  ))}
+                <div className="cat-main">
+                  {/* Style chips (where the category has them) + filters + sort */}
+                  <div className="category-filters-row">
+                    {CATEGORY_FILTERS[selectedCategory] ? (
+                      <div className="category-filter-chips">
+                        <button
+                          className={`cat-filter-chip${!activeFilter ? ' active' : ''}`}
+                          onClick={() => setActiveFilter(null)}
+                        >All</button>
+                        {CATEGORY_FILTERS[selectedCategory].map(f => (
+                          <button
+                            key={f}
+                            className={`cat-filter-chip${activeFilter === f ? ' active' : ''}`}
+                            onClick={() => setActiveFilter(f === activeFilter ? null : f)}
+                          >{f}</button>
+                        ))}
+                      </div>
+                    ) : <div className="category-filter-chips" />}
+                    <div className="cat-toolbar-actions">
+                      <button type="button" className="cat-filter-toggle" onClick={() => setFiltersOpen(true)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                          <line x1="4" y1="7" x2="20" y2="7" /><line x1="7" y1="12" x2="17" y2="12" />
+                          <line x1="10" y1="17" x2="14" y2="17" />
+                        </svg>
+                        Filters
+                        {activePanelCount > 0 && <span className="pf-count">{activePanelCount}</span>}
+                      </button>
+                      <select className="cat-sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                        <option value="default">Sort: Relevance</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="name">Name: A–Z</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {categoryProducts.length > 0 ? (
+                    <div className="products-grid" ref={gridRef}>
+                      {categoryProducts.map((product, index) => (
+                        <ProductCard key={product._variantKey || product.id} product={product} index={index} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-products">
+                      <p>No products match these filters.</p>
+                      {activePanelCount > 0 || activeFilter ? (
+                        <button type="button" className="back-to-categories" onClick={() => { resetPanel(); setActiveFilter(null) }}>
+                          Clear filters
+                        </button>
+                      ) : (
+                        <Link to="/products" className="back-to-categories">Browse all products</Link>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="no-products">
-                  <p>No products found.</p>
-                  <Link to="/products" className="back-to-categories">Browse all products</Link>
+              </div>
+
+              {filtersOpen && (
+                <div className="cat-sheet" role="dialog" aria-modal="true" aria-label="Filters">
+                  <button type="button" className="cat-sheet-backdrop" aria-label="Close filters" onClick={() => setFiltersOpen(false)} />
+                  <div className="cat-sheet-panel">
+                    <ProductFilters
+                      priceBands={priceBands}
+                      onTogglePriceBand={togglePriceBand}
+                      priceCounts={priceCounts}
+                      deliveryBands={deliveryBands}
+                      onToggleDeliveryBand={toggleDeliveryBand}
+                      deliveryCounts={deliveryCounts}
+                      inStockOnly={inStockOnly}
+                      onToggleInStock={() => setInStockOnly(v => !v)}
+                      onReset={resetPanel}
+                      activeCount={activePanelCount}
+                    />
+                    <div className="cat-sheet-foot">
+                      <button type="button" className="btn btn--primary" onClick={() => setFiltersOpen(false)}>
+                        Show {categoryProducts.length} {categoryProducts.length === 1 ? 'gift' : 'gifts'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

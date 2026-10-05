@@ -14,6 +14,7 @@ import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
 import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } from '../utils/reviewsApi'
 import { buildReviewSchema } from '../utils/reviewSchema'
+import { getDeliveryWindow } from '../utils/delivery'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -156,11 +157,8 @@ const ProductDetail = () => {
     const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]}`
     const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r }
 
-    // Parse delivery_time like "3-4 days", "7 days", etc. Default 3-4 making + 3-4 delivery
-    const raw = product?.meta?.delivery_time || ''
-    const nums = raw.match(/\d+/g)?.map(Number) || []
-    const makingMin = nums[0] || 3
-    const makingMax = nums[1] || makingMin + 1
+    // Shared with the category "Delivery time" filter so the two always agree
+    const { makingMin, makingMax } = getDeliveryWindow(product)
 
     const dispatchMin = addDays(today, makingMin)
     const dispatchMax = addDays(today, makingMax)
