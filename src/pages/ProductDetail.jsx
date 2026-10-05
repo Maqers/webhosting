@@ -13,6 +13,7 @@ import { trackEvent } from '../utils/analytics'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
 import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } from '../utils/reviewsApi'
+import { buildReviewSchema } from '../utils/reviewSchema'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -486,6 +487,8 @@ const ProductDetail = () => {
     ...(product.tags?.length > 0 && {
       keywords: product.tags.join(', '),
     }),
+    // Star ratings in search results, from real reviews only
+    ...buildReviewSchema(product.meta?.reviews, customerReviews),
     offers: {
       '@type': 'Offer',
       url: `${BASE_URL}/product/${product.slug}`,

@@ -26,6 +26,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
+import { buildReviewSchema } from '../src/utils/reviewSchema.js'
+import { SUPABASE_REVIEWS_URL, SUPABASE_PUBLIC_KEY } from './supabase-public.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
@@ -53,6 +55,27 @@ const toPlainText = (desc) =>
     .replace(/\s{2,}/g, ' ')
     .trim()
 
+// Customer reviews live in Supabase (the product page fetches them in the
+// browser). Pull them at build time too so the static JSON-LD includes them.
+// Never fail the build over this: fall back to catalog reviews only.
+async function fetchCustomerReviews() {
+  try {
+    const res = await fetch(SUPABASE_REVIEWS_URL, {
+      headers: { apikey: SUPABASE_PUBLIC_KEY, Authorization: `Bearer ${SUPABASE_PUBLIC_KEY}` },
+      signal: AbortSignal.timeout(8000),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const rows = await res.json()
+    const byProduct = {}
+    for (const r of rows) (byProduct[r.product_id] ||= []).push(r)
+    return byProduct
+  } catch (err) {
+    console.warn(`⚠ prerender-products — couldn't fetch customer reviews (${err.message}); using catalog reviews only`)
+    return {}
+  }
+}
+const customerReviewsByProduct = await fetchCustomerReviews()
+
 const products = getAllProducts()
 let written = 0
 
@@ -77,6 +100,7 @@ for (const product of products) {
     brand: { '@type': 'Brand', name: 'Maqers' },
     ...(categoryName && { category: categoryName }),
     ...(product.tags?.length > 0 && { keywords: product.tags.join(', ') }),
+    ...buildReviewSchema(product.meta?.reviews, customerReviewsByProduct[product.id]),
     offers: {
       '@type': 'Offer',
       url: canonicalUrl,
