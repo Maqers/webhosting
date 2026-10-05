@@ -87,7 +87,7 @@ function writePage({ path, title, description, heading, body, jsonLd }) {
   <meta data-rh="true" name="twitter:description" content="${escapeHtml(desc)}">
   ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ''}
 </head>`
-  const root = `<div id="root"><main>
+  const root = `<div id="root"><main data-prerender>
     <h1>${escapeHtml(heading)}</h1>
     <p>${escapeHtml(description)}</p>
     ${body || ''}

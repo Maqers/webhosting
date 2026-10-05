@@ -111,7 +111,7 @@ for (const product of products) {
 </head>`
 
   const inStock = product.inStock !== false
-  const fallbackContent = `<div id="root"><main>
+  const fallbackContent = `<div id="root"><main data-prerender>
     <h1>${escapeHtml(product.title)}</h1>
     <p>by Maqers</p>
     <img src="${primaryImage}" alt="${escapeHtml(product.title)}" width="600">

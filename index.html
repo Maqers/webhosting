@@ -67,6 +67,12 @@
       overflow-x: hidden;
     }
 
+    /* Prerendered crawler copy (scripts/prerender-*.js) sits inside #root
+       until React replaces it. Keep it out of sight so visitors see the plain
+       background for that moment instead of an unstyled list of links. It is
+       still in the HTML for crawlers; no-JS visitors get it via <noscript>. */
+    [data-prerender] { display: none; }
+
     #root {
       min-height: 100vh;
       min-height: -webkit-fill-available;
@@ -150,6 +156,7 @@
       }
     }
   </style>
+  <noscript><style>[data-prerender] { display: block; }</style></noscript>
 </head>
 
 <body>
