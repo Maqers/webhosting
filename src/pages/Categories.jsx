@@ -13,6 +13,7 @@ import { DELIVERY_BANDS, inDeliveryBand } from '../utils/delivery'
 import { expandProductsByColor, productLinkQuery, applyDisplayOrder } from '../utils/productVariants'
 import './Categories.css'
 import OfferTag from '../components/OfferTag'
+import CardPrice from '../components/CardPrice'
 import { categorySeo, lowestPrice } from '../utils/seoCopy'
 
 const occasionCategories = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
@@ -432,18 +433,7 @@ const ProductCard = ({ product, index }) => {
       <div className="feat-info-zone">
         <p className="feat-category">{product.category || product.categoryId}</p>
         <h3 className="feat-title">{product.title}</h3>
-        <p className="feat-price">
-          {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
-            `₹${product.price.toLocaleString("en-IN")} onwards`
-          ) : product.meta?.originalPrice > product.price ? (
-            <>
-              <span className="feat-price-original">₹{product.meta.originalPrice.toLocaleString("en-IN")}</span>
-              <span className="feat-price-current">₹{product.price.toLocaleString("en-IN")}</span>
-            </>
-          ) : (
-            `₹${product.price.toLocaleString("en-IN")}`
-          )}
-        </p>
+        <CardPrice product={product} />
         <OfferTag product={product} />
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button

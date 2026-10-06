@@ -15,6 +15,7 @@ import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
 import './Products.css'
 import OfferTag from '../components/OfferTag'
+import CardPrice from '../components/CardPrice'
 
 let cachedCategories = null
 let cachedCategoryMap = null
@@ -474,18 +475,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
       <div className="feat-info-zone">
         <p className="feat-category">{categoryName}</p>
         <h3 className="feat-title">{product.title}</h3>
-        <p className="feat-price">
-          {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
-            `₹${product.price.toLocaleString("en-IN")} onwards`
-          ) : product.meta?.originalPrice > product.price ? (
-            <>
-              <span className="feat-price-original">₹{product.meta.originalPrice.toLocaleString("en-IN")}</span>
-              <span className="feat-price-current">₹{product.price.toLocaleString("en-IN")}</span>
-            </>
-          ) : (
-            `₹${product.price.toLocaleString("en-IN")}`
-          )}
-        </p>
+        <CardPrice product={product} />
         <OfferTag product={product} />
 
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>

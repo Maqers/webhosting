@@ -12,6 +12,7 @@ import SeoHead from "../components/SeoHead";
 import { useMobileCenterSwap } from "../hooks/useMobileCenterSwap";
 import "./Home.css";
 import OfferTag from '../components/OfferTag';
+import CardPrice from '../components/CardPrice';
 
 // Raksha Bandhan 2026 falls on Aug 28 — this banner auto-hides itself the day
 // after, reverting to the normal hero with no code change needed next year.
@@ -380,18 +381,7 @@ export const FeaturedCard = ({ product, index }) => {
       <div className="feat-info-zone">
         <p className="feat-category">{product.category}</p>
         <h3 className="feat-title">{product.title}</h3>
-        <p className="feat-price">
-          {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
-            `₹${product.price.toLocaleString("en-IN")} onwards`
-          ) : product.meta?.originalPrice > product.price ? (
-            <>
-              <span className="feat-price-original">₹{product.meta.originalPrice.toLocaleString("en-IN")}</span>
-              <span className="feat-price-current">₹{product.price.toLocaleString("en-IN")}</span>
-            </>
-          ) : (
-            `₹${product.price.toLocaleString("en-IN")}`
-          )}
-        </p>
+        <CardPrice product={product} />
         <OfferTag product={product} />
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button

@@ -16,6 +16,7 @@ import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } f
 import { buildReviewSchema } from '../utils/reviewSchema'
 import { getDeliveryWindow, getDeliveryFee } from '../utils/delivery'
 import OfferTag from '../components/OfferTag'
+import { hasDiwaliOffer, priceWithDiwaliCode } from '../data/offers'
 import { productMetaDescription } from '../utils/seoCopy'
 import './ProductDetail.css'
 import './Home.css'
@@ -687,21 +688,27 @@ const ProductDetail = () => {
             <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
 
             <div className="price-section">
-              {product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0 ? (
-                <span className="product-detail-price">
-                  {selectedSize && product.meta.sizePrices[selectedSize]
-                    ? `₹${Number(product.meta.sizePrices[selectedSize]).toLocaleString("en-IN")}`
-                    : `₹${product.price.toLocaleString("en-IN")} onwards`
-                  }
-                </span>
-              ) : product.meta?.originalPrice > product.price ? (
-                <>
-                  <span className="product-detail-price-original">₹{product.meta.originalPrice.toLocaleString("en-IN")}</span>
-                  <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
-                </>
-              ) : (
-                <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
-              )}
+              {(() => {
+                const hasSizes = product.meta?.sizePrices && Object.keys(product.meta.sizePrices).length > 0
+                const sizePrice = hasSizes && selectedSize && product.meta.sizePrices[selectedSize]
+                const price = sizePrice ? Number(sizePrice) : product.price
+                const onwards = hasSizes && !sizePrice ? ' onwards' : ''
+                const original = !hasSizes && product.meta?.originalPrice > product.price ? product.meta.originalPrice : null
+                // Diwali code live: regular price struck through, code price beside it
+                if (hasDiwaliOffer(product)) return (
+                  <>
+                    <span className="product-detail-price-original">₹{(original || price).toLocaleString("en-IN")}</span>
+                    <span className="product-detail-price">₹{priceWithDiwaliCode(price).toLocaleString("en-IN")}{onwards}</span>
+                  </>
+                )
+                if (original) return (
+                  <>
+                    <span className="product-detail-price-original">₹{original.toLocaleString("en-IN")}</span>
+                    <span className="product-detail-price">₹{price.toLocaleString("en-IN")}</span>
+                  </>
+                )
+                return <span className="product-detail-price">₹{price.toLocaleString("en-IN")}{onwards}</span>
+              })()}
             </div>
 
             <OfferTag product={product} variant="detail" />
