@@ -161,6 +161,34 @@
   margin: 0.25rem 0 0;
 }
 
+.cart-item-price-original {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-tertiary, #999);
+  text-decoration: line-through;
+  margin-right: 0.4rem;
+}
+
+.cart-item-coupon {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #1a6e3c;
+  background: #e8f5ec;
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+  margin: 0.3rem 0 0;
+}
+
+/* Delivery banner + totals: below the last product, scrolling with the list */
+.cart-summary {
+  /* The last product's own bottom border already separates it */
+  padding: 1.25rem 0 0.5rem;
+}
+
+.cart-coupon-row .cart-total-amount { color: #1a6e3c; }
+
 .cart-item-controls {
   display: flex;
   align-items: center;
@@ -218,10 +246,13 @@
 
 /* Footer */
 .cart-footer {
-  padding: 1.25rem 1.5rem 1.5rem;
+  /* Only the checkout button stays pinned; the summary scrolls above it */
+  padding: 0.75rem 1.5rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid #e8e2da;
   background: #faf8f5;
 }
+
+.cart-footer .cart-checkout-btn { margin-bottom: 0; }
 
 .cart-subtotal {
   display: flex;

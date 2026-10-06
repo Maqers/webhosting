@@ -9,7 +9,7 @@ import SeoHead from '../components/SeoHead'
 import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
-import { DIWALI_COUPON, isOfferLive } from '../data/offers'
+import { DIWALI_COUPON, isOfferLive, diwaliCartDiscount } from '../data/offers'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import './Checkout.css'
 
@@ -36,9 +36,8 @@ const ALL_COUPONS = [
   {
     code: DIWALI_COUPON.code,
     endsAt: DIWALI_COUPON.endsAt,
-    discountFor: (items) => Math.round(
-      items.filter(i => DIWALI_COUPON.productIds.has(i.id)).reduce((sum, i) => sum + i.price * i.qty, 0) * DIWALI_COUPON.percent / 100
-    ),
+    // Same per-unit rounding as the card and cart prices
+    discountFor: (items) => diwaliCartDiscount(items),
     pitch: `${DIWALI_COUPON.percent}% off every Diwali gift in your bag`,
     locked: () => `Add a Diwali gift to use ${DIWALI_COUPON.percent}% off`,
   },
@@ -89,6 +88,13 @@ export default function Checkout() {
   useEffect(() => {
     if (appliedCoupon && couponDiscount <= 0) setAppliedCode(null)
   }, [appliedCoupon, couponDiscount])
+  // The cart drawer already shows MAQERSDIWALI5 as applied on Diwali items, so
+  // apply it here too unless the shopper removed it or picked another code.
+  const [autoApplyOff, setAutoApplyOff] = useState(false)
+  const diwaliSaving = couponSavings[DIWALI_COUPON.code] || 0
+  useEffect(() => {
+    if (!autoApplyOff && !appliedCode && diwaliSaving > 0) setAppliedCode(DIWALI_COUPON.code)
+  }, [autoApplyOff, appliedCode, diwaliSaving])
   const grandTotal = total + deliveryFee - couponDiscount
   const couponNote = couponApplied ? `, ${appliedCode} -₹${couponDiscount}` : ''
 
@@ -753,7 +759,7 @@ export default function Checkout() {
                       </span>
                     </div>
                     {isApplied ? (
-                      <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => setAppliedCode(null)}>
+                      <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => { setAutoApplyOff(true); setAppliedCode(null) }}>
                         Remove
                       </button>
                     ) : (

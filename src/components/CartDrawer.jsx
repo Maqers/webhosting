@@ -2,15 +2,20 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useScrollLock } from '../hooks/useScrollLock'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
+import { DIWALI_COUPON, hasDiwaliOffer, priceWithDiwaliCode, diwaliCartDiscount } from '../data/offers'
 import './CartDrawer.css'
 
 export default function CartDrawer() {
   const { items, removeItem, updateQty, total, count, isOpen, setIsOpen } = useCart()
 
-  // Same rule as checkout (utils/delivery.js)
+  // Same rules as checkout: delivery on the pre-coupon subtotal
+  // (utils/delivery.js), and MAQERSDIWALI5 applied to Diwali items
+  // (data/offers.js), which checkout auto-applies to match.
   const deliveryFee = getDeliveryFee(total)
   const deliveryFree = deliveryFee === 0
-  const grandTotal = total + deliveryFee
+  const couponDiscount = diwaliCartDiscount(items)
+  const grandTotal = total - couponDiscount + deliveryFee
+  const inr = (n) => `₹${n.toLocaleString('en-IN')}`
 
   useScrollLock(isOpen)
 
@@ -63,7 +68,17 @@ export default function CartDrawer() {
                     {item.orderNote?.trim() && (
                       <p className="cart-item-variant">Note: {item.orderNote.trim()}</p>
                     )}
-                    <p className="cart-item-price">₹{item.price.toLocaleString('en-IN')}</p>
+                    {hasDiwaliOffer(item) ? (
+                      <>
+                        <p className="cart-item-price">
+                          <span className="cart-item-price-original">{inr(item.price)}</span>
+                          {inr(priceWithDiwaliCode(item.price))}
+                        </p>
+                        <p className="cart-item-coupon">✓ {DIWALI_COUPON.code} applied</p>
+                      </>
+                    ) : (
+                      <p className="cart-item-price">{inr(item.price)}</p>
+                    )}
                     <div className="cart-item-controls">
                       <div className="cart-qty">
                         <button onClick={() => updateQty(item.key, item.qty - 1)} disabled={item.qty <= 1}>−</button>
@@ -79,41 +94,49 @@ export default function CartDrawer() {
                   </div>
                 </div>
               ))}
+
+              {/* Summary sits under the products and scrolls with them */}
+              <div className="cart-summary">
+                {deliveryFree ? (
+                  <div className="cart-free-delivery-banner">🎉 FREE DELIVERY UNLOCKED!</div>
+                ) : (
+                  <div className="cart-delivery-nudge">
+                    Add {inr(FREE_DELIVERY_MIN - total)} more for FREE delivery
+                  </div>
+                )}
+                <div className="cart-subtotal">
+                  <span>SUBTOTAL</span>
+                  <span className="cart-total-amount">{inr(total)}</span>
+                </div>
+                {couponDiscount > 0 && (
+                  <div className="cart-subtotal cart-coupon-row">
+                    <span>COUPON ({DIWALI_COUPON.code})</span>
+                    <span className="cart-total-amount">−{inr(couponDiscount)}</span>
+                  </div>
+                )}
+                <div className="cart-subtotal">
+                  <span>DELIVERY</span>
+                  <span className={`cart-total-amount ${deliveryFree ? 'cart-delivery-free' : ''}`}>
+                    {deliveryFree ? 'FREE' : inr(deliveryFee)}
+                  </span>
+                </div>
+                <div className="cart-subtotal cart-grand-total">
+                  <span>TOTAL</span>
+                  <span className="cart-total-amount">{inr(grandTotal)}</span>
+                </div>
+                <button className="cart-continue-link" onClick={() => setIsOpen(false)}>
+                  CONTINUE SHOPPING
+                </button>
+              </div>
             </div>
           )}
         </div>
 
         {items.length > 0 && (
           <div className="cart-footer">
-            {deliveryFree ? (
-              <div className="cart-free-delivery-banner">
-                🎉 FREE DELIVERY UNLOCKED!
-              </div>
-            ) : (
-              <div className="cart-delivery-nudge">
-                Add ₹{(FREE_DELIVERY_MIN - total).toLocaleString('en-IN')} more for FREE delivery
-              </div>
-            )}
-            <div className="cart-subtotal">
-              <span>SUBTOTAL</span>
-              <span className="cart-total-amount">₹{total.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="cart-subtotal">
-              <span>DELIVERY</span>
-              <span className={`cart-total-amount ${deliveryFree ? 'cart-delivery-free' : ''}`}>
-                {deliveryFree ? 'FREE' : `₹${deliveryFee}`}
-              </span>
-            </div>
-            <div className="cart-subtotal cart-grand-total">
-              <span>TOTAL</span>
-              <span className="cart-total-amount">₹{grandTotal.toLocaleString('en-IN')}</span>
-            </div>
             <Link to="/checkout" className="cart-checkout-btn" onClick={() => setIsOpen(false)}>
-              PROCEED TO CHECKOUT
+              PROCEED TO CHECKOUT · {inr(grandTotal)}
             </Link>
-            <button className="cart-continue-link" onClick={() => setIsOpen(false)}>
-              CONTINUE SHOPPING
-            </button>
           </div>
         )}
       </div>

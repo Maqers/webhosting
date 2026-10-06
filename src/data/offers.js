@@ -19,6 +19,12 @@ export const isOfferLive = (offer, now = Date.now()) => now <= offer.endsAt
 export const hasDiwaliOffer = (product, now = Date.now()) =>
   !!product && isOfferLive(DIWALI_COUPON, now) && DIWALI_COUPON.productIds.has(product.id)
 
-// Price after the Diwali code, rounded exactly like checkout's discount
-export const priceWithDiwaliCode = (price) =>
-  price - Math.round((Number(price) * DIWALI_COUPON.percent) / 100)
+// Discount per unit, rounded per unit. The card, cart and checkout all use
+// this, so a ₹950 item is ₹902 everywhere (and a cart total never drifts ₹1
+// from the sum of its lines).
+export const diwaliUnitDiscount = (price) => Math.round((Number(price) * DIWALI_COUPON.percent) / 100)
+export const priceWithDiwaliCode = (price) => price - diwaliUnitDiscount(price)
+
+// Total code discount for cart lines ({ id, price, qty }); 0 once it ends
+export const diwaliCartDiscount = (items, now = Date.now()) =>
+  items.reduce((sum, i) => sum + (hasDiwaliOffer(i, now) ? diwaliUnitDiscount(i.price) * i.qty : 0), 0)
