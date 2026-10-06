@@ -10,6 +10,7 @@ import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
 import { occasionProductMap } from '../data/catalog'
+import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import './Checkout.css'
 
 const UPI_ID = '9650800399@pthdfc'
@@ -42,10 +43,6 @@ const COUPONS = [
     locked: () => 'Add a Diwali gift to use 5% off',
   },
 ]
-
-function getDeliveryFee(subtotal) {
-  return 0
-}
 
 function generateOrderId() {
   return 'MQ' + Date.now().toString(36).toUpperCase()
@@ -284,7 +281,7 @@ export default function Checkout() {
           shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
           items_list: buildItemsText(),
           subtotal: `₹${total.toLocaleString('en-IN')}`,
-          delivery_fee: 'FREE',
+          delivery_fee: deliveryFee ? `₹${deliveryFee}` : 'FREE',
           grand_total: `₹${grandTotal.toLocaleString('en-IN')}${couponApplied ? ` (${appliedCode} saved you ₹${couponDiscount})` : ''}`,
           upi_id: UPI_ID,
         },
@@ -769,7 +766,9 @@ export default function Checkout() {
                 </div>
                 <div className="checkout-summary-row">
                   <span>Delivery</span>
-                  <span className='checkout-free-delivery'>FREE</span>
+                  {deliveryFee
+                    ? <span>₹{deliveryFee}</span>
+                    : <span className='checkout-free-delivery'>FREE</span>}
                 </div>
                 {couponApplied && (
                   <div className="checkout-summary-row">
@@ -777,7 +776,9 @@ export default function Checkout() {
                     <span className="checkout-coupon-discount">&minus;₹{couponDiscount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
-                <p className="checkout-free-msg">🎉 Free delivery!</p>
+                {deliveryFee
+                  ? <p className="checkout-delivery-nudge">Add ₹{(FREE_DELIVERY_MIN - total).toLocaleString('en-IN')} more for free delivery</p>
+                  : <p className="checkout-free-msg">🎉 Free delivery!</p>}
                 <div className="checkout-summary-row checkout-grand-total">
                   <span>Total</span>
                   <span className="checkout-total-val">₹{grandTotal.toLocaleString('en-IN')}</span>

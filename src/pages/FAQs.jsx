@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import SeoHead from '../components/SeoHead'
+import { FREE_DELIVERY_MIN, DELIVERY_FEE } from '../utils/delivery'
 import './FAQs.css'
 
 const FAQs = () => {
@@ -17,7 +18,7 @@ const FAQs = () => {
     },
     {
       question: "Do you ship across India?",
-      answer: "Yes, we ship anywhere in India. Delivery is free on orders above Rs. 1,500. For orders below that, a flat delivery fee of Rs. 60 applies."
+      answer: `Yes, we ship anywhere in India. Delivery is free on orders of Rs. ${FREE_DELIVERY_MIN} and above. For orders below that, a flat delivery fee of Rs. ${DELIVERY_FEE} applies.`
     },
     {
       question: "How long does delivery take?",

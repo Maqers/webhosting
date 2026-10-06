@@ -29,3 +29,12 @@ export const inDeliveryBand = (product, band) => {
   const { deliveryMaxDays } = getDeliveryWindow(product)
   return deliveryMaxDays >= band.min && deliveryMaxDays <= band.max
 }
+
+// ── Delivery charge ──────────────────────────────────────────────────────────
+// Single source of truth for the delivery fee, used by the cart drawer,
+// checkout, the product page's structured data and the Google Merchant feed.
+// Change the numbers here and everything (including Google) follows.
+export const FREE_DELIVERY_MIN = 499 // carts of ₹499 and above deliver free
+export const DELIVERY_FEE = 49 // flat fee below that
+
+export const getDeliveryFee = (subtotal) => (subtotal >= FREE_DELIVERY_MIN ? 0 : DELIVERY_FEE)

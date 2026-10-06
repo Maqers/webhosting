@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useScrollLock } from '../hooks/useScrollLock'
+import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import './CartDrawer.css'
 
 export default function CartDrawer() {
   const { items, removeItem, updateQty, total, count, isOpen, setIsOpen } = useCart()
 
-  const DELIVERY_THRESHOLD = 500
-  const DELIVERY_CHARGE = 49
-  const deliveryFree = total >= DELIVERY_THRESHOLD
-  const grandTotal = deliveryFree ? total : total + DELIVERY_CHARGE
+  // Same rule as checkout (utils/delivery.js)
+  const deliveryFee = getDeliveryFee(total)
+  const deliveryFree = deliveryFee === 0
+  const grandTotal = total + deliveryFee
 
   useScrollLock(isOpen)
 
@@ -90,7 +91,7 @@ export default function CartDrawer() {
               </div>
             ) : (
               <div className="cart-delivery-nudge">
-                Add ₹{(DELIVERY_THRESHOLD - total).toLocaleString('en-IN')} more for FREE delivery
+                Add ₹{(FREE_DELIVERY_MIN - total).toLocaleString('en-IN')} more for FREE delivery
               </div>
             )}
             <div className="cart-subtotal">
@@ -100,7 +101,7 @@ export default function CartDrawer() {
             <div className="cart-subtotal">
               <span>DELIVERY</span>
               <span className={`cart-total-amount ${deliveryFree ? 'cart-delivery-free' : ''}`}>
-                {deliveryFree ? 'FREE' : `₹${DELIVERY_CHARGE}`}
+                {deliveryFree ? 'FREE' : `₹${deliveryFee}`}
               </span>
             </div>
             <div className="cart-subtotal cart-grand-total">

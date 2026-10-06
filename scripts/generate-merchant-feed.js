@@ -23,7 +23,7 @@ import { writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
-import { getDeliveryWindow } from '../src/utils/delivery.js'
+import { getDeliveryWindow, getDeliveryFee } from '../src/utils/delivery.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
@@ -108,11 +108,12 @@ const items = products.map((product) => {
     `    <g:identifier_exists>no</g:identifier_exists>\n` +
     (googleCategory ? `    <g:google_product_category>${escapeXml(googleCategory)}</g:google_product_category>\n` : '') +
     (categoryName ? `    <g:product_type>${escapeXml(categoryName)}</g:product_type>\n` : '') +
-    // Free delivery across India: 3-4 days in transit after the making time
+    // Google prices shipping for one unit bought alone, so this is the same
+    // rule as checkout applied to the item's price: free from ₹499, else ₹49
     `    <g:shipping>\n` +
     `      <g:country>IN</g:country>\n` +
     `      <g:service>Standard</g:service>\n` +
-    `      <g:price>0 INR</g:price>\n` +
+    `      <g:price>${getDeliveryFee(product.price)} INR</g:price>\n` +
     `      <g:min_transit_time>3</g:min_transit_time>\n` +
     `      <g:max_transit_time>4</g:max_transit_time>\n` +
     `    </g:shipping>\n` +

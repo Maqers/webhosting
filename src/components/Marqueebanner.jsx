@@ -10,7 +10,7 @@ const Diamond = () => (
 // Emoji removed: they rendered as a different glyph on every platform and sat
 // mid-sentence in an otherwise typographic band.
 const desktopItems = [
-  "Free delivery above \u20B9499",
+  "Free delivery on \u20B9499 and above",
   "Straight from artisan hands",
   "Every seller personally vetted",
   "One of a kind pieces",
@@ -19,7 +19,7 @@ const desktopItems = [
 ];
 
 const mobileItems = [
-  "Free delivery above \u20B9499",
+  "Free delivery on \u20B9499 and above",
   "Every seller personally vetted",
   "One of a kind pieces",
   "Ships across India",

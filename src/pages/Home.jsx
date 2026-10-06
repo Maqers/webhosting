@@ -151,7 +151,7 @@ const Home = () => {
                     Help me choose
                   </button>
                 </div>
-                <p className="hero-note">Free delivery over &#8377;499, anywhere in India.</p>
+                <p className="hero-note">Free delivery on &#8377;499 and above, anywhere in India.</p>
               </>
             ) : (
               <>
@@ -176,7 +176,7 @@ const Home = () => {
                     <span className="hero-only-mobile">✨ Find the Perfect Gift</span>
                   </button>
                 </div>
-                <p className="hero-note">Free delivery over &#8377;499, anywhere in India.</p>
+                <p className="hero-note">Free delivery on &#8377;499 and above, anywhere in India.</p>
               </>
             )}
           </div>

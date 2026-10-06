@@ -14,7 +14,7 @@ import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
 import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } from '../utils/reviewsApi'
 import { buildReviewSchema } from '../utils/reviewSchema'
-import { getDeliveryWindow } from '../utils/delivery'
+import { getDeliveryWindow, getDeliveryFee } from '../utils/delivery'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -506,23 +506,25 @@ const ProductDetail = () => {
       },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
+        // Shipping for this item bought on its own, same rule as checkout
         shippingRate: {
           '@type': 'MonetaryAmount',
-          value: 0,
+          value: getDeliveryFee(product.price),
           currency: 'INR',
         },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
+          // Same making time + 3-4 days transit as the timeline on this page
           handlingTime: {
             '@type': 'QuantitativeValue',
-            minValue: 1,
-            maxValue: 3,
+            minValue: getDeliveryWindow(product).makingMin,
+            maxValue: getDeliveryWindow(product).makingMax,
             unitCode: 'DAY',
           },
           transitTime: {
             '@type': 'QuantitativeValue',
-            minValue: 7,
-            maxValue: 14,
+            minValue: 3,
+            maxValue: 4,
             unitCode: 'DAY',
           },
         },
