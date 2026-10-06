@@ -23,6 +23,7 @@ import { writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
+import { getDeliveryWindow } from '../src/utils/delivery.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
@@ -47,6 +48,33 @@ const toPlainText = (desc) =>
     .replace(/\s{2,}/g, ' ')
     .trim()
 
+// Google product category per catalog category: exact paths from
+// google.com/basepages/producttype/taxonomy.en-US.txt (anything not on that
+// list is ignored by Google). Hampers mix decor, candles and treats, so they
+// go under Gift Giving rather than Google's food-only gift baskets.
+const GOOGLE_CATEGORY = {
+  'Florals':              'Home & Garden > Decor > Artificial Flora',
+  'Candles':              'Home & Garden > Decor > Home Fragrances > Candles',
+  'Handbags':             'Apparel & Accessories > Handbags, Wallets & Cases > Handbags',
+  'Frames&Paintings':     'Home & Garden > Decor > Artwork',
+  'Home-decor':           'Home & Garden > Decor',
+  'resin-products':       'Home & Garden > Decor',
+  'Handmade-Accessories': 'Apparel & Accessories > Jewelry',
+  'Customised-Hampers':   'Arts & Entertainment > Party & Celebration > Gift Giving',
+  'Handmade-Soaps':       'Health & Beauty > Personal Care > Cosmetics > Bath & Body > Bar Soap',
+  'Wedding-Gifts':        'Arts & Entertainment > Party & Celebration > Gift Giving',
+  'Cosmetics':            'Health & Beauty > Personal Care > Cosmetics',
+  'Kids-Accessories':     'Apparel & Accessories > Clothing Accessories',
+  'Charm-accessories':    'Apparel & Accessories > Jewelry > Charms & Pendants',
+  'Oxidised-jewellery':   'Apparel & Accessories > Jewelry',
+}
+
+// Shopping matches on plain words, and "handmade gift" is what people search.
+// Feed-only: the website keeps its titles. Not a product-type noun, because
+// categories mix item types (a watch under Charms) and a wrong noun misleads.
+const shoppingTitle = (title) =>
+  `${title} - Handmade${/\bgifts?\b/i.test(title) ? '' : ' Gift'}`.slice(0, 150)
+
 const products = getAllProducts()
 
 const items = products.map((product) => {
@@ -55,20 +83,41 @@ const items = products.map((product) => {
   const categoryName = getCategoryByIdOrSlug(product.categoryId)?.name || ''
   const link = `${BASE_URL}/product/${product.slug}`
   const availability = product.inStock !== false ? 'in stock' : 'out of stock'
+  const googleCategory = GOOGLE_CATEGORY[product.categoryId]
+  // Making time (handling) from the same helper as the product page timeline
+  const { makingMin, makingMax } = getDeliveryWindow(product)
+  // A higher original price (shown struck through on the product page) is
+  // sent as price + sale_price, which gives the "% off" label in Shopping
+  const originalPrice = Number(product.meta?.originalPrice) || 0
+  const onSale = originalPrice > product.price
 
   return (
     `  <item>\n` +
     `    <g:id>${product.id}</g:id>\n` +
-    `    <title>${escapeXml(product.title)}</title>\n` +
+    `    <title>${escapeXml(shoppingTitle(product.title))}</title>\n` +
     `    <description>${escapeXml(toPlainText(product.description))}</description>\n` +
     `    <link>${link}</link>\n` +
     (imageLink ? `    <g:image_link>${escapeXml(imageLink)}</g:image_link>\n` : '') +
     additionalImages.slice(0, 10).map((img) => `    <g:additional_image_link>${escapeXml(img)}</g:additional_image_link>\n`).join('') +
     `    <g:availability>${availability}</g:availability>\n` +
-    `    <g:price>${product.price} INR</g:price>\n` +
+    `    <g:price>${onSale ? originalPrice : product.price} INR</g:price>\n` +
+    (onSale ? `    <g:sale_price>${product.price} INR</g:sale_price>\n` : '') +
     `    <g:condition>new</g:condition>\n` +
     `    <g:brand>Maqers</g:brand>\n` +
+    // Handmade pieces have no barcode; without this Google expects a GTIN
+    `    <g:identifier_exists>no</g:identifier_exists>\n` +
+    (googleCategory ? `    <g:google_product_category>${escapeXml(googleCategory)}</g:google_product_category>\n` : '') +
     (categoryName ? `    <g:product_type>${escapeXml(categoryName)}</g:product_type>\n` : '') +
+    // Free delivery across India: 3-4 days in transit after the making time
+    `    <g:shipping>\n` +
+    `      <g:country>IN</g:country>\n` +
+    `      <g:service>Standard</g:service>\n` +
+    `      <g:price>0 INR</g:price>\n` +
+    `      <g:min_transit_time>3</g:min_transit_time>\n` +
+    `      <g:max_transit_time>4</g:max_transit_time>\n` +
+    `    </g:shipping>\n` +
+    `    <g:min_handling_time>${makingMin}</g:min_handling_time>\n` +
+    `    <g:max_handling_time>${makingMax}</g:max_handling_time>\n` +
     `  </item>`
   )
 })
