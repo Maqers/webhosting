@@ -27,6 +27,7 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
 import { buildReviewSchema } from '../src/utils/reviewSchema.js'
+import { productMetaDescription } from '../src/utils/seoCopy.js'
 import { SUPABASE_REVIEWS_URL, SUPABASE_PUBLIC_KEY } from './supabase-public.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -81,8 +82,10 @@ let written = 0
 
 for (const product of products) {
   const plainDescription = toPlainText(product.description)
+  // Search-result line (what it is, price, delivery) — same as the live page
+  const searchLine = productMetaDescription(product)
   const metaDescription =
-    plainDescription.length > 155 ? plainDescription.slice(0, 152).trimEnd() + '…' : plainDescription
+    searchLine.length > 155 ? searchLine.slice(0, 152).trimEnd() + '…' : searchLine
 
   const canonicalUrl = `${BASE_URL}/product/${product.slug}`
   const images = (product.images || []).map((img) => (img.startsWith('http') ? img : `${BASE_URL}${img}`))
@@ -147,7 +150,7 @@ for (const product of products) {
 
   let html = template
     .replace(/<title>[^<]*<\/title>\s*/, '')
-    .replace(/<meta name="description"[^>]*>\s*/, '')
+    .replace(/<meta[^>]*name="description"[^>]*>\s*/, '')
     .replace('</head>', headInjection)
     .replace('<div id="root"></div>', fallbackContent)
 

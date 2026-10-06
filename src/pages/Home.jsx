@@ -11,6 +11,7 @@ import { useWishlist } from "../context/WishlistContext";
 import SeoHead from "../components/SeoHead";
 import { useMobileCenterSwap } from "../hooks/useMobileCenterSwap";
 import "./Home.css";
+import OfferTag from '../components/OfferTag';
 
 // Raksha Bandhan 2026 falls on Aug 28 — this banner auto-hides itself the day
 // after, reverting to the normal hero with no code change needed next year.
@@ -391,6 +392,7 @@ export const FeaturedCard = ({ product, index }) => {
             `₹${product.price.toLocaleString("en-IN")}`
           )}
         </p>
+        <OfferTag product={product} />
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button
             className={`feat-add-btn${addedFeedback ? " added" : ""}`}

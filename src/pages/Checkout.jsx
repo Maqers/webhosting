@@ -9,7 +9,7 @@ import SeoHead from '../components/SeoHead'
 import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import posthog from 'posthog-js'
-import { occasionProductMap } from '../data/catalog'
+import { DIWALI_COUPON, isOfferLive } from '../data/offers'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import './Checkout.css'
 
@@ -23,10 +23,9 @@ const EMAILJS_PUBLIC_KEY = '7HzR9jrZ1jK9NrkBD'
 const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq9f1nTqbOf8ZXbOI1bvk_uIa6jwUjvYshdvOFNAUcqlYbM8U8_pVAvQYxZxhI/exec'
 
 // Only one coupon can be applied per order: applying one replaces the other.
-// Diwali items are whatever is on the Diwali page (occasionProductMap.diwali),
-// so the 5% coupon follows the admin's Diwali list automatically.
-const DIWALI_IDS = new Set(occasionProductMap.diwali || [])
-const COUPONS = [
+// The 5% Diwali coupon (code, products, end date) lives in data/offers.js,
+// shared with the "5% off" labels on product cards, so both end together.
+const ALL_COUPONS = [
   {
     code: 'MAQERSDIWALI100',
     minOrder: 2000,
@@ -35,14 +34,17 @@ const COUPONS = [
     locked: (items, total) => `Add ₹${(2000 - total).toLocaleString('en-IN')} more to unlock ₹100 off (orders of ₹2,000+)`,
   },
   {
-    code: 'MAQERSDIWALI5',
+    code: DIWALI_COUPON.code,
+    endsAt: DIWALI_COUPON.endsAt,
     discountFor: (items) => Math.round(
-      items.filter(i => DIWALI_IDS.has(i.id)).reduce((sum, i) => sum + i.price * i.qty, 0) * 0.05
+      items.filter(i => DIWALI_COUPON.productIds.has(i.id)).reduce((sum, i) => sum + i.price * i.qty, 0) * DIWALI_COUPON.percent / 100
     ),
-    pitch: '5% off every Diwali gift in your bag',
-    locked: () => 'Add a Diwali gift to use 5% off',
+    pitch: `${DIWALI_COUPON.percent}% off every Diwali gift in your bag`,
+    locked: () => `Add a Diwali gift to use ${DIWALI_COUPON.percent}% off`,
   },
 ]
+const couponIsLive = (c) => !c.endsAt || isOfferLive(c)
+
 
 function generateOrderId() {
   return 'MQ' + Date.now().toString(36).toUpperCase()
@@ -72,6 +74,8 @@ export default function Checkout() {
   const navigate = useNavigate()
   const deliveryFee = getDeliveryFee(total)
   const [appliedCode, setAppliedCode] = useState(null)
+  // Expired coupons drop out of the cards and can't be applied
+  const COUPONS = ALL_COUPONS.filter(couponIsLive)
   const [codeInput, setCodeInput] = useState('')
   const [codeError, setCodeError] = useState('')
   const [showCouponCelebration, setShowCouponCelebration] = useState(false)
@@ -102,6 +106,7 @@ export default function Checkout() {
     const code = codeInput.trim().toUpperCase().replace(/\s+/g, '')
     if (!code) return
     const coupon = COUPONS.find(c => c.code === code)
+    if (!coupon && ALL_COUPONS.some(c => c.code === code)) return setCodeError(`${code} has ended`)
     if (!coupon) return setCodeError(`"${code}" isn't a valid code`)
     if (appliedCode === code) return setCodeError(`${code} is already applied`)
     if (!(couponSavings[code] > 0)) return setCodeError(coupon.locked(items, total))

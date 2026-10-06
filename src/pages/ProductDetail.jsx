@@ -15,6 +15,8 @@ import { expandProductsByColor } from '../utils/productVariants'
 import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } from '../utils/reviewsApi'
 import { buildReviewSchema } from '../utils/reviewSchema'
 import { getDeliveryWindow, getDeliveryFee } from '../utils/delivery'
+import OfferTag from '../components/OfferTag'
+import { productMetaDescription } from '../utils/seoCopy'
 import './ProductDetail.css'
 import './Home.css'
 
@@ -560,7 +562,7 @@ const ProductDetail = () => {
     <div className="product-detail">
       <SeoHead
         title={product.title}
-        description={product.description}
+        description={productMetaDescription(product)}
         image={images[0] || undefined}
         url={`/product/${product.slug}`}
         type="product"
@@ -701,6 +703,8 @@ const ProductDetail = () => {
                 <span className="product-detail-price">₹{product.price.toLocaleString("en-IN")}</span>
               )}
             </div>
+
+            <OfferTag product={product} variant="detail" />
 
             {/* MOQ */}
             {product.meta?.moq > 0 && (

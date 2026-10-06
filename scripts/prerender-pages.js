@@ -21,6 +21,7 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { categories, getAllProducts, getProductsByCategory, getPopularProducts, occasionProductMap } from '../src/data/catalog.js'
 import { occasionCategories } from '../src/data/occasionCatalog.js'
+import { categorySeo, lowestPrice } from '../src/utils/seoCopy.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DIST = resolve(__dirname, '..', 'dist')
@@ -95,7 +96,7 @@ function writePage({ path, title, description, heading, body, jsonLd }) {
 
   const html = template
     .replace(/<title>[^<]*<\/title>\s*/, '')
-    .replace(/<meta name="description"[^>]*>\s*/, '')
+    .replace(/<meta[^>]*name="description"[^>]*>\s*/, '')
     .replace('</head>', head)
     .replace('<div id="root"></div>', root)
 
@@ -109,10 +110,11 @@ const pages = []
 // ── Category pages (product type) ────────────────────────────────────────────
 for (const cat of visibleCategories) {
   const products = getProductsByCategory(cat.id).filter(Boolean)
+  const copy = categorySeo({ name: cat.name, slug: cat.slug, isOccasion: false, minPrice: lowestPrice(products) })
   pages.push({
     path: `/category/${cat.slug}`,
-    title: `${cat.name}: Handmade Gifts`,
-    description: `Browse handpicked ${cat.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`,
+    title: copy.title,
+    description: copy.description,
     heading: cat.name,
     body: productList(products),
   })
@@ -121,12 +123,11 @@ for (const cat of visibleCategories) {
 // ── Occasion pages (Diwali, For Your Mom, …) ────────────────────────────────
 for (const occ of sortedOccasions) {
   const products = (occasionProductMap[occ.slug] || []).map((id) => productById.get(id)).filter(Boolean)
+  const copy = categorySeo({ name: occ.name, slug: occ.slug, isOccasion: true, occasionDescription: occ.description, minPrice: lowestPrice(products) })
   pages.push({
     path: `/category/${occ.slug}`,
-    title: `${occ.name}: Handmade Gifts`,
-    description: occ.description
-      ? `${occ.name} gifts: ${occ.description}`
-      : `Browse handpicked ${occ.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`,
+    title: copy.title,
+    description: copy.description,
     heading: occ.name,
     body: productList(products),
   })

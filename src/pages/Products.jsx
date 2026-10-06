@@ -14,6 +14,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor, productLinkQuery } from '../utils/productVariants'
 import './Products.css'
+import OfferTag from '../components/OfferTag'
 
 let cachedCategories = null
 let cachedCategoryMap = null
@@ -485,6 +486,7 @@ const ProductCard = ({ product, index, categoryMap, priority = false, selectedCa
             `₹${product.price.toLocaleString("en-IN")}`
           )}
         </p>
+        <OfferTag product={product} />
 
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button

@@ -12,6 +12,8 @@ import ProductFilters, { PRICE_BANDS } from '../components/ProductFilters'
 import { DELIVERY_BANDS, inDeliveryBand } from '../utils/delivery'
 import { expandProductsByColor, productLinkQuery, applyDisplayOrder } from '../utils/productVariants'
 import './Categories.css'
+import OfferTag from '../components/OfferTag'
+import { categorySeo, lowestPrice } from '../utils/seoCopy'
 
 const occasionCategories = [...OCCASION_CATEGORIES_RAW].sort((a, b) => a.order - b.order)
 const SOURCE_CATS = getSortedCategories().filter(c => c.id !== 'Oxidised-jewellery')
@@ -187,16 +189,19 @@ const Categories = () => {
     return applyDisplayOrder(expanded, displayOrder[orderKey])
   }, [chipProducts, matchesPrice, matchesDelivery, matchesStock, sortBy, selectedCategory])
 
-  const seoTitle = selectedCategoryObj
-    ? `${selectedCategoryObj.name}: Handmade Gifts`
-    : 'Shop All Collections'
-  // Occasions have their own written description; keep in sync with
-  // scripts/prerender-pages.js so the static and live versions match.
-  const occasionDescription = occasionCategories.find(o => o.slug === selectedCategoryObj?.slug)?.description
-  const seoDescription = selectedCategoryObj
-    ? occasionDescription
-      ? `${selectedCategoryObj.name} gifts: ${occasionDescription}`
-      : `Browse handpicked ${selectedCategoryObj.name.toLowerCase()} gifts from India's finest independent artisans. Unique, handcrafted, and customisable.`
+  // Same copy as scripts/prerender-pages.js (utils/seoCopy.js); the "from ₹"
+  // price follows the catalog automatically
+  const occasionObj = occasionCategories.find(o => o.slug === selectedCategoryObj?.slug)
+  const categoryCopy = selectedCategoryObj && categorySeo({
+    name: selectedCategoryObj.name,
+    slug: selectedCategoryObj.slug,
+    isOccasion: !!occasionObj,
+    occasionDescription: occasionObj?.description,
+    minPrice: lowestPrice(rawCategoryProducts),
+  })
+  const seoTitle = categoryCopy ? categoryCopy.title : 'Shop All Collections'
+  const seoDescription = categoryCopy
+    ? categoryCopy.description
     : 'Browse curated handmade gift collections from India\'s best independent artisans, by occasion or by product type.'
 
   return (
@@ -439,6 +444,7 @@ const ProductCard = ({ product, index }) => {
             `₹${product.price.toLocaleString("en-IN")}`
           )}
         </p>
+        <OfferTag product={product} />
         <div className="feat-actions" onClick={(e) => e.stopPropagation()}>
           <button
             className={`feat-add-btn${addedFeedback ? " added" : ""}`}
