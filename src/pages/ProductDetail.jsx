@@ -540,18 +540,18 @@ const ProductDetail = () => {
   }
 
   // ── More from this maker logic ─────────────────────────────────────────────
-  // A real sellerCode on this product always wins, even if this happens to be
-  // that maker's only catalog item right now — their storefront link is still
-  // valid and should still be offered. Only products with NO sellerCode at
-  // all fall back to a same-category recommendation, which is a genuinely
-  // different, unrelated-sellers grid and must never be mislabeled as "more
-  // from this maker".
+  // Other in-stock products from the same maker when there are any. If this
+  // is their only listed product (or it has no sellerCode), fall back to the
+  // same category instead, labeled "You may also like" — never mislabeled as
+  // the maker's, and without a "See everything" link to a one-item storefront.
   const getMoreFromMaker = () => {
     const allProds = getAllProducts().filter(p => p.id !== product.id && p.inStock)
     const sellerCode = product.meta?.sellerCode
     if (sellerCode) {
       const fromSeller = allProds.filter(p => p.meta?.sellerCode === sellerCode)
-      return { products: expandProductsByColor(fromSeller), sellerCode, isMaker: true }
+      if (fromSeller.length > 0) {
+        return { products: expandProductsByColor(fromSeller), sellerCode, isMaker: true }
+      }
     }
     return { products: expandProductsByColor(allProds.filter(p => p.categoryId === product.categoryId).slice(0, 6)), sellerCode: null, isMaker: false }
   }
@@ -972,11 +972,10 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {/* More from this maker — compact FeaturedCard grid. Only ever
-              labeled "this maker" when it's a real sellerCode match; the
-              same-category fallback (no sellerCode on this product at all)
-              is a different, unrelated-sellers grid and is labeled as such. */}
-          {(moreProducts.length > 0 || (isMaker && makerCode)) && (
+          {/* More from this maker — compact FeaturedCard grid. Labeled "this
+              maker" only for real sellerCode matches; the same-category
+              fallback is labeled "You may also like". Hidden if empty. */}
+          {moreProducts.length > 0 && (
             <div className="more-from-maker">
               <div className="more-from-maker-header">
                 <h3 className="more-from-maker-title">{isMaker ? "More from this maker" : "You may also like"}</h3>
@@ -984,15 +983,11 @@ const ProductDetail = () => {
                   <Link to={`/maker/${makerCode}`} className="more-from-maker-viewall">See everything</Link>
                 )}
               </div>
-              {moreProducts.length > 0 ? (
-                <div className="more-from-maker-grid" ref={moreProductsGridRef}>
-                  {moreProducts.slice(0, 4).map((p, i) => (
-                    <FeaturedCard key={p._variantKey || p.id} product={p} index={i} />
-                  ))}
-                </div>
-              ) : (
-                <p className="more-from-maker-empty">This is currently their only listed product.</p>
-              )}
+              <div className="more-from-maker-grid" ref={moreProductsGridRef}>
+                {moreProducts.slice(0, 4).map((p, i) => (
+                  <FeaturedCard key={p._variantKey || p.id} product={p} index={i} />
+                ))}
+              </div>
             </div>
           )}
         </div>
