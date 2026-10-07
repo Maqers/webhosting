@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
+import { getProductById } from '../data/catalog'
 import { useScrollLock } from '../hooks/useScrollLock'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import { DIWALI_COUPON, hasDiwaliOffer, priceWithDiwaliCode, diwaliCartDiscount } from '../data/offers'
@@ -7,6 +10,18 @@ import './CartDrawer.css'
 
 export default function CartDrawer() {
   const { items, removeItem, updateQty, total, count, isOpen, setIsOpen } = useCart()
+  const { toggleItem, isWishlisted } = useWishlist()
+  // Item whose "remove?" prompt is open (trash, or minus at quantity 1)
+  const [confirmKey, setConfirmKey] = useState(null)
+  useEffect(() => { if (!isOpen) setConfirmKey(null) }, [isOpen])
+
+  const moveToWishlist = (item) => {
+    // toggleItem would *remove* an already-saved product, so only add if new.
+    // It wants the full product (for its photo), so look it up by id.
+    if (!isWishlisted(item.id)) toggleItem(getProductById(item.id) || { ...item, images: [item.image] })
+    removeItem(item.key)
+    setConfirmKey(null)
+  }
 
   // Same rules as checkout: delivery on the pre-coupon subtotal
   // (utils/delivery.js), and MAQERSDIWALI5 applied to Diwali items
@@ -79,18 +94,45 @@ export default function CartDrawer() {
                     ) : (
                       <p className="cart-item-price">{inr(item.price)}</p>
                     )}
+                    {confirmKey === item.key ? (
+                      <div className="cart-remove-confirm" role="group" aria-label={`Remove ${item.title}?`}>
+                        <p>Remove from cart?</p>
+                        <div className="cart-remove-confirm-actions">
+                          {isWishlisted(item.id) ? (
+                            <button type="button" className="cart-confirm-wishlist" onClick={() => { removeItem(item.key); setConfirmKey(null) }}>
+                              ♥ Already in wishlist, remove
+                            </button>
+                          ) : (
+                            <button type="button" className="cart-confirm-wishlist" onClick={() => moveToWishlist(item)}>
+                              ♡ Move to wishlist
+                            </button>
+                          )}
+                          {!isWishlisted(item.id) && (
+                            <button type="button" className="cart-confirm-remove" onClick={() => { removeItem(item.key); setConfirmKey(null) }}>
+                              Remove
+                            </button>
+                          )}
+                          <button type="button" className="cart-confirm-keep" onClick={() => setConfirmKey(null)}>Keep</button>
+                        </div>
+                      </div>
+                    ) : (
                     <div className="cart-item-controls">
                       <div className="cart-qty">
-                        <button onClick={() => updateQty(item.key, item.qty - 1)} disabled={item.qty <= 1}>−</button>
+                        {/* At 1, minus asks to remove (or move to wishlist) */}
+                        <button
+                          onClick={() => (item.qty <= 1 ? setConfirmKey(item.key) : updateQty(item.key, item.qty - 1))}
+                          aria-label={item.qty <= 1 ? `Remove ${item.title}` : 'Decrease quantity'}
+                        >−</button>
                         <span>{item.qty}</span>
                         <button onClick={() => updateQty(item.key, item.qty + 1)}>+</button>
                       </div>
-                      <button className="cart-remove" onClick={() => removeItem(item.key)} aria-label="Remove item">
+                      <button className="cart-remove" onClick={() => setConfirmKey(item.key)} aria-label="Remove item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
                         </svg>
                       </button>
                     </div>
+                    )}
                   </div>
                 </div>
               ))}
