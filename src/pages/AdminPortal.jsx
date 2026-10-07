@@ -30,6 +30,14 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Now it backs off and retries automatically instead of failing outright.
 async function githubFetchWithRetry(url, options, attempt = 0) {
   const res = await fetch(url, options);
+  // GitHub 5xx are transient on their side. Reads are safe to retry here;
+  // writes are retried in ghPut, which first checks whether the failed
+  // write actually landed.
+  const isRead = !options?.method || options.method === "GET";
+  if (isRead && res.status >= 500 && attempt < 3) {
+    await sleep(1000 * 2 ** attempt);
+    return githubFetchWithRetry(url, options, attempt + 1);
+  }
   if ((res.status === 403 || res.status === 429) && attempt < 4) {
     const bodyText = await res.text();
     const retryAfter = res.headers.get("Retry-After");
@@ -53,17 +61,49 @@ async function ghGet(path, creds) {
   return res.json();
 }
 
+// Size in bytes of a base64 string, for comparing with GitHub's `size`
+const base64Bytes = (b64) => {
+  const clean = String(b64).replace(/\s/g, "");
+  return Math.floor((clean.length * 3) / 4) - (clean.endsWith("==") ? 2 : clean.endsWith("=") ? 1 : 0);
+};
+
 async function ghPut(path, content, message, sha, creds) {
-  const res = await githubFetchWithRetry(
-    `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}`,
-    {
+  const url = `https://api.github.com/repos/${creds.owner}/${creds.repo}/contents/${path}`;
+  let lastError = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const res = await githubFetchWithRetry(url, {
       method: "PUT",
       headers: { Authorization: `Bearer ${creds.token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
       body: JSON.stringify({ message, content, branch: creds.branch, ...(sha ? { sha } : {}) }),
+    });
+    if (res.ok) return res.json();
+
+    const bodyText = await res.text();
+    lastError = `GitHub PUT failed for ${path} (${res.status})${bodyText ? `: ${bodyText}` : ""}`;
+    // 409/422 only matter right after a 5xx (the earlier write may have
+    // landed); anything else is a real error.
+    const retriable = res.status >= 500 || (attempt > 0 && (res.status === 409 || res.status === 422));
+    if (!retriable || attempt === 3) break;
+
+    // GitHub sometimes saves the file *and* returns a 5xx. Before retrying,
+    // check what's there now: our content already → success. Unchanged
+    // from what we started with → retry. Changed by someone else → stop:
+    // retrying would overwrite their edit (e.g. a catalog.js built from the
+    // old version) with ours.
+    await sleep(1500 * 2 ** attempt);
+    let existing = null;
+    try { existing = await ghGet(path, creds); } catch { /* not there: retry the create */ }
+    if (existing) {
+      const sameContent = existing.content
+        ? existing.content.replace(/\s/g, "") === String(content).replace(/\s/g, "")
+        : existing.size === base64Bytes(content); // >1MB files come back without content
+      if (sameContent) return { content: { sha: existing.sha } };
+      if (existing.sha !== sha) {
+        throw new Error(`${path} was changed on GitHub while saving. Click "Refresh Catalog" and try again.`);
+      }
     }
-  );
-  if (!res.ok) throw new Error(`GitHub PUT failed (${res.status}): ${await res.text()}`);
-  return res.json();
+  }
+  throw new Error(lastError);
 }
 
 // ─── Supabase API ─────────────────────────────────────────────────────────────
@@ -529,6 +569,37 @@ function updateProductInSource(source, product) {
 
 // Find the exact character range of a product entry using brace-counting
 // This is safe against regex cross-matching between products
+// Remove a product id from every array inside one top-level object literal
+// of catalog.js (e.g. occasionProductMap), leaving the rest of the file alone.
+// The object's end is found by brace matching, so edits can never spill past it.
+function removeIdFromObjectLiteral(source, marker, id) {
+  const markerIdx = source.indexOf(marker);
+  if (markerIdx === -1) return source;
+  const open = source.indexOf("{", markerIdx);
+  if (open === -1) return source;
+  let depth = 0, close = -1;
+  for (let i = open; i < source.length; i++) {
+    const ch = source[i];
+    if (ch === '"' || ch === "'" || ch === "`") {
+      // skip string literals (keys like "occ:diwali")
+      const q = ch;
+      for (i++; i < source.length && source[i] !== q; i++) if (source[i] === "\\") i++;
+      continue;
+    }
+    if (ch === "{") depth++;
+    else if (ch === "}" && --depth === 0) { close = i; break; }
+  }
+  if (close === -1) return source;
+  const pid = String(id);
+  // Only bare numbers inside [...] arrays — never digits inside quoted strings
+  const body = source.slice(open, close + 1).replace(/\[[^\]]*\]/g, (arr) =>
+    arr
+      .replace(new RegExp(`(^\\[|,)\\s*${pid}\\s*(?=,|\\])`, "g"), "$1")
+      .replace(/\[\s*,\s*/, "[").replace(/,\s*,/g, ",").replace(/,\s*\]/g, "]")
+  );
+  return source.slice(0, open) + body + source.slice(close + 1);
+}
+
 function getEntryRange(source, id) {
   const pattern = new RegExp(`    \\{ id: ${id},`);
   const m = source.match(pattern);
@@ -1382,20 +1453,13 @@ export default function AdminPortal() {
       // Clean up extra blank line left behind
       if (before.endsWith("\n") && after.startsWith("\n")) after = after.slice(1);
       source = before + after;
-      // Remove product id from occasionProductMap ONLY — scoped to avoid corrupting
-      // order numbers in the categories array or IDs elsewhere in the file.
-      const pid = String(product.id);
-      const mapKey = 'export const occasionProductMap';
-      const mapIdx = source.indexOf(mapKey);
-      if (mapIdx !== -1) {
-        const beforeMap = source.slice(0, mapIdx);
-        let mapSection = source.slice(mapIdx);
-        mapSection = mapSection.replace(new RegExp(`,\\s*\\b${pid}\\b`, "g"), "");
-        mapSection = mapSection.replace(new RegExp(`\\b${pid}\\b\\s*,\\s*`, "g"), "");
-        mapSection = mapSection.replace(new RegExp(`\\b${pid}\\b`, "g"), "");
-        mapSection = mapSection.replace(/,\s*,/g, ",").replace(/\[\s*,/g, "[").replace(/,\s*\]/g, "]");
-        source = beforeMap + mapSection;
-      }
+      // Remove the id from occasionProductMap and displayOrder — and ONLY
+      // inside those two object literals. This used to run from the map to the
+      // end of the file, so deleting product 7 also stripped the "7" out of
+      // other products' image names (e.g. "…at-7.59.33-pm.png" → "…at-.59.33-pm.png")
+      // and could hit the helper code after displayOrder.
+      source = removeIdFromObjectLiteral(source, "export const occasionProductMap", product.id);
+      source = removeIdFromObjectLiteral(source, "export const displayOrder", product.id);
       await commitCatalog(source, sha, `Delete product: ${product.title} (ID ${product.id})`, creds);
       // Also drop this product from whichever seller has it in their Supabase
       // product_ids — otherwise that array keeps a dangling reference to an
