@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { trackEvent } from '../utils/analytics'
 import { useSupabaseSync } from '../hooks/useSupabaseSync'
+import { saveLeadSoon, summariseCart } from '../utils/leads'
 
 const CartContext = createContext(null)
 
@@ -25,13 +26,25 @@ export function CartProvider({ children }) {
 
   useSupabaseSync('cart', items, setItems, mergeCarts)
 
-  const addItem = useCallback((product, selectedColor = '', selectedSize = '', selectedPersonalisation = [], orderNote = '') => {
+  // Lead capture, step 1: remember what's in the cart even before we know who
+  // the shopper is. Contact details join the same lead once checkout has them.
+  useEffect(() => {
+    if (items.length === 0) return
+    saveLeadSoon({
+      stage: 'cart',
+      cart: summariseCart(items),
+      cart_total: items.reduce((sum, i) => sum + i.price * i.qty, 0),
+      item_count: items.reduce((sum, i) => sum + i.qty, 0),
+    }, 1500)
+  }, [items])
+
+  const addItem = useCallback((product, selectedColor = '', selectedSize = '', selectedPersonalisation = [], orderNote = '', quantity = 1) => {
     setItems(prev => {
       const personalisationKey = selectedPersonalisation.slice().sort().join('|')
       const key = `${product.id}-${selectedColor}-${selectedSize}-${personalisationKey}`
       const existing = prev.find(i => i.key === key)
       if (existing) {
-        return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i)
+        return prev.map(i => i.key === key ? { ...i, qty: i.qty + quantity } : i)
       }
       // Compute extra price from selected personalisation options
       const prices = product.meta?.personalisation_prices || []
@@ -57,7 +70,7 @@ export function CartProvider({ children }) {
         selectedSize,
         selectedPersonalisation,
         orderNote,
-        qty: 1,
+        qty: quantity,
       }]
     })
     setIsOpen(true)
@@ -66,6 +79,7 @@ export function CartProvider({ children }) {
       title: product.title,
       price: product.price,
       category_id: product.categoryId,
+      quantity,
     })
   }, [])
 

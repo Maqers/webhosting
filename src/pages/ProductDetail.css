@@ -1426,3 +1426,98 @@
 @media (max-width: 420px) {
   .product-action-buttons { grid-template-columns: minmax(0, 1fr) auto; }
 }
+
+
+/* ── Phone product page: buy block up top, long copy below ───────────────────
+   After the photo a shopper now sees title, price, the pickers, quantity,
+   Add To Cart and Buy It Now, then the description and details further down.
+   Everything here is phone-only; the new block is hidden on desktop. */
+.pdp-mobile-buy { display: none; }
+
+@media (max-width: 768px) {
+  .product-info-section .product-detail-title { order: -2; font-size: 1.75rem; line-height: 1.2; }
+  .product-info-section .price-section { order: -1; margin-top: -0.4rem; }
+  .product-info-section .product-detail-price { font-size: 1.5rem; }
+  .product-info-section .product-category-badge,
+  .product-info-section .product-also-in { order: 19; }
+  .product-info-section .product-detail-description { order: 20; font-size: 0.95rem; }
+  .product-info-section .product-features { order: 21; }
+
+  /* The old Add to Cart / Wishlist pair is replaced by the block below. */
+  .product-info-section .product-actions { display: none; }
+
+  .pdp-mobile-buy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.25rem;
+  }
+  .pdp-mobile-qty-label {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+  }
+  .pdp-mobile-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: stretch;
+  }
+  .pdp-qty {
+    flex: 0 0 auto;
+    width: 8.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(36, 27, 26, 0.05);
+    border-radius: 12px;
+    padding: 0 0.25rem;
+  }
+  .pdp-qty button {
+    width: 2.6rem;
+    height: 3rem;
+    border: 0;
+    background: transparent;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .pdp-qty button:disabled { opacity: 0.3; cursor: default; }
+  .pdp-qty span {
+    font-family: var(--font-ui);
+    font-size: 1.05rem;
+    font-weight: 600;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+  .pdp-mobile-add,
+  .pdp-mobile-buynow {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 3rem;
+    border-radius: 12px;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    border: 0;
+  }
+  .pdp-mobile-add { background: var(--maroon); }
+  .pdp-mobile-add:active { background: var(--maroon-deep); }
+  .pdp-mobile-add:disabled { background: var(--rule-strong); color: var(--ink-mute); cursor: not-allowed; }
+  .pdp-mobile-buynow { background: var(--ink); }
+  .pdp-mobile-wish {
+    flex: 0 0 3rem;
+    height: 3rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--rule-strong);
+    background: transparent;
+    font-size: 1.4rem;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .pdp-mobile-wish.wishlisted { border-color: var(--maroon); color: var(--maroon); }
+}

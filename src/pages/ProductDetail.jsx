@@ -70,6 +70,11 @@ const ProductDetail = () => {
   const [selectedPersonalisation, setSelectedPersonalisation] = useState([])
   const [orderNote, setOrderNote] = useState("")
   const [selectionError, setSelectionError] = useState("")
+  const [qty, setQty] = useState(1)
+  // True once this exact selection is in the cart, so Buy It Now right after
+  // Add To Cart goes to checkout without adding the same lines a second time.
+  const [justAdded, setJustAdded] = useState(false)
+  useEffect(() => { setJustAdded(false) }, [qty, selectedColor, selectedSize, selectedPersonalisation, orderNote, product?.id])
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   const imageWrapRef = useRef(null)
   const imgRef = useRef(null)
@@ -79,7 +84,7 @@ const ProductDetail = () => {
   const imageCountRef = useRef(0)
 
   const whatsappNumber = getWhatsAppNumber()
-  const { addItem } = useCart()
+  const { addItem, setIsOpen: setCartOpen } = useCart()
   const { toggleItem, isWishlisted } = useWishlist()
   const wishlisted = isWishlisted(product?.id)
   const { isLoggedIn, user, accessToken } = useAuth()
@@ -297,17 +302,33 @@ const ProductDetail = () => {
   const needsColor = product?.meta?.colors && product.meta.colors.length > 0
   const needsSize = product?.meta?.sizes && product.meta.sizes.length > 0
 
+  // Returns true when the colour/size picks are complete. On a phone the
+  // pickers sit above the buy buttons, so scroll the missing one into view.
+  const validateSelections = () => {
+    const missing = (needsColor && !selectedColor) ? 'color-select' : (needsSize && !selectedSize) ? 'size-select' : null
+    if (!missing) { setSelectionError(""); return true }
+    setSelectionError(missing === 'color-select'
+      ? 'Please select a colour before adding to cart.'
+      : 'Please select a size before adding to cart.')
+    if (window.innerWidth <= 768) {
+      document.getElementById(missing)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    return false
+  }
+
   const handleAddToCart = () => {
-    if (needsColor && !selectedColor) {
-      setSelectionError('Please select a colour before adding to cart.')
-      return
-    }
-    if (needsSize && !selectedSize) {
-      setSelectionError('Please select a size before adding to cart.')
-      return
-    }
-    setSelectionError("")
-    addItem(product, selectedColor, selectedSize, selectedPersonalisation, orderNote)
+    if (!validateSelections()) return
+    addItem(product, selectedColor, selectedSize, selectedPersonalisation, orderNote, qty)
+    setJustAdded(true)
+  }
+
+  // Mobile "Buy It Now": same cart add, then straight to checkout without the
+  // cart drawer popping open on top of it.
+  const handleBuyNow = () => {
+    if (!validateSelections()) return
+    if (!justAdded) addItem(product, selectedColor, selectedSize, selectedPersonalisation, orderNote, qty)
+    setCartOpen(false)
+    navigate('/checkout')
   }
   const handleContactUs = () => {
     trackEvent('ContactWhatsAppClicked', {
@@ -796,6 +817,37 @@ const ProductDetail = () => {
                 onChange={e => setOrderNote(e.target.value)}
                 rows={2}
               />
+            </div>
+
+            {/* Phone-only buy block: quantity + Add To Cart side by side, Buy It
+                Now underneath. Hidden on desktop, where .product-actions below
+                is unchanged. */}
+            <div className="pdp-mobile-buy">
+              {product.inStock === false ? (
+                <>
+                  <button type="button" className="pdp-mobile-add out-of-stock-button" disabled>Out of Stock</button>
+                  <p className="out-of-stock-note">This item is currently unavailable. Check back soon.</p>
+                </>
+              ) : (
+                <>
+                  <span className="pdp-mobile-qty-label">QUANTITY</span>
+                  <div className="pdp-mobile-row">
+                    <div className="pdp-qty" role="group" aria-label="Quantity">
+                      <button type="button" onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Decrease quantity">&minus;</button>
+                      <span aria-live="polite">{qty}</span>
+                      <button type="button" onClick={() => setQty(q => Math.min(99, q + 1))} aria-label="Increase quantity">+</button>
+                    </div>
+                    <button type="button" className="pdp-mobile-add" onClick={handleAddToCart}>Add To Cart</button>
+                  </div>
+                  <div className="pdp-mobile-row">
+                    <button type="button" className="pdp-mobile-buynow" onClick={handleBuyNow}>Buy It Now</button>
+                    <button type="button" onClick={() => toggleItem(product)} className={`pdp-mobile-wish ${wishlisted ? 'wishlisted' : ''}`} aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
+                      {wishlisted ? '♥' : '♡'}
+                    </button>
+                  </div>
+                </>
+              )}
+              {selectionError && <p className="selection-error-note">{selectionError}</p>}
             </div>
 
             <div className="product-actions">

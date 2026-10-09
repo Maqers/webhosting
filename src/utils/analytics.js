@@ -57,7 +57,7 @@ function buildGa4Items(props) {
       item_id: String(props.product_id),
       item_name: props.title,
       price: Number(props.price) || 0,
-      quantity: 1,
+      quantity: props.quantity || 1,
       ...(props.category_id && { item_category: props.category_id }),
     }]
   }
