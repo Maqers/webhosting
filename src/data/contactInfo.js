@@ -43,7 +43,8 @@ export const contactInfo = {
   location: {
     text: 'Available nationwide',
     label: 'Location'
-  }
+  },
+  gstin: '03ACIFM0667K1Z4'
 }
 
 /**
@@ -70,6 +71,11 @@ export const getWhatsAppNumber = () => contactInfo.whatsapp.number
  * Get email address
  */
 export const getEmail = () => contactInfo.email.primary.address
+
+/**
+ * Get GSTIN (GST registration number)
+ */
+export const getGstin = () => contactInfo.gstin
 
 /**
  * Get Instagram username

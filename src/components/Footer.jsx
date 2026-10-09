@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import './Footer.css'
+import { getGstin } from '../data/contactInfo'
 
 const Footer = () => {
   const year = new Date().getFullYear()
@@ -50,7 +51,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p className="footer-copy">&copy; {year} maqers.in &nbsp;|&nbsp; Made in India, by hand</p>
+        <p className="footer-copy">&copy; {year} maqers.in &nbsp;|&nbsp; GSTIN {getGstin()} &nbsp;|&nbsp; Made in India, by hand</p>
       </div>
     </footer>
   )
