@@ -4,6 +4,19 @@ const BANNED_TITLE_WORDS = /\b(festive|festival|diwali|celebrations?|delight(ful
 // Ignored when counting which title words are overused
 const TITLE_STOPWORDS = new Set(['and', 'the', 'with', 'for', 'set', 'of', 'pcs', 'piece', 'pieces'])
 
+const MAX_DESC_WORDS = 100
+
+function capWords(text, max) {
+  const words = text.split(/\s+/).filter(Boolean)
+  if (words.length <= max) return text
+  const clipped = words.slice(0, max).join(' ')
+  const lastStop = Math.max(clipped.lastIndexOf('. '), clipped.lastIndexOf('! '), clipped.lastIndexOf('? '), clipped.lastIndexOf('.\\n'))
+  // Only cut at a sentence end if that keeps most of the copy; else hard clip.
+  if (lastStop > clipped.length * 0.5) return clipped.slice(0, lastStop + 1)
+  const trimmed = clipped.replace(/[,;:\s]+$/, '')
+  return /[.!?]$/.test(trimmed) ? trimmed : trimmed + '.'
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -69,17 +82,17 @@ Match THAT energy: specific, funny where it earns it, never generic-nice. If a l
 
 Study this product image and write copy for the product page.
 ${extraSection}
-Write exactly 2–3 short paragraphs covering:
-1. A hook with an emoji, what the product is, its colours, feel, and materials/craft.
-2. Who it is for and what occasions it suits — make this specific and a little funny, not a bland occasion list.
-3. End with 4–6 bullet points of key product facts, each prefixed with ✨ followed by exactly one space, nothing else in front of the bullets (no header line like "What's inside:" — go straight from the second paragraph into the ✨ lines).
+Write the description as ONE paragraph, or one paragraph plus a short half-paragraph of one or two sentences. Keep it tight.
+- Paragraph: open with the hook (with an emoji), then what the product is, its colours, feel and materials/craft, with one small, specific observation. Fold the key facts (material, size, use) into the sentences themselves.
+- Optional half-paragraph: who it is for or when it earns its place, specific and a little funny, not a bland occasion list.
+- NO bullet points, NO ✨ lines, NO headers.
 
 Formatting rules:
-- Use \\n\\n between paragraphs, and between the last paragraph and the bullet block
-- 180–220 words total (paragraphs + bullets combined)
-- Wrap at most 2–3 short phrases in **double asterisks** for emphasis on the single most compelling detail per paragraph (a standout material, a specific use-case) — don't overuse it, it should read like emphasis, not decoration.
-- Use straight, single, plain quote marks only if quoting something — never double them up ("" is always wrong, use ").
-- NO em dashes, anywhere, ever (use a comma, colon, or period instead). This rule gets broken more than any other — check your output for the — character before finishing and remove every instance.
+- If you write the half-paragraph, separate it from the first with \\n\\n. Otherwise there is just one paragraph.
+- 60 to 90 words total. Never more than 100.
+- Wrap at most 2 short phrases in **double asterisks** for emphasis on the single most compelling detail (a standout material, a specific use-case). It should read like emphasis, not decoration.
+- Use straight, single, plain quote marks only if quoting something, never double them up ("" is always wrong, use ").
+- NO em dashes, anywhere, ever (use a comma, colon, or period instead). This rule gets broken more than any other, check your output for the — character before finishing and remove every instance.
 - Weave in natural SEO keywords (material, occasion, product type).
 
 Avoid sounding like every other listing (this is the main failure mode — read this twice):
@@ -99,7 +112,7 @@ Opening line rules (this is where generic AI copy fails hardest, so follow close
 Return ONLY a valid JSON object in exactly this format:
 {
   "title_options": ["Best name", "Alternative name", "Alternative name"],
-  "description": "Full rich description as described above",
+  "description": "The short description as described above",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
   "keywords": ["keyword phrase 1", "keyword phrase 2", "keyword phrase 3", "keyword phrase 4", "keyword phrase 5", "keyword phrase 6", "keyword phrase 7", "keyword phrase 8"]
 }
@@ -138,7 +151,7 @@ ${catalogSection}`
             content: [imageContent, { type: 'text', text: prompt }],
           },
         ],
-        // The JSON response has to hold title + a 180-220 word description +
+        // The JSON response has to hold title + a 60-90 word description +
         // up to 8 tags + up to 8 keywords, all within this budget. 700 was
         // tight enough that a longer description could squeeze out (or
         // truncate) the tags/keywords arrays that come after it in the JSON.
@@ -204,6 +217,10 @@ ${catalogSection}`
       .replace(/""+/g, '"')
       .replace(/✨(?=\S)/g, '✨ ')
 
+    // Backstop for the length limit: the model drifts long. Cut at the last
+    // full sentence at or under MAX_DESC_WORDS rather than mid-sentence.
+    const cappedDescription = capWords(cleanDescription, MAX_DESC_WORDS)
+
     const tags = Array.isArray(parsed.tags) ? parsed.tags : []
     const keywords = Array.isArray(parsed.keywords) ? parsed.keywords : []
 
@@ -230,7 +247,7 @@ ${catalogSection}`
     return res.status(200).json({
       title: titleOptions[0] || '',
       titleOptions,
-      description: cleanDescription,
+      description: cappedDescription,
       tags,
       keywords,
     })

@@ -246,6 +246,28 @@ function slugify(text) {
 // ✨-prefixed bullet lines — that ProductDetail.jsx parses back into real HTML
 // at render time. Works directly on the textarea's own selection, since these
 // forms are controlled inputs (state, not the DOM, is the source of truth).
+// Product descriptions are capped so the product page stays scannable: one
+// paragraph, or one and a half. ~100 words is that, with a little headroom.
+const DESC_MAX_WORDS = 100;
+function countWords(text) {
+  return (text || "").replace(/\*\*|__|✨/g, " ").split(/\s+/).filter(Boolean).length;
+}
+function descLimitMessage(text) {
+  const n = countWords(text);
+  return n > DESC_MAX_WORDS
+    ? `Description is ${n} words. Keep it to ${DESC_MAX_WORDS} or fewer (one to one and a half paragraphs).`
+    : "";
+}
+function DescCounter({ value }) {
+  const n = countWords(value);
+  const over = n > DESC_MAX_WORDS;
+  return (
+    <p style={{ fontSize: 12, margin: "4px 0 0", color: over ? "#c00" : "#999", fontWeight: over ? 600 : 400 }}>
+      {n} / {DESC_MAX_WORDS} words{over ? ` (${n - DESC_MAX_WORDS} over, shorten before saving)` : ""}
+    </p>
+  );
+}
+
 function wrapDescSelection(ref, value, setValue, marker) {
   const el = ref.current;
   if (!el) return;
@@ -1316,6 +1338,7 @@ export default function AdminPortal() {
     if (!newProduct.title.trim()) return setFormError("Title required.");
     if (!newProduct.categoryId) return setFormError("Select a category.");
     if (!newProduct.description.trim()) return setFormError("Description required.");
+    if (descLimitMessage(newProduct.description)) return setFormError(descLimitMessage(newProduct.description));
     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
     if (!newProduct.sellerId) return setFormError("Select a seller before adding this product.");
@@ -1552,6 +1575,12 @@ export default function AdminPortal() {
   }
 
   function handleStageProductEdit(edited) {
+    // Older products keep their long descriptions untouched; the limit only
+    // applies once someone edits the description itself.
+    const original = products.find(p => p.id === edited.id);
+    if (edited.description !== original?.description && descLimitMessage(edited.description)) {
+      return showToast(descLimitMessage(edited.description), "error");
+    }
     setPendingChanges(prev => ({ ...prev, [edited.id]: edited }));
     setEditingProduct(null); setEditImageFiles([]);
     if (viewingSeller) { setProductFilter(""); setActiveTab("sellers"); }
@@ -2489,6 +2518,7 @@ export default function AdminPortal() {
                       <textarea ref={newDescRef} style={{ ...ts.input, height: 100, resize: "vertical", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: 0 }}
                         placeholder="Keep it punchy. Select text and hit Bold/Underline, or use Bullet to add a line."
                         value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} />
+                      <DescCounter value={newProduct.description} />
                       <p style={ts.fieldHint}>Line breaks become paragraph breaks. **bold** and __underline__ render as real formatting on the product page.</p>
                       <label style={ts.label}>Tags (comma-separated)</label>
                       <input style={ts.input} placeholder="candle, soy, gift" value={newProduct.tags}
@@ -2789,6 +2819,7 @@ export default function AdminPortal() {
                     setFormError("");
                     if (!newProduct.title.trim()) return setFormError("Title required.");
                     if (!newProduct.categoryId) return setFormError("Select a category.");
+                    if (descLimitMessage(newProduct.description)) return setFormError(descLimitMessage(newProduct.description));
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
@@ -2841,7 +2872,9 @@ export default function AdminPortal() {
                       ["Seller Quoted Price", newProduct.sellerQuotedPrice ? `Rs.${newProduct.sellerQuotedPrice}` : "none"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => (occasionCatalogEntries.find(oc => oc.id === o) || occasionCategories.find(oc => oc.id === o))?.name).filter(Boolean).join(", ") || "None"],
-                      ["Images", imageFiles.map(f => f.name).join(", ")],
+                      // The names these files will be saved under in the repo (the title's
+                      // slug plus a running number), not the uploaded files' own names.
+                      ["Images", imageFiles.map((f, i) => productImageName(slugify(newProduct.title), i + 1, f.mime)).join(", ")],
                     ].map(([label, val]) => (
                       <div key={label} style={{ marginBottom: 10 }}>
                         <p style={ts.previewLabel}>{label}</p>
@@ -3070,6 +3103,7 @@ export default function AdminPortal() {
                           </div>
                           <textarea ref={editDescRef} style={{ ...ts.input, height: 100, resize: "vertical", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: 0 }} value={editingProduct.description}
                             onChange={e => setEditingProduct(p => ({ ...p, description: e.target.value }))} />
+                          <DescCounter value={editingProduct.description} />
                           <p style={ts.fieldHint}>Line breaks become paragraph breaks. **bold** and __underline__ render as real formatting on the product page.</p>
                           <label style={ts.label}>Tags (comma-separated)</label>
                           <input style={ts.input} value={editingProduct.tags.join(", ")}

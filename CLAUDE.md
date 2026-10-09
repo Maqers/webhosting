@@ -107,8 +107,8 @@ Images are served as static files from `public/images/` (referenced as `/images/
 
 ## Description copy rules
 
-When writing or editing product descriptions for catalog.js:
+Applies to new and AI-generated descriptions (admin portal enforces it: 100-word cap with a live counter, and `api/generate-description.js` prompts for it). Existing long descriptions in catalog.js are left as they are unless someone edits them; do not bulk-shorten them.
 - No em dashes (`—`). Use commas, colons, or rewrite.
-- Paragraphs separated with `\n\n` (literal backslash-n, not actual newlines — they're inside JS strings).
-- Minimum 180 words.
-- End with 4–6 bullet points prefixed with `✨`.
+- One paragraph, or one plus a short half-paragraph, 60 to 100 words total.
+- Paragraphs separated with `\n\n` (literal backslash-n, not actual newlines, they're inside JS strings).
+- No bullet block. Fold material, size and use into the sentences.
