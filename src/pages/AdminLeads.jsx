@@ -12,6 +12,30 @@ const STAGES = {
   ordered: "Ordered",
 };
 
+// A lead counts as abandoned once it has been quiet for this long without
+// reaching Ordered. Leaving the page is not used: on a phone the tab goes to
+// the background when someone switches to a UPI app to pay, which looks the
+// same as leaving. Each save refreshes updated_at, so the clock restarts
+// whenever they do something.
+const IDLE_MINUTES = {
+  cart: 24 * 60,
+  checkout_started: 120,
+  details_entered: 120,
+  payment_shown: 30,
+};
+
+function statusOf(lead) {
+  if (lead.stage === "ordered") return "ordered";
+  const idle = (Date.now() - new Date(lead.updated_at).getTime()) / 60000;
+  return idle >= (IDLE_MINUTES[lead.stage] ?? 120) ? "abandoned" : "active";
+}
+
+const STATUS_STYLE = {
+  ordered: { bg: "#e8f5ec", fg: "#1f7a3d", label: "Ordered" },
+  active: { bg: "#eef3fb", fg: "#2a5db0", label: "Still active" },
+  abandoned: { bg: "#fdeceb", fg: "#b3261e", label: "Abandoned" },
+};
+
 function ago(iso) {
   const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
   if (mins < 60) return `${mins}m ago`;
@@ -34,7 +58,7 @@ export default function AdminLeads({ creds, ts, showToast }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [view, setView] = useState("open"); // open | all | ordered
+  const [view, setView] = useState("open"); // open | active | all | ordered
   const [saving, setSaving] = useState({});
 
   const call = useCallback(async body => {
@@ -67,13 +91,24 @@ export default function AdminLeads({ creds, ts, showToast }) {
   }
 
   const reachable = l => !!(l.phone || l.email);
-  const rows = useMemo(() => leads.filter(l => {
-    if (view === "ordered") return l.stage === "ordered";
-    if (view === "open") return l.stage !== "ordered" && reachable(l);
-    return true;
-  }), [leads, view]);
+  const rows = useMemo(() => {
+    const list = leads.filter(l => {
+      const st = statusOf(l);
+      if (view === "ordered") return st === "ordered";
+      if (view === "active") return st === "active";
+      if (view === "open") return st === "abandoned" && reachable(l);
+      return true;
+    });
+    // Follow-up list: people who reached the payment screen go first, since
+    // they may have paid and never confirmed.
+    if (view === "open") {
+      list.sort((a, b) => (b.stage === "payment_shown") - (a.stage === "payment_shown")
+        || new Date(b.updated_at) - new Date(a.updated_at));
+    }
+    return list;
+  }, [leads, view]);
 
-  const openCount = leads.filter(l => l.stage !== "ordered" && reachable(l) && !l.followed_up).length;
+  const openCount = leads.filter(l => statusOf(l) === "abandoned" && reachable(l) && !l.followed_up).length;
 
   return (
     <div>
@@ -81,11 +116,11 @@ export default function AdminLeads({ creds, ts, showToast }) {
         <div>
           <h1 style={ts.pageTitle}>Leads</h1>
           <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-            {openCount} to follow up · people who left details but did not order. Internal only.
+            {openCount} to follow up · quiet for a while without ordering (cart 24h, checkout 2h, payment screen 30m). Internal only.
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {[["open", "To follow up"], ["all", "Everyone"], ["ordered", "Ordered"]].map(([k, label]) => (
+          {[["open", "To follow up"], ["active", "Still active"], ["all", "Everyone"], ["ordered", "Ordered"]].map(([k, label]) => (
             <button key={k} style={view === k ? ts.primaryBtn : ts.ghostBtn} onClick={() => setView(k)}>{label}</button>
           ))}
           <button style={ts.ghostBtn} onClick={load} disabled={loading}>{loading ? "Loading..." : "↺ Refresh"}</button>
@@ -110,6 +145,8 @@ export default function AdminLeads({ creds, ts, showToast }) {
       <div style={{ display: "grid", gap: 10 }}>
         {rows.map(l => {
           const link = waLink(l);
+          const st = statusOf(l);
+          const stStyle = STATUS_STYLE[st];
           const campaign = l.utm?.utm_campaign || l.utm?.utm_source || (l.referrer ? new URL(l.referrer, "https://x").hostname : "direct");
           return (
             <div key={l.lead_id} style={{ background: "#fff", border: "1px solid #eadfdf", borderRadius: 10, padding: 14, opacity: l.followed_up ? 0.6 : 1 }}>
@@ -117,8 +154,14 @@ export default function AdminLeads({ creds, ts, showToast }) {
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 15 }}>
                     {l.name || "(no name yet)"}{" "}
+                    <span style={{ fontWeight: 600, fontSize: 11, padding: "2px 8px", borderRadius: 999, background: stStyle.bg, color: stStyle.fg }}>{stStyle.label}</span>{" "}
                     <span style={{ fontWeight: 400, fontSize: 12, color: "#888" }}>· {STAGES[l.stage] || l.stage} · {ago(l.updated_at)}</span>
                   </div>
+                  {l.stage === "payment_shown" && st === "abandoned" && (
+                    <div style={{ fontSize: 12, color: "#9a5b00", marginTop: 3 }}>
+                      Check your UPI for a payment first. They may have paid without tapping "I've paid".
+                    </div>
+                  )}
                   <div style={{ fontSize: 13, color: "#444", marginTop: 3 }}>
                     {l.phone || "no phone"}{l.email ? ` · ${l.email}` : ""}{l.city ? ` · ${l.city}` : ""}
                   </div>
