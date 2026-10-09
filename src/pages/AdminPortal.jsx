@@ -12,6 +12,7 @@ import "./AdminPortal.css";
 import { splitsByColor } from "../utils/productVariants";
 import AdminCalendar from "./AdminCalendar";
 import AdminImageEditor from "./AdminImageEditor";
+import AdminLeads from "./AdminLeads";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -2323,6 +2324,7 @@ export default function AdminPortal() {
     { id: "occasions", label: "Occasions", icon: "♡" },
     { id: "circles", label: "Home Circles", icon: "◎" },
     { id: "sellers", label: "Sellers", icon: "◎" },
+    { id: "leads", label: "Leads", icon: "☎" },
   ];
 
   function handleTabSwitch(tabId) {
@@ -4006,6 +4008,8 @@ export default function AdminPortal() {
             </div>
           </div>
         )}
+
+        {activeTab === "leads" && <AdminLeads creds={creds} ts={ts} showToast={showToast} />}
 
         {activeTab === "sellers" && (
           <div>

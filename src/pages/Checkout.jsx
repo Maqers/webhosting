@@ -8,6 +8,7 @@ import { saveGuestOrder } from '../utils/guestOrders'
 import SeoHead from '../components/SeoHead'
 import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
+import { saveLead, saveLeadSoon, endLead, summariseCart } from '../utils/leads'
 import posthog from 'posthog-js'
 import { DIWALI_COUPON, isOfferLive, diwaliCartDiscount } from '../data/offers'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
@@ -155,6 +156,42 @@ export default function Checkout() {
   const [payRevealed, setPayRevealed] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  // ── Lead capture ──────────────────────────────────────────────────────────
+  // Saved at every step so a shopper who leaves still leaves us a way to reach
+  // them: checkout opened, then details as they type (once there is a phone or
+  // a valid email), then payment shown, then order placed.
+  const leadCart = () => ({
+    cart: summariseCart(items),
+    cart_total: grandTotal,
+    item_count: items.reduce((sum, i) => sum + i.qty, 0),
+  })
+
+  useEffect(() => {
+    if (items.length === 0) return
+    saveLead({ stage: 'checkout_started', ...leadCart() })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (items.length === 0) return
+    const phone = form.phone.trim().replace(/[\s-]/g, '')
+    const hasPhone = /^\d{10}$/.test(phone) || /^\+[1-9]\d{7,14}$/.test(phone)
+    const hasEmail = /^\S+@\S+\.\S+$/.test(form.email.trim())
+    if (!hasPhone && !hasEmail) return
+    saveLeadSoon({
+      stage: 'details_entered',
+      name: form.name.trim(),
+      phone: hasPhone ? phone : '',
+      email: hasEmail ? form.email.trim() : '',
+      address: form.address.trim(),
+      city: form.city.trim(),
+      state: form.state.trim(),
+      pincode: form.pincode.trim(),
+      ...leadCart(),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, grandTotal])
 
   // ── Saved addresses (Profile page) ───────────────────────────────────────
   // 'new' means the shopper is filling in a fresh address (default for
@@ -403,6 +440,7 @@ export default function Checkout() {
       return
     }
     setPayRevealed(true)
+    saveLead({ stage: 'payment_shown', ...leadCart() })
     // Give the block a frame to mount before scrolling it into view.
     requestAnimationFrame(() => {
       document.querySelector('.checkout-pay-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -417,6 +455,7 @@ export default function Checkout() {
     setSubmitting(true)
     const oid = generateOrderId()
     setOrderId(oid)
+    saveLead({ stage: 'ordered', order_ref: oid, ...leadCart() })
 
     posthog.identify(form.email || form.phone, {
       name: form.name,
@@ -446,6 +485,7 @@ export default function Checkout() {
       ...(couponApplied && { coupon: appliedCode, discount: couponDiscount }),
     })
     clearCart()
+    endLead()
     setOrderPlaced(true)
     setSubmitting(false)
   }
@@ -578,6 +618,7 @@ export default function Checkout() {
                 <label>PHONE NUMBER *</label>
                 <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="10-digit number, or +countrycode if outside India" />
                 {errors.phone && <span className="checkout-error">{errors.phone}</span>}
+                <span className="checkout-lead-note">We save your details as you go so we can help if anything goes wrong.</span>
               </div>
             </div>
 
