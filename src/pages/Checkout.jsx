@@ -133,6 +133,7 @@ export default function Checkout() {
       value: total,
       item_count: items.length,
       product_ids: items.map(i => i.id),
+      items,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -440,6 +441,7 @@ export default function Checkout() {
       value: grandTotal,
       item_count: items.length,
       product_ids: items.map(i => i.id),
+      items,
       payment_method: paymentMethod,
       ...(couponApplied && { coupon: appliedCode, discount: couponDiscount }),
     })
@@ -508,6 +510,7 @@ export default function Checkout() {
       value: grandTotal,
       item_count: items.length,
       product_ids: items.map(i => i.id),
+      items,
       payment_method: 'upi',
     })
     clearCart()

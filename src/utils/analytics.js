@@ -37,12 +37,59 @@ const GA4_EVENT_MAP = {
   ContactWhatsAppClicked: 'contact',
 }
 
+// GA4 e-commerce reports (item name, items added/checked out/purchased) are
+// empty unless events carry an `ecommerce.items` array. Callers pass either a
+// single product (product_id/title/price/category_id) or `items` (cart lines).
+const GA4_ECOMMERCE_EVENTS = new Set(['view_item', 'add_to_cart', 'remove_from_cart', 'begin_checkout', 'purchase'])
+
+function buildGa4Items(props) {
+  if (Array.isArray(props.items) && props.items.length) {
+    return props.items.map(i => ({
+      item_id: String(i.id),
+      item_name: i.title,
+      price: Number(i.price) || 0,
+      quantity: i.qty || 1,
+      ...(i.categoryId && { item_category: i.categoryId }),
+    }))
+  }
+  if (props.product_id != null) {
+    return [{
+      item_id: String(props.product_id),
+      item_name: props.title,
+      price: Number(props.price) || 0,
+      quantity: 1,
+      ...(props.category_id && { item_category: props.category_id }),
+    }]
+  }
+  return []
+}
+
 export function trackEvent(name, props = {}) {
-  if (initialized) posthog.capture(name, props)
+  const { items, ...posthogProps } = props
+  if (initialized) posthog.capture(name, posthogProps)
 
   const ga4Name = GA4_EVENT_MAP[name]
   if (ga4Name) {
     window.dataLayer = window.dataLayer || []
-    window.dataLayer.push({ event: ga4Name, ...props })
+    if (GA4_ECOMMERCE_EVENTS.has(ga4Name)) {
+      const ga4Items = buildGa4Items(props)
+      const value = props.value != null
+        ? Number(props.value)
+        : ga4Items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+      // Clear the previous ecommerce object so items never leak between events.
+      window.dataLayer.push({ ecommerce: null })
+      window.dataLayer.push({
+        event: ga4Name,
+        ...posthogProps,
+        ecommerce: {
+          currency: 'INR',
+          value,
+          ...(props.order_id && { transaction_id: props.order_id }),
+          items: ga4Items,
+        },
+      })
+    } else {
+      window.dataLayer.push({ event: ga4Name, ...posthogProps })
+    }
   }
 }
