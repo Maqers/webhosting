@@ -59,91 +59,99 @@ button.whatsapp-button.active, .whatsapp-button.active {
 }
 .whatsapp-button .whatsapp-text { font-weight: 600 !important; white-space: nowrap !important; }
 
-/* ── POPUP ── */
-.whatsapp-popup {
+/* ── POPUP: topic picker that opens WhatsApp with a real question ── */
+.wa-sheet {
   position: fixed !important;
   bottom: 96px !important; right: 24px !important;
   left: auto !important; top: auto !important;
   z-index: 999999 !important;
-  width: 420px !important;
+  width: 380px !important;
   max-width: calc(100vw - 48px) !important;
   max-height: calc(100vh - 140px) !important;
-  background: #fff !important; border-radius: 24px !important;
-  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25) !important;
+  background: #fff !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3) !important;
   display: flex !important; flex-direction: column !important;
-  animation: popupSlideIn 0.3s ease-out; overflow: hidden !important;
+  overflow: hidden !important;
+  animation: popupSlideIn 0.25s ease-out;
 }
 @keyframes popupSlideIn {
-  from{opacity:0;transform:translateY(20px) scale(0.95)}
-  to{opacity:1;transform:translateY(0) scale(1)}
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
 }
 
-.whatsapp-popup-header {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
-  color: white !important; padding: 20px !important;
-  border-radius: 24px 24px 0 0 !important;
-  display: flex !important; align-items: flex-start !important;
-  justify-content: space-between !important; gap: 12px !important; flex-shrink: 0 !important;
+.wa-sheet-head {
+  flex: none;
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 16px 16px 20px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #fff;
 }
-.whatsapp-header-content { display: flex !important; align-items: center !important; gap: 14px !important; flex: 1 !important; min-width: 0 !important; }
-.whatsapp-icon-wrapper {
-  width: 52px !important; height: 52px !important; min-width: 52px !important;
-  background: rgba(255,255,255,0.2) !important; border-radius: 50% !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
+.wa-sheet-icon {
+  flex: none; width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
 }
-.whatsapp-icon-wrapper svg { width: 28px !important; height: 28px !important; color: white !important; }
-.whatsapp-header-text { flex: 1 !important; min-width: 0 !important; }
-.whatsapp-popup-header h3 { margin: 0 !important; font-size: 1.5rem !important; font-weight: 700 !important; color: white !important; }
-.whatsapp-subtitle { margin: 4px 0 0 !important; font-size: 0.875rem !important; color: rgba(255,255,255,0.9) !important; }
-.whatsapp-close-btn {
-  width: 40px !important; height: 40px !important; min-width: 40px !important;
-  background: rgba(255,255,255,0.2) !important; border: none !important; border-radius: 50% !important;
-  color: white !important; cursor: pointer !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
+.wa-sheet-titles { flex: 1; min-width: 0; }
+.wa-sheet-titles h3 { margin: 0; font-size: 1.15rem; font-weight: 600; color: #fff; line-height: 1.2; }
+.wa-sheet-titles p { margin: 2px 0 0; font-size: 0.8rem; color: rgba(255,255,255,0.9); }
+.wa-sheet-close {
+  flex: none; width: 36px; height: 36px; min-width: 36px; min-height: 36px;
+  border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.2); color: #fff;
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
 }
-.whatsapp-close-btn:hover { background: rgba(255,255,255,0.3) !important; transform: rotate(90deg) !important; }
-.whatsapp-close-btn svg { width: 20px !important; height: 20px !important; }
 
-.whatsapp-popup-content {
-  padding: 24px !important; overflow-y: auto !important; flex: 1 !important;
-  display: flex !important; flex-direction: column !important; gap: 20px !important;
+.wa-sheet-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  padding: 16px 20px 4px;
+  display: flex; flex-direction: column; gap: 12px;
 }
-.chatbot-conversation { display: flex !important; flex-direction: column !important; gap: 16px !important; }
-.chat-message { display: flex !important; gap: 10px !important; }
-.bot-message { justify-content: flex-start !important; align-items: flex-end !important; }
-.user-message { justify-content: flex-end !important; align-items: flex-end !important; flex-direction: row-reverse !important; }
-.bot-avatar, .user-avatar {
-  width: 36px !important; height: 36px !important; min-width: 36px !important;
-  border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important;
-}
-.bot-avatar { background: linear-gradient(135deg,#25D366,#128C7E) !important; }
-.user-avatar { background: #760909 !important; }
-.bot-avatar svg, .user-avatar svg { color: white !important; }
-.bot-avatar svg { width: 20px !important; height: 20px !important; }
-.user-avatar svg { width: 16px !important; height: 16px !important; }
-.bot-bubble { background: #f3f4f6 !important; color: #1f2937 !important; border-radius: 18px 18px 18px 4px !important; padding: 12px 16px !important; max-width: 75% !important; }
-.user-bubble { background: linear-gradient(135deg,#25D366,#128C7E) !important; color: white !important; border-radius: 18px 18px 4px 18px !important; padding: 12px 16px !important; max-width: 75% !important; }
-.chat-text { margin: 0 !important; font-size: 0.9375rem !important; line-height: 1.5 !important; }
-.chat-time { display: block !important; font-size: 0.6875rem !important; opacity: 0.75 !important; margin-top: 4px !important; }
+.wa-sheet-body > * { flex-shrink: 0; }
 
-.product-info-card { display: flex !important; align-items: center !important; gap: 14px !important; padding: 14px 16px !important; background: rgba(118,9,9,0.05) !important; border: 1.5px solid rgba(118,9,9,0.15) !important; border-radius: 12px !important; }
-.product-info-icon { width: 44px !important; height: 44px !important; min-width: 44px !important; background: rgba(118,9,9,0.1) !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
-.product-info-icon svg { width: 20px !important; height: 20px !important; color: #760909 !important; }
-.product-info-details { display: flex !important; flex-direction: column !important; gap: 2px !important; flex: 1 !important; }
-.product-info-label { font-size: 0.75rem !important; color: #6b7280 !important; font-weight: 500 !important; text-transform: uppercase !important; }
-.product-info-value { font-size: 1rem !important; color: #760909 !important; font-weight: 700 !important; }
-
-.whatsapp-action-btn {
-  width: 100% !important; padding: 16px 24px !important;
-  background: linear-gradient(135deg,#25D366 0%,#128C7E 100%) !important;
-  color: white !important; border: none !important; border-radius: 12px !important;
-  font-size: 1rem !important; font-weight: 600 !important; cursor: pointer !important;
-  display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important;
-  min-height: 54px !important;
+.wa-sheet-product {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px; border-radius: 12px;
+  background: #faf6f2; border: 1px solid #eee4dc;
 }
-.whatsapp-action-btn:hover { transform: translateY(-2px) !important; }
-.whatsapp-action-btn svg { width: 22px !important; height: 22px !important; }
-.whatsapp-help-text { margin: 0 !important; font-size: 0.875rem !important; color: #6b7280 !important; text-align: center !important; }
+.wa-sheet-product img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex: none; }
+.wa-sheet-product > div { min-width: 0; }
+.wa-sheet-product-title {
+  margin: 0; font-size: 0.9rem; font-weight: 600; color: #1a1714;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wa-sheet-product-price { margin: 2px 0 0; font-size: 0.85rem; color: #760909; font-weight: 600; }
+
+.wa-sheet-q { margin: 4px 0 0; font-size: 0.85rem; font-weight: 700; color: #1a1714; }
+.wa-sheet-topics { display: flex; flex-wrap: wrap; gap: 8px; }
+.wa-sheet-topic {
+  min-height: 38px; padding: 0 14px;
+  border: 1px solid #ddd3cb; border-radius: 999px;
+  background: #fff; color: #3a2f2f;
+  font-family: inherit; font-size: 0.85rem; font-weight: 500;
+  cursor: pointer;
+}
+.wa-sheet-topic.is-on { background: #128C7E; border-color: #128C7E; color: #fff; font-weight: 600; }
+
+.wa-sheet-details {
+  width: 100%; box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid #ddd3cb; border-radius: 10px;
+  font-family: inherit; font-size: 16px; /* 16px stops iOS zooming in */
+  line-height: 1.4; color: #1a1714; resize: none; outline: none;
+}
+.wa-sheet-details:focus { border-color: #128C7E; }
+
+.wa-sheet-foot { flex: none; padding: 12px 20px 16px; }
+.wa-sheet-send {
+  width: 100%; min-height: 50px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: 12px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #fff; font-family: inherit; font-size: 1rem; font-weight: 600;
+  cursor: pointer;
+}
+.wa-sheet-send:disabled { background: #e6e1dc; color: #8a817a; cursor: default; }
 
 /* ── MOBILE — THE KEY FIX ── */
 @media screen and (max-width: 968px) {
@@ -164,13 +172,14 @@ button.whatsapp-button.active, .whatsapp-button.active {
     width: 27px !important; height: 27px !important;
     min-width: 27px !important; min-height: 27px !important;
   }
-  .whatsapp-popup {
+  .wa-sheet {
     position: fixed !important;
     bottom: 0 !important; left: 0 !important; right: 0 !important; top: auto !important;
-    width: 100% !important; max-width: 100% !important; max-height: 85vh !important;
-    border-radius: 24px 24px 0 0 !important;
-    animation: slideUpMobile 0.3s ease-out;
+    width: 100% !important; max-width: 100% !important; max-height: 85dvh !important;
+    border-radius: 20px 20px 0 0 !important;
+    animation: slideUpMobile 0.25s ease-out;
   }
+  .wa-sheet-foot { padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
   @keyframes slideUpMobile { from{transform:translateY(100%)} to{transform:translateY(0)} }
 }
 
