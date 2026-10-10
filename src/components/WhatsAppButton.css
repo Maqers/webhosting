@@ -122,6 +122,18 @@ button.whatsapp-button.active, .whatsapp-button.active {
 }
 .wa-sheet-product-price { margin: 2px 0 0; font-size: 0.85rem; color: #760909; font-weight: 600; }
 
+.wa-sheet-preview {
+  margin: 0; padding: 10px 12px;
+  border-radius: 12px 12px 12px 4px;
+  background: #e7f8ee; color: #1a1714;
+  font-size: 0.9rem; line-height: 1.4;
+}
+.wa-sheet-preview span {
+  display: block; margin-bottom: 2px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: #128C7E;
+}
+
 .wa-sheet-q { margin: 4px 0 0; font-size: 0.85rem; font-weight: 700; color: #1a1714; }
 .wa-sheet-topics { display: flex; flex-wrap: wrap; gap: 8px; }
 .wa-sheet-topic {

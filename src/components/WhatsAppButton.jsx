@@ -134,6 +134,9 @@ const WhatsAppButton = () => {
 
           <div className="wa-sheet-body">
             {product && (
+              <p className="wa-sheet-q">Questions about this piece? Message us on WhatsApp.</p>
+            )}
+            {product && (
               <div className="wa-sheet-product">
                 {product.images?.[0] && <img src={product.images[0]} alt="" />}
                 <div>
@@ -141,6 +144,13 @@ const WhatsAppButton = () => {
                   <p className="wa-sheet-product-price">₹{Number(product.price).toLocaleString('en-IN')}</p>
                 </div>
               </div>
+            )}
+
+            {product && (
+              <p className="wa-sheet-preview">
+                <span>Your message</span>
+                {buildMessage().split(': http')[0]}
+              </p>
             )}
 
             {!product && <>
