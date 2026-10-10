@@ -27,7 +27,8 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { getAllProducts, getCategoryByIdOrSlug } from '../src/data/catalog.js'
 import { buildReviewSchema } from '../src/utils/reviewSchema.js'
-import { productMetaDescription } from '../src/utils/seoCopy.js'
+import { productMetaDescription, trimMeta } from '../src/utils/seoCopy.js'
+import { buildOfferSchema } from '../src/utils/productSchema.js'
 import { SUPABASE_REVIEWS_URL, SUPABASE_PUBLIC_KEY } from './supabase-public.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -84,8 +85,7 @@ for (const product of products) {
   const plainDescription = toPlainText(product.description)
   // Search-result line (what it is, price, delivery) — same as the live page
   const searchLine = productMetaDescription(product)
-  const metaDescription =
-    searchLine.length > 155 ? searchLine.slice(0, 152).trimEnd() + '…' : searchLine
+  const metaDescription = trimMeta(searchLine)
 
   const canonicalUrl = `${BASE_URL}/product/${product.slug}`
   const images = (product.images || []).map((img) => (img.startsWith('http') ? img : `${BASE_URL}${img}`))
@@ -104,15 +104,7 @@ for (const product of products) {
     ...(categoryName && { category: categoryName }),
     ...(product.tags?.length > 0 && { keywords: product.tags.join(', ') }),
     ...buildReviewSchema(product.meta?.reviews, customerReviewsByProduct[product.id]),
-    offers: {
-      '@type': 'Offer',
-      url: canonicalUrl,
-      priceCurrency: 'INR',
-      price: product.price,
-      availability: product.inStock !== false ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      itemCondition: 'https://schema.org/NewCondition',
-      seller: { '@type': 'Organization', name: 'Maqers', url: BASE_URL },
-    },
+    offers: buildOfferSchema(product, canonicalUrl),
   }
 
   // data-rh marks these as react-helmet-async's own tags, so when React

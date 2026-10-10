@@ -107,8 +107,8 @@ Images are served as static files from `public/images/` (referenced as `/images/
 
 ## Description copy rules
 
-Applies to new and AI-generated descriptions (admin portal enforces it: 100-word cap with a live counter, and `api/generate-description.js` prompts for it). Existing long descriptions in catalog.js are left as they are unless someone edits them; do not bulk-shorten them.
+Applies to new and AI-generated descriptions (admin portal enforces it: 150-word cap with a live counter, and `api/generate-description.js` prompts for it). Existing long descriptions in catalog.js are left as they are unless someone edits them; do not bulk-shorten them.
 - No em dashes (`—`). Use commas, colons, or rewrite.
-- One paragraph, or one plus a short half-paragraph, 60 to 100 words total.
+- One paragraph, or one plus a short half-paragraph, 100 to 150 words total.
 - Paragraphs separated with `\n\n` (literal backslash-n, not actual newlines, they're inside JS strings).
 - No bullet block. Fold material, size and use into the sentences.

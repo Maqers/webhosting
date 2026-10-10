@@ -21,7 +21,7 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { categories, getAllProducts, getProductsByCategory, getPopularProducts, occasionProductMap } from '../src/data/catalog.js'
 import { occasionCategories } from '../src/data/occasionCatalog.js'
-import { categorySeo, lowestPrice } from '../src/utils/seoCopy.js'
+import { categorySeo, lowestPrice, trimMeta } from '../src/utils/seoCopy.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DIST = resolve(__dirname, '..', 'dist')
@@ -43,7 +43,7 @@ const escapeHtml = (str) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 
-const truncate = (s) => (s.length > 155 ? s.slice(0, 152).trimEnd() + '…' : s)
+const truncate = (s) => trimMeta(s)
 
 const allProducts = getAllProducts()
 const productById = new Map(allProducts.map((p) => [p.id, p]))

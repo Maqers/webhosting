@@ -14,7 +14,8 @@ import { useMobileCenterSwap } from '../hooks/useMobileCenterSwap'
 import { expandProductsByColor } from '../utils/productVariants'
 import { fetchProductReviews, hasPurchasedProduct, fetchUserReviewForProduct } from '../utils/reviewsApi'
 import { buildReviewSchema } from '../utils/reviewSchema'
-import { getDeliveryWindow, getDeliveryFee } from '../utils/delivery'
+import { getDeliveryWindow } from '../utils/delivery'
+import { buildOfferSchema } from '../utils/productSchema'
 import OfferTag from '../components/OfferTag'
 import { hasDiwaliOffer, priceWithDiwaliCode } from '../data/offers'
 import { productMetaDescription } from '../utils/seoCopy'
@@ -511,53 +512,7 @@ const ProductDetail = () => {
     }),
     // Star ratings in search results, from real reviews only
     ...buildReviewSchema(product.meta?.reviews, customerReviews),
-    offers: {
-      '@type': 'Offer',
-      url: `${BASE_URL}/product/${product.slug}`,
-      priceCurrency: 'INR',
-      price: product.price,
-      priceValidUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split('T')[0],
-      availability: product.inStock !== false
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      itemCondition: 'https://schema.org/NewCondition',
-      seller: {
-        '@type': 'Organization',
-        name: 'Maqers',
-        url: BASE_URL,
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        // Shipping for this item bought on its own, same rule as checkout
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: getDeliveryFee(product.price),
-          currency: 'INR',
-        },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          // Same making time + 3-4 days transit as the timeline on this page
-          handlingTime: {
-            '@type': 'QuantitativeValue',
-            minValue: getDeliveryWindow(product).makingMin,
-            maxValue: getDeliveryWindow(product).makingMax,
-            unitCode: 'DAY',
-          },
-          transitTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 3,
-            maxValue: 4,
-            unitCode: 'DAY',
-          },
-        },
-        shippingDestination: {
-          '@type': 'DefinedRegion',
-          addressCountry: 'IN',
-        },
-      },
-    },
+    offers: buildOfferSchema(product, `${BASE_URL}/product/${product.slug}`),
   }
 
   // ── More from this maker logic ─────────────────────────────────────────────

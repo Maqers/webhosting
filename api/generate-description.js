@@ -4,7 +4,7 @@ const BANNED_TITLE_WORDS = /\b(festive|festival|diwali|celebrations?|delight(ful
 // Ignored when counting which title words are overused
 const TITLE_STOPWORDS = new Set(['and', 'the', 'with', 'for', 'set', 'of', 'pcs', 'piece', 'pieces'])
 
-const MAX_DESC_WORDS = 100
+const MAX_DESC_WORDS = 150
 
 function capWords(text, max) {
   const words = text.split(/\s+/).filter(Boolean)
@@ -89,7 +89,7 @@ Write the description as ONE paragraph, or one paragraph plus a short half-parag
 
 Formatting rules:
 - If you write the half-paragraph, separate it from the first with \\n\\n. Otherwise there is just one paragraph.
-- 60 to 90 words total. Never more than 100.
+- 100 to 140 words total. Never more than 150.
 - Wrap at most 2 short phrases in **double asterisks** for emphasis on the single most compelling detail (a standout material, a specific use-case). It should read like emphasis, not decoration.
 - Use straight, single, plain quote marks only if quoting something, never double them up ("" is always wrong, use ").
 - NO em dashes, anywhere, ever (use a comma, colon, or period instead). This rule gets broken more than any other, check your output for the — character before finishing and remove every instance.
@@ -151,7 +151,7 @@ ${catalogSection}`
             content: [imageContent, { type: 'text', text: prompt }],
           },
         ],
-        // The JSON response has to hold title + a 60-90 word description +
+        // The JSON response has to hold title + a 100-140 word description +
         // up to 8 tags + up to 8 keywords, all within this budget. 700 was
         // tight enough that a longer description could squeeze out (or
         // truncate) the tags/keywords arrays that come after it in the JSON.

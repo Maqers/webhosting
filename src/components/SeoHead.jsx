@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async'
+import { trimMeta } from '../utils/seoCopy'
 
 const BASE_URL = 'https://www.maqers.in'
 const DEFAULT_IMAGE = `${BASE_URL}/images/logo.png`
@@ -13,7 +14,7 @@ const DEFAULT_DESCRIPTION =
  *
  * Props:
  *   title       string  — page title (appended with " | Maqers")
- *   description string  — meta description (auto-truncated to 155 chars)
+ *   description string  — meta description (trimmed to 160 chars at a sentence end)
  *   image       string  — absolute URL for og:image (defaults to logo)
  *   url         string  — canonical URL path, e.g. "/products"
  *   type        string  — og:type, "product" for product pages, "website" elsewhere
@@ -35,9 +36,8 @@ export default function SeoHead({
   const fullImage = image.startsWith('http') ? image : `${BASE_URL}${image}`
   const canonicalUrl = url ? `${BASE_URL}${url}` : undefined
 
-  // Truncate description to 155 chars for Google
-  const safeDescription =
-    description.length > 155 ? description.slice(0, 152).trimEnd() + '\u2026' : description
+  // Keep within what Google shows, ending on a full sentence where possible
+  const safeDescription = trimMeta(description)
 
   return (
     <Helmet>

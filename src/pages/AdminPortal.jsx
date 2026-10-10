@@ -249,7 +249,7 @@ function slugify(text) {
 // forms are controlled inputs (state, not the DOM, is the source of truth).
 // Product descriptions are capped so the product page stays scannable: one
 // paragraph, or one and a half. ~100 words is that, with a little headroom.
-const DESC_MAX_WORDS = 100;
+const DESC_MAX_WORDS = 150;
 function countWords(text) {
   return (text || "").replace(/\*\*|__|✨/g, " ").split(/\s+/).filter(Boolean).length;
 }
