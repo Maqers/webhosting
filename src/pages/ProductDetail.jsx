@@ -77,6 +77,13 @@ const ProductDetail = () => {
   const [justAdded, setJustAdded] = useState(false)
   useEffect(() => { setJustAdded(false) }, [qty, selectedColor, selectedSize, selectedPersonalisation, orderNote, product?.id])
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
+  // Phone only: the note box starts folded into a one-line link.
+  const [noteOpen, setNoteOpen] = useState(false)
+  const noteRef = useRef(null)
+  // Phone only: a fixed Add To Cart / Buy It Now bar shows whenever the inline
+  // buy block is off screen, so the buttons are never a scroll away.
+  const mobileBuyRef = useRef(null)
+  const [showBuyBar, setShowBuyBar] = useState(false)
   const imageWrapRef = useRef(null)
   const imgRef = useRef(null)
   const mobileImgRef = useRef(null)
@@ -316,6 +323,21 @@ const ProductDetail = () => {
     }
     return false
   }
+
+  useEffect(() => {
+    const el = mobileBuyRef.current
+    if (!el || product?.inStock === false || !window.matchMedia('(max-width: 768px)').matches) return
+    // Counts as visible only above the bottom nav (54px) and the bar itself.
+    const io = new IntersectionObserver(([e]) => setShowBuyBar(!e.isIntersecting), { rootMargin: '0px 0px -124px 0px' })
+    io.observe(el)
+    return () => { io.disconnect(); setShowBuyBar(false) }
+  }, [product?.id])
+
+  // Lifts the WhatsApp and gift buttons clear of the bar while it shows.
+  useEffect(() => {
+    document.body.classList.toggle('pdp-buybar-on', showBuyBar)
+    return () => document.body.classList.remove('pdp-buybar-on')
+  }, [showBuyBar])
 
   const handleAddToCart = () => {
     if (!validateSelections()) return
@@ -763,7 +785,12 @@ const ProductDetail = () => {
             )}
 
             {/* ── Order note ── */}
-            <div className="order-note-section">
+            {!noteOpen && !orderNote && (
+              <button type="button" className="order-note-toggle" onClick={() => { setNoteOpen(true); requestAnimationFrame(() => noteRef.current?.focus()) }}>
+                + Add a note for us <span className="order-note-hint">(optional)</span>
+              </button>
+            )}
+            <div className={`order-note-section${noteOpen || orderNote ? '' : ' is-folded'}`}>
               <label className="order-note-label">Add a note for us <span className="order-note-hint">(optional)</span></label>
               <textarea
                 className="order-note-input"
@@ -771,13 +798,14 @@ const ProductDetail = () => {
                 value={orderNote}
                 onChange={e => setOrderNote(e.target.value)}
                 rows={2}
+                ref={noteRef}
               />
             </div>
 
             {/* Phone-only buy block: quantity + Add To Cart side by side, Buy It
                 Now underneath. Hidden on desktop, where .product-actions below
                 is unchanged. */}
-            <div className="pdp-mobile-buy">
+            <div className="pdp-mobile-buy" ref={mobileBuyRef}>
               {product.inStock === false ? (
                 <>
                   <button type="button" className="pdp-mobile-add out-of-stock-button" disabled>Out of Stock</button>
@@ -785,7 +813,6 @@ const ProductDetail = () => {
                 </>
               ) : (
                 <>
-                  <span className="pdp-mobile-qty-label">QUANTITY</span>
                   <div className="pdp-mobile-row">
                     <div className="pdp-qty" role="group" aria-label="Quantity">
                       <button type="button" onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Decrease quantity">&minus;</button>
@@ -804,6 +831,19 @@ const ProductDetail = () => {
               )}
               {selectionError && <p className="selection-error-note">{selectionError}</p>}
             </div>
+
+            {/* Phone-only sticky bar, mirrors the buy block above */}
+            {showBuyBar && (
+              <div className="pdp-buybar">
+                <div className="pdp-qty pdp-qty--compact" role="group" aria-label="Quantity">
+                  <button type="button" onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Decrease quantity">&minus;</button>
+                  <span aria-live="polite">{qty}</span>
+                  <button type="button" onClick={() => setQty(q => Math.min(99, q + 1))} aria-label="Increase quantity">+</button>
+                </div>
+                <button type="button" className="pdp-mobile-add" onClick={handleAddToCart}>Add To Cart</button>
+                <button type="button" className="pdp-mobile-buynow" onClick={handleBuyNow}>Buy It Now</button>
+              </div>
+            )}
 
             <div className="product-actions">
               <div className="product-action-buttons">

@@ -1432,7 +1432,9 @@
    After the photo a shopper now sees title, price, the pickers, quantity,
    Add To Cart and Buy It Now, then the description and details further down.
    Everything here is phone-only; the new block is hidden on desktop. */
-.pdp-mobile-buy { display: none; }
+.pdp-mobile-buy,
+.pdp-buybar,
+.order-note-toggle { display: none; }
 
 @media (max-width: 768px) {
   .product-info-section .product-detail-title { order: -2; font-size: 1.75rem; line-height: 1.2; }
@@ -1451,13 +1453,6 @@
     flex-direction: column;
     gap: 0.6rem;
     margin-top: 0.25rem;
-  }
-  .pdp-mobile-qty-label {
-    font-family: var(--font-ui);
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--ink);
   }
   .pdp-mobile-row {
     display: flex;
@@ -1520,4 +1515,85 @@
     cursor: pointer;
   }
   .pdp-mobile-wish.wishlisted { border-color: var(--maroon); color: var(--maroon); }
+}
+
+/* ── Phone product page: keep the buy buttons within reach ──────────────────
+   The photo alone fills the first screen, so a fixed bar above the bottom nav
+   carries Wishlist / Add To Cart / Buy It Now until the inline block scrolls
+   into view. The rest trims height between the photo and the buttons. */
+@media (max-width: 768px) {
+  .pdp-buybar {
+    display: flex;
+    gap: 0.5rem;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(54px + env(safe-area-inset-bottom, 0px));
+    z-index: 997;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-primary, #faf6f2);
+    border-top: 1px solid var(--rule, #e8e2da);
+    box-shadow: 0 -4px 14px rgba(36, 27, 26, 0.08);
+    animation: pdp-buybar-in 0.2s ease-out;
+  }
+  .pdp-buybar .pdp-mobile-add,
+  .pdp-buybar .pdp-mobile-buynow { flex: 1 1 0; font-size: 0.9rem; padding: 0 0.25rem; white-space: nowrap; }
+  /* Same stepper as the inline block, narrowed to leave room for both buttons */
+  .pdp-buybar .pdp-qty--compact { width: auto; padding: 0; }
+  .pdp-buybar .pdp-qty--compact button { width: 2rem; min-width: 2rem; font-size: 1.25rem; }
+  .pdp-buybar .pdp-qty--compact span { min-width: 1.4rem; font-size: 1rem; }
+
+  /* WhatsApp and gift buttons ride up by the bar's height (64px) */
+  body.pdp-buybar-on .whatsapp-button {
+    bottom: calc(54px + env(safe-area-inset-bottom, 0px) + 16px + 64px) !important;
+  }
+  body.pdp-buybar-on .gift-assistant-btn {
+    bottom: calc(54px + env(safe-area-inset-bottom, 0px) + 84px + 64px) !important;
+  }
+
+  /* Room so the last of the page is not hidden behind the bar */
+  .product-detail { padding-bottom: 64px; }
+
+  /* Note box folds into a single line until tapped */
+  .order-note-section.is-folded { display: none; }
+  .order-note-toggle {
+    display: inline-block;
+    align-self: flex-start;
+    background: none;
+    border: 0;
+    padding: 0.25rem 0;
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--maroon);
+    cursor: pointer;
+  }
+
+  /* Dots sit on the bottom edge of the photo instead of a row of their own */
+  .mobile-dot-indicators {
+    position: relative;
+    z-index: 3;
+    width: max-content;
+    margin: -38px auto 0;
+    padding: 0 6px;
+    height: 30px;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.28);
+  }
+  .mobile-dot { height: 30px; width: 24px; }
+  .mobile-dot::after { background: rgba(255, 255, 255, 0.7); }
+  .mobile-dot.active::after { background: #fff; }
+  .product-images-section { margin-bottom: 0.5rem; }
+
+  /* Back link: same tap target, less dead space around it */
+  .product-detail .back-button { margin-bottom: 0.25rem; padding: 0.4rem 0; }
+}
+@keyframes pdp-buybar-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@media (max-width: 480px) {
+  body.pdp-buybar-on .whatsapp-button {
+    bottom: calc(54px + env(safe-area-inset-bottom, 0px) + 14px + 64px) !important;
+  }
 }

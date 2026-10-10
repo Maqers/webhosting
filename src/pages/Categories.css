@@ -499,3 +499,67 @@
 @media (min-width: 969px) {
   .cat-sheet { display: none; }
 }
+
+/* ── Phone/tablet toolbar (rail hidden) ──────────────────────────────────────
+   The style chips shared a row with Filters + Sort and were squeezed into a
+   narrow column, one chip per line. Now: one swipeable strip of chips running
+   edge to edge, then a two-button bar (Filters | Sort) underneath. */
+@media (max-width: 968px) {
+  .cat-main .category-filters-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin: 0.25rem 0 1rem;
+  }
+  .category-filter-chips:empty { display: none; }
+  .category-filter-chips {
+    flex: none;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--cat-bleed, 1rem);
+    scrollbar-width: none;
+    width: calc(100% + 2 * var(--cat-bleed, 1rem));
+    min-width: 0;
+    box-sizing: border-box;
+    margin-inline: calc(-1 * var(--cat-bleed, 1rem));
+    padding-inline: var(--cat-bleed, 1rem);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .category-filter-chips::-webkit-scrollbar { display: none; }
+  .cat-filter-chip {
+    flex: none;
+    scroll-snap-align: start;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 1rem;
+    border: 1px solid var(--rule-strong, #e0d4d4);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  .cat-toolbar-actions {
+    margin-left: 0;
+    gap: 0.5rem;
+  }
+  .cat-filter-toggle,
+  .cat-sort-select {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 40px;
+    min-height: 40px;
+    border: 1px solid var(--rule-strong, #e0d4d4);
+    border-radius: 10px;
+    background-color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a3a3a;
+  }
+  .cat-filter-toggle { justify-content: center; padding: 0 0.75rem; }
+  .cat-sort-select { padding: 0 0.75rem; text-align: center; text-align-last: center; }
+}
