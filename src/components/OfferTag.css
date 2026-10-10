@@ -29,3 +29,10 @@
 .offer-tag-code {
   letter-spacing: 0.04em;
 }
+
+.offer-tag-short { display: none; }
+@media (max-width: 768px) {
+  .offer-tag-long { display: none; }
+  .offer-tag-short { display: inline; }
+  .offer-tag--detail { display: inline-block; align-self: flex-start; }
+}

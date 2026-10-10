@@ -1,0 +1,107 @@
+.welcome-offer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000; /* above the WhatsApp button (999999) */
+  background: rgba(26, 23, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: welcomeOfferFade 0.2s ease-out;
+}
+
+.welcome-offer {
+  position: relative;
+  width: 100%;
+  max-width: 360px !important; /* beats the sitewide max-width: 100% !important */
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 1.75rem 1.25rem;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: welcomeOfferIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.welcome-offer-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-tertiary, #999);
+  cursor: pointer;
+  border-radius: 50%;
+}
+.welcome-offer-close:hover { background: #f5ede4; }
+
+.welcome-offer-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary-color, #760909);
+}
+
+.welcome-offer-title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-family-heading);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--text-primary, #1a1714);
+}
+
+.welcome-offer-sub {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+}
+
+.welcome-offer-code {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  padding: 0.5rem 1.25rem;
+  border: 1.5px dashed #d9a066;
+  border-radius: 10px;
+  background: #fffaf3;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  color: var(--text-primary, #1a1714);
+  user-select: all;
+}
+
+.welcome-offer-cta {
+  display: block;
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-color, #760909);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.welcome-offer-cta:hover { background: #5a0707; }
+
+.welcome-offer-later {
+  margin-top: 0.4rem;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@keyframes welcomeOfferFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcomeOfferIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}

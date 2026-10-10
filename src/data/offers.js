@@ -28,3 +28,11 @@ export const priceWithDiwaliCode = (price) => price - diwaliUnitDiscount(price)
 // Total code discount for cart lines ({ id, price, qty }); 0 once it ends
 export const diwaliCartDiscount = (items, now = Date.now()) =>
   items.reduce((sum, i) => sum + (hasDiwaliOffer(i, now) ? diwaliUnitDiscount(i.price) * i.qty : 0), 0)
+
+// First-order coupon: 5% off the whole bag for a logged-in shopper with no
+// past orders. The welcome popup advertises it; checkout checks eligibility.
+export const NEW_USER_COUPON = {
+  code: 'MAQERSNEW',
+  percent: 5,
+}
+export const newUserDiscount = (total) => Math.round((Number(total) * NEW_USER_COUPON.percent) / 100)

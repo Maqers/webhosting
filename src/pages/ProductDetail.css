@@ -1437,7 +1437,7 @@
 .order-note-toggle { display: none; }
 
 @media (max-width: 768px) {
-  .product-info-section .product-detail-title { order: -2; font-size: 1.75rem; line-height: 1.2; }
+  .product-info-section .product-detail-title { order: -2; font-size: 1.75rem; line-height: 1.2; font-weight: 400; }
   .product-info-section .price-section { order: -1; margin-top: -0.4rem; }
   .product-info-section .product-detail-price { font-size: 1.5rem; }
   .product-info-section .product-category-badge,

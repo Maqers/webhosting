@@ -10,7 +10,7 @@ import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import { saveLead, saveLeadSoon, endLead, summariseCart } from '../utils/leads'
 import posthog from 'posthog-js'
-import { DIWALI_COUPON, isOfferLive, diwaliCartDiscount } from '../data/offers'
+import { DIWALI_COUPON, NEW_USER_COUPON, isOfferLive, diwaliCartDiscount, newUserDiscount } from '../data/offers'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import './Checkout.css'
 
@@ -26,11 +26,24 @@ const ORDER_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzXsgcq
 // Only one coupon can be applied per order: applying one replaces the other.
 // The 5% Diwali coupon (code, products, end date) lives in data/offers.js,
 // shared with the "5% off" labels on product cards, so both end together.
+// `ctx` carries the shopper's state: { isLoggedIn, firstOrder (true/false/null while checking) }.
 const ALL_COUPONS = [
+  {
+    code: NEW_USER_COUPON.code,
+    icon: '🎁',
+    needsLogin: true,
+    discountFor: (items, total, ctx) => (ctx.isLoggedIn && ctx.firstOrder === true ? newUserDiscount(total) : 0),
+    pitch: `${NEW_USER_COUPON.percent}% off your first order`,
+    locked: (items, total, ctx) => !ctx.isLoggedIn
+      ? `Log in to get ${NEW_USER_COUPON.percent}% off your first order`
+      : ctx.firstOrder === null ? 'Checking your account…' : 'Valid on your first order only',
+    terms: '*T&C: Valid once per customer, on the first order placed from a logged-in Maqers account. Applies to the item subtotal, not delivery. One coupon per order; cannot be combined with other offers. Maqers may cancel orders that misuse the offer and may change or withdraw it at any time.',
+  },
   {
     code: 'MAQERSDIWALI100',
     minOrder: 2000,
     discountFor: (items, total) => (total >= 2000 ? 100 : 0),
+    icon: '🪔',
     pitch: 'Diwali special: ₹100 off orders of ₹2,000+',
     locked: (items, total) => `Add ₹${(2000 - total).toLocaleString('en-IN')} more to unlock ₹100 off (orders of ₹2,000+)`,
   },
@@ -39,6 +52,7 @@ const ALL_COUPONS = [
     endsAt: DIWALI_COUPON.endsAt,
     // Same per-unit rounding as the card and cart prices
     discountFor: (items) => diwaliCartDiscount(items),
+    icon: '🪔',
     pitch: `${DIWALI_COUPON.percent}% off every Diwali gift in your bag`,
     locked: () => `Add a Diwali gift to use ${DIWALI_COUPON.percent}% off`,
   },
@@ -79,7 +93,19 @@ export default function Checkout() {
   const [codeInput, setCodeInput] = useState('')
   const [codeError, setCodeError] = useState('')
   const [showCouponCelebration, setShowCouponCelebration] = useState(false)
-  const couponSavings = Object.fromEntries(COUPONS.map(c => [c.code, c.discountFor(items, total)]))
+  // First order = no orders on this account yet (guest orders are attached
+  // to the account on login, so they count too). null while checking.
+  const [firstOrder, setFirstOrder] = useState(null)
+  useEffect(() => {
+    if (!isLoggedIn || !user?.id) { setFirstOrder(null); return }
+    let cancelled = false
+    supabaseRest(`orders?user_id=eq.${user.id}&select=order_ref&limit=1`, { accessToken })
+      .then(rows => { if (!cancelled) setFirstOrder(!(rows && rows.length)) })
+      .catch(() => { if (!cancelled) setFirstOrder(false) })
+    return () => { cancelled = true }
+  }, [isLoggedIn, user?.id, accessToken])
+  const couponCtx = { isLoggedIn, firstOrder }
+  const couponSavings = Object.fromEntries(COUPONS.map(c => [c.code, c.discountFor(items, total, couponCtx)]))
   const appliedCoupon = COUPONS.find(c => c.code === appliedCode) || null
   const couponApplied = !!appliedCoupon
   const couponDiscount = appliedCoupon ? couponSavings[appliedCoupon.code] : 0
@@ -91,6 +117,7 @@ export default function Checkout() {
   }, [appliedCoupon, couponDiscount])
   // The cart drawer already shows MAQERSDIWALI5 as applied on Diwali items, so
   // apply it here too unless the shopper removed it or picked another code.
+  // MAQERSNEW is never auto-applied: the shopper enters or taps it.
   const [autoApplyOff, setAutoApplyOff] = useState(false)
   const diwaliSaving = couponSavings[DIWALI_COUPON.code] || 0
   useEffect(() => {
@@ -116,7 +143,7 @@ export default function Checkout() {
     if (!coupon && ALL_COUPONS.some(c => c.code === code)) return setCodeError(`${code} has ended`)
     if (!coupon) return setCodeError(`"${code}" isn't a valid code`)
     if (appliedCode === code) return setCodeError(`${code} is already applied`)
-    if (!(couponSavings[code] > 0)) return setCodeError(coupon.locked(items, total))
+    if (!(couponSavings[code] > 0)) return setCodeError(coupon.locked(items, total, couponCtx))
     applyCoupon(code)
     setCodeInput('')
   }
@@ -791,21 +818,24 @@ export default function Checkout() {
                 return (
                   <div key={c.code} className={`checkout-coupon ${isApplied ? 'applied' : ''} ${eligible ? '' : 'locked'}`}>
                     <div className="checkout-coupon-info">
-                      <span className="checkout-coupon-code">🪔 {c.code}</span>
+                      <span className="checkout-coupon-code">{c.icon} {c.code}</span>
                       <span className="checkout-coupon-desc">
                         {isApplied
                           ? `₹${saves.toLocaleString('en-IN')} off applied`
                           : !eligible
-                            ? c.locked(items, total)
+                            ? c.locked(items, total, couponCtx)
                             : appliedCode
                               ? `${c.pitch}. Saves ₹${saves.toLocaleString('en-IN')}, replaces ${appliedCode} (one coupon per order)`
                               : `${c.pitch}. Saves ₹${saves.toLocaleString('en-IN')}`}
                       </span>
+                      {c.terms && <span className="checkout-coupon-terms">{c.terms}</span>}
                     </div>
                     {isApplied ? (
                       <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => { setAutoApplyOff(true); setAppliedCode(null) }}>
                         Remove
                       </button>
+                    ) : c.needsLogin && !isLoggedIn ? (
+                      <button type="button" className="checkout-coupon-btn" onClick={openLoginModal}>Log in</button>
                     ) : (
                       <button type="button" className="checkout-coupon-btn" onClick={() => applyCoupon(c.code)} disabled={!eligible}>
                         {appliedCode ? 'Use instead' : 'Apply'}

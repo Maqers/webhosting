@@ -10,6 +10,7 @@ import WishlistDrawer from './components/WishlistDrawer'
 import BottomNav from './components/BottomNav'
 import ChunkErrorBoundary from './components/ChunkErrorBoundary'
 import LoginModal from './components/LoginModal'
+import WelcomeOffer from './components/WelcomeOffer'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
@@ -66,6 +67,7 @@ function AppContent() {
       <CartDrawer />
       <WishlistDrawer />
       <LoginModal />
+      <WelcomeOffer />
       <main>
         <ChunkErrorBoundary>
         <Suspense fallback={<RouteLoadingFallback />}>
