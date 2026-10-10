@@ -38,7 +38,10 @@ export default async function handler(req, res) {
         image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: 'high' },
       }
     } else if (imageUrl) {
-      const imgRes = await fetch(imageUrl)
+      // A site path like /images/x.jpg is resolved against this deployment
+      const host = req.headers['x-forwarded-host'] || req.headers.host
+      const absUrl = /^https?:\/\//i.test(imageUrl) ? imageUrl : new URL(imageUrl, `https://${host}`).href
+      const imgRes = await fetch(absUrl)
       if (!imgRes.ok) return res.status(400).json({ error: 'Could not fetch the product image URL.' })
       const arrayBuffer = await imgRes.arrayBuffer()
       const base64 = Buffer.from(arrayBuffer).toString('base64')

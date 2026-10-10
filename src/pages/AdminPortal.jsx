@@ -1259,7 +1259,8 @@ export default function AdminPortal() {
         const resized = await resizeImageForAI(imageBase64, mimeType).catch(() => ({ base64: imageBase64, mimeType }));
         body = { imageBase64: resized.base64, mimeType: resized.mimeType, extraDetails };
       } else {
-        body = { imageUrl, extraDetails };
+        // Catalog images are site paths (/images/...); the server needs a full URL
+        body = { imageUrl: new URL(imageUrl, window.location.origin).href, extraDetails };
       }
       // Lets the AI avoid names (and overused words) already in the catalog
       body.existingTitles = products.map(p => p.title).filter(Boolean);
