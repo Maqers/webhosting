@@ -250,8 +250,10 @@ function slugify(text) {
 // Product descriptions are capped so the product page stays scannable: one
 // paragraph, or one and a half. ~100 words is that, with a little headroom.
 const DESC_MAX_WORDS = 150;
+// A "What's inside:" contents list under the paragraph doesn't count.
 function countWords(text) {
-  return (text || "").replace(/\*\*|__|✨/g, " ").split(/\s+/).filter(Boolean).length;
+  const prose = (text || "").split(/\n\s*\*\*What's inside:\*\*/)[0];
+  return prose.replace(/\*\*|__|✨/g, " ").split(/\s+/).filter(Boolean).length;
 }
 function descLimitMessage(text) {
   const n = countWords(text);

@@ -54,6 +54,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Provide either imageBase64+mimeType or imageUrl.' })
     }
 
+    // A list in the seller's details (a hamper's contents, a set's pieces) is
+    // kept as a list: appended under the paragraph, word for word.
+    const listItems = extractListItems(extraDetails)
+
     const extraSection = extraDetails
       ? `\nAdditional details from the seller — incorporate these precisely:\n${extraDetails}\n`
       : ''
@@ -88,7 +92,8 @@ ${extraSection}
 Write the description as ONE paragraph, or one paragraph plus a short half-paragraph of one or two sentences. Keep it tight.
 - Paragraph: open with the hook (with an emoji), then what the product is, its colours, feel and materials/craft, with one small, specific observation. Fold the key facts (material, size, use) into the sentences themselves.
 - Optional half-paragraph: who it is for or when it earns its place, specific and a little funny, not a bland occasion list.
-- NO bullet points, NO ✨ lines, NO headers.
+- NO bullet points, NO ✨ lines, NO headers.${listItems.length ? `
+- The seller listed what's included. That list is shown, as a list, directly under your description, so do not enumerate the items. Describe the set as a whole and at most name one or two highlights.` : ''}
 
 Formatting rules:
 - If you write the half-paragraph, separate it from the first with \\n\\n. Otherwise there is just one paragraph.
@@ -247,14 +252,32 @@ ${catalogSection}`
     )
     const titleOptions = [...new Set(goodOptions.length ? goodOptions : cleanedOptions)]
 
+    const finalDescription = listItems.length
+      ? `${cappedDescription}\n\n**What's inside:**\n${listItems.map(i => `• ${i}`).join('\n')}`
+      : cappedDescription
+
     return res.status(200).json({
       title: titleOptions[0] || '',
       titleOptions,
-      description: cappedDescription,
+      description: finalDescription,
       tags,
       keywords,
     })
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' })
   }
+}
+
+// Lines that start with a bullet (•, -, *, ·, ▪, ●) or a number ("1." / "1)").
+// Two or more count as a list. Dashes inside an item become commas, per the
+// no-dash copy rule ("Urli Candle – 3.5 inch" -> "Urli Candle, 3.5 inch").
+function extractListItems(text) {
+  const items = String(text || '')
+    .split(/\r?\n/)
+    .map(line => line.match(/^\s*(?:[•\-*·▪●]|\d+[.)])\s+(.+)$/))
+    .filter(Boolean)
+    .map(m => m[1].replace(/\s*[—–]\s*|\s+-\s+/g, ', ').replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .slice(0, 30)
+  return items.length >= 2 ? items : []
 }

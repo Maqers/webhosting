@@ -112,3 +112,4 @@ Applies to new and AI-generated descriptions (admin portal enforces it: 150-word
 - One paragraph, or one plus a short half-paragraph, 100 to 150 words total.
 - Paragraphs separated with `\n\n` (literal backslash-n, not actual newlines, they're inside JS strings).
 - No bullet block. Fold material, size and use into the sentences.
+- Exception: when the seller's extra details include a list (a hamper's contents, a set's pieces), `api/generate-description.js` appends it word for word under the paragraph as `**What's inside:**` with `•` lines. The admin word counter ignores that list.
