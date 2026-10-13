@@ -116,9 +116,13 @@ async function ghPut(path, content, message, sha, creds) {
 let sellersApiToken = "";
 
 async function sellersApi(action, payload = {}) {
+  // Right after sign-in, sellers load before the portal re-renders with the
+  // new creds, so fall back to the creds the login just saved.
+  let token = sellersApiToken;
+  if (!token) { try { token = JSON.parse(sessionStorage.getItem("maqers_admin_creds") || "null")?.token || ""; } catch { /* ignore */ } }
   const res = await fetch("/api/sellers", {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${sellersApiToken}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify({ action, ...payload }),
   });
   const data = await res.json().catch(() => ({}));
@@ -1090,7 +1094,8 @@ export default function AdminPortal() {
     setDisplayOrderMap(parseDisplayOrder(source));
     setOccVariantOrder({});
     loadOccasionCatalogData(credsOverride);
-    // Load sellers so they're available everywhere
+    // Load sellers so they're available everywhere (with the fresh token on sign-in)
+    if (credsOverride?.token) sellersApiToken = credsOverride.token;
     loadSellers();
   }
 
