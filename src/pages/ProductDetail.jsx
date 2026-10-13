@@ -471,27 +471,6 @@ const ProductDetail = () => {
   )
   const handleMouseLeave = useCallback(() => setLensVisible(false), [])
 
-  // Real, per-product facts. Anything the catalogue does not have is simply
-  // not shown rather than padded out with generic copy. Declared above the
-  // `if (!product)` return so the hook runs on every render.
-  const productFacts = useMemo(() => {
-    if (!product) return []
-    const m = product.meta || {}
-    const facts = []
-    // delivery_time is left out: the order timeline above already shows it.
-    if (m.moq > 1) facts.push({ label: 'Minimum order', value: `${m.moq} units` })
-    if (m.colors?.length > 1) {
-      facts.push({
-        label: 'Colours',
-        value: m.colors.map(c => (typeof c === 'object' ? c.name : c)).filter(Boolean).join(', '),
-      })
-    }
-    if (m.sizes?.length) facts.push({ label: 'Sizes', value: m.sizes.join(', ') })
-    const personalisation = (m.personalisation_options || []).filter(o => o && o.trim())
-    if (personalisation.length) facts.push({ label: 'Can be personalised', value: personalisation.join(', ') })
-    return facts
-  }, [product])
-
   if (!product) {
     return (
       <div className="product-not-found">
@@ -900,24 +879,6 @@ const ProductDetail = () => {
               <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
             </div>
 
-            {/* These five bullets used to be hardcoded and identical on every
-                product ("Elegant royal design" on a bar of soap), which reads
-                as filler on a site whose whole pitch is that a human checked
-                each listing. Built from the product's own metadata now, and
-                omitted when there is nothing to say. */}
-            {productFacts.length > 0 && (
-              <div className="product-features">
-                <h3>The details</h3>
-                <dl className="product-facts">
-                  {productFacts.map(fact => (
-                    <div className="product-fact" key={fact.label}>
-                      <dt>{fact.label}</dt>
-                      <dd>{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
           </div>
 
           {/* ── Customer Reviews — shown if reviews exist, or the logged-in
