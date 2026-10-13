@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
+import { useAuth } from '../context/AuthContext'
 import { getProductById } from '../data/catalog'
 import { useScrollLock } from '../hooks/useScrollLock'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
@@ -11,6 +12,7 @@ import './CartDrawer.css'
 export default function CartDrawer() {
   const { items, removeItem, updateQty, total, count, isOpen, setIsOpen } = useCart()
   const { toggleItem, isWishlisted } = useWishlist()
+  const { isLoggedIn, openLoginModal } = useAuth()
   // Item whose "remove?" prompt is open (trash, or minus at quantity 1)
   const [confirmKey, setConfirmKey] = useState(null)
   useEffect(() => { if (!isOpen) setConfirmKey(null) }, [isOpen])
@@ -25,10 +27,12 @@ export default function CartDrawer() {
 
   // Same rules as checkout: delivery on the pre-coupon subtotal
   // (utils/delivery.js), and MAQERSDIWALI5 applied to Diwali items
-  // (data/offers.js), which checkout auto-applies to match.
+  // (data/offers.js), which checkout auto-applies to match. Coupons need a
+  // login, so a guest sees what they would save and a Log in button instead.
   const deliveryFee = getDeliveryFee(total)
   const deliveryFree = deliveryFee === 0
-  const couponDiscount = diwaliCartDiscount(items)
+  const possibleDiscount = diwaliCartDiscount(items)
+  const couponDiscount = isLoggedIn ? possibleDiscount : 0
   const grandTotal = total - couponDiscount + deliveryFee
   const inr = (n) => `₹${n.toLocaleString('en-IN')}`
 
@@ -83,7 +87,7 @@ export default function CartDrawer() {
                     {item.orderNote?.trim() && (
                       <p className="cart-item-variant">Note: {item.orderNote.trim()}</p>
                     )}
-                    {hasDiwaliOffer(item) ? (
+                    {isLoggedIn && hasDiwaliOffer(item) ? (
                       <>
                         <p className="cart-item-price">
                           <span className="cart-item-price-original">{inr(item.price)}</span>
@@ -150,6 +154,11 @@ export default function CartDrawer() {
                   <span>SUBTOTAL</span>
                   <span className="cart-total-amount">{inr(total)}</span>
                 </div>
+                {!isLoggedIn && possibleDiscount > 0 && (
+                  <button type="button" className="cart-coupon-login" onClick={() => { setIsOpen(false); openLoginModal() }}>
+                    Log in to apply {DIWALI_COUPON.code} and save {inr(possibleDiscount)}
+                  </button>
+                )}
                 {couponDiscount > 0 && (
                   <div className="cart-subtotal cart-coupon-row">
                     <span>COUPON ({DIWALI_COUPON.code})</span>

@@ -105,7 +105,9 @@ export default function Checkout() {
     return () => { cancelled = true }
   }, [isLoggedIn, user?.id, accessToken])
   const couponCtx = { isLoggedIn, firstOrder }
-  const couponSavings = Object.fromEntries(COUPONS.map(c => [c.code, c.discountFor(items, total, couponCtx)]))
+  // Coupons are for logged-in shoppers only: a guest saves nothing, sees every
+  // card greyed out with a Log in button, and nothing is auto-applied.
+  const couponSavings = Object.fromEntries(COUPONS.map(c => [c.code, isLoggedIn ? c.discountFor(items, total, couponCtx) : 0]))
   const appliedCoupon = COUPONS.find(c => c.code === appliedCode) || null
   const couponApplied = !!appliedCoupon
   const couponDiscount = appliedCoupon ? couponSavings[appliedCoupon.code] : 0
@@ -143,6 +145,7 @@ export default function Checkout() {
     if (!coupon && ALL_COUPONS.some(c => c.code === code)) return setCodeError(`${code} has ended`)
     if (!coupon) return setCodeError(`"${code}" isn't a valid code`)
     if (appliedCode === code) return setCodeError(`${code} is already applied`)
+    if (!isLoggedIn) return setCodeError('Log in to apply a coupon')
     if (!(couponSavings[code] > 0)) return setCodeError(coupon.locked(items, total, couponCtx))
     applyCoupon(code)
     setCodeInput('')
@@ -796,11 +799,12 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
-              <form className="checkout-code-entry" onSubmit={applyTypedCode}>
+              <form className="checkout-code-entry" onSubmit={isLoggedIn ? applyTypedCode : e => { e.preventDefault(); openLoginModal() }}>
                 <input
                   type="text"
                   className="checkout-code-input"
-                  placeholder="Have a coupon code?"
+                  placeholder={isLoggedIn ? 'Have a coupon code?' : 'Log in to apply a coupon'}
+                  disabled={!isLoggedIn}
                   value={codeInput}
                   onChange={e => { setCodeInput(e.target.value); setCodeError('') }}
                   autoCapitalize="characters"
@@ -808,7 +812,9 @@ export default function Checkout() {
                   spellCheck={false}
                   aria-label="Coupon code"
                 />
-                <button type="submit" className="checkout-coupon-btn" disabled={!codeInput.trim()}>Apply</button>
+                {isLoggedIn
+                  ? <button type="submit" className="checkout-coupon-btn" disabled={!codeInput.trim()}>Apply</button>
+                  : <button type="submit" className="checkout-coupon-btn">Log in</button>}
               </form>
               {codeError && <p className="checkout-code-error" role="alert">{codeError}</p>}
               {COUPONS.map(c => {
@@ -823,7 +829,7 @@ export default function Checkout() {
                         {isApplied
                           ? `₹${saves.toLocaleString('en-IN')} off applied`
                           : !eligible
-                            ? c.locked(items, total, couponCtx)
+                            ? (isLoggedIn ? c.locked(items, total, couponCtx) : 'Log in to apply this coupon')
                             : appliedCode
                               ? `${c.pitch}. Saves ₹${saves.toLocaleString('en-IN')}, replaces ${appliedCode} (one coupon per order)`
                               : `${c.pitch}. Saves ₹${saves.toLocaleString('en-IN')}`}
@@ -834,7 +840,7 @@ export default function Checkout() {
                       <button type="button" className="checkout-coupon-btn checkout-coupon-btn--remove" onClick={() => { setAutoApplyOff(true); setAppliedCode(null) }}>
                         Remove
                       </button>
-                    ) : c.needsLogin && !isLoggedIn ? (
+                    ) : !isLoggedIn ? (
                       <button type="button" className="checkout-coupon-btn" onClick={openLoginModal}>Log in</button>
                     ) : (
                       <button type="button" className="checkout-coupon-btn" onClick={() => applyCoupon(c.code)} disabled={!eligible}>

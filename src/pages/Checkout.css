@@ -1071,3 +1071,6 @@
   line-height: 1.35;
   color: #9a948d;
 }
+
+/* Logged out: code entry is greyed, its button opens login */
+.checkout-code-input:disabled { background: #f3f0ec; color: #8a817a; cursor: not-allowed; }

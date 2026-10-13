@@ -423,3 +423,19 @@
   margin-top: 0.25rem;
   font-weight: 700;
 }
+/* Guest: the Diwali code needs a login, so offer it instead of applying it */
+.cart-coupon-login {
+  display: block;
+  width: 100%;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed #d9a066;
+  border-radius: 8px;
+  background: #fffaf3;
+  color: #8a5a00;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
