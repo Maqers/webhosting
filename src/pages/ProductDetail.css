@@ -1598,3 +1598,45 @@
     bottom: calc(54px + env(safe-area-inset-bottom, 0px) + 14px + 64px) !important;
   }
 }
+
+/* ── Size chart: an optional accordion row (bangles only) ── */
+.size-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.size-chart-link {
+  background: none; border: 0; padding: 0; min-height: 0; min-width: 0;
+  font-family: var(--font-ui); font-size: 0.85rem; font-weight: 600;
+  color: var(--maroon, #760909); text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.pdp-accordion {
+  border-top: 1px solid var(--rule-strong, #ddd3cb);
+  border-bottom: 1px solid var(--rule-strong, #ddd3cb);
+  margin-top: 1.25rem;
+}
+.pdp-accordion summary {
+  list-style: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 0.25rem;
+  font-family: var(--font-ui); font-size: 1.05rem; color: var(--ink, #1a1714);
+  cursor: pointer;
+}
+.pdp-accordion summary::-webkit-details-marker { display: none; }
+.pdp-accordion summary::after {
+  content: '';
+  width: 9px; height: 9px; margin-right: 6px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-3px);
+  transition: transform 0.2s ease;
+}
+.pdp-accordion[open] summary::after { transform: rotate(-135deg) translateY(-3px); }
+.pdp-accordion-body { padding: 0 0.25rem 1.1rem; }
+
+.size-chart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui); font-size: 0.9rem; text-align: center;
+}
+.size-chart-table th, .size-chart-table td { border: 1px solid var(--rule-strong, #ddd3cb); padding: 0.55rem 0.5rem; }
+.size-chart-table th { font-weight: 600; background: rgba(36, 27, 26, 0.03); }
+.size-chart-table th span { font-weight: 400; color: var(--ink-soft, #6b625b); }
+.size-chart-tip { margin: 0.6rem 0 0; font-size: 0.8rem; color: var(--ink-soft, #6b625b); }

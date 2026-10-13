@@ -38,6 +38,16 @@ const formatDescriptionHtml = (text) => {
     .split('\\n').join('<br/>')
 }
 
+// Indian bangle sizes (2'4 = 2 and 4/16 inch) with inner diameter. Shown on
+// any product whose sizes are in that form; collapsed until opened.
+const BANGLE_SIZE_CHART = [
+  { size: "2'4", inches: '2.35', cm: '5.7' },
+  { size: "2'6", inches: '2.375', cm: '6.0' },
+  { size: "2'8", inches: '2.5', cm: '6.5' },
+  { size: "2'10", inches: '2.625', cm: '6.8' },
+]
+const hasBangleSizes = (product) => (product?.meta?.sizes || []).some(s => /^2'\d+$/.test(String(s).trim()))
+
 const ProductDetail = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
@@ -79,6 +89,13 @@ const ProductDetail = () => {
   const [lensPos, setLensPos] = useState({ x: 0, y: 0 })
   // Phone only: the note box starts folded into a one-line link.
   const [noteOpen, setNoteOpen] = useState(false)
+  const sizeChartRef = useRef(null)
+  const openSizeChart = () => {
+    const el = sizeChartRef.current
+    if (!el) return
+    el.open = true
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
   const noteRef = useRef(null)
   // Phone only: a fixed Add To Cart / Buy It Now bar shows whenever the inline
   // buy block is off screen, so the buttons are never a scroll away.
@@ -722,7 +739,12 @@ const ProductDetail = () => {
             {/* Size dropdown — shows per-size price if available */}
             {product.meta?.sizes && product.meta.sizes.length > 0 && (
               <div className="product-colors">
-                <label className="colors-label" htmlFor="size-select">Select Size: <span className="required-asterisk">*</span></label>
+                <div className="size-label-row">
+                  <label className="colors-label" htmlFor="size-select">Select Size: <span className="required-asterisk">*</span></label>
+                  {hasBangleSizes(product) && (
+                    <button type="button" className="size-chart-link" onClick={openSizeChart}>Size chart</button>
+                  )}
+                </div>
                 <select id="size-select" className={`colors-select ${selectionError && !selectedSize ? 'select-error' : ''}`} value={selectedSize}
                   onChange={e => { setSelectedSize(e.target.value); setSelectionError(""); }}>
                   <option value="">Choose a size</option>
@@ -878,6 +900,26 @@ const ProductDetail = () => {
               </svg>
               <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
             </div>
+
+            {hasBangleSizes(product) && (
+              <details className="pdp-accordion" ref={sizeChartRef}>
+                <summary>Size chart</summary>
+                <div className="pdp-accordion-body">
+                  <table className="size-chart-table">
+                    <thead>
+                      <tr><th rowSpan={2}>Bangle size<br /><span>(Indian)</span></th><th colSpan={2}>Inner diameter</th></tr>
+                      <tr><th>inches</th><th>cm</th></tr>
+                    </thead>
+                    <tbody>
+                      {BANGLE_SIZE_CHART.map(r => (
+                        <tr key={r.size}><td>{r.size}</td><td>{r.inches}</td><td>{r.cm}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="size-chart-tip">Measure the inside of a bangle that fits you well, then pick the closest size.</p>
+                </div>
+              </details>
+            )}
 
           </div>
 
