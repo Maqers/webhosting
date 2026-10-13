@@ -59,17 +59,15 @@ const ProductDetail = () => {
   // visited. Arriving from search, a shared link or any card that did not set
   // the state landed you somewhere unrelated. Real history first.
   const handleBack = () => {
-    if (location.state?.from) {
-      navigate(location.state.from)
-      return
-    }
-    // React Router tracks its position in the session history here; anything
-    // above 0 means there is a previous in-app page to return to.
+    // A real history step when there is one, so the list underneath comes back
+    // where the shopper left it (filters, Show more, scroll). React Router
+    // tracks its position here; anything above 0 is a previous in-app page.
     if (window.history.state?.idx > 0) {
       navigate(-1)
       return
     }
-    navigate('/products')
+    // Landed here directly (shared link, ad): go to where they came from, or the shop
+    navigate(location.state?.from || '/products')
   };
 
   // Support both slug-based URLs (/product/customised-pouch) and

@@ -1,5 +1,6 @@
-import { useEffect, Suspense, lazy } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect, useRef, Suspense, lazy } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom'
+import { readPageMemory, writePageMemory } from './utils/pageMemory'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -48,12 +49,62 @@ const RouteLoadingFallback = () => (
   </div>
 )
 
+// Restores where the shopper was when they come Back to a page; anything else
+// opens at the top. Pages render late (lazy chunks, then product images), so
+// the restore keeps retrying until the page is tall enough, and gives up the
+// moment the shopper scrolls or taps themselves.
+function useScrollMemory(location) {
+  const navType = useNavigationType()
+  const prevPath = useRef(location.pathname)
+
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
+  }, [])
+
+  // Track this entry's position as the shopper scrolls.
+  useEffect(() => {
+    const key = location.key
+    let y = window.scrollY
+    const onScroll = () => { y = window.scrollY }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    const timer = setInterval(() => writePageMemory(key, 'scrollY', y), 250)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      clearInterval(timer)
+      writePageMemory(key, 'scrollY', y) // last position before leaving
+    }
+  }, [location.key])
+
+  useEffect(() => {
+    const pathChanged = prevPath.current !== location.pathname
+    prevPath.current = location.pathname
+    const target = navType === 'POP' ? readPageMemory(location.key, 'scrollY') : undefined
+    if (typeof target !== 'number') {
+      if (pathChanged || navType !== 'POP') window.scrollTo({ top: 0, behavior: 'instant' })
+      return
+    }
+    let cancelled = false
+    const stop = () => { cancelled = true }
+    const events = ['wheel', 'touchstart', 'keydown', 'mousedown']
+    events.forEach(e => window.addEventListener(e, stop, { passive: true, once: true }))
+    const started = Date.now()
+    const attempt = () => {
+      if (cancelled) return
+      window.scrollTo({ top: target, behavior: 'instant' })
+      const reached = Math.abs(window.scrollY - target) < 2
+      if (!reached && Date.now() - started < 3000) setTimeout(attempt, 50)
+    }
+    attempt()
+    return () => { cancelled = true; events.forEach(e => window.removeEventListener(e, stop)) }
+  }, [location.key])
+}
+
 function AppContent() {
   const location = useLocation()
+  useScrollMemory(location)
 
   useEffect(() => {
     const observers = initScrollAnimations()
-    window.scrollTo({ top: 0, behavior: 'instant' })
     trackPageview(location.pathname)
     return () => {
       cleanupScrollAnimations(observers)

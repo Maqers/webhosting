@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProducts, getSortedCategories, getProductsByCategory, getCategoryByIdOrSlug, occasionProductMap, displayOrder } from '../data/catalog'
 import { occasionCategories as OCCASION_CATEGORIES_RAW, getOccasionProducts } from '../data/occasionCatalog'
+import { useRestoredState } from '../utils/pageMemory'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -83,18 +84,24 @@ const TITLE_TAG_ONLY_FILTERS = new Set(['Hampers', 'Diyas & Holders', 'Candles',
 const Categories = () => {
   const { name } = useParams()
   const [selectedCategory, setSelectedCategory] = useState(name || 'All')
-  const [activeFilter, setActiveFilter] = useState(null)
-  const [sortBy, setSortBy] = useState('default')
+  // Chip, sort and filters survive Back from a product page
+  const [activeFilter, setActiveFilter] = useRestoredState('chip', null)
+  const [sortBy, setSortBy] = useRestoredState('sort', 'default')
   // Same filter panel as All Products, minus Category, plus Delivery time
-  const [priceBands, setPriceBands] = useState([])
-  const [deliveryBands, setDeliveryBands] = useState([])
-  const [inStockOnly, setInStockOnly] = useState(false)
+  const [priceBands, setPriceBands] = useRestoredState('prices', [])
+  const [deliveryBands, setDeliveryBands] = useRestoredState('delivery', [])
+  const [inStockOnly, setInStockOnly] = useRestoredState('inStock', false)
+  const lastName = useRef(name)
   const [filtersOpen, setFiltersOpen] = useState(false)
   useScrollLock(filtersOpen)
   const location = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Reset only when the category really changes, never on mount: a fresh
+    // visit already starts from defaults, and a Back visit keeps what was restored
+    if (lastName.current === name) return
+    lastName.current = name
     setSelectedCategory(name || 'All'); setActiveFilter(null); setSortBy('default')
     setPriceBands([]); setDeliveryBands([]); setInStockOnly(false); setFiltersOpen(false)
   }, [name])

@@ -6,6 +6,7 @@ import { sortProducts, extractRelevanceScores, SORT_TYPES, DEFAULT_SORT } from '
 import ProductSort from '../components/ProductSort'
 import ProductFilters, { PRICE_BANDS } from '../components/ProductFilters'
 import SeoHead from '../components/SeoHead'
+import { useRestoredState } from '../utils/pageMemory'
 import { useScrollLock } from '../hooks/useScrollLock'
 import ImageWithFallback from '../components/ImageWithFallback'
 import ProductSkeleton from '../components/ProductSkeleton'
@@ -60,14 +61,16 @@ const PAGE_SIZE = 24
 const Products = () => {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const [selectedCategories, setSelectedCategories] = useState([])
-  const [priceBands, setPriceBands] = useState([])
-  const [inStockOnly, setInStockOnly] = useState(false)
+  // Survive Back from a product page, so the list is as long as when they left
+  const [selectedCategories, setSelectedCategories] = useRestoredState('cats', [])
+  const [priceBands, setPriceBands] = useRestoredState('prices', [])
+  const [inStockOnly, setInStockOnly] = useRestoredState('inStock', false)
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [visibleCount, setVisibleCount] = useRestoredState('visible', PAGE_SIZE)
 
   const sortBy = searchParams.get('sort') || DEFAULT_SORT
   const searchQuery = location.state?.searchQuery
+  const lastListQuery = useRef(`${sortBy}|${searchQuery || ''}`)
   const searchResults = location.state?.searchResults
 
   const categories = useMemo(() => getCachedCategories(), [])
@@ -174,7 +177,14 @@ const Products = () => {
   const gridRef = useRef(null)
   useMobileCenterSwap(gridRef, '.feat-img-zone.has-second-img', [visibleProducts.length, sortBy, searchQuery])
 
-  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [sortBy, searchQuery])
+  useEffect(() => {
+    // Only a real change of sort/search shortens the list again, so a Back
+    // visit keeps every "Show more" the shopper had opened
+    const q = `${sortBy}|${searchQuery || ''}`
+    if (lastListQuery.current === q) return
+    lastListQuery.current = q
+    setVisibleCount(PAGE_SIZE)
+  }, [sortBy, searchQuery])
 
   // ── Pin the category-circles banner below the navbar via JS, not CSS
   // position:sticky. Two stacked native sticky elements (navbar + this
@@ -206,30 +216,6 @@ const Products = () => {
       })
     })
   }, [sortBy, selectedCategories.length, filteredProducts.length])
-
-  useEffect(() => {
-    let ticking = false
-    const handleScroll = () => {
-      if (ticking) return
-      ticking = true
-      requestAnimationFrame(() => {
-        sessionStorage.setItem('productsScrollY', window.scrollY)
-        ticking = false
-      })
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const saved = sessionStorage.getItem('productsScrollY')
-    if (saved) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(saved, 10))
-        sessionStorage.removeItem('productsScrollY')
-      })
-    }
-  }, [])
 
   const seoTitle = searchQuery
     ? `Results for "${searchQuery}"`
