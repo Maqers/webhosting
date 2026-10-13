@@ -19,9 +19,7 @@ export const occasionCategories = [
     slug: "karva-chauth",
     emoji: "🌕",
     order: 1,
-    description: "Bangles, jhumkas and a little extra sparkle for the night everyone keeps checking the sky.",
-    circleImage: "/images/thumb-karva-chauth.webp",
-    circleOrder: 0
+    description: "Bangles, jhumkas and a little extra sparkle for the night everyone keeps checking the sky."
   },
   {
     id: "shaadi-fever",
