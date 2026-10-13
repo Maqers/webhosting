@@ -107,59 +107,47 @@ async function ghPut(path, content, message, sha, creds) {
   throw new Error(lastError);
 }
 
-// ─── Supabase API ─────────────────────────────────────────────────────────────
+// ─── Sellers (via /api/sellers) ─────────────────────────────────────────────────────────────
 
-const SUPABASE_URL = "https://ipkyssauulddtthrebnw.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwa3lzc2F1dWxkZHR0aHJlYm53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDAyMTEsImV4cCI6MjA4MTYxNjIxMX0.TIZuwR0Vu2cyhhpGuCoB38fC6K8ZtnW17NeVzHWc-n0";
+// Seller records and KYC files are private, so the browser no longer touches
+// them with the public key: every call goes through /api/sellers, which checks
+// the signed-in GitHub token and uses the Supabase service-role key server-side.
+// The token is set from the admin's credentials when the portal renders.
+let sellersApiToken = "";
 
-const sbHeaders = {
-  "Content-Type": "application/json",
-  "apikey": SUPABASE_KEY,
-  "Authorization": `Bearer ${SUPABASE_KEY}`,
-};
+async function sellersApi(action, payload = {}) {
+  const res = await fetch("/api/sellers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${sellersApiToken}` },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Sellers API failed (${res.status})`);
+  return data;
+}
 
 async function sbGetSellers() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?select=*&order=business_name.asc`, {
-    headers: { ...sbHeaders, "Cache-Control": "no-cache", "Pragma": "no-cache" }
-  });
-  if (!res.ok) throw new Error(`Supabase GET failed: ${await res.text()}`);
-  return res.json();
+  return (await sellersApi("list")).sellers;
 }
 
 async function sbCreateSeller(seller) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db`, {
-    method: "POST",
-    headers: { ...sbHeaders, "Prefer": "return=representation" },
-    body: JSON.stringify(seller),
-  });
-  if (!res.ok) throw new Error(`Supabase CREATE failed: ${await res.text()}`);
-  return res.json();
+  return (await sellersApi("create", { seller })).sellers;
 }
 
 async function sbUpdateSeller(id, updates) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?id=eq.${encodeURIComponent(id)}`, {
-    method: "PATCH",
-    headers: { ...sbHeaders, "Prefer": "return=representation" },
-    body: JSON.stringify(updates),
-  });
-  if (!res.ok) throw new Error(`Supabase UPDATE failed: ${await res.text()}`);
-  return res.json();
+  return (await sellersApi("update", { id, updates })).sellers;
 }
 
 async function sbDeleteSeller(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sellers_db?id=eq.${encodeURIComponent(id)}`, {
-    method: "DELETE",
-    headers: sbHeaders,
-  });
-  if (!res.ok) throw new Error(`Supabase DELETE failed: ${await res.text()}`);
+  await sellersApi("delete", { id });
 }
 
 async function sbUploadKYC(file, sellerId) {
   const ext = file.name.split(".").pop();
-  const path = `${sellerId}/${Date.now()}.${ext}`;
-  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/seller_docs/${path}`, {
-    method: "POST",
-    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": file.type },
+  const { path, uploadUrl } = await sellersApi("kycUploadUrl", { id: sellerId, ext });
+  const res = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": file.type || "application/octet-stream" },
     body: file,
   });
   if (!res.ok) throw new Error(`KYC upload failed: ${await res.text()}`);
@@ -167,14 +155,8 @@ async function sbUploadKYC(file, sellerId) {
 }
 
 async function sbGetKYCUrl(path) {
-  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/seller_docs/${path}`, {
-    method: "POST",
-    headers: { ...sbHeaders },
-    body: JSON.stringify({ expiresIn: 3600 }),
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return `${SUPABASE_URL}/storage/v1${data.signedURL}`;
+  try { return (await sellersApi("kycUrl", { path })).url; }
+  catch { return null; }
 }
 
 function generateSellerId(businessName, ownerName) {
@@ -953,6 +935,7 @@ function ProductCard({ product, categories, previewIndex = 0 }) {
 export default function AdminPortal() {
   const [step, setStep] = useState("login");
   const [creds, setCreds] = useState(() => { try { return JSON.parse(sessionStorage.getItem("maqers_admin_creds") || "null") || {}; } catch { return {}; } });
+  sellersApiToken = creds?.token || "";
   const [loginForm, setLoginForm] = useState({ token: "", owner: "Maqers", repo: "webhosting", branch: "main" });
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);

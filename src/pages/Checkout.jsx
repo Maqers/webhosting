@@ -395,6 +395,11 @@ export default function Checkout() {
   // for manual follow-up. A seller with no email on file is also skipped
   // (nothing to send to) rather than erroring the whole checkout.
   const notifySellers = async (oid) => {
+    // Seller emails were never live (the template id above is a placeholder),
+    // and looking up a seller's email/phone from the browser needs the public
+    // key to read sellers_db, which is now locked. Until this moves to a
+    // server-side function, skip it rather than fail on every order.
+    if (EMAILJS_TEMPLATE_SELLER.includes('REPLACE_ME')) return
     try {
       const sellerCodes = [...new Set(items.filter(i => i.sellerCode).map(i => i.sellerCode))]
       if (!sellerCodes.length) return
