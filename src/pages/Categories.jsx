@@ -30,6 +30,7 @@ const CATEGORY_FILTERS = {
   'Customised-Hampers':   ['Anniversary', 'Luxury', 'Personalised', 'Photo Frame'],
   'resin-products':       ['Clock', 'Keychain', 'Photo Frame', 'Nameplate'],
   'diwali':               ['Hampers', 'Diyas & Holders', 'Candles', 'Pooja', 'Wall & Table Decor', 'Serveware'],
+  'karva-chauth':         ['Bangles', 'Earrings', 'Necklace'],
 }
 
 // Map filter label → tag keywords to match against

@@ -827,14 +827,14 @@ function addOccasionMapKey(source, occasionId) {
 // occasion only shows on the site once it exists in BOTH files.
 
 function parseOccasionCatalogEntries(source) {
-  // circleImage is optional and trails description, so entries written before
-  // it existed still parse. An occasion with one gets a circle on the home
+  // circleImage (and the circleOrder written with it) are optional and trail
+  // description, so entries written before they existed still parse. An occasion with one gets a circle on the home
   // page; without one it appears everywhere else but not there.
-  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*emoji:\s*"([^"]*)",\s*order:\s*(\d+),\s*description:\s*"((?:[^"\\]|\\.)*)"(?:,\s*circleImage:\s*"([^"]*)")?\s*\}/g;
+  const regex = /\{\s*id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*slug:\s*"([^"]+)",\s*emoji:\s*"([^"]*)",\s*order:\s*(\d+),\s*description:\s*"((?:[^"\\]|\\.)*)"(?:,\s*circleImage:\s*"([^"]*)")?(?:,\s*circleOrder:\s*(\d+))?\s*\}/g;
   const results = [];
   let m;
   while ((m = regex.exec(source)) !== null) {
-    results.push({ id: m[1], name: m[2], slug: m[3], emoji: m[4], order: parseInt(m[5]), description: m[6].replace(/\\"/g, '"'), circleImage: m[7] || "" });
+    results.push({ id: m[1], name: m[2], slug: m[3], emoji: m[4], order: parseInt(m[5]), description: m[6].replace(/\\"/g, '"'), circleImage: m[7] || "", circleOrder: m[8] !== undefined ? parseInt(m[8]) : null });
   }
   return results.sort((a, b) => a.order - b.order);
 }

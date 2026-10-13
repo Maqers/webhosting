@@ -470,6 +470,8 @@ export const productsByCategory = {
 // OCCASION PRODUCT MAP (also exported for Products.jsx compatibility)
 // ============================================================================
 export const occasionProductMap = {
+  // Karva Chauth: every bangle/kada, plus BanjaranSoul (BM1001) jewellery.
+  'karva-chauth': [42, 43, 44, 85, 45, 54, 55, 84, 87, 88, 91, 92, 93, 94, 89, 96, 97, 98, 99, 86, 100, 101, 103, 104, 95, 102, 90, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83],
   // Diwali: populate from the admin portal as the festive range is decided.
   'diwali': [380, 379, 365, 382, 366, 381, 320, 372, 384, 340, 371, 283, 370, 362, 113, 278, 277, 361, 364, 342, 354, 360, 373, 352, 357, 367, 350, 337, 368, 353, 341, 359, 41, 336, 349, 351, 363, 374, 375, 376, 377, 378, 281, 196, 256, 111, 254, 267, 276, 37, 338, 279, 356, 344, 383, 386, 387, 388, 355],
   'anniversary': [321, 320, 64, 65, 71, 235, 315, 316, 36, 37, 33, 191, 327, 329, 331, 332, 333, 339, 340, 341, 342, 343, 345, 346],
