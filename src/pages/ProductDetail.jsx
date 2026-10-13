@@ -41,6 +41,7 @@ const formatDescriptionHtml = (text) => {
 // Indian bangle sizes (2'4 = 2 and 4/16 inch) with inner diameter. Shown on
 // any product whose sizes are in that form; collapsed until opened.
 const BANGLE_SIZE_CHART = [
+  { size: "2'2", inches: '2.125', cm: '5.4' },
   { size: "2'4", inches: '2.35', cm: '5.7' },
   { size: "2'6", inches: '2.375', cm: '6.0' },
   { size: "2'8", inches: '2.5', cm: '6.5' },
