@@ -186,7 +186,7 @@ export default function AdminFeatures({ products, pendingChanges, setPendingChan
                 </td>
                 <td style={cell}>
                   <input style={{ ...input, ...(aiIds.has(p.id) ? { background: "#f3f8ee", borderColor: "#b8d4a0" } : null) }}
-                    placeholder="e.g. Silk thread, kundan stones, brass" value={p.material || ""}
+                    placeholder="e.g. Crochet, Wax, Glass, Brass" value={p.material || ""}
                     onChange={e => setField(p, "material", e.target.value)} />
                   {aiIds.has(p.id) && <div style={{ fontSize: 10, color: "#6a9a4a", marginTop: 2 }}>✦ AI suggestion, check it</div>}
                 </td>

@@ -260,8 +260,8 @@ function ProductFeatureFields({ value, onChange, ts }) {
       <label style={ts.label}>Weight <span style={ts.labelHint}>(optional, shown under Product Features)</span></label>
       <input style={ts.input} placeholder="e.g. 250 g" value={value.weight || ""}
         onChange={e => onChange({ weight: e.target.value })} />
-      <label style={ts.label}>Material <span style={ts.labelHint}>(optional, the AI suggests it when it writes the description; edit freely)</span></label>
-      <input style={ts.input} placeholder="e.g. Silk thread, kundan stones, brass" value={value.material || ""}
+      <label style={ts.label}>Material <span style={ts.labelHint}>(optional, the main material only, e.g. Crochet; the AI suggests it, edit freely)</span></label>
+      <input style={ts.input} placeholder="e.g. Crochet, Wax, Glass, Brass" value={value.material || ""}
         onChange={e => onChange({ material: e.target.value })} />
     </>
   );
