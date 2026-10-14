@@ -17,10 +17,94 @@ function capWords(text, max) {
   return /[.!?]$/.test(trimmed) ? trimmed : trimmed + '.'
 }
 
+// ── Material-only suggestion ────────────────────────────────────────────────
+// For products that already exist: the photo plus what the listing already
+// says, answered with just the materials. Same rules as the full generator:
+// never claim a precious material unless the listing says so.
+async function canPushToRepo(token, repo) {
+  const r = await fetch(`https://api.github.com/repos/${repo}`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'User-Agent': 'maqers-material' },
+  })
+  if (!r.ok) return false
+  return !!(await r.json()).permissions?.push
+}
+
+const cleanMaterial = (v) => String(v || '')
+  .replace(/\s*[—–]\s*/g, ', ')
+  .replace(/\s+/g, ' ')
+  .replace(/,\s*,/g, ',')
+  .replace(/^[\s,]+|[\s,]+$/g, '')
+  .slice(0, 100)
+
+async function suggestMaterial(req, res, apiKey) {
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
+  if (!token || !(await canPushToRepo(token, process.env.LEADS_REPO || 'Maqers/webhosting'))) {
+    return res.status(401).json({ error: 'Not authorised.' })
+  }
+  const { imageUrl, title, description, tags, categoryId } = req.body
+  if (!title) return res.status(400).json({ error: 'A title is required.' })
+
+  // Only the site's own images (OpenAI fetches the URL itself)
+  const host = req.headers['x-forwarded-host'] || req.headers.host || ''
+  let imageContent = null
+  if (imageUrl) {
+    let u
+    try { u = new URL(imageUrl) } catch { return res.status(400).json({ error: 'Bad image URL.' }) }
+    const ok = u.protocol === 'https:' && (u.host === host || /^(www\.)?maqers\.in$/.test(u.host))
+    if (!ok) return res.status(400).json({ error: 'Image must be on maqers.in.' })
+    imageContent = { type: 'image_url', image_url: { url: u.href, detail: 'low' } }
+  }
+
+  const listing = [
+    `Title: ${String(title).slice(0, 200)}`,
+    categoryId ? `Category: ${String(categoryId).slice(0, 60)}` : '',
+    Array.isArray(tags) && tags.length ? `Tags: ${tags.slice(0, 12).join(', ').slice(0, 300)}` : '',
+    description ? `Listing text: ${String(description).replace(/\\n|\n/g, ' ').slice(0, 900)}` : '',
+  ].filter(Boolean).join('\n')
+
+  const prompt = `You are filling in the "Material" line for a handmade product on an Indian artisan marketplace.
+
+${listing}
+
+Name the main materials this product is made of, comma-separated, 1 to 5 items, title case, under 80 characters, no dashes. Examples: "Silk thread, kundan stones, brass base" or "Soy wax, glass jar" or "Cotton, hand block print".
+- If the listing text names materials, use those words.
+- Otherwise say only what you can actually see in the photo (fabric, thread, wood, glass, resin, wax, brass, beads, stones, clay, paper, metal).
+- Never claim a precious material (gold, silver, real gemstones, real pearls) unless the listing says so: write "gold tone", "silver tone", "stone-look" or "faux pearls" instead.
+- For a gift hamper, name the main materials of its main items (for example "Jute basket, soy wax candle, ceramic").
+- If you genuinely cannot tell, return an empty string.`
+
+  const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: imageContent ? [imageContent, { type: 'text', text: prompt }] : prompt }],
+      max_tokens: 80,
+      temperature: 0.2,
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'product_material',
+          strict: true,
+          schema: { type: 'object', properties: { material: { type: 'string' } }, required: ['material'], additionalProperties: false },
+        },
+      },
+    }),
+  })
+  if (!openaiRes.ok) {
+    const err = await openaiRes.json().catch(() => ({}))
+    return res.status(502).json({ error: err.error?.message || `OpenAI error ${openaiRes.status}` })
+  }
+  const data = await openaiRes.json()
+  let material = ''
+  try { material = cleanMaterial(JSON.parse(data.choices?.[0]?.message?.content || '{}').material) } catch { /* leave empty */ }
+  return res.status(200).json({ material })
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
@@ -29,6 +113,11 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY is not configured in Vercel environment variables.' })
+
+    // Bulk "fill in missing materials" from the admin. Cheap (one small call
+    // per product) and admin-only, so it can't be used to spend the OpenAI
+    // credit from outside.
+    if (req.body.mode === 'material') return suggestMaterial(req, res, apiKey)
 
     // Build the image content block
     let imageContent

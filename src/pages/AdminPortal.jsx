@@ -13,6 +13,7 @@ import { splitsByColor } from "../utils/productVariants";
 import AdminCalendar from "./AdminCalendar";
 import AdminImageEditor from "./AdminImageEditor";
 import AdminLeads from "./AdminLeads";
+import AdminFeatures from "./AdminFeatures";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -2401,6 +2402,7 @@ export default function AdminPortal() {
     { id: "calendar", label: "Calendar", icon: "▦" },
     { id: "add-product", label: "Add Product", icon: "+" },
     { id: "products", label: "Products", icon: "▤" },
+    { id: "features", label: "Weight & Material", icon: "⚖" },
     { id: "by-category", label: "By Category", icon: "⊟" },
     { id: "categories", label: "Categories", icon: "⊞" },
     { id: "occasions", label: "Occasions", icon: "♡" },
@@ -4098,6 +4100,10 @@ export default function AdminPortal() {
           </div>
         )}
 
+        {activeTab === "features" && (
+          <AdminFeatures products={products} pendingChanges={pendingChanges} setPendingChanges={setPendingChanges}
+            onPublish={handlePublishAllChanges} publishing={publishing} creds={creds} showToast={showToast} ts={ts} />
+        )}
         {activeTab === "leads" && <AdminLeads creds={creds} ts={ts} showToast={showToast} />}
 
         {activeTab === "sellers" && (
