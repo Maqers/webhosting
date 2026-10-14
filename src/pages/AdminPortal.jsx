@@ -646,16 +646,24 @@ function serializeColors(colors) {
     .join(", ");
 }
 
+// Bangle sizes are written the Indian way, 2'4 not 2.4 (the site, the size
+// chart and order messages all use it). Typed variants are normalised.
+function normalizeSize(v) {
+  const s = String(v).trim();
+  const m = s.match(/^2\s*[.'’-]\s*(\d{1,2})$/);
+  return m ? `2'${m[1]}` : s;
+}
+
 function serializeSizes(sizes) {
   if (!sizes || !Array.isArray(sizes) || sizes.length === 0) return "";
-  return sizes.map(s => `"${sanitizeForJS(String(s))}"`).join(", ");
+  return sizes.map(s => `"${sanitizeForJS(normalizeSize(s))}"`).join(", ");
 }
 
 function serializeSizePrices(sizePrices) {
   if (!sizePrices || typeof sizePrices !== "object" || Object.keys(sizePrices).length === 0) return null;
   const entries = Object.entries(sizePrices)
     .filter(([, v]) => v !== "" && v !== null && !isNaN(Number(v)))
-    .map(([k, v]) => `"${sanitizeForJS(k)}": ${Number(v)}`);
+    .map(([k, v]) => `"${sanitizeForJS(normalizeSize(k))}": ${Number(v)}`);
   return entries.length > 0 ? `{ ${entries.join(", ")} }` : null;
 }
 
@@ -2548,9 +2556,9 @@ export default function AdminPortal() {
                       <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
                         <input style={{ ...ts.input, flex: 2, marginTop: 0 }} placeholder="Size name e.g. Small, 6 inch"
                           value={newSizeInput} onChange={e => setNewSizeInput(e.target.value)}
-                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newSizeInput.trim(); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } } }} />
+                          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = normalizeSize(newSizeInput); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } } }} />
                         <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                          onClick={() => { const v = newSizeInput.trim(); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } }}>+</button>
+                          onClick={() => { const v = normalizeSize(newSizeInput); if (v) { setNewProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setNewSizeInput(""); } }}>+</button>
                       </div>
                       {(newProduct.sizes||[]).length > 0 && (
                         <div style={{ marginTop: 8 }}>
@@ -3139,9 +3147,9 @@ export default function AdminPortal() {
                             <input style={{ ...ts.input, flex: 2, marginTop: 0 }} placeholder="Size name e.g. Small, 6 inch"
                               value={editSizeInput}
                               onChange={e => setEditSizeInput(e.target.value)}
-                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = editSizeInput.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } } }} />
+                              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = normalizeSize(editSizeInput); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } } }} />
                             <button type="button" style={{ ...ts.primaryBtn, padding: "9px 14px", flexShrink: 0 }}
-                              onClick={() => { const v = editSizeInput.trim(); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } }}>+</button>
+                              onClick={() => { const v = normalizeSize(editSizeInput); if (v) { setEditingProduct(p => ({ ...p, sizes: [...(p.sizes||[]), v] })); setEditSizeInput(""); } }}>+</button>
                           </div>
                           {(editingProduct.sizes||[]).length > 0 && (
                             <div style={{ marginTop: 8 }}>
