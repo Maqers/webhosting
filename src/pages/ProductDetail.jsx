@@ -876,8 +876,35 @@ const ProductDetail = () => {
               {selectionError && <p className="selection-error-note">{selectionError}</p>}
             </div>
 
+            {/* Delivery timeline: always visible, under the buy buttons */}
+            <div className="delivery-timeline">
+              <div className="dtl-step">
+                <div className="dtl-icon dtl-icon--done">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <div className="dtl-label">{deliveryTimeline.orderDate}</div>
+                <div className="dtl-sublabel">Order Placed</div>
+              </div>
+              <div className="dtl-line"><span className="dtl-line-label">Crafting</span></div>
+              <div className="dtl-step">
+                <div className="dtl-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                </div>
+                <div className="dtl-label">{deliveryTimeline.dispatchStr}</div>
+                <div className="dtl-sublabel">Dispatched</div>
+              </div>
+              <div className="dtl-line"><span className="dtl-line-label">Shipping</span></div>
+              <div className="dtl-step">
+                <div className="dtl-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div className="dtl-label">{deliveryTimeline.deliveryStr}</div>
+                <div className="dtl-sublabel">Delivered</div>
+              </div>
+            </div>
+
             {/* Collapsible rows: Description (open), Product Features, Size chart
-                (bangles), Exchange and Return Policy, Delivery Timeline */}
+                (bangles), Exchange and Return Policy */}
             <div className="pdp-accordions">
               <details className="pdp-accordion" open>
                 <summary>Description</summary>
@@ -926,37 +953,6 @@ const ProductDetail = () => {
                 <summary>Exchange and Return Policy</summary>
                 <div className="pdp-accordion-body">
                   <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
-                </div>
-              </details>
-
-              <details className="pdp-accordion">
-                <summary>Delivery Timeline</summary>
-                <div className="pdp-accordion-body">
-                  <div className="delivery-timeline">
-                    <div className="dtl-step">
-                      <div className="dtl-icon dtl-icon--done">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18"><path d="M20 6L9 17l-5-5"/></svg>
-                      </div>
-                      <div className="dtl-label">{deliveryTimeline.orderDate}</div>
-                      <div className="dtl-sublabel">Order Placed</div>
-                    </div>
-                    <div className="dtl-line"><span className="dtl-line-label">Crafting</span></div>
-                    <div className="dtl-step">
-                      <div className="dtl-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                      </div>
-                      <div className="dtl-label">{deliveryTimeline.dispatchStr}</div>
-                      <div className="dtl-sublabel">Dispatched</div>
-                    </div>
-                    <div className="dtl-line"><span className="dtl-line-label">Shipping</span></div>
-                    <div className="dtl-step">
-                      <div className="dtl-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                      </div>
-                      <div className="dtl-label">{deliveryTimeline.deliveryStr}</div>
-                      <div className="dtl-sublabel">Delivered</div>
-                    </div>
-                  </div>
                 </div>
               </details>
             </div>

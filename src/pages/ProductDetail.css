@@ -1654,8 +1654,6 @@
 .pdp-accordion-body p a { color: var(--primary-color, #760909); font-weight: 600; }
 .pdp-accordion-body .product-detail-description { font-size: 0.95rem; color: var(--text-secondary); }
 .pdp-accordion-body .product-facts { margin-top: 0.1rem; }
-/* The timeline was its own card; inside a row it needs no frame of its own */
-.pdp-accordion .delivery-timeline { margin: 0; padding: 0.25rem 0 0; background: none; border: 0; }
 
 @media (max-width: 768px) {
   /* Under the buy block, ahead of the category tag */
