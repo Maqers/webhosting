@@ -37,15 +37,8 @@ const OrderHistory = lazy(() => import('./pages/OrderHistory'))
 const Profile = lazy(() => import('./pages/Profile'))
 
 const RouteLoadingFallback = () => (
-  <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '50vh',
-    fontSize: '1.125rem',
-    color: '#666'
-  }}>
-    Loading...
+  <div className="route-loading">
+    <div className="loader-spinner" role="status" aria-label="Loading"></div>
   </div>
 )
 

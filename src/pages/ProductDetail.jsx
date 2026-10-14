@@ -903,10 +903,10 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Collapsible rows: Description (open), Product Features, Size chart
+            {/* Collapsible rows, all closed until tapped: Description, Product Features, Size chart
                 (bangles), Exchange and Return Policy */}
             <div className="pdp-accordions">
-              <details className="pdp-accordion" open>
+              <details className="pdp-accordion">
                 <summary>Description</summary>
                 <div className="pdp-accordion-body">
                   <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />

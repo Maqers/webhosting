@@ -397,6 +397,12 @@
   background: var(--primary-color);
 }
 
+/* The rule above (.faqs-contact .contact-link) keeps the text maroon, which on
+   the maroon hover background made the label vanish. */
+.faqs-contact .contact-link:hover {
+  color: #fff;
+}
+
 @media (max-width: 968px) {
   .faqs-hero {
     padding: 4rem 0 3rem;

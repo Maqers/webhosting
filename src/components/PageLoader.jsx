@@ -28,8 +28,7 @@ const PageLoader = () => {
   return (
     <div className={`page-loader ${!isVisible ? 'hidden' : ''}`}>
       <div className="loader-content">
-        <div className="loader-spinner"></div>
-        <div className="loader-text">Loading...</div>
+        <div className="loader-spinner" role="status" aria-label="Loading"></div>
       </div>
     </div>
   )
