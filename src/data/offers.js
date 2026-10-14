@@ -42,21 +42,22 @@ export const newUserDiscount = (total) => Math.round((Number(total) * NEW_USER_C
 // set in the admin). Order two of their products and the customer pays that
 // delivery twice for what ships once. So, per seller: when 2 or more different
 // products with delivery included are in the cart, take the smallest of their
-// delivery amounts off. Products flagged noDeliveryDiscount (hampers, which
-// each ship separately) and products without delivery included don't count.
-// Automatic: it is a correction to the price, not a promo code, so it applies
-// with or without a coupon and without a login.
+// delivery amounts off. A different colour or size counts as a different
+// product; quantity and personalisation don't. Products flagged
+// noDeliveryDiscount (hampers, which each ship separately) and products
+// without delivery included don't count. Logged-in shoppers only, like a
+// coupon: callers pass the result through only when someone is signed in.
 export const SELLER_DELIVERY_CODE = 'MAQERSPL'
 
 export function sellerDeliveryDiscount(items) {
-  const bySeller = new Map() // sellerCode -> Map(productId -> deliveryAmount)
+  const bySeller = new Map() // sellerCode -> Map(id|colour|size -> deliveryAmount)
   for (const line of items || []) {
     const meta = getProductById(line.id)?.meta
     const code = meta?.sellerCode
     const amount = Number(meta?.deliveryAmount)
     if (!code || !meta.deliveryIncluded || meta.noDeliveryDiscount || !(amount > 0)) continue
     if (!bySeller.has(code)) bySeller.set(code, new Map())
-    bySeller.get(code).set(line.id, amount)
+    bySeller.get(code).set(`${line.id}|${line.selectedColor || ''}|${line.selectedSize || ''}`, amount)
   }
   const groups = []
   for (const [sellerCode, products] of bySeller) {

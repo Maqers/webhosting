@@ -34,7 +34,8 @@ export default function CartDrawer() {
   const possibleDiscount = diwaliCartDiscount(items)
   const couponDiscount = isLoggedIn ? possibleDiscount : 0
   // Delivery counted once for several products from the same seller (MAQERSPL)
-  const plDiscount = sellerDeliveryDiscount(items).total
+  const plPossible = sellerDeliveryDiscount(items).total
+  const plDiscount = isLoggedIn ? plPossible : 0
   const grandTotal = total - couponDiscount - plDiscount + deliveryFee
   const inr = (n) => `₹${n.toLocaleString('en-IN')}`
 
@@ -156,9 +157,9 @@ export default function CartDrawer() {
                   <span>SUBTOTAL</span>
                   <span className="cart-total-amount">{inr(total)}</span>
                 </div>
-                {!isLoggedIn && possibleDiscount > 0 && (
+                {!isLoggedIn && possibleDiscount + plPossible > 0 && (
                   <button type="button" className="cart-coupon-login" onClick={() => { setIsOpen(false); openLoginModal() }}>
-                    Log in to apply {DIWALI_COUPON.code} and save {inr(possibleDiscount)}
+                    Log in to apply {[possibleDiscount > 0 && DIWALI_COUPON.code, plPossible > 0 && SELLER_DELIVERY_CODE].filter(Boolean).join(' + ')} and save {inr(possibleDiscount + plPossible)}
                   </button>
                 )}
                 {couponDiscount > 0 && (

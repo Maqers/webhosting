@@ -126,8 +126,10 @@ export default function Checkout() {
     if (!autoApplyOff && !appliedCode && diwaliSaving > 0) setAppliedCode(DIWALI_COUPON.code)
   }, [autoApplyOff, appliedCode, diwaliSaving])
   // MAQERSPL: delivery counted once for several products from the same seller.
-  // Applies on top of any coupon (it corrects the price, it isn't a promo).
-  const plDiscount = sellerDeliveryDiscount(items).total
+  // Logged-in shoppers only; applies on top of any coupon. A guest sees what
+  // they would save and a Log in button instead.
+  const plPossible = sellerDeliveryDiscount(items).total
+  const plDiscount = isLoggedIn ? plPossible : 0
   const grandTotal = total + deliveryFee - couponDiscount - plDiscount
   const plNote = plDiscount > 0 ? `, ${SELLER_DELIVERY_CODE} -₹${plDiscount}` : ''
   const couponNote = (couponApplied ? `, ${appliedCode} -₹${couponDiscount}` : '') + plNote
@@ -861,6 +863,15 @@ export default function Checkout() {
                   </div>
                 )
               })}
+              {!isLoggedIn && plPossible > 0 && (
+                <div className="checkout-coupon locked">
+                  <div className="checkout-coupon-info">
+                    <span className="checkout-coupon-code">🚚 {SELLER_DELIVERY_CODE}</span>
+                    <span className="checkout-coupon-desc">Log in to apply: items from the same maker ship together, so delivery is counted once. Saves ₹{plPossible.toLocaleString('en-IN')}</span>
+                  </div>
+                  <button type="button" className="checkout-coupon-btn" onClick={openLoginModal}>Log in</button>
+                </div>
+              )}
               <div className="checkout-summary-breakdown">
                 <div className="checkout-summary-row">
                   <span>Subtotal</span>
