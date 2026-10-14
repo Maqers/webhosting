@@ -3,7 +3,7 @@
  * cards / product page show the matching label, so both switch off together
  * when the offer ends — no deploy needed.
  */
-import { occasionProductMap } from './catalog'
+import { occasionProductMap, getProductById } from './catalog'
 
 export const DIWALI_COUPON = {
   code: 'MAQERSDIWALI5',
@@ -36,3 +36,32 @@ export const NEW_USER_COUPON = {
   percent: 5,
 }
 export const newUserDiscount = (total) => Math.round((Number(total) * NEW_USER_COUPON.percent) / 100)
+
+// Same-seller delivery saving, shown as MAQERSPL. Some sellers build delivery
+// into the price of every product (meta.deliveryIncluded + meta.deliveryAmount,
+// set in the admin). Order two of their products and the customer pays that
+// delivery twice for what ships once. So, per seller: when 2 or more different
+// products with delivery included are in the cart, take the smallest of their
+// delivery amounts off. Products flagged noDeliveryDiscount (hampers, which
+// each ship separately) and products without delivery included don't count.
+// Automatic: it is a correction to the price, not a promo code, so it applies
+// with or without a coupon and without a login.
+export const SELLER_DELIVERY_CODE = 'MAQERSPL'
+
+export function sellerDeliveryDiscount(items) {
+  const bySeller = new Map() // sellerCode -> Map(productId -> deliveryAmount)
+  for (const line of items || []) {
+    const meta = getProductById(line.id)?.meta
+    const code = meta?.sellerCode
+    const amount = Number(meta?.deliveryAmount)
+    if (!code || !meta.deliveryIncluded || meta.noDeliveryDiscount || !(amount > 0)) continue
+    if (!bySeller.has(code)) bySeller.set(code, new Map())
+    bySeller.get(code).set(line.id, amount)
+  }
+  const groups = []
+  for (const [sellerCode, products] of bySeller) {
+    if (products.size < 2) continue
+    groups.push({ sellerCode, count: products.size, amount: Math.min(...products.values()) })
+  }
+  return { total: groups.reduce((sum, g) => sum + g.amount, 0), groups }
+}

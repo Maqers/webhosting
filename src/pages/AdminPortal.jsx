@@ -247,6 +247,38 @@ function descLimitMessage(text) {
     ? `Description is ${n} words. Keep it to ${DESC_MAX_WORDS} or fewer (one to one and a half paragraphs).`
     : "";
 }
+// "Delivery included in the price?" block, shared by the Add and Edit forms.
+// Yes needs an amount; the amount feeds the MAQERSPL discount when several
+// such products from one seller are in a cart (data/offers.js).
+function DeliveryIncludedFields({ value, onChange, ts }) {
+  const included = value.deliveryIncluded === true;
+  return (
+    <>
+      <label style={ts.label}>Delivery included in the price? <span style={ts.labelHint}>(some sellers build delivery into every product's price)</span></label>
+      <div style={{ display: "flex", gap: 6, marginTop: 4, marginBottom: 4 }}>
+        <button type="button" style={included ? ts.chipActive : ts.chip} onClick={() => onChange({ deliveryIncluded: true })}>Yes</button>
+        <button type="button" style={!included ? ts.chipActive : ts.chip} onClick={() => onChange({ deliveryIncluded: false })}>No</button>
+      </div>
+      {included && (
+        <>
+          <label style={ts.label}>Delivery amount in the price (₹)</label>
+          <input style={ts.input} type="number" min="0" placeholder="e.g. 80" value={value.deliveryAmount ?? ""}
+            onChange={e => onChange({ deliveryAmount: e.target.value })} />
+          {!(Number(value.deliveryAmount) > 0) && (
+            <p style={{ ...ts.fieldHint, color: "#c0392b" }}>Enter the amount, or this will be saved as "No".</p>
+          )}
+          <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 13, color: "#444", cursor: "pointer" }}>
+            <input type="checkbox" checked={value.noDeliveryDiscount === true}
+              onChange={e => onChange({ noDeliveryDiscount: e.target.checked })} />
+            Don't apply the shared-delivery discount <span style={ts.labelHint}>(e.g. hampers, each ships separately)</span>
+          </label>
+          <p style={ts.fieldHint}>When 2+ products from this seller (each with delivery included) are in one cart, the customer gets MAQERSPL: the smallest of their delivery amounts off the order.</p>
+        </>
+      )}
+    </>
+  );
+}
+
 function DescCounter({ value }) {
   const n = countWords(value);
   const over = n > DESC_MAX_WORDS;
@@ -481,6 +513,14 @@ function parseProducts(source) {
     const sqp = entry.match(/sellerQuotedPrice:\s*([\d.]+)/);
     if (sqp) p.sellerQuotedPrice = parseFloat(sqp[1]);
 
+    // "Delivery included in the price" (see sellerDeliveryDiscount in data/offers.js)
+    const di = entry.match(/deliveryIncluded:\s*(true|false)/);
+    if (di) p.deliveryIncluded = di[1] === "true";
+    const da = entry.match(/deliveryAmount:\s*(\d+(?:\.\d+)?)/);
+    if (da) p.deliveryAmount = Number(da[1]);
+    const nd = entry.match(/noDeliveryDiscount:\s*(true|false)/);
+    if (nd) p.noDeliveryDiscount = nd[1] === "true";
+
     const dt = entry.match(/delivery_time:\s*"([^"]*)"/);
     if (dt) p.delivery_time = dt[1];
 
@@ -707,6 +747,14 @@ function buildEntry(id, product) {
     ? `, sellerQuotedPrice: ${sellerQuotedPriceNum}`
     : '';
 
+  // Delivery included in the price: written only when Yes with an amount, so
+  // products without it stay exactly as they were. noDeliveryDiscount keeps a
+  // product (e.g. a hamper) out of the same-seller MAQERSPL discount.
+  const deliveryAmountNum = Number(product.deliveryAmount);
+  const deliveryPart = (product.deliveryIncluded === true && deliveryAmountNum > 0)
+    ? `, deliveryIncluded: true, deliveryAmount: ${deliveryAmountNum}${product.noDeliveryDiscount ? ", noDeliveryDiscount: true" : ""}`
+    : '';
+
   // If size-based pricing, auto-set product.price to the minimum size price
   let basePrice = Number(product.price);
   if (sizePricesStr && product.sizePrices) {
@@ -720,7 +768,7 @@ function buildEntry(id, product) {
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}"${r.image ? `, image: "${sanitizeForJS(r.image)}"` : ""} }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${deliveryPart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -974,7 +1022,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, personalisation_options: [], personalisation_prices: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -1402,7 +1450,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setPreviewImgIndex(0); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -2595,6 +2643,7 @@ export default function AdminPortal() {
                       <label style={ts.label}>Seller Quoted Price (₹) <span style={ts.labelHint}>(optional — what the seller charges us, before our markup; used for the order summary sheet)</span></label>
                       <input style={ts.input} type="number" min="0" placeholder="e.g. 650" value={newProduct.sellerQuotedPrice}
                         onChange={e => setNewProduct(p => ({ ...p, sellerQuotedPrice: e.target.value }))} />
+                      <DeliveryIncludedFields ts={ts} value={newProduct} onChange={patch => setNewProduct(p => ({ ...p, ...patch }))} />
                       <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
                       <input style={ts.input} placeholder="e.g. 2–3 days" value={newProduct.delivery_time || ""}
                         onChange={e => setNewProduct(p => ({ ...p, delivery_time: e.target.value }))} />
@@ -2824,7 +2873,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]); setPreviewImgIndex(0);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -2871,6 +2920,7 @@ export default function AdminPortal() {
                       ["Dispatch Time", newProduct.delivery_time || "none"],
                       ["MOQ", newProduct.moq || "none"],
                       ["Seller Quoted Price", newProduct.sellerQuotedPrice ? `Rs.${newProduct.sellerQuotedPrice}` : "none"],
+                      ["Delivery in price", newProduct.deliveryIncluded && Number(newProduct.deliveryAmount) > 0 ? `Yes, Rs.${newProduct.deliveryAmount}${newProduct.noDeliveryDiscount ? " (no shared-delivery discount)" : ""}` : "No"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => (occasionCatalogEntries.find(oc => oc.id === o) || occasionCategories.find(oc => oc.id === o))?.name).filter(Boolean).join(", ") || "None"],
                       // The names these files will be saved under in the repo (the title's
@@ -3186,6 +3236,7 @@ export default function AdminPortal() {
                           <label style={ts.label}>Seller Quoted Price (₹) <span style={ts.labelHint}>(optional — what the seller charges us, before our markup; used for the order summary sheet)</span></label>
                           <input style={ts.input} type="number" min="0" placeholder="e.g. 650" value={editingProduct.sellerQuotedPrice ?? editingProduct.meta?.sellerQuotedPrice ?? ""}
                             onChange={e => setEditingProduct(p => ({ ...p, sellerQuotedPrice: e.target.value }))} />
+                          <DeliveryIncludedFields ts={ts} value={editingProduct} onChange={patch => setEditingProduct(p => ({ ...p, ...patch }))} />
                           <label style={ts.label}>Dispatch Time <span style={ts.labelHint}>(time to make &amp; ship out — site adds ~3–4 more days on top for actual delivery)</span></label>
                           <input style={ts.input} placeholder="e.g. 2–3 days" value={editingProduct.delivery_time || editingProduct.meta?.delivery_time || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, delivery_time: e.target.value }))} />

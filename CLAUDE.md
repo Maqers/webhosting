@@ -23,9 +23,11 @@ There are no tests or lint scripts configured.
 - `categories` — array of category objects (id, name, slug, icon, order, meta.keywords)
 - `productsByCategory` — object keyed by category id, each value an array of product objects
 
-**Product shape:** `{ id, categoryId, title, slug, description, price, images[], popular, featured, inStock, tags[], meta: { keywords[], colors[], sizes[], moq, delivery_time, secondaryCategories[], sellerId, sellerCode, personalisation_options[], personalisation_prices[] } }`
+**Product shape:** `{ id, categoryId, title, slug, description, price, images[], popular, featured, inStock, tags[], meta: { keywords[], colors[], sizes[], moq, delivery_time, secondaryCategories[], sellerId, sellerCode, personalisation_options[], personalisation_prices[], deliveryIncluded, deliveryAmount, noDeliveryDiscount } }`
 
-Products can appear in multiple categories via `meta.secondaryCategories`. The helper `getAllProducts()` flattens `productsByCategory` and deduplicates.
+Products can appear in multiple categories via `meta.secondaryCategories`.
+
+**Delivery included in the price** (`meta.deliveryIncluded`, `deliveryAmount`, `noDeliveryDiscount`, set in the admin product form): some sellers build delivery into every product's price. When 2+ different products from one seller (each with delivery included, none flagged `noDeliveryDiscount`) are in a cart, `sellerDeliveryDiscount()` in `src/data/offers.js` takes the smallest of their delivery amounts off, shown as **MAQERSPL** in the cart drawer and checkout. It is automatic, needs no login, and stacks with a coupon. The admin writes these fields only when Yes with an amount, so other products' entries are unchanged. The helper `getAllProducts()` flattens `productsByCategory` and deduplicates.
 
 > **Critical:** Do not shorten or replace catalog.js. The comment at the top of the file ("DO NOT replace this with any shortened version") is a real constraint — short descriptions break SEO and the AI gift assistant.
 

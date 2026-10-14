@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { getProductById } from '../data/catalog'
 import { useScrollLock } from '../hooks/useScrollLock'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
-import { DIWALI_COUPON, hasDiwaliOffer, priceWithDiwaliCode, diwaliCartDiscount } from '../data/offers'
+import { DIWALI_COUPON, SELLER_DELIVERY_CODE, hasDiwaliOffer, priceWithDiwaliCode, diwaliCartDiscount, sellerDeliveryDiscount } from '../data/offers'
 import './CartDrawer.css'
 
 export default function CartDrawer() {
@@ -33,7 +33,9 @@ export default function CartDrawer() {
   const deliveryFree = deliveryFee === 0
   const possibleDiscount = diwaliCartDiscount(items)
   const couponDiscount = isLoggedIn ? possibleDiscount : 0
-  const grandTotal = total - couponDiscount + deliveryFee
+  // Delivery counted once for several products from the same seller (MAQERSPL)
+  const plDiscount = sellerDeliveryDiscount(items).total
+  const grandTotal = total - couponDiscount - plDiscount + deliveryFee
   const inr = (n) => `₹${n.toLocaleString('en-IN')}`
 
   useScrollLock(isOpen)
@@ -163,6 +165,12 @@ export default function CartDrawer() {
                   <div className="cart-subtotal cart-coupon-row">
                     <span>COUPON ({DIWALI_COUPON.code})</span>
                     <span className="cart-total-amount">−{inr(couponDiscount)}</span>
+                  </div>
+                )}
+                {plDiscount > 0 && (
+                  <div className="cart-subtotal cart-coupon-row">
+                    <span>SAME-MAKER DELIVERY ({SELLER_DELIVERY_CODE})</span>
+                    <span className="cart-total-amount">−{inr(plDiscount)}</span>
                   </div>
                 )}
                 <div className="cart-subtotal">

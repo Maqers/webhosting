@@ -10,7 +10,7 @@ import CouponCelebration from '../components/CouponCelebration'
 import { trackEvent } from '../utils/analytics'
 import { saveLead, saveLeadSoon, endLead, summariseCart } from '../utils/leads'
 import posthog from 'posthog-js'
-import { DIWALI_COUPON, NEW_USER_COUPON, isOfferLive, diwaliCartDiscount, newUserDiscount } from '../data/offers'
+import { DIWALI_COUPON, NEW_USER_COUPON, SELLER_DELIVERY_CODE, isOfferLive, diwaliCartDiscount, newUserDiscount, sellerDeliveryDiscount } from '../data/offers'
 import { getDeliveryFee, FREE_DELIVERY_MIN } from '../utils/delivery'
 import './Checkout.css'
 
@@ -125,8 +125,12 @@ export default function Checkout() {
   useEffect(() => {
     if (!autoApplyOff && !appliedCode && diwaliSaving > 0) setAppliedCode(DIWALI_COUPON.code)
   }, [autoApplyOff, appliedCode, diwaliSaving])
-  const grandTotal = total + deliveryFee - couponDiscount
-  const couponNote = couponApplied ? `, ${appliedCode} -₹${couponDiscount}` : ''
+  // MAQERSPL: delivery counted once for several products from the same seller.
+  // Applies on top of any coupon (it corrects the price, it isn't a promo).
+  const plDiscount = sellerDeliveryDiscount(items).total
+  const grandTotal = total + deliveryFee - couponDiscount - plDiscount
+  const plNote = plDiscount > 0 ? `, ${SELLER_DELIVERY_CODE} -₹${plDiscount}` : ''
+  const couponNote = (couponApplied ? `, ${appliedCode} -₹${couponDiscount}` : '') + plNote
 
   const applyCoupon = (code) => {
     if (!(couponSavings[code] > 0)) return
@@ -361,7 +365,7 @@ export default function Checkout() {
           items_list: buildItemsText(),
           subtotal: `₹${total.toLocaleString('en-IN')}`,
           delivery_fee: deliveryFee ? `₹${deliveryFee}` : 'FREE',
-          grand_total: `₹${grandTotal.toLocaleString('en-IN')}${couponApplied ? ` (${appliedCode} saved you ₹${couponDiscount})` : ''}`,
+          grand_total: `₹${grandTotal.toLocaleString('en-IN')}${couponApplied ? ` (${appliedCode} saved you ₹${couponDiscount})` : ''}${plDiscount > 0 ? ` (${SELLER_DELIVERY_CODE} saved you ₹${plDiscount})` : ''}`,
           upi_id: UPI_ID,
         },
         EMAILJS_PUBLIC_KEY
@@ -518,6 +522,7 @@ export default function Checkout() {
       items,
       payment_method: paymentMethod,
       ...(couponApplied && { coupon: appliedCode, discount: couponDiscount }),
+      ...(plDiscount > 0 && { seller_delivery_discount: plDiscount }),
     })
     clearCart()
     endLead()
@@ -587,6 +592,7 @@ export default function Checkout() {
       product_ids: items.map(i => i.id),
       items,
       payment_method: 'upi',
+      ...(plDiscount > 0 && { seller_delivery_discount: plDiscount }),
     })
     clearCart()
     setShowPaymentConfirm(false)
@@ -870,6 +876,12 @@ export default function Checkout() {
                   <div className="checkout-summary-row">
                     <span>Coupon ({appliedCode})</span>
                     <span className="checkout-coupon-discount">&minus;₹{couponDiscount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                {plDiscount > 0 && (
+                  <div className="checkout-summary-row">
+                    <span>Same-maker delivery ({SELLER_DELIVERY_CODE})</span>
+                    <span className="checkout-coupon-discount">&minus;₹{plDiscount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
                 {deliveryFee
