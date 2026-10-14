@@ -1443,8 +1443,6 @@
   .product-info-section .product-detail-price-original { font-size: 1rem; }
   .product-info-section .product-category-badge,
   .product-info-section .product-also-in { order: 19; }
-  .product-info-section .product-detail-description { order: 20; font-size: 0.95rem; }
-  .product-info-section .product-features { order: 21; }
 
   /* The old Add to Cart / Wishlist pair is replaced by the block below. */
   .product-info-section .product-actions { display: none; }
@@ -1529,7 +1527,9 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: calc(54px + env(safe-area-inset-bottom, 0px));
+    /* Exactly the bottom nav's height. The nav is a fixed 54px that already
+       includes the iPhone safe area, so adding the inset here left a gap. */
+    bottom: 54px;
     z-index: 997;
     padding: 0.5rem 0.75rem;
     background: var(--bg-primary, #faf6f2);
@@ -1608,10 +1608,13 @@
   cursor: pointer;
 }
 
-.pdp-accordion {
+/* The rows sit together: one line above the first, one under each */
+.pdp-accordions {
   border-top: 1px solid var(--rule-strong, #ddd3cb);
-  border-bottom: 1px solid var(--rule-strong, #ddd3cb);
   margin-top: 1.25rem;
+}
+.pdp-accordion {
+  border-bottom: 1px solid var(--rule-strong, #ddd3cb);
 }
 .pdp-accordion summary {
   list-style: none;
@@ -1640,3 +1643,21 @@
 .size-chart-table th { font-weight: 600; background: rgba(36, 27, 26, 0.03); }
 .size-chart-table th span { font-weight: 400; color: var(--ink-soft, #6b625b); }
 .size-chart-tip { margin: 0.6rem 0 0; font-size: 0.8rem; color: var(--ink-soft, #6b625b); }
+
+/* Content inside the rows */
+.pdp-accordion-body p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink-soft, #6b625b);
+}
+.pdp-accordion-body p a { color: var(--primary-color, #760909); font-weight: 600; }
+.pdp-accordion-body .product-detail-description { font-size: 0.95rem; color: var(--text-secondary); }
+.pdp-accordion-body .product-facts { margin-top: 0.1rem; }
+/* The timeline was its own card; inside a row it needs no frame of its own */
+.pdp-accordion .delivery-timeline { margin: 0; padding: 0.25rem 0 0; background: none; border: 0; }
+
+@media (max-width: 768px) {
+  /* Under the buy block, ahead of the category tag */
+  .product-info-section .pdp-accordions { order: 18; }
+}

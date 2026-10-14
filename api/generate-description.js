@@ -121,12 +121,14 @@ Return ONLY a valid JSON object in exactly this format:
 {
   "title_options": ["Best name", "Alternative name", "Alternative name"],
   "description": "The short description as described above",
+  "material": "Silk thread, kundan stones, brass",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
   "keywords": ["keyword phrase 1", "keyword phrase 2", "keyword phrase 3", "keyword phrase 4", "keyword phrase 5", "keyword phrase 6", "keyword phrase 7", "keyword phrase 8"]
 }
 
 Additional rules:
 - title_options: exactly 3 different names for THIS product, best first. See the naming rules below.
+- material: the main materials the product is made of, comma-separated, 1 to 5 items, title case, under 80 characters, no dashes. If the seller's additional details name the materials, use their words. Otherwise say only what you can actually see (fabric, thread, wood, glass, resin, wax, brass, beads, stones). Never claim a precious material (gold, silver, real gemstones, pearls) unless the details say so: write "gold tone", "silver tone", "stone-look" or "faux pearls" instead. If you cannot tell, return an empty string.
 - tags: 6–8 lowercase words or short phrases a buyer or social media post would use
 - keywords: 6–8 lowercase search phrases a real buyer would type into Google or an Indian e-commerce search bar
 
@@ -187,8 +189,9 @@ ${catalogSection}`
                 keywords: { type: 'array', items: { type: 'string' } },
                 title_options: { type: 'array', items: { type: 'string' } },
                 description: { type: 'string' },
+                material: { type: 'string' },
               },
-              required: ['tags', 'keywords', 'title_options', 'description'],
+              required: ['tags', 'keywords', 'title_options', 'description', 'material'],
               additionalProperties: false,
             },
           },
@@ -256,10 +259,19 @@ ${catalogSection}`
       ? `${cappedDescription}\n\n**What's inside:**\n${listItems.map(i => `• ${i}`).join('\n')}`
       : cappedDescription
 
+    // Same copy rules as the description: no dashes, tidy spacing, a sane length
+    const material = String(parsed.material || '')
+      .replace(/\s*[—–]\s*/g, ', ')
+      .replace(/\s+/g, ' ')
+      .replace(/,\s*,/g, ',')
+      .trim()
+      .slice(0, 100)
+
     return res.status(200).json({
       title: titleOptions[0] || '',
       titleOptions,
       description: finalDescription,
+      material,
       tags,
       keywords,
     })

@@ -247,6 +247,25 @@ function descLimitMessage(text) {
     ? `Description is ${n} words. Keep it to ${DESC_MAX_WORDS} or fewer (one to one and a half paragraphs).`
     : "";
 }
+// The AI's material suggestion fills the field only when it is empty, so a
+// material typed by hand is never overwritten by a regenerate.
+const fillMaterial = (p, r) => (p.material && p.material.trim()) ? p.material : (r.material || p.material || "");
+
+// Weight and material, shared by the Add and Edit forms. Material is filled in
+// by the AI when it writes the description (only if empty), and is editable.
+function ProductFeatureFields({ value, onChange, ts }) {
+  return (
+    <>
+      <label style={ts.label}>Weight <span style={ts.labelHint}>(optional, shown under Product Features)</span></label>
+      <input style={ts.input} placeholder="e.g. 250 g" value={value.weight || ""}
+        onChange={e => onChange({ weight: e.target.value })} />
+      <label style={ts.label}>Material <span style={ts.labelHint}>(optional, the AI suggests it when it writes the description; edit freely)</span></label>
+      <input style={ts.input} placeholder="e.g. Silk thread, kundan stones, brass" value={value.material || ""}
+        onChange={e => onChange({ material: e.target.value })} />
+    </>
+  );
+}
+
 // "Delivery included in the price?" block, shared by the Add and Edit forms.
 // Yes needs an amount; the amount feeds the MAQERSPL discount when several
 // such products from one seller are in a cart (data/offers.js).
@@ -513,6 +532,13 @@ function parseProducts(source) {
     const sqp = entry.match(/sellerQuotedPrice:\s*([\d.]+)/);
     if (sqp) p.sellerQuotedPrice = parseFloat(sqp[1]);
 
+    // Shown in the product page's "Product Features" row
+    const unq = (v) => v.replace(/\\"/g, '"').replace(/\\\\/g, "\\");
+    const wt = entry.match(/weight:\s*"((?:[^"\\]|\\.)*)"/);
+    if (wt) p.weight = unq(wt[1]);
+    const mt = entry.match(/material:\s*"((?:[^"\\]|\\.)*)"/);
+    if (mt) p.material = unq(mt[1]);
+
     // "Delivery included in the price" (see sellerDeliveryDiscount in data/offers.js)
     const di = entry.match(/deliveryIncluded:\s*(true|false)/);
     if (di) p.deliveryIncluded = di[1] === "true";
@@ -755,6 +781,13 @@ function buildEntry(id, product) {
     ? `, deliveryIncluded: true, deliveryAmount: ${deliveryAmountNum}${product.noDeliveryDiscount ? ", noDeliveryDiscount: true" : ""}`
     : '';
 
+  // Weight and material for the Product Features row; omitted when empty
+  const oneLine = (v) => sanitizeForJS(String(v ?? "").replace(/\s+/g, " ").trim());
+  const featuresPart = [
+    oneLine(product.weight) ? `, weight: "${oneLine(product.weight)}"` : "",
+    oneLine(product.material) ? `, material: "${oneLine(product.material)}"` : "",
+  ].join("");
+
   // If size-based pricing, auto-set product.price to the minimum size price
   let basePrice = Number(product.price);
   if (sizePricesStr && product.sizePrices) {
@@ -768,7 +801,7 @@ function buildEntry(id, product) {
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}"${r.image ? `, image: "${sanitizeForJS(r.image)}"` : ""} }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${deliveryPart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${deliveryPart}${featuresPart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -1022,7 +1055,7 @@ export default function AdminPortal() {
   const [toast, setToast] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishLog, setPublishLog] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, personalisation_options: [], personalisation_prices: [] });
+  const [newProduct, setNewProduct] = useState({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, weight: "", material: "", personalisation_options: [], personalisation_prices: [] });
   const [newColorInput, setNewColorInput] = useState("");
   const [newColorImageIdx, setNewColorImageIdx] = useState(0);
   const [newSizeInput, setNewSizeInput] = useState("");
@@ -1340,13 +1373,14 @@ export default function AdminPortal() {
         if (mode !== 'tags') setAiTitleOptions(r.titleOptions || []);
         setNewProduct(p => (
         mode === 'tags'
-          ? { ...p, tags: r.tags?.join(', ') || p.tags, keywords: r.keywords?.join(', ') || p.keywords }
+          ? { ...p, tags: r.tags?.join(', ') || p.tags, keywords: r.keywords?.join(', ') || p.keywords, material: fillMaterial(p, r) }
           : {
               ...p,
               title: r.title || p.title,
               description: r.description || p.description,
               tags: r.tags?.join(', ') || p.tags,
               keywords: r.keywords?.join(', ') || p.keywords,
+              material: fillMaterial(p, r),
             }
         ));
       },
@@ -1368,13 +1402,14 @@ export default function AdminPortal() {
         if (mode !== 'tags') setAiEditTitleOptions(r.titleOptions || []);
         setEditingProduct(p => (
         mode === 'tags'
-          ? { ...p, tags: r.tags?.length ? r.tags : p.tags, keywords: r.keywords?.length ? r.keywords : p.keywords }
+          ? { ...p, tags: r.tags?.length ? r.tags : p.tags, keywords: r.keywords?.length ? r.keywords : p.keywords, material: fillMaterial(p, r) }
           : {
               ...p,
               title: r.title || p.title,
               description: r.description || p.description,
               tags: r.tags?.length ? r.tags : p.tags,
               keywords: r.keywords?.length ? r.keywords : p.keywords,
+              material: fillMaterial(p, r),
             }
         ));
       },
@@ -1450,7 +1485,7 @@ export default function AdminPortal() {
         } catch {}
       }
       loadCatalogData(updated, sha);
-      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
+      setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, weight: "", material: "", personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
       setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput("");
       setImageFiles([]); setPreviewImgIndex(0); setProductStep("form");
       showToast(`"${newProduct.title}" published!`); setActiveTab("products");
@@ -2637,6 +2672,7 @@ export default function AdminPortal() {
                           )}
                         </div>
                       )}
+                      <ProductFeatureFields ts={ts} value={newProduct} onChange={patch => setNewProduct(p => ({ ...p, ...patch }))} />
                       <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                       <input style={ts.input} type="number" placeholder="e.g. 15" value={newProduct.moq}
                         onChange={e => setNewProduct(p => ({ ...p, moq: e.target.value }))} />
@@ -2873,7 +2909,7 @@ export default function AdminPortal() {
                     if (!newProduct.price || isNaN(Number(newProduct.price)) || Number(newProduct.price) <= 0) return setFormError("Valid price required.");
                     if (imageFiles.length === 0) return setFormError("Upload at least one image.");
                     setProductQueue(q => [...q, { ...newProduct, _imageFiles: imageFiles }]);
-                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
+                    setNewProduct({ title: "", categoryId: "", description: "", price: "", originalPrice: "", tags: "", keywords: "", occasions: [], colors: [], sizes: [], sizePrices: {}, moq: "", delivery_time: "", inStock: true, popular: false, featured: false, secondaryCategories: [], sellerId: "", sellerCode: "", sellerQuotedPrice: "", deliveryIncluded: false, deliveryAmount: "", noDeliveryDiscount: false, weight: "", material: "", personalisation_options: [], personalisation_prices: [] }); setAiTitleOptions([]);
                     setNewColorInput(""); setNewColorImageIdx(0); setNewSizeInput(""); setImageFiles([]); setPreviewImgIndex(0);
                     showToast("Added to queue!", "info");
                   }}>+ Add to Queue</button>
@@ -2920,6 +2956,8 @@ export default function AdminPortal() {
                       ["Dispatch Time", newProduct.delivery_time || "none"],
                       ["MOQ", newProduct.moq || "none"],
                       ["Seller Quoted Price", newProduct.sellerQuotedPrice ? `Rs.${newProduct.sellerQuotedPrice}` : "none"],
+                      ["Weight", newProduct.weight || "none"],
+                      ["Material", newProduct.material || "none"],
                       ["Delivery in price", newProduct.deliveryIncluded && Number(newProduct.deliveryAmount) > 0 ? `Yes, Rs.${newProduct.deliveryAmount}${newProduct.noDeliveryDiscount ? " (no shared-delivery discount)" : ""}` : "No"],
                       ["Also in", (newProduct.secondaryCategories||[]).map(id => categories.find(c=>c.id===id)?.name).filter(Boolean).join(", ") || "none"],
                       ["Occasions", newProduct.occasions.map(o => (occasionCatalogEntries.find(oc => oc.id === o) || occasionCategories.find(oc => oc.id === o))?.name).filter(Boolean).join(", ") || "None"],
@@ -3230,6 +3268,7 @@ export default function AdminPortal() {
                               )}
                             </div>
                           )}
+                          <ProductFeatureFields ts={ts} value={editingProduct} onChange={patch => setEditingProduct(p => ({ ...p, ...patch }))} />
                           <label style={ts.label}>Minimum Order Quantity <span style={ts.labelHint}>(optional)</span></label>
                           <input style={ts.input} type="number" placeholder="e.g. 15" value={editingProduct.moq || ""}
                             onChange={e => setEditingProduct(p => ({ ...p, moq: e.target.value }))} />

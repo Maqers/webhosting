@@ -487,6 +487,17 @@ const ProductDetail = () => {
   )
   const handleMouseLeave = useCallback(() => setLensVisible(false), [])
 
+  // Product Features rows: only what this product actually has (set in the admin)
+  const productFeatures = useMemo(() => {
+    if (!product) return []
+    const m = product.meta || {}
+    const rows = []
+    if (m.material?.trim()) rows.push({ label: 'Material', value: m.material.trim() })
+    if (m.weight?.trim()) rows.push({ label: 'Weight', value: m.weight.trim() })
+    if (m.sizes?.length) rows.push({ label: 'Size', value: m.sizes.join(', ') })
+    return rows
+  }, [product])
+
   if (!product) {
     return (
       <div className="product-not-found">
@@ -678,7 +689,6 @@ const ProductDetail = () => {
             )}
 
             <h1 className="product-detail-title">{product.title}</h1>
-            <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
 
             <div className="price-section">
               {(() => {
@@ -866,59 +876,90 @@ const ProductDetail = () => {
               {selectionError && <p className="selection-error-note">{selectionError}</p>}
             </div>
 
-            {/* Delivery timeline — below actions */}
-            <div className="delivery-timeline">
-              <div className="dtl-step">
-                <div className="dtl-icon dtl-icon--done">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div className="dtl-label">{deliveryTimeline.orderDate}</div>
-                <div className="dtl-sublabel">Order Placed</div>
-              </div>
-              <div className="dtl-line"><span className="dtl-line-label">Crafting</span></div>
-              <div className="dtl-step">
-                <div className="dtl-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                </div>
-                <div className="dtl-label">{deliveryTimeline.dispatchStr}</div>
-                <div className="dtl-sublabel">Dispatched</div>
-              </div>
-              <div className="dtl-line"><span className="dtl-line-label">Shipping</span></div>
-              <div className="dtl-step">
-                <div className="dtl-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                </div>
-                <div className="dtl-label">{deliveryTimeline.deliveryStr}</div>
-                <div className="dtl-sublabel">Delivered</div>
-              </div>
-            </div>
-
-            <div className="no-returns-note">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
-            </div>
-
-            {hasBangleSizes(product) && (
-              <details className="pdp-accordion" ref={sizeChartRef}>
-                <summary>Size chart</summary>
+            {/* Collapsible rows: Description (open), Product Features, Size chart
+                (bangles), Exchange and Return Policy, Delivery Timeline */}
+            <div className="pdp-accordions">
+              <details className="pdp-accordion" open>
+                <summary>Description</summary>
                 <div className="pdp-accordion-body">
-                  <table className="size-chart-table">
-                    <thead>
-                      <tr><th rowSpan={2}>Bangle size<br /><span>(Indian)</span></th><th colSpan={2}>Inner diameter</th></tr>
-                      <tr><th>inches</th><th>cm</th></tr>
-                    </thead>
-                    <tbody>
-                      {BANGLE_SIZE_CHART.map(r => (
-                        <tr key={r.size}><td>{r.size}</td><td>{r.inches}</td><td>{r.cm}</td></tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <p className="size-chart-tip">Measure the inside of a bangle that fits you well, then pick the closest size.</p>
+                  <p className="product-detail-description" dangerouslySetInnerHTML={{ __html: formatDescriptionHtml(product.description) }} />
                 </div>
               </details>
-            )}
+
+              {productFeatures.length > 0 && (
+                <details className="pdp-accordion">
+                  <summary>Product Features</summary>
+                  <div className="pdp-accordion-body">
+                    <dl className="product-facts">
+                      {productFeatures.map(f => (
+                        <div className="product-fact" key={f.label}>
+                          <dt>{f.label}</dt>
+                          <dd>{f.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </details>
+              )}
+
+              {hasBangleSizes(product) && (
+                <details className="pdp-accordion" ref={sizeChartRef}>
+                  <summary>Size chart</summary>
+                  <div className="pdp-accordion-body">
+                    <table className="size-chart-table">
+                      <thead>
+                        <tr><th rowSpan={2}>Bangle size<br /><span>(Indian)</span></th><th colSpan={2}>Inner diameter</th></tr>
+                        <tr><th>inches</th><th>cm</th></tr>
+                      </thead>
+                      <tbody>
+                        {BANGLE_SIZE_CHART.map(r => (
+                          <tr key={r.size}><td>{r.size}</td><td>{r.inches}</td><td>{r.cm}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="size-chart-tip">Measure the inside of a bangle that fits you well, then pick the closest size.</p>
+                  </div>
+                </details>
+              )}
+
+              <details className="pdp-accordion">
+                <summary>Exchange and Return Policy</summary>
+                <div className="pdp-accordion-body">
+                  <p>This piece is handcrafted especially for you, so we don't accept returns or exchanges. If it arrives damaged, defective, or incorrect, share an unedited unboxing video with us within 48 hours and we'll arrange a pickup and return. <Link to="/policies">Read our full policy</Link></p>
+                </div>
+              </details>
+
+              <details className="pdp-accordion">
+                <summary>Delivery Timeline</summary>
+                <div className="pdp-accordion-body">
+                  <div className="delivery-timeline">
+                    <div className="dtl-step">
+                      <div className="dtl-icon dtl-icon--done">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div className="dtl-label">{deliveryTimeline.orderDate}</div>
+                      <div className="dtl-sublabel">Order Placed</div>
+                    </div>
+                    <div className="dtl-line"><span className="dtl-line-label">Crafting</span></div>
+                    <div className="dtl-step">
+                      <div className="dtl-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                      </div>
+                      <div className="dtl-label">{deliveryTimeline.dispatchStr}</div>
+                      <div className="dtl-sublabel">Dispatched</div>
+                    </div>
+                    <div className="dtl-line"><span className="dtl-line-label">Shipping</span></div>
+                    <div className="dtl-step">
+                      <div className="dtl-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                      </div>
+                      <div className="dtl-label">{deliveryTimeline.deliveryStr}</div>
+                      <div className="dtl-sublabel">Delivered</div>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
 
           </div>
 
