@@ -64,7 +64,29 @@ function buildGa4Items(props) {
   return []
 }
 
+// Google Ads "PURCHASE (2)" conversion: Ads counts this event name when the
+// site's Google tag sends it to the Ads account. The tag is loaded by GTM, so
+// the event must name its destination (send_to) or the tag ignores it. Sent as
+// a gtag command through dataLayer, the queue GTM's Google tag reads, so it
+// also works if called before analytics has finished loading.
+const ADS_PURCHASE_EVENT = 'conversion_event_purchase_2'
+const ADS_ACCOUNT = 'AW-18420008750'
+
+function gtagCommand() {
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push(arguments) // eslint-disable-line prefer-rest-params
+}
+
 export function trackEvent(name, props = {}) {
+  if (name === 'Purchase' && props.order_id) {
+    gtagCommand('event', ADS_PURCHASE_EVENT, {
+      send_to: ADS_ACCOUNT,
+      value: Number(props.value) || 0,
+      currency: 'INR',
+      transaction_id: String(props.order_id), // Ads de-duplicates on this
+    })
+  }
+
   const { items, ...posthogProps } = props
   if (initialized) posthog.capture(name, posthogProps)
 
