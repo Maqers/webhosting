@@ -1007,3 +1007,24 @@
 .about-section > h2,
 .about-content > .about-section > h2 { margin-inline: 0; }
 .founders-copy p { margin-inline: 0; }
+
+/* ── Phones: founders block ─────────────────────────────────────────────────
+   The photo column is a fixed 300px plus a 3rem gap, which on a 390px screen
+   left the text a sliver at the edge. Stack it: photo first, text below, and
+   drop the extra side inset so it lines up with the sections around it. */
+@media (max-width: 768px) {
+  .founders-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .founders-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+    margin-top: 1.25rem;
+  }
+  .polaroid {
+    justify-self: center;
+    width: fit-content;
+    max-width: 100%;
+  }
+}
