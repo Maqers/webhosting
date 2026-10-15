@@ -14,6 +14,7 @@ import AdminCalendar from "./AdminCalendar";
 import AdminImageEditor from "./AdminImageEditor";
 import AdminLeads from "./AdminLeads";
 import AdminFeatures from "./AdminFeatures";
+import { THREAD_COLOURS, THREAD_COLOUR_NAMES } from "../data/threadColours";
 
 // Occasion categories are parsed dynamically from catalog.js occasionProductMap
 // — no hardcoded list needed anymore
@@ -268,16 +269,6 @@ function descLimitMessage(text) {
 // The AI's material suggestion fills the field only when it is empty, so a
 // material typed by hand is never overwritten by a regenerate.
 const fillMaterial = (p, r) => (p.material && p.material.trim()) ? p.material : (r.material || p.material || "");
-
-// The silk-thread shade card (two photos of the spools), grouped so the
-// dropdown is quick to scan. Names are the ones printed on the card.
-const THREAD_COLOURS = [
-  ["Pinks & oranges", ["Baby Pink", "Pink", "Hot Pink", "Peach", "Onion", "Dark Onion", "Orange", "Yellow"]],
-  ["Purples & reds", ["Violet", "Light Purple", "Purple", "Light Magenta", "Magenta", "Red", "Maroon", "Black"]],
-  ["Blues & greens", ["Sky Blue", "Peacock Blue", "Royal Blue", "Dark Blue", "Rama Green", "Light Turquoise", "Turquoise", "Mint Green", "Parrot Green", "Green"]],
-  ["Olives, golds & browns", ["Olive", "Light Olive", "Bronze", "Brown", "Gold", "Bright Gold"]],
-];
-const THREAD_COLOUR_NAMES = THREAD_COLOURS.flatMap(([, names]) => names);
 
 // Colour name for the Colour Options row: pick a shade from the dropdown, or
 // type any other colour. The dropdown just fills the text box, so everything

@@ -1,3 +1,4 @@
+import { THREAD_COLOUR_NAMES } from '../src/data/threadColours.js'
 // Generic words that made every title read the same. Matches whole words only.
 const BANNED_TITLE_WORDS = /\b(festive|festival|diwali|celebrations?|delight(ful)?|utsav|shubh|artisan(al)?|handcrafted|handmade|vibrant|elegant|beautiful|exquisite|unique|premium|luxury|gifts?)\b/i
 
@@ -245,6 +246,7 @@ Naming rules for title_options (the catalog is full of names like "Festive Diwal
   crafts and objects: Lippan, Meenakari, Zari, Gota, Kantha, Bandhani, Dokra, Jharokha, Toran, Urli, Thali, Potli, Kalash
   moods and moments: Chandni, Roshni, Noor, Saanjh, Aangan, Mehfil, Rangoli, Jhilmil, Barsaat, Sukoon
   English works too when it is specific and vivid (Lotus, Peacock, Marigold, Moonlit, Mirrorwork).
+- Silk-thread pieces (bangles, kadas, jhumkas, tassels, thread work): when you name the colour, use the shade name from our thread card that matches best, written exactly as listed here: ${THREAD_COLOUR_NAMES.join(', ')}. For example "Peacock Blue Kamal Bangle Set". Fall back to the Indian colour names above only if no card shade fits.
 - Only use a colour word if that colour clearly dominates the piece, and a motif only if it is visibly there. Accuracy beats flourish.
 - Never use these words in a title: Festive, Festival, Diwali, Celebration, Delight, Delightful, Utsav, Shubh, Artisan, Artisanal, Handcrafted, Handmade, Vibrant, Elegant, Beautiful, Exquisite, Unique, Premium, Luxury, Gift (Hamper, Box, Basket are fine as the product type). Occasion words belong in tags and keywords, not the name.
 - Make the 3 options genuinely different from each other: lead with a different evocative word in each.
