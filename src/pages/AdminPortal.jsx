@@ -126,11 +126,12 @@ async function ghPut(path, content, message, sha, creds) {
   throw new Error(lastError);
 }
 
-// "16 Oct 2026, 3:42 pm" in the viewer's own time zone; empty for no/bad value
+// "16 Oct 2026": the day only, in the viewer's own time zone (the stored stamp
+// keeps the time so same-day uploads still sort in order); empty for no/bad value
 function formatAddedAt(iso) {
   const d = new Date(iso || "");
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true });
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
 // ─── Sellers (via /api/sellers) ─────────────────────────────────────────────────────────────
@@ -3164,7 +3165,7 @@ export default function AdminPortal() {
                       </div>
                     </div>
                     <span style={{ flex: 1.2, fontSize: 12, color: p.addedAt ? "#555" : "#bbb", lineHeight: 1.35 }}
-                      title={p.addedAt ? new Date(p.addedAt).toString() : "Added before upload dates were recorded"}>
+                      title={p.addedAt ? `Added ${new Date(p.addedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}` : "Upload date unknown"}>
                       {formatAddedAt(p.addedAt) || "—"}
                     </span>
                     <span style={{ flex: 1, fontSize: 13 }}>Rs.{p.price}</span>
