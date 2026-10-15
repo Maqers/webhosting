@@ -269,6 +269,38 @@ function descLimitMessage(text) {
 // material typed by hand is never overwritten by a regenerate.
 const fillMaterial = (p, r) => (p.material && p.material.trim()) ? p.material : (r.material || p.material || "");
 
+// The silk-thread shade card (two photos of the spools), grouped so the
+// dropdown is quick to scan. Names are the ones printed on the card.
+const THREAD_COLOURS = [
+  ["Pinks & oranges", ["Baby Pink", "Pink", "Hot Pink", "Peach", "Onion", "Dark Onion", "Orange", "Yellow"]],
+  ["Purples & reds", ["Violet", "Light Purple", "Purple", "Light Magenta", "Magenta", "Red", "Maroon", "Black"]],
+  ["Blues & greens", ["Sky Blue", "Peacock Blue", "Royal Blue", "Dark Blue", "Rama Green", "Light Turquoise", "Turquoise", "Mint Green", "Parrot Green", "Green"]],
+  ["Olives, golds & browns", ["Olive", "Light Olive", "Bronze", "Brown", "Gold", "Bright Gold"]],
+];
+const THREAD_COLOUR_NAMES = THREAD_COLOURS.flatMap(([, names]) => names);
+
+// Colour name for the Colour Options row: pick a shade from the dropdown, or
+// type any other colour. The dropdown just fills the text box, so everything
+// downstream (Enter key, the + button) works exactly as before.
+function ColourPicker({ value, onChange, onKeyDown, placeholder, ts }) {
+  return (
+    <>
+      <select style={{ ...ts.input, width: 168, marginTop: 0, flexShrink: 0 }} aria-label="Pick a thread colour"
+        value={THREAD_COLOUR_NAMES.includes(value) ? value : ""}
+        onChange={e => onChange(e.target.value)}>
+        <option value="">Pick a colour ▾</option>
+        {THREAD_COLOURS.map(([group, names]) => (
+          <optgroup key={group} label={group}>
+            {names.map(n => <option key={n} value={n}>{n}</option>)}
+          </optgroup>
+        ))}
+      </select>
+      <input style={{ ...ts.input, flex: 1, marginTop: 0, minWidth: 0 }} placeholder={placeholder}
+        value={value} onChange={e => onChange(e.target.value)} onKeyDown={onKeyDown} />
+    </>
+  );
+}
+
 // Weight and material, shared by the Add and Edit forms. Material is filled in
 // by the AI when it writes the description (only if empty), and is editable.
 function ProductFeatureFields({ value, onChange, ts }) {
@@ -2642,8 +2674,8 @@ export default function AdminPortal() {
                         onChange={e => setNewProduct(p => ({ ...p, keywords: e.target.value }))} />
                       <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional — links to product image)</span></label>
                       <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                        <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="e.g. Red"
-                          value={newColorInput} onChange={e => setNewColorInput(e.target.value)}
+                        <ColourPicker ts={ts} placeholder="e.g. Red"
+                          value={newColorInput} onChange={setNewColorInput}
                           onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = newColorInput.trim(); if (v) { setNewProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: newColorImageIdx }] })); setNewColorInput(""); setNewColorImageIdx(0); } } }} />
                         <select style={{ ...ts.input, width: 100, marginTop: 0 }} value={newColorImageIdx}
                           onChange={e => setNewColorImageIdx(Number(e.target.value))}>
@@ -3232,9 +3264,8 @@ export default function AdminPortal() {
                             onChange={e => setEditingProduct(p => ({ ...p, keywords: e.target.value.split(",").map(k => k.trim()).filter(Boolean) }))} />
                           <label style={ts.label}>Colour Options <span style={ts.labelHint}>(optional)</span></label>
                           <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                            <input style={{ ...ts.input, flex: 1, marginTop: 0 }} placeholder="Add a colour"
-                              value={editColorInput}
-                              onChange={e => setEditColorInput(e.target.value)}
+                            <ColourPicker ts={ts} placeholder="Add a colour"
+                              value={editColorInput} onChange={setEditColorInput}
                               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); const v = editColorInput.trim(); if (v) { setEditingProduct(p => ({ ...p, colors: [...(p.colors||[]), { name: v, imageIndex: editColorImageIdx }] })); setEditColorInput(""); setEditColorImageIdx(0); } } }} />
                             <select style={{ ...ts.input, width: 110, marginTop: 0 }} value={editColorImageIdx}
                               onChange={e => setEditColorImageIdx(Number(e.target.value))}>
