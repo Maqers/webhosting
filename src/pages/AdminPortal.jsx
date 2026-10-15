@@ -126,6 +126,13 @@ async function ghPut(path, content, message, sha, creds) {
   throw new Error(lastError);
 }
 
+// "16 Oct 2026, 3:42 pm" in the viewer's own time zone; empty for no/bad value
+function formatAddedAt(iso) {
+  const d = new Date(iso || "");
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true });
+}
+
 // ─── Sellers (via /api/sellers) ─────────────────────────────────────────────────────────────
 
 // Seller records and KYC files are private, so the browser no longer touches
@@ -580,6 +587,11 @@ function parseProducts(source) {
     const mt = entry.match(/material:\s*"((?:[^"\\]|\\.)*)"/);
     if (mt) p.material = unq(mt[1]);
 
+    // When the product was uploaded (ISO, UTC). Products added before this was
+    // tracked simply have none.
+    const aa = entry.match(/addedAt:\s*"([^"]*)"/);
+    if (aa) p.addedAt = aa[1];
+
     // "Delivery included in the price" (see sellerDeliveryDiscount in data/offers.js)
     const di = entry.match(/deliveryIncluded:\s*(true|false)/);
     if (di) p.deliveryIncluded = di[1] === "true";
@@ -822,6 +834,9 @@ function buildEntry(id, product) {
     ? `, deliveryIncluded: true, deliveryAmount: ${deliveryAmountNum}${product.noDeliveryDiscount ? ", noDeliveryDiscount: true" : ""}`
     : '';
 
+  // Upload time, kept on every re-save; written only when it is a valid ISO stamp
+  const addedAtPart = /^\d{4}-\d\d-\d\dT[\d:.]+Z$/.test(product.addedAt || "") ? `, addedAt: "${product.addedAt}"` : "";
+
   // Weight and material for the Product Features row; omitted when empty
   const oneLine = (v) => sanitizeForJS(String(v ?? "").replace(/\s+/g, " ").trim());
   const featuresPart = [
@@ -842,7 +857,7 @@ function buildEntry(id, product) {
   const reviewsPart = (product.reviews && product.reviews.length > 0)
     ? `, reviews: [${product.reviews.map(r => `{ name: "${sanitizeForJS(r.name)}", rating: ${Number(r.rating)}, text: "${sanitizeForJS(r.text||"")}", date: "${sanitizeForJS(r.date||"")}"${r.image ? `, image: "${sanitizeForJS(r.image)}"` : ""} }`).join(", ")}]`
     : "";
-  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${deliveryPart}${featuresPart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
+  return `    { id: ${id}, categoryId: "${product.categoryId}", title: "${title}", slug: "${slug}", description: "${desc}", price: ${basePrice}, images: [${images}], popular: ${!!product.popular}, featured: ${!!product.featured}, inStock: ${!!product.inStock}, tags: [${tags}], meta: { keywords: [${keywords}], colors: [${colors}], sizes: [${sizes}]${sizePricesPart}${originalPricePart}, moq: ${moq}, delivery_time: "${deliveryTime}", secondaryCategories: [${secCats}], sellerId: ${sellerId}, sellerCode: ${sellerCode}${sellerQuotedPricePart}${deliveryPart}${featuresPart}${addedAtPart}${personalisationPart}${personalisationPricesPart}${reviewsPart} } },`;
 }
 
 function insertProductIntoSource(source, product, id) {
@@ -1135,6 +1150,7 @@ export default function AdminPortal() {
   const [productFilter, setProductFilter] = useState("");
   const [productFilterCat, setProductFilterCat] = useState("all");
   const [productFlagFilter, setProductFlagFilter] = useState("all");
+  const [productSort, setProductSort] = useState("default"); // default | newest | oldest
   const [pendingChanges, setPendingChanges] = useState({});
   const [editingCategory, setEditingCategory] = useState(null);
   const [newCategory, setNewCategory] = useState({ name: "", description: "", icon: "gift" });
@@ -1515,7 +1531,7 @@ export default function AdminPortal() {
         }
         reviews.push(review);
       }
-      const fullProduct = { ...newProduct, price: Number(newProduct.price), images: imagePaths, reviews };
+      const fullProduct = { ...newProduct, price: Number(newProduct.price), images: imagePaths, reviews, addedAt: new Date().toISOString() };
       let updated = insertProductIntoSource(source, fullProduct, newId);
       for (const occ of (newProduct.occasions || [])) {
         updated = updated.replace(
@@ -1566,7 +1582,7 @@ export default function AdminPortal() {
           }
           await sleep(350);
         }
-        const fullProduct = { ...qp, price: Number(qp.price), images: imagePaths };
+        const fullProduct = { ...qp, price: Number(qp.price), images: imagePaths, addedAt: new Date().toISOString() };
         source = insertProductIntoSource(source, fullProduct, currentId);
         for (const occ of (qp.occasions || [])) {
           source = source.replace(
@@ -2187,7 +2203,17 @@ export default function AdminPortal() {
       "in-stock": r => r.inStock,
       "out-of-stock": r => !r.inStock,
     }[productFlagFilter] || (() => true);
-    return rows.filter(test);
+    const filtered = rows.filter(test);
+    if (productSort === "default") return filtered;
+    // By upload time. Products from before it was tracked have no time: they sort
+    // as oldest, and by ID among themselves (IDs only ever count up).
+    const when = r => { const t = Date.parse(r.p.addedAt || ""); return Number.isNaN(t) ? -Infinity : t; };
+    const dir = productSort === "newest" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      const ta = when(a), tb = when(b);
+      if (ta !== tb) return ta === -Infinity ? -dir : tb === -Infinity ? dir : (ta - tb) * dir;
+      return (a.p.id - b.p.id) * dir;
+    });
   }
 
   // ── Seller functions ─────────────────────────────────────────────────────────
@@ -3088,11 +3114,17 @@ export default function AdminPortal() {
                 <option value="in-stock">In stock</option>
                 <option value="out-of-stock">Out of stock</option>
               </select>
+              <select style={{ ...ts.input, width: 190, margin: 0 }} value={productSort} onChange={e => setProductSort(e.target.value)} aria-label="Sort products">
+                <option value="default">Sort: Default order</option>
+                <option value="newest">Sort: Newest added</option>
+                <option value="oldest">Sort: Oldest added</option>
+              </select>
             </div>
 
             <div style={ts.productTable}>
               <div style={ts.productTableHeader}>
-                <span style={{ flex: 3 }}>Product {productFilterCat !== "all" && <span style={{ fontSize: 10, color: "#c8a96e", marginLeft: 6 }}>⠿ drag to reorder</span>}</span>
+                <span style={{ flex: 3 }}>Product {productFilterCat !== "all" && productSort === "default" && <span style={{ fontSize: 10, color: "#c8a96e", marginLeft: 6 }}>⠿ drag to reorder</span>}</span>
+                <span style={{ flex: 1.2 }}>Added</span>
                 <span style={{ flex: 1 }}>Price</span>
                 <span style={{ flex: 1 }}>Stock</span>
                 <span style={{ flex: 1 }}>Popular</span>
@@ -3112,13 +3144,13 @@ export default function AdminPortal() {
                 return (
                   <React.Fragment key={row.key}>
                   <div
-                    draggable={productFilterCat !== "all"}
+                    draggable={productFilterCat !== "all" && productSort === "default"}
                     onDragStart={e => handleDragStart(e, product.id)}
                     onDragOver={e => handleDragOver(e, product.id)}
                     onDrop={handleDragEnd}
                     onDragEnd={handleDragEnd}
                     style={{ ...ts.productTableRow, background: isDirty ? "#fffbf3" : draggingId === product.id ? "#e8f0fe" : "#fff", opacity: draggingId === product.id ? 0.5 : 1, borderBottom: isEditingThis ? "none" : undefined }}>
-                    {productFilterCat !== "all" && (
+                    {productFilterCat !== "all" && productSort === "default" && (
                       <span title="Drag to reorder" style={{ cursor: "grab", color: "#ccc", fontSize: 18, marginRight: 8, flexShrink: 0, userSelect: "none" }}>⠿</span>
                     )}
                     <div style={{ flex: 3, display: "flex", alignItems: "center", gap: 10 }}>
@@ -3131,6 +3163,10 @@ export default function AdminPortal() {
                         <p style={{ margin: 0, fontSize: 11, color: "#999" }}>{categories.find(c => c.id === p.categoryId)?.name} · ID {p.id}</p>
                       </div>
                     </div>
+                    <span style={{ flex: 1.2, fontSize: 12, color: p.addedAt ? "#555" : "#bbb", lineHeight: 1.35 }}
+                      title={p.addedAt ? new Date(p.addedAt).toString() : "Added before upload dates were recorded"}>
+                      {formatAddedAt(p.addedAt) || "—"}
+                    </span>
                     <span style={{ flex: 1, fontSize: 13 }}>Rs.{p.price}</span>
                     <span style={{ flex: 1 }}>
                       <button onClick={() => handleToggleFlag(product, "inStock")}
