@@ -63,6 +63,23 @@ async function ghGet(path, creds) {
   return res.json();
 }
 
+// What went wrong at sign-in, in words, so "Could not connect" isn't the only
+// clue. Pasted tokens often carry a trailing space or newline (trimmed in
+// handleLogin) and a blocked or offline connection looks nothing like a bad token.
+function describeLoginFailure(err, c) {
+  const msg = String(err?.message || err || "");
+  const status = Number((msg.match(/\((\d{3})\)/) || [])[1]) || 0;
+  const repo = `${c.owner}/${c.repo}`;
+  if (err instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(msg)) {
+    return "Could not reach GitHub from this browser. Check the internet connection, and turn off any VPN or ad/privacy blocker for this page.";
+  }
+  if (status === 401) return "GitHub rejected this token (401). It may be expired, revoked or copied wrongly. Create a new token and paste it again.";
+  if (status === 403) return "GitHub refused access (403). The token may need approval for the Maqers organisation (Authorize SSO), or GitHub is rate-limiting this connection for a few minutes.";
+  if (status === 404) return `GitHub could not find ${repo} on branch "${c.branch}" with this token (404). Check owner, repo and branch, and that the token has access to the repository.`;
+  if (status) return `GitHub returned an error (${status}). Try again, or create a new token.`;
+  return `Signed in to GitHub, but the catalog could not be read: ${msg.slice(0, 140) || "unknown error"}`;
+}
+
 // Size in bytes of a base64 string, for comparing with GitHub's `size`
 const base64Bytes = (b64) => {
   const clean = String(b64).replace(/\s/g, "");
@@ -1159,11 +1176,17 @@ export default function AdminPortal() {
     e.preventDefault();
     setLoginError(""); setLoginLoading(true);
     try {
-      const c = { token: loginForm.token, owner: loginForm.owner, repo: loginForm.repo, branch: loginForm.branch };
+      const c = { token: loginForm.token.trim(), owner: loginForm.owner.trim(), repo: loginForm.repo.trim(), branch: loginForm.branch.trim() };
       const { source, sha } = await fetchCatalog(c);
       sessionStorage.setItem("maqers_admin_creds", JSON.stringify(c));
       setCreds(c); loadCatalogData(source, sha, c); setStep("app");
-    } catch { setLoginError("Could not connect. Check your token, owner, repo, and branch."); }
+      // Reading works for any valid token on a public repo, saving needs push
+      // access. Say so now rather than when the first save fails.
+      fetch(`https://api.github.com/repos/${c.owner}/${c.repo}`, { headers: { Authorization: `Bearer ${c.token}`, Accept: "application/vnd.github+json" } })
+        .then(r => r.ok ? r.json() : null)
+        .then(info => { if (info && info.permissions && info.permissions.push === false) showToast("This token can read the catalog but not save changes. It needs Contents: Read and write on this repository.", "error"); })
+        .catch(() => {});
+    } catch (err) { setLoginError(describeLoginFailure(err, { token: "", owner: loginForm.owner.trim(), repo: loginForm.repo.trim(), branch: loginForm.branch.trim() })); }
     finally { setLoginLoading(false); }
   }
 
@@ -2144,7 +2167,12 @@ export default function AdminPortal() {
   async function loadSellers() {
     setSellersLoading(true);
     try { setSellers(await sbGetSellers()); }
-    catch (err) { showToast("Could not load sellers: " + err.message, "error"); }
+    catch (err) {
+      // /api/sellers only answers a GitHub token that can push to the repo
+      showToast(/Not authorised/i.test(err.message)
+        ? "Your GitHub token can read the catalog but can't save changes or open Sellers and Leads. It needs Contents: Read and write on this repository."
+        : "Could not load sellers: " + err.message, "error");
+    }
     finally { setSellersLoading(false); }
   }
 
