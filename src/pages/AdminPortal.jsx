@@ -1711,6 +1711,11 @@ export default function AdminPortal() {
     if (edited.description !== original?.description && descLimitMessage(edited.description)) {
       return showToast(descLimitMessage(edited.description), "error");
     }
+    // Every product needs a seller (the Add form already insists). Products
+    // that have one are untouched by this; only an unlinked product is stopped.
+    if (!String(edited.sellerId || "").trim() && !String(edited.sellerCode || "").trim()) {
+      return showToast("Select a seller before saving this product.", "error");
+    }
     setPendingChanges(prev => ({ ...prev, [edited.id]: edited }));
     setEditingProduct(null); setEditImageFiles([]);
     if (viewingSeller) { setProductFilter(""); setActiveTab("sellers"); }
@@ -3425,8 +3430,8 @@ export default function AdminPortal() {
                               </div>
                             )}
                           </div>
-                          <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(optional)</span></label>
-                          <select style={ts.input} value={editingProduct.sellerId || ""}
+                          <label style={ts.label}>Seller / Maker <span style={ts.labelHint}>(required)</span></label>
+                          <select style={{ ...ts.input, ...(!editingProduct.sellerId && !editingProduct.sellerCode ? { borderColor: "#c0392b" } : null) }} required value={editingProduct.sellerId || ""}
                             onChange={e => {
                               const sel = sellers.find(s => s.id === e.target.value);
                               setEditingProduct(p => ({ ...p, sellerId: e.target.value, sellerCode: sel?.seller_code || "" }));
@@ -3434,6 +3439,9 @@ export default function AdminPortal() {
                             <option value="">— Select seller —</option>
                             {sellers.map(s => <option key={s.id} value={s.id}>{s.seller_code ? `${s.seller_code} — ` : ""}{s.business_name}</option>)}
                           </select>
+                          {!editingProduct.sellerId && !editingProduct.sellerCode && (
+                            <p style={{ ...ts.fieldHint, color: "#c0392b", fontStyle: "normal" }}>This product has no seller yet. Pick one to save it.</p>
+                          )}
                           <button type="button" style={{ ...ts.ghostBtn, padding: "6px 12px", fontSize: 11, marginTop: 4 }}
                             onClick={() => setShowInlineAddSeller(s => !s)}>
                             {showInlineAddSeller ? "Cancel new seller" : "+ Create new seller"}
