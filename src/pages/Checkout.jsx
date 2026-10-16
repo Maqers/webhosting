@@ -177,7 +177,7 @@ export default function Checkout() {
 
   const [form, setForm] = useState({
     name: '', email: '', phone: user?.phone ? user.phone.replace(/^\+91/, '') : '',
-    address: '', city: '', pincode: '', state: '',
+    address: '', address2: '', city: '', pincode: '', state: '',
   })
   const [paymentMethod, setPaymentMethod] = useState('upi')
   const [errors, setErrors] = useState({})
@@ -192,6 +192,29 @@ export default function Checkout() {
   const [payRevealed, setPayRevealed] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const fullAddress = [form.address.trim(), form.address2.trim()].filter(Boolean).join(', ')
+
+  // Fill state (and city, if still empty) from a 6-digit PIN code. If the lookup
+  // fails the shopper just types the state as before.
+  useEffect(() => {
+    if (!/^\d{6}$/.test(form.pincode)) return
+    const ctrl = new AbortController()
+    fetch(`https://api.postalpincode.in/pincode/${form.pincode}`, { signal: ctrl.signal })
+      .then(r => r.json())
+      .then(data => {
+        const office = data?.[0]?.Status === 'Success' ? data[0].PostOffice?.[0] : null
+        if (!office?.State) return
+        const toTitle = t => t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+        setForm(f => f.pincode !== form.pincode ? f : {
+          ...f,
+          state: toTitle(office.State),
+          city: f.city.trim() ? f.city : (office.District || ''),
+        })
+        setErrors(e => ({ ...e, state: undefined, city: undefined }))
+      })
+      .catch(() => {})
+    return () => ctrl.abort()
+  }, [form.pincode])
 
   // ── Lead capture ──────────────────────────────────────────────────────────
   // Saved at every step so a shopper who leaves still leaves us a way to reach
@@ -220,7 +243,7 @@ export default function Checkout() {
       name: form.name.trim(),
       phone: hasPhone ? phone : '',
       email: hasEmail ? form.email.trim() : '',
-      address: form.address.trim(),
+      address: fullAddress,
       city: form.city.trim(),
       state: form.state.trim(),
       pincode: form.pincode.trim(),
@@ -244,6 +267,7 @@ export default function Checkout() {
       name: addr.name || f.name,
       phone: addr.phone || f.phone,
       address: addr.address || '',
+      address2: addr.address2 || '',
       city: addr.city || '',
       state: addr.state || '',
       pincode: addr.pincode || '',
@@ -271,7 +295,7 @@ export default function Checkout() {
     setSelectedAddressId(id)
     setAddressSaveError('')
     if (id === 'new') {
-      setForm(f => ({ ...f, address: '', city: '', state: '', pincode: '' }))
+      setForm(f => ({ ...f, address: '', address2: '', city: '', state: '', pincode: '' }))
       return
     }
     const addr = savedAddresses.find(a => a.id === id)
@@ -288,7 +312,7 @@ export default function Checkout() {
       const id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`)
       const next = [...savedAddresses, {
         id, label: 'Home', name: form.name, phone: form.phone,
-        address: form.address, city: form.city, state: form.state, pincode: form.pincode,
+        address: form.address, address2: form.address2, city: form.city, state: form.state, pincode: form.pincode,
         isDefault: savedAddresses.length === 0,
       }]
       await updateProfile({ addresses: next })
@@ -342,7 +366,7 @@ export default function Checkout() {
         customer_name: form.name,
         customer_email: form.email || 'Not provided',
         customer_phone: form.phone,
-        shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+        shipping_address: `${fullAddress}, ${form.city}, ${form.state} - ${form.pincode}`,
         items: buildItemsText(),
         total: `₹${grandTotal.toLocaleString('en-IN')} (incl. ₹${deliveryFee} delivery${couponNote})`,
         sellers: buildSellersText(),
@@ -363,7 +387,7 @@ export default function Checkout() {
           customer_name: form.name,
           customer_email: form.email,
           customer_phone: form.phone,
-          shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+          shipping_address: `${fullAddress}, ${form.city}, ${form.state} - ${form.pincode}`,
           items_list: buildItemsText(),
           subtotal: `₹${total.toLocaleString('en-IN')}`,
           delivery_fee: deliveryFee ? `₹${deliveryFee}` : 'FREE',
@@ -438,7 +462,7 @@ export default function Checkout() {
               items_total: `₹${sellerTotal.toLocaleString('en-IN')}`,
               customer_name: form.name,
               customer_phone: form.phone,
-              shipping_address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+              shipping_address: `${fullAddress}, ${form.city}, ${form.state} - ${form.pincode}`,
             },
             EMAILJS_PUBLIC_KEY
           )
@@ -681,7 +705,7 @@ export default function Checkout() {
                       <div>
                         <span className="checkout-address-option-label">{addr.label || 'Address'}{addr.isDefault ? ' (Default)' : ''}</span>
                         <p className="checkout-address-option-text">
-                          {addr.address}, {addr.city}, {addr.state} - {addr.pincode}
+                          {[addr.address, addr.address2].filter(Boolean).join(', ')}, {addr.city}, {addr.state} - {addr.pincode}
                         </p>
                       </div>
                     </label>
@@ -699,9 +723,13 @@ export default function Checkout() {
               )}
 
               <div className="checkout-field">
-                <label>STREET ADDRESS *</label>
+                <label>ADDRESS LINE 1 *</label>
                 <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="House no, Street, Area" />
                 {errors.address && <span className="checkout-error">{errors.address}</span>}
+              </div>
+              <div className="checkout-field">
+                <label>ADDRESS LINE 2</label>
+                <input value={form.address2} onChange={e => set('address2', e.target.value)} placeholder="Apartment, landmark (optional)" />
               </div>
               <div className="checkout-field">
                 <label>CITY *</label>

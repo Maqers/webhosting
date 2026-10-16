@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import SeoHead from '../components/SeoHead'
 import './Profile.css'
 
-const emptyAddress = { label: '', name: '', phone: '', address: '', city: '', state: '', pincode: '' }
+const emptyAddress = { label: '', name: '', phone: '', address: '', address2: '', city: '', state: '', pincode: '' }
 
 function newId() {
   return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`)
@@ -56,8 +56,28 @@ export default function Profile() {
   }
 
   const startAdd = () => { setForm(emptyAddress); setEditingId('new') }
-  const startEdit = (addr) => { setForm(addr); setEditingId(addr.id) }
+  const startEdit = (addr) => { setForm({ ...emptyAddress, ...addr }); setEditingId(addr.id) }
   const cancelEdit = () => { setEditingId(null); setForm(emptyAddress) }
+
+  // Fill state (and city, if empty) from a 6-digit pincode; on failure the shopper types it.
+  useEffect(() => {
+    if (editingId === null || !/^\d{6}$/.test(form.pincode)) return
+    const ctrl = new AbortController()
+    fetch(`https://api.postalpincode.in/pincode/${form.pincode}`, { signal: ctrl.signal })
+      .then(r => r.json())
+      .then(data => {
+        const office = data?.[0]?.Status === 'Success' ? data[0].PostOffice?.[0] : null
+        if (!office?.State) return
+        const toTitle = t => t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+        setForm(f => f.pincode !== form.pincode ? f : {
+          ...f,
+          state: toTitle(office.State),
+          city: f.city.trim() ? f.city : (office.District || ''),
+        })
+      })
+      .catch(() => {})
+    return () => ctrl.abort()
+  }, [form.pincode, editingId])
 
   const handleSaveAddress = (e) => {
     e.preventDefault()
@@ -149,7 +169,7 @@ export default function Profile() {
                     </div>
                     <p className="profile-address-text">
                       {addr.name && <strong>{addr.name}</strong>}{addr.name && <br />}
-                      {addr.address}, {addr.city}, {addr.state} - {addr.pincode}
+                      {[addr.address, addr.address2].filter(Boolean).join(', ')}, {addr.city}, {addr.state} - {addr.pincode}
                       {addr.phone && <><br />{addr.phone}</>}
                     </p>
                     <div className="profile-address-actions">
@@ -178,8 +198,11 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  <label className="profile-label">Address</label>
+                  <label className="profile-label">Address Line 1</label>
                   <input className="profile-input" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} placeholder="House no., street, area" />
+
+                  <label className="profile-label">Address Line 2 <span className="profile-label-hint">(optional)</span></label>
+                  <input className="profile-input" value={form.address2} onChange={e => setForm(f => ({ ...f, address2: e.target.value }))} placeholder="Apartment, landmark" />
 
                   <div className="profile-row">
                     <div>
