@@ -44,6 +44,7 @@ const staticPages = [
   { url: '/faqs',        priority: '0.5', changefreq: 'monthly' },
   { url: '/shipping', priority: '0.4', changefreq: 'monthly' },
   { url: '/policies', priority: '0.4', changefreq: 'monthly' },
+  { url: '/privacy-policy', priority: '0.4', changefreq: 'monthly' },
 ]
 
 // Category and occasion pages, by the slug the site actually links to

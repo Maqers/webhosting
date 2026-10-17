@@ -27,6 +27,7 @@ const AboutUs = lazy(() => import('./pages/AboutUs'))
 const FAQs = lazy(() => import('./pages/FAQs'))
 const Shipping = lazy(() => import('./pages/Shipping'))
 const Policies = lazy(() => import('./pages/Policies'))
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 const SellerStorefront = lazy(() => import('./pages/SellerStorefront'))
@@ -124,6 +125,7 @@ function AppContent() {
             <Route path="/faqs" element={<FAQs />} />
             <Route path="/shipping" element={<Shipping />} />
             <Route path="/policies" element={<Policies />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/admin" element={<AdminPortal />} />
