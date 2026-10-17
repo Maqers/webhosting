@@ -58,7 +58,7 @@ export default function AdminLeads({ creds, ts, showToast }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [view, setView] = useState("open"); // open | active | all | ordered
+  const [view, setView] = useState("all"); // all | open | active | ordered
   const [saving, setSaving] = useState({});
 
   const call = useCallback(async body => {
@@ -72,14 +72,24 @@ export default function AdminLeads({ creds, ts, showToast }) {
     return data;
   }, [creds.token]);
 
-  const load = useCallback(async () => {
-    setLoading(true); setError("");
+  // silent = background refresh: no "Loading..." flash and no error banner if a
+  // poll fails, so the list just keeps its last good data.
+  const load = useCallback(async (silent = false) => {
+    if (!silent) { setLoading(true); setError(""); }
     try { setLeads((await call({ action: "list" })).leads || []); }
-    catch (e) { setError(e.message); }
-    setLoading(false);
+    catch (e) { if (!silent) setError(e.message); }
+    if (!silent) setLoading(false);
   }, [call]);
 
   useEffect(() => { load(); }, [load]);
+
+  // New carts show up on their own: refresh every 30s while this tab is open.
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") load(true);
+    }, 30000);
+    return () => clearInterval(id);
+  }, [load]);
 
   async function update(lead, patch) {
     setSaving(s => ({ ...s, [lead.lead_id]: true }));
@@ -116,14 +126,14 @@ export default function AdminLeads({ creds, ts, showToast }) {
         <div>
           <h1 style={ts.pageTitle}>Leads</h1>
           <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-            {openCount} to follow up · quiet for a while without ordering (cart 24h, checkout 2h, payment screen 30m). Internal only.
+            {openCount} to follow up · every cart appears here as soon as something is added (updates every 30s). "To follow up" is for people quiet without ordering (cart 24h, checkout 2h, payment screen 30m). Internal only.
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {[["open", "To follow up"], ["active", "Still active"], ["all", "Everyone"], ["ordered", "Ordered"]].map(([k, label]) => (
+          {[["all", "Everyone"], ["open", "To follow up"], ["active", "Still active"], ["ordered", "Ordered"]].map(([k, label]) => (
             <button key={k} style={view === k ? ts.primaryBtn : ts.ghostBtn} onClick={() => setView(k)}>{label}</button>
           ))}
-          <button style={ts.ghostBtn} onClick={load} disabled={loading}>{loading ? "Loading..." : "↺ Refresh"}</button>
+          <button style={ts.ghostBtn} onClick={() => load()} disabled={loading}>{loading ? "Loading..." : "↺ Refresh"}</button>
         </div>
       </div>
 
