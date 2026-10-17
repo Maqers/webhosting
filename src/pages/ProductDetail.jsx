@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getProductById, getProductBySlug, getCategoryByIdOrSlug, getAllProducts } from '../data/catalog'
 import { getWhatsAppNumber } from '../data/contactInfo'
-import { useCart } from '../context/CartContext'
+import { useCart, qtyLimitFor } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import ImageWithFallback from '../components/ImageWithFallback'
@@ -827,7 +827,7 @@ const ProductDetail = () => {
                     <div className="pdp-qty" role="group" aria-label="Quantity">
                       <button type="button" onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Decrease quantity">&minus;</button>
                       <span aria-live="polite">{qty}</span>
-                      <button type="button" onClick={() => setQty(q => Math.min(99, q + 1))} aria-label="Increase quantity">+</button>
+                      <button type="button" onClick={() => setQty(q => Math.min(qtyLimitFor(product), q + 1))} disabled={qty >= qtyLimitFor(product)} aria-label="Increase quantity">+</button>
                     </div>
                     <button type="button" className="pdp-mobile-add" onClick={handleAddToCart}>Add To Cart</button>
                   </div>
@@ -848,7 +848,7 @@ const ProductDetail = () => {
                 <div className="pdp-qty pdp-qty--compact" role="group" aria-label="Quantity">
                   <button type="button" onClick={() => setQty(q => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="Decrease quantity">&minus;</button>
                   <span aria-live="polite">{qty}</span>
-                  <button type="button" onClick={() => setQty(q => Math.min(99, q + 1))} aria-label="Increase quantity">+</button>
+                  <button type="button" onClick={() => setQty(q => Math.min(qtyLimitFor(product), q + 1))} disabled={qty >= qtyLimitFor(product)} aria-label="Increase quantity">+</button>
                 </div>
                 <button type="button" className="pdp-mobile-add" onClick={handleAddToCart}>Add To Cart</button>
                 <button type="button" className="pdp-mobile-buynow" onClick={handleBuyNow}>Buy It Now</button>

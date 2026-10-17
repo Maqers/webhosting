@@ -5,6 +5,12 @@ import { saveLeadSoon, summariseCart } from '../utils/leads'
 
 const CartContext = createContext(null)
 
+// Most of one product a shopper can add (all its colours and sizes together).
+// Hampers are made to order, so they have no limit.
+export const MAX_QTY_PER_PRODUCT = 10
+export const qtyLimitFor = (product) =>
+  product?.categoryId === 'Customised-Hampers' ? Infinity : MAX_QTY_PER_PRODUCT
+
 function mergeCarts(local, remote) {
   const byKey = new Map(remote.map(i => [i.key, i]))
   local.forEach(i => byKey.set(i.key, i)) // local wins on conflict, freshest device
@@ -43,9 +49,13 @@ export function CartProvider({ children }) {
       const personalisationKey = selectedPersonalisation.slice().sort().join('|')
       const key = `${product.id}-${selectedColor}-${selectedSize}-${personalisationKey}`
       const existing = prev.find(i => i.key === key)
+      const inOtherVariants = prev.reduce((sum, i) => sum + (i.id === product.id && i.key !== key ? i.qty : 0), 0)
+      const room = qtyLimitFor(product) - inOtherVariants
       if (existing) {
-        return prev.map(i => i.key === key ? { ...i, qty: i.qty + quantity } : i)
+        return prev.map(i => i.key === key ? { ...i, qty: Math.min(i.qty + quantity, room) } : i)
       }
+      quantity = Math.min(quantity, room)
+      if (quantity < 1) return prev
       // Compute extra price from selected personalisation options
       const prices = product.meta?.personalisation_prices || []
       const opts = product.meta?.personalisation_options || []
@@ -93,7 +103,13 @@ export function CartProvider({ children }) {
 
   const updateQty = useCallback((key, qty) => {
     if (qty < 1) return
-    setItems(prev => prev.map(i => i.key === key ? { ...i, qty } : i))
+    setItems(prev => {
+      const line = prev.find(i => i.key === key)
+      if (!line) return prev
+      const inOtherVariants = prev.reduce((sum, i) => sum + (i.id === line.id && i.key !== key ? i.qty : 0), 0)
+      const room = qtyLimitFor(line) - inOtherVariants
+      return prev.map(i => i.key === key ? { ...i, qty: Math.min(qty, room) } : i)
+    })
   }, [])
 
   const clearCart = useCallback(() => setItems([]), [])

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useCart, qtyLimitFor } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import { getProductById } from '../data/catalog'
@@ -131,7 +131,11 @@ export default function CartDrawer() {
                           aria-label={item.qty <= 1 ? `Remove ${item.title}` : 'Decrease quantity'}
                         >−</button>
                         <span>{item.qty}</span>
-                        <button onClick={() => updateQty(item.key, item.qty + 1)}>+</button>
+                        <button
+                          onClick={() => updateQty(item.key, item.qty + 1)}
+                          disabled={items.reduce((s, i) => s + (i.id === item.id ? i.qty : 0), 0) >= qtyLimitFor(item)}
+                          aria-label="Increase quantity"
+                        >+</button>
                       </div>
                       <button className="cart-remove" onClick={() => setConfirmKey(item.key)} aria-label="Remove item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
