@@ -228,9 +228,19 @@ export default function Checkout() {
 
   useEffect(() => {
     if (items.length === 0) return
-    saveLead({ stage: 'checkout_started', ...leadCart() })
+    // A logged-in shopper is identified from the first save, not once the form
+    // has been prefilled. Blank fields never wipe anything already captured.
+    const meta = user?.user_metadata || {}
+    saveLead({
+      stage: 'checkout_started',
+      name: (meta.full_name || meta.name || '').trim(),
+      email: user?.email || '',
+      phone: user?.phone ? user.phone.replace(/^\+91/, '') : '',
+      ...leadCart(),
+    })
+    // Re-runs when the login finishes loading; the stage only moves forward.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [user?.id])
 
   useEffect(() => {
     if (items.length === 0) return
